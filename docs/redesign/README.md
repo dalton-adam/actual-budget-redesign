@@ -5,9 +5,10 @@
 1. [Approved staged plan](plan.md).
 2. [Stage 0 findings and code map](stage-0.md).
 3. [Behavior inventory](behavior-inventory.md).
-4. [Implementation backlog](backlog.md).
-5. [Verification record](baseline/README.md).
-6. Root `AGENTS.md`, `CODE_REVIEW_GUIDELINES.md`, and `.github/agents/pr-and-commit-rules.md`.
+4. [Design decisions](design-decisions.md): the record implementation tasks follow.
+5. [Implementation backlog](backlog.md).
+6. [Verification record](baseline/README.md).
+7. Root `AGENTS.md`, `CODE_REVIEW_GUIDELINES.md`, and `.github/agents/pr-and-commit-rules.md`.
 
 ## Development setup
 

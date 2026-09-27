@@ -1,6 +1,6 @@
 # Actual Budget UI overhaul — staged implementation plan
 
-Status: approved implementation plan. Stage 0 complete; next is Stage 1 (prototype).
+Status: approved implementation plan. Stage 0 and Stage 1 (DESIGN-01–03) complete; next is Stage 2. Design choices are recorded in [design-decisions.md](design-decisions.md), which takes precedence over §3 where they differ.
 Prepared September 27, 2026. Revised September 27, 2026 for the Copilot-inspired visual direction (see §1.1).
 
 ## 1. The outcome we are aiming for
@@ -34,6 +34,10 @@ This is a substantial front-end redesign. It is not a rewrite of Actual Budget. 
 | Category icons  | **Automatic colors, no emoji.** Each category gets a stable accent chosen from its ID; its tile shows the category's first letter. Nothing new is stored. A user-chosen icon or emoji is a possible later project because it needs stored data (see §2).                          |
 | Themes          | All three built-in themes, **light, dark, and midnight**, are fully designed and first-class. Custom themes must still load and stay readable, but they may not style every new surface.                                                                                          |
 | Layout          | **Layout A** (one continuous envelope table) with the **summary cards** header (September 27, 2026 review). Layout B and Concept C's trend header are dropped for the Budget page; C's month-trend chart may return as a Reports widget.                                          |
+| Density         | **44px category rows** with a compact summary strip once the table scrolls (DESIGN-02 walkthrough).                                                                                                                                                                               |
+| Months shown    | **One month at a time.** The multi-month budget view and its months-shown control are removed; the stored `maxMonths` preference is left untouched. This supersedes the multi-month items in §3 and §6.                                                                           |
+| Accounts        | A **collapsible accounts pane** on the left of every page (device-local open state), plus the Accounts menu in the top bar.                                                                                                                                                       |
+| Progress bar    | A negative Available with no spending this month shows an **empty** bar; the negative pill carries the warning. See design-decisions §7.1.                                                                                                                                        |
 | Details panel   | Budget page only, **open by default**, with its open/closed state remembered per device (front-end browser storage; no new stored or synced preference). Not shown on account registers, Reports, Schedules, or settings pages; see [accounts-review](accounts-review/README.md). |
 | Font            | Keep Actual's bundled **Inter**. The mockups use the Mac system font, but Inter works on every platform and its figures already line up. Tune weights and tracking to get close to Copilot's look.                                                                                |
 | Charts          | Allowed where they explain the budget (category pace, month spending trend), built only from data the app already exposes. See §3 "Charts".                                                                                                                                       |
