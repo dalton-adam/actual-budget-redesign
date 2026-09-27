@@ -313,6 +313,27 @@ UI-01 must check each accent's tile letter contrast against its tint in all
 three themes and report any pair below 3:1 (the letter is decorative, but
 should stay legible).
 
+### As implemented (UI-01, September 27, 2026)
+
+- **Renamed:** `cardBorder` and `cardShadow` already existed (the purple
+  `Card` border and a shadow color used by `mobileAccountShadow`), so the new
+  hairline and elevation roles are `cardHairline` and `cardElevation`. The
+  existing roles are unchanged.
+- **Fallback wiring (owner-approved):** fallback expressions live in
+  `packages/component-library/src/themes/fallback.css`.
+  `CustomThemeStyle` (`packages/desktop-client/src/style/theme.tsx`) inserts
+  that file before each custom theme's CSS, inside the same
+  `prefers-color-scheme` block in auto mode. Custom-theme roles still win. It
+  is not added for a CSS override on its own, so built-in themes with an
+  override keep their tuned values. Theme parsing and validation are
+  unchanged. `popoverShadow` falls back to `0 8px 24px rgba(0, 0, 0, 0.3)`.
+- **Tile letter contrast** (letter on its tint over `cardBackground`):
+  dark 4.81–8.26 and midnight 5.34–8.34, all at least 3:1. Light: 1 3.79,
+  **2 2.24**, **3 2.77**, 4 3.17, 5 3.78, 6 3.04, 7 3.16, 8 4.69, **9 2.71**,
+  10 3.82. Accents 2 (emerald), 3 (amber) and 9 (lime) are below 3:1
+  in light. **Owner accepted them as they are (September 27, 2026):** the
+  letter is decorative, since the category name appears alongside it.
+
 ## 9. Wording (TERM-01)
 
 Visible text only; no identifier, binding, preference or API renames.

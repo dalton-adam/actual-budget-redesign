@@ -1,0 +1,71 @@
+/*
+ * Fallbacks for the redesign roles (docs/redesign/design-decisions.md §8),
+ * applied only while a custom theme is active. Each role is derived from
+ * existing roles so new surfaces follow the custom palette. Category accents
+ * and tile opacity are not listed, so they keep the base theme's values.
+ * A custom theme that defines any of these roles still wins.
+ */
+:root {
+  --color-pageGlow: none;
+  --color-pageTextFaint: color-mix(
+    in srgb,
+    var(--color-pageTextSubdued) 70%,
+    var(--color-pageBackground)
+  );
+  --color-cardHairline: var(--color-tableBorder);
+  --color-cardElevation: none;
+  --color-cardInset: color-mix(in srgb, var(--color-pageText) 6%, transparent);
+  --color-controlBackground: var(--color-cardBackground);
+  --color-navTrack: var(--color-cardBackground);
+  --color-navActive: color-mix(in srgb, var(--color-pageText) 12%, transparent);
+  --color-navActiveShadow: none;
+  --color-selectionBackground: color-mix(
+    in srgb,
+    var(--color-buttonPrimaryBackground) 16%,
+    transparent
+  );
+  --color-selectionBorder: var(--color-buttonPrimaryBackground);
+  --color-tableRowHover: color-mix(
+    in srgb,
+    var(--color-pageText) 4%,
+    transparent
+  );
+  --color-groupRowBackground: color-mix(
+    in srgb,
+    var(--color-pageText) 3%,
+    transparent
+  );
+  --color-progressTrack: color-mix(
+    in srgb,
+    var(--color-pageText) 10%,
+    transparent
+  );
+  --color-pillPositiveBackground: color-mix(
+    in srgb,
+    var(--color-numberPositive) 18%,
+    transparent
+  );
+  --color-pillPositiveText: var(--color-numberPositive);
+  --color-pillNeutralBackground: color-mix(
+    in srgb,
+    var(--color-pageText) 8%,
+    transparent
+  );
+  --color-pillNeutralText: var(--color-pageTextSubdued);
+  --color-pillNegativeBackground: color-mix(
+    in srgb,
+    var(--color-numberNegative) 18%,
+    transparent
+  );
+  --color-pillNegativeText: var(--color-numberNegative);
+  --color-pillWarningBackground: color-mix(
+    in srgb,
+    var(--color-templateNumberUnderFunded) 18%,
+    transparent
+  );
+  --color-pillWarningText: var(--color-templateNumberUnderFunded);
+  --color-heroGlow: transparent;
+  --color-heroGlowNegative: transparent;
+  --color-popoverShadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --color-scrim: rgba(0, 0, 0, 0.5);
+}

@@ -20,14 +20,20 @@ It does not replace the design specification or authorize a new design direction
   [design-decisions.md](design-decisions.md). Implementation tasks are released
   in dependency order; items marked "Shown" in its §11 are confirmed with the
   owner before the task that needs them starts.
-- UI-01: in review on branch `redesign/ui-01-theme-roles` (status recorded
-  there).
-- UI-03: **in review September 27, 2026**, branch
-  `redesign/ui-03-presentation-helpers`, based on `redesign/main` (it does not
-  depend on UI-01). New files only:
-  `C/budget/categoryPresentation.ts` and `C/budget/categoryPresentation.test.ts`
-  — accent index (§7.3), progress bar (§7.1), pace chart data and summary
-  (§7.2, the "Shown" default in §11 item 2, with the owner's past-month summary change) and summary stacked bar (§7.4).
+- UI-01: **done September 27, 2026**, merged into `redesign/main` with owner
+  approval. Scope grew, with owner approval, to cover the fallback layer:
+  `L/themes/fallback.css`, the component-library `package.json` export, and
+  `packages/desktop-client/src/style/theme.tsx` plus an adjacent test. Results
+  and the accepted light-theme contrast shortfalls are in design-decisions §8 "As
+  implemented". Checks: typecheck pass; theme-related UNIT 256/256; E2E(settings)
+  2/2; VISUAL in light, dark, midnight and a custom theme at 1440×900 and
+  1000×700. Rebased onto `redesign/main` after the prototype lint fixes and
+  UI-03; typecheck, lint and theme UNIT rerun after the rebase.
+- UI-03: **done September 27, 2026**, merged into `redesign/main`. New files
+  only: `C/budget/categoryPresentation.ts` and
+  `C/budget/categoryPresentation.test.ts` — accent index (§7.3), progress bar
+  (§7.1), pace chart data and summary (§7.2, the "Shown" default in §11 item 2,
+  with the owner's past-month summary change) and summary stacked bar (§7.4).
   Helpers take amounts and transactions the app already provides and return
   numbers and summary kinds; wording, formatting and theme roles are left to
   the components that use them. Nothing calls them yet. Checks: typecheck

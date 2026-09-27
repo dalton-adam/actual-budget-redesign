@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import darkThemeCss from '@actual-app/components/themes/dark.css?inline';
+import fallbackThemeCss from '@actual-app/components/themes/fallback.css?inline';
 import lightThemeCss from '@actual-app/components/themes/light.css?inline';
 import midnightThemeCss from '@actual-app/components/themes/midnight.css?inline';
 import paletteCss from '@actual-app/components/themes/palette.css?inline';
@@ -179,6 +180,9 @@ export function ThemeStyle() {
  *
  * When `theme === 'auto'`, separate custom themes can be set for light and dark modes,
  * injected via @media (prefers-color-scheme) rules. Otherwise, a single custom theme applies.
+ *
+ * Each custom theme is preceded by the fallback layer, which derives the redesign roles
+ * from existing roles. A CSS override on its own does not add the fallback layer.
  */
 export function CustomThemeStyle() {
   useMigrateLegacyOverride();
@@ -209,20 +213,23 @@ export function CustomThemeStyle() {
         'Invalid custom light theme CSS',
       );
       if (lightCss) {
-        baseCss += `@media (prefers-color-scheme: light) { ${lightCss} }\n`;
+        baseCss += `@media (prefers-color-scheme: light) { ${fallbackThemeCss}\n${lightCss} }\n`;
       }
       const darkCss = safeValidate(
         parseInstalledTheme(installedCustomDarkThemeJson)?.cssContent,
         'Invalid custom dark theme CSS',
       );
       if (darkCss) {
-        baseCss += `@media (prefers-color-scheme: dark) { ${darkCss} }\n`;
+        baseCss += `@media (prefers-color-scheme: dark) { ${fallbackThemeCss}\n${darkCss} }\n`;
       }
     } else {
-      baseCss = safeValidate(
+      const css = safeValidate(
         parseInstalledTheme(installedCustomLightThemeJson)?.cssContent,
         'Invalid custom theme CSS',
       );
+      if (css) {
+        baseCss = `${fallbackThemeCss}\n${css}`;
+      }
     }
 
     const overrideLayer = safeValidate(

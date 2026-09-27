@@ -253,4 +253,50 @@
   --color-chartQual7: var(--palette-chartQual7);
   --color-chartQual8: var(--palette-chartQual8);
   --color-chartQual9: var(--palette-chartQual9);
+
+  /* Redesign roles (docs/redesign/design-decisions.md §8). Custom themes get
+     derived values from fallback.css instead. */
+  --color-pageGlow: radial-gradient(
+    1100px 460px at 12% -12%,
+    rgba(135, 25, 224, 0.2),
+    transparent 60%
+  );
+  --color-pageTextFaint: #766e8a;
+  --color-cardHairline: rgba(200, 170, 255, 0.08);
+  --color-cardElevation:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 18px 36px rgba(0, 0, 0, 0.4);
+  --color-cardInset: rgba(200, 170, 255, 0.05);
+  --color-controlBackground: #15111f;
+  --color-navTrack: #13101d;
+  --color-navActive: rgba(163, 104, 252, 0.2);
+  --color-navActiveShadow: none;
+  --color-selectionBackground: rgba(163, 104, 252, 0.13);
+  --color-selectionBorder: #a368fc;
+  --color-tableRowHover: rgba(200, 170, 255, 0.03);
+  --color-groupRowBackground: rgba(200, 170, 255, 0.03);
+  --color-progressTrack: rgba(200, 170, 255, 0.09);
+  --color-pillPositiveBackground: rgba(74, 222, 128, 0.13);
+  --color-pillPositiveText: #4ade80;
+  --color-pillNeutralBackground: rgba(200, 170, 255, 0.07);
+  --color-pillNeutralText: #a59cba;
+  --color-pillNegativeBackground: rgba(248, 113, 113, 0.15);
+  --color-pillNegativeText: #f87171;
+  --color-pillWarningBackground: rgba(251, 191, 36, 0.14);
+  --color-pillWarningText: #fbbf24;
+  --color-heroGlow: rgba(74, 222, 128, 0.18);
+  --color-heroGlowNegative: rgba(248, 113, 113, 0.16);
+  --color-popoverShadow:
+    0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(200, 170, 255, 0.08);
+  --color-scrim: rgba(0, 0, 0, 0.55);
+  --color-categoryAccent1: #a5b4fc;
+  --color-categoryAccent2: #34d399;
+  --color-categoryAccent3: #fbbf24;
+  --color-categoryAccent4: #7dd3fc;
+  --color-categoryAccent5: #f472b6;
+  --color-categoryAccent6: #fb923c;
+  --color-categoryAccent7: #22d3ee;
+  --color-categoryAccent8: #c4b5fd;
+  --color-categoryAccent9: #a3e635;
+  --color-categoryAccent10: #fb7185;
+  --color-tileAlpha: 0.18;
 }
