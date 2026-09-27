@@ -200,4 +200,7 @@ const design02 = [
     await p.close();
   }
   await b.close();
-})();
+})().catch(err => {
+  console.error(err);
+  process.exitCode = 1;
+});

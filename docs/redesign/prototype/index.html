@@ -45,8 +45,8 @@
         --pageTextFaint: #8d8d99;
         --cardBackground: #ffffff; /* existing: cardBackground */
         --cardBorder: rgba(15, 15, 30, 0.07);
-        --cardShadow: 0 1px 2px rgba(15, 15, 30, 0.04),
-          0 10px 28px rgba(15, 15, 30, 0.05);
+        --cardShadow:
+          0 1px 2px rgba(15, 15, 30, 0.04), 0 10px 28px rgba(15, 15, 30, 0.05);
         --cardInset: #f6f6f9;
         --controlBackground: #ffffff;
         --navTrack: rgba(15, 15, 30, 0.05);
@@ -65,8 +65,8 @@
         --pillNegativeBackground: rgba(225, 45, 57, 0.11);
         --pillNegativeText: #c21f2c; /* numberNegative */
         --heroGlow: rgba(20, 125, 100, 0.12);
-        --popoverShadow: 0 16px 40px rgba(15, 15, 30, 0.16),
-          0 2px 6px rgba(15, 15, 30, 0.06);
+        --popoverShadow:
+          0 16px 40px rgba(15, 15, 30, 0.16), 0 2px 6px rgba(15, 15, 30, 0.06);
         --scrim: rgba(15, 15, 30, 0.28);
         --categoryAccent1: #6366f1;
         --categoryAccent2: #10b981;
@@ -82,7 +82,8 @@
       }
       [data-theme='dark'] {
         --pageBackground: #0b0b0f;
-        --pageGlow: radial-gradient(
+        --pageGlow:
+          radial-gradient(
             1100px 460px at 12% -12%,
             rgba(129, 140, 248, 0.13),
             transparent 60%
@@ -97,7 +98,8 @@
         --pageTextFaint: #74747f;
         --cardBackground: #141419;
         --cardBorder: rgba(255, 255, 255, 0.065);
-        --cardShadow: inset 0 1px 0 rgba(255, 255, 255, 0.03),
+        --cardShadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.03),
           0 18px 36px rgba(0, 0, 0, 0.32);
         --cardInset: rgba(255, 255, 255, 0.04);
         --controlBackground: #16161c;
@@ -117,8 +119,8 @@
         --pillNegativeBackground: rgba(248, 113, 113, 0.15);
         --pillNegativeText: #f87171;
         --heroGlow: rgba(74, 222, 128, 0.2);
-        --popoverShadow: 0 20px 50px rgba(0, 0, 0, 0.55),
-          0 0 0 1px rgba(255, 255, 255, 0.06);
+        --popoverShadow:
+          0 20px 50px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
         --scrim: rgba(0, 0, 0, 0.5);
         --categoryAccent1: #818cf8;
         --categoryAccent2: #34d399;
@@ -144,7 +146,8 @@
         --pageTextFaint: #766e8a;
         --cardBackground: #13101d;
         --cardBorder: rgba(200, 170, 255, 0.08);
-        --cardShadow: inset 0 1px 0 rgba(255, 255, 255, 0.03),
+        --cardShadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.03),
           0 18px 36px rgba(0, 0, 0, 0.4);
         --cardInset: rgba(200, 170, 255, 0.05);
         --controlBackground: #15111f;
@@ -164,8 +167,8 @@
         --pillNegativeBackground: rgba(248, 113, 113, 0.15);
         --pillNegativeText: #f87171;
         --heroGlow: rgba(74, 222, 128, 0.18);
-        --popoverShadow: 0 20px 50px rgba(0, 0, 0, 0.6),
-          0 0 0 1px rgba(200, 170, 255, 0.08);
+        --popoverShadow:
+          0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(200, 170, 255, 0.08);
         --scrim: rgba(0, 0, 0, 0.55);
         --categoryAccent1: #a5b4fc;
         --categoryAccent2: #34d399;
@@ -190,8 +193,13 @@
         height: 100%;
       }
       body {
-        font-family: 'Inter Variable', -apple-system, BlinkMacSystemFont,
-          'Segoe UI', Roboto, sans-serif;
+        font-family:
+          'Inter Variable',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
         font-feature-settings: 'ss01', 'ss04';
         background: var(--pageGlow), var(--pageBackground);
         background-attachment: fixed;
@@ -2169,7 +2177,9 @@
         min-width: 0;
       }
       .mcard.focus {
-        box-shadow: var(--cardShadow), inset 0 0 0 1px var(--selectionBorder);
+        box-shadow:
+          var(--cardShadow),
+          inset 0 0 0 1px var(--selectionBorder);
       }
       .mc-top {
         display: flex;
@@ -2484,7 +2494,9 @@
         color: inherit;
       }
       .acct-hero.reconciling {
-        box-shadow: var(--cardShadow), inset 0 0 0 1.5px var(--selectionBorder);
+        box-shadow:
+          var(--cardShadow),
+          inset 0 0 0 1.5px var(--selectionBorder);
       }
       .register.reconciling .clr-head {
         color: var(--accent);
@@ -2604,7 +2616,7 @@
         ov: params.get('ov') === '1',
         showHidden: params.get('hidden') !== '0',
         collapsed: new Set(
-          (params.get('collapsed') || '').split(',').filter(Boolean)
+          (params.get('collapsed') || '').split(',').filter(Boolean),
         ),
         filter: params.get('filter') || '',
         recon: params.get('recon') || '0',
@@ -2881,7 +2893,7 @@
       const firstGrapheme = s =>
         [
           ...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(
-            s
+            s,
           ),
         ][0]?.segment ?? '?';
       function progress(activity, available) {
@@ -2947,11 +2959,11 @@
 
       const tile = (c, cls = '') =>
         `<div class="tile ${cls}" style="color:${accent(
-          c.id
+          c.id,
         )}" aria-hidden="true">${firstGrapheme(c.n)}</div>`;
       const pill = n =>
         `<span class="pill ${n > 0 ? 'pos' : n < 0 ? 'neg' : 'zero'} num">${fmt(
-          n
+          n,
         )}</span>`;
 
       function topbar() {
@@ -2964,14 +2976,14 @@
             opts.menu
               ? `data-menu="${key}"`
               : key === 'budget'
-              ? 'data-set="page" data-val="budget"'
-              : ''
+                ? 'data-set="page" data-val="budget"'
+                : ''
           }
         aria-haspopup="${opts.menu ? 'menu' : 'false'}" aria-expanded="${
-            state.menu === key
-          }">${label}${
-            opts.menu ? `<span class="chev">${I.chevD}</span>` : ''
-          }</button>`;
+          state.menu === key
+        }">${label}${
+          opts.menu ? `<span class="chev">${I.chevD}</span>` : ''
+        }</button>`;
         return `
     <header class="top">
       <button class="icon-btn burger" data-menu="drawer" aria-label="Menu">${
@@ -3012,10 +3024,10 @@
             a.st === 'ok'
               ? 'var(--pillPositiveText)'
               : a.st === 'warn'
-              ? 'var(--categoryAccent3)'
-              : 'transparent'
+                ? 'var(--categoryAccent3)'
+                : 'transparent'
           }"></span>${a.n}<span class="amt num ${a.v < 0 ? 'neg' : ''}">${fmt(
-            a.v
+            a.v,
           )}</span></button>`;
         const on = sum(accounts.on, a => a.v),
           off = sum(accounts.off, a => a.v);
@@ -3027,14 +3039,14 @@
       <button class="item hl"><span class="ico">${
         I.wallet
       }</span>All accounts<span class="amt num ${
-          on + off < 0 ? 'neg' : ''
-        }">${fmt(on + off)}</span></button>
+        on + off < 0 ? 'neg' : ''
+      }">${fmt(on + off)}</span></button>
       <div class="sec"><span>On budget</span><span class="num">${fmt(
-        on
+        on,
       )}</span></div>
       ${accounts.on.map(row).join('')}
       <div class="sec"><span>Off budget</span><span class="num">${fmt(
-        off
+        off,
       )}</span></div>
       ${accounts.off.map(row).join('')}
       <hr>
@@ -3056,10 +3068,10 @@
           inDrawer ? 0 : 440
         }px">
       ${it(I.payees, 'Payees')}${it(I.rules, 'Rules')}${it(
-          I.bank,
-          'Bank Sync',
-          '<span class="amt muted">if enabled</span>'
-        )}${it(I.tag, 'Tags')}
+        I.bank,
+        'Bank Sync',
+        '<span class="amt muted">if enabled</span>',
+      )}${it(I.tag, 'Tags')}
       <hr>${it(I.gear, 'Settings')}
     </div>`;
       }
@@ -3072,9 +3084,9 @@
         }" id="pop-budget" role="menu">
       <div class="total"><div><b style="font-size:15px">My Budget</b><div class="muted">Envelope budget · Local file</div></div></div>
       <hr>${it(I.pencil, 'Rename budget')}${it(I.gear, 'Settings')}${it(
-          I.archive,
-          'Load backup…'
-        )}${it(I.file, 'Switch file')}
+        I.archive,
+        'Load backup…',
+      )}${it(I.file, 'Switch file')}
     </div>`;
       }
 
@@ -3112,8 +3124,8 @@
           c = 2 * Math.PI * r;
         return `<svg class="ring" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="${r}" fill="none" stroke="var(--progressTrack)" stroke-width="6"/>
       <circle cx="27" cy="27" r="${r}" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(
-          c * pct
-        ).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 27 27)"/></svg>`;
+        c * pct
+      ).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 27 27)"/></svg>`;
       }
 
       function trendSvg() {
@@ -3149,17 +3161,17 @@
           a
             .map(
               ([d, v], i) =>
-                `${i ? 'L' : 'M'}${x(d).toFixed(1)},${y(v).toFixed(1)}`
+                `${i ? 'L' : 'M'}${x(d).toFixed(1)},${y(v).toFixed(1)}`,
             )
             .join(' ');
         return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" style="margin-top:8px" role="img" aria-label="Spending this month is below last month's pace">
       <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--categoryAccent1)" stop-opacity=".35"/><stop offset="1" stop-color="var(--categoryAccent1)" stop-opacity="0"/></linearGradient></defs>
       <path d="${p(
-        prev
+        prev,
       )}" fill="none" stroke="var(--pageTextFaint)" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
       <path d="${p(cur)} L${x(26)},${h} L0,${h} Z" fill="url(#tg)"/>
       <path d="${p(
-        cur
+        cur,
       )}" fill="none" stroke="var(--categoryAccent1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
     </svg>`;
       }
@@ -3170,7 +3182,7 @@
         <div class="row-top"><div>
           <div class="label" style="font-size:12.5px;color:var(--pageTextSubdued);font-weight:500">Activity this month</div>
           <div class="num" style="font-size:26px;font-weight:700;letter-spacing:-.03em;margin-top:3px">${fmt(
-            -totS
+            -totS,
           )}<span class="delta">$520 less than August</span></div>
         </div></div>
         ${trendSvg()}
@@ -3178,10 +3190,10 @@
       </div>
       <div class="stack2">
         <div class="card stat hero" role="button" tabindex="0"><div><div class="label">Ready to Assign</div><div class="value num">${fmt(
-          1000
+          1000,
         )}</div></div>${ring(0.81, 'var(--pillPositiveText)')}</div>
         <div class="card stat"><div><div class="label">Assigned</div><div class="value num">${fmt(
-          totB
+          totB,
         )}</div></div>${ring(0.58, 'var(--categoryAccent1)')}</div>
       </div>
     </section>`;
@@ -3207,7 +3219,7 @@
       const esc = s =>
         String(s).replace(
           /[&<>"]/g,
-          ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch])
+          ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch],
         );
       const fmtC = n =>
         (n < 0 ? '−' : '+') +
@@ -3257,7 +3269,8 @@
             state.rta === 'pos'
               ? Math.max(
                   0,
-                  Math.ceil((next.assigned + t.over - rtaNow + 200) / 100) * 100
+                  Math.ceil((next.assigned + t.over - rtaNow + 200) / 100) *
+                    100,
                 )
               : 0;
           return {
@@ -3282,7 +3295,7 @@
             pct,
             text: `Goal ${fmt(c.goal)} · ${Math.round(pct * 100)}% saved`,
             long: `Long-term goal of ${fmt(c.goal)}. ${fmt(
-              c.goal - d.avail
+              c.goal - d.avail,
             )} to go.`,
           };
         }
@@ -3297,7 +3310,7 @@
           long:
             short > 0
               ? `Template asks for ${fmt(c.goal)} a month. Underfunded by ${fmt(
-                  short
+                  short,
                 )}.`
               : `Template asks for ${fmt(c.goal)} a month. Fully funded.`,
         };
@@ -3308,10 +3321,10 @@
         return d.avail < 0
           ? 'neg'
           : gi && gi.under
-          ? 'warn'
-          : d.avail > 0
-          ? 'pos'
-          : 'zero';
+            ? 'warn'
+            : d.avail > 0
+              ? 'pos'
+              : 'zero';
       };
 
       // Illustrative transactions, generated so that they add up to each month's activity.
@@ -3372,7 +3385,7 @@
         const upto = off === 0 ? TODAY_DAY : off < 0 ? days : 0;
         const spent = -sum(
           tx.filter(t => t.day <= upto),
-          t => t.amt
+          t => t.amt,
         );
         const expected = start > 0 ? (start * upto) / days : 0;
         return {
@@ -3414,7 +3427,7 @@
             ? `<div class="seg"><button aria-label="${mName(off)} notes">${
                 I.note
               }</button><button data-menu="month" data-for="${off}" data-anchor="month:${off}" aria-label="${mName(
-                off
+                off,
               )} budget menu" aria-haspopup="menu">${I.dots}</button></div>`
             : '';
         return `<div class="head">
@@ -3445,8 +3458,8 @@
         k === 'neg'
           ? '<span class="badge neg">Overassigned</span>'
           : k === 'zero'
-          ? '<span class="badge">All assigned</span>'
-          : '';
+            ? '<span class="badge">All assigned</span>'
+            : '';
 
       function summaryCards(off) {
         const s = summaryFor(off),
@@ -3461,12 +3474,12 @@
           k === 'pos'
             ? `${fmt(s.af)} available funds`
             : k === 'zero'
-            ? 'Every dollar has a job'
-            : 'More assigned than you have';
+              ? 'Every dollar has a job'
+              : 'More assigned than you have';
         return `<section class="summary cards" aria-label="Month summary">
       <div class="card stat hero ${k}" role="button" tabindex="0" data-menu="breakdown" data-for="${off}" data-anchor="breakdown:${off}" aria-haspopup="dialog" aria-label="Ready to Assign ${fmt(
-          s.rta
-        )}. Open breakdown and actions">
+        s.rta,
+      )}. Open breakdown and actions">
         <div class="more"><span class="txt">Breakdown</span>${I.chevD}</div>
         <div class="label">Ready to Assign ${rtaBadge(k)}</div>
         <div class="value num">${fmt(s.rta)}</div>
@@ -3482,7 +3495,7 @@
         <div class="value num">${fmt(s.activity)}</div>
         <div class="stackbar" aria-hidden="true">${top
           .map(
-            ([c, v]) => `<i style="flex:${v};background:${accent(c.id)}"></i>`
+            ([c, v]) => `<i style="flex:${v};background:${accent(c.id)}"></i>`,
           )
           .join('')}${
           other
@@ -3490,19 +3503,19 @@
             : ''
         }<i style="flex:${Math.max(
           0,
-          s.assigned + s.activity
+          s.assigned + s.activity,
         )};background:var(--progressTrack)"></i></div>
       </div>
     </section>
     <div class="card cstrip" aria-label="Month summary">
       <button class="cs-rta ${k}" data-menu="breakdown" data-for="${off}" data-anchor="breakdown:${off}"><span class="l">Ready to Assign</span><b class="num">${fmt(
-          s.rta
-        )}</b>${rtaBadge(k)}${I.chevD}</button>
+        s.rta,
+      )}</b>${rtaBadge(k)}${I.chevD}</button>
       <span class="cs-item"><span class="l">Assigned</span><b class="num">${fmt(
-        s.assigned
+        s.assigned,
       )}</b></span>
       <span class="cs-item"><span class="l">Activity</span><b class="num">${fmt(
-        s.activity
+        s.activity,
       )}</b></span>
     </div>`;
       }
@@ -3514,7 +3527,7 @@
         <button class="cname" data-open="${c.id}" data-anchor="catmenu:${
           c.id
         }" aria-label="${esc(c.n)}. Open details">${tile(
-          c
+          c,
         )}<span class="ntext"><span class="nlabel">${esc(c.n)}</span>${
           gi ? `<span class="cap">${gi.text}</span>` : ''
         }</span>${
@@ -3524,13 +3537,13 @@
         }${c.hidden ? '<span class="hid">Hidden</span>' : ''}</button>
         <span class="tools">
           <button class="tool ${c.notes ? 'on' : ''}" aria-label="${
-          c.notes ? 'Notes: ' + esc(c.notes) : 'Add notes'
-        }" title="${esc(c.notes || 'Add notes')}">${I.note}</button>
+            c.notes ? 'Notes: ' + esc(c.notes) : 'Add notes'
+          }" title="${esc(c.notes || 'Add notes')}">${I.note}</button>
           <button class="tool" data-menu="catmenu" data-for="${
             c.id
           }" aria-label="${esc(c.n)} menu" aria-haspopup="menu">${
-          I.dots
-        }</button>
+            I.dots
+          }</button>
         </span>
       </div>`;
       }
@@ -3544,36 +3557,36 @@
         const assigned =
           state.edit === key
             ? `<input class="amt-input num" data-edit="${key}" value="${d.b.toFixed(
-                2
+                2,
               )}" inputmode="decimal" aria-label="Assigned to ${esc(
-                c.n
+                c.n,
               )} in ${mLong(off)}">`
             : `<button class="assigned num ${
                 d.b === 0 ? 'z' : ''
               }" data-edit-start="${key}" aria-label="Assigned ${fmt(
-                d.b
+                d.b,
               )} in ${mName(off)}. Edit">${fmt(d.b)}</button>`;
         const act =
           d.s === 0
             ? `<span class="z">${fmt(0)}</span>`
             : d.s < 0
-            ? `+${fmt(-d.s)}`
-            : fmt(-d.s);
+              ? `+${fmt(-d.s)}`
+              : fmt(-d.s);
         const pct = p.over
           ? 'Over'
           : d.s > 0
-          ? Math.round(p.fill * 100) + '%'
-          : '';
+            ? Math.round(p.fill * 100) + '%'
+            : '';
         const arrow = c.roll
           ? `<span class="carry" title="Overspending rolls over to ${mName(
-              off + 1
+              off + 1,
             )}">${I.arrowR}</span>`
           : '';
         return `<div class="r ${first ? '' : 'mstart'}">${assigned}</div>
       <div class="act">
         <div class="t num"><button class="actlink" data-activity="${key}" aria-label="Activity ${act.replace(
           /<[^>]+>/g,
-          ''
+          '',
         )}. Show transactions">${act}</button>${
           multi ? '' : `<span class="pct">${pct}</span>`
         }</div>
@@ -3584,12 +3597,12 @@
         }"></i></div>
       </div>
       <div class="r"><button class="pill ${k} num" data-menu="balance" data-for="${key}" data-anchor="balance:${key}" aria-haspopup="menu" aria-label="Available ${fmt(
-          d.avail
-        )}${gi ? '. ' + gi.long : ''}${
-          c.roll ? '. Overspending rolls over' : ''
-        }. Open balance menu">${
-          gi ? `<span class="gi" aria-hidden="true">${I.target}</span>` : ''
-        }${fmt(d.avail)}${arrow}</button></div>`;
+        d.avail,
+      )}${gi ? '. ' + gi.long : ''}${
+        c.roll ? '. Overspending rolls over' : ''
+      }. Open balance menu">${
+        gi ? `<span class="gi" aria-hidden="true">${I.target}</span>` : ''
+      }${fmt(d.avail)}${arrow}</button></div>`;
       }
       function catRow(c, offs) {
         if (c.hidden && !state.showHidden) return '';
@@ -3603,7 +3616,7 @@
           goalInfo(c, panelOff()) ? 'has-cap' : '',
         ].join(' ');
         return `<div class="${cls}" role="row" style="${L.tpl}">${nameCell(
-          c
+          c,
         )}${offs.map((o, i) => monthCells(c, o, i === 0)).join('')}</div>`;
       }
       function groupRow(g, offs) {
@@ -3613,18 +3626,18 @@
       <div class="name" role="rowheader"><button class="caret" data-collapse="${
         g.id
       }" aria-expanded="${!collapsed}" aria-label="${
-          collapsed ? 'Expand' : 'Collapse'
-        } ${esc(g.name)}">${
-          collapsed ? I.chevR : I.chevD
-        }</button><span class="gname">${esc(g.name)}</span>
+        collapsed ? 'Expand' : 'Collapse'
+      } ${esc(g.name)}">${
+        collapsed ? I.chevR : I.chevD
+      }</button><span class="gname">${esc(g.name)}</span>
         <span class="tools"><button class="tool" aria-label="Add category to ${esc(
-          g.name
+          g.name,
         )}">${I.plus}</button><button class="tool" aria-label="Group notes">${
           I.note
         }</button><button class="tool" data-menu="groupmenu" data-for="${
           g.id
         }" data-anchor="groupmenu:${g.id}" aria-label="${esc(
-          g.name
+          g.name,
         )} menu" aria-haspopup="menu">${I.dots}</button></span></div>
       ${offs
         .map((o, i) => {
@@ -3632,11 +3645,11 @@
             s = sum(cats, c => cell(c, o).s),
             a = sum(cats, c => cell(c, o).avail);
           return `<div class="r num ${i ? 'mstart' : ''}">${fmt(
-            b
+            b,
           )}</div><div class="num gt">${fmt(
-            -s
+            -s,
           )}</div><div class="r"><span class="pill ${rtaKind(a)} num">${fmt(
-            a
+            a,
           )}</span></div>`;
         })
         .join('')}
@@ -3646,18 +3659,18 @@
         const collapsed = state.collapsed.has('inc');
         const head = `<div class="cols grow inc" role="row" style="${L.tpl}">
       <div class="name" role="rowheader"><button class="caret" data-collapse="inc" aria-expanded="${!collapsed}" aria-label="${
-          collapsed ? 'Expand' : 'Collapse'
-        } Income">${
-          collapsed ? I.chevR : I.chevD
-        }</button><span class="gname">Income</span><span class="rl" style="margin-left:auto">Received</span></div>
+        collapsed ? 'Expand' : 'Collapse'
+      } Income">${
+        collapsed ? I.chevR : I.chevD
+      }</button><span class="gname">Income</span><span class="rl" style="margin-left:auto">Received</span></div>
       ${offs
         .map(
           (o, i) =>
             `<div class="${
               i ? 'mstart' : ''
             }"></div><div></div><div class="r num">${fmt(
-              sum(income, x => x.r[o] || 0)
-            )}</div>`
+              sum(income, x => x.r[o] || 0),
+            )}</div>`,
         )
         .join('')}
     </div>`;
@@ -3670,21 +3683,21 @@
       <div class="name" role="rowheader"><span class="drag" aria-hidden="true">${
         I.grip
       }</span><span class="cname static">${tile(
-                x
-              )}<span class="ntext"><span class="nlabel">${esc(
-                x.n
-              )}</span></span></span></div>
+        x,
+      )}<span class="ntext"><span class="nlabel">${esc(
+        x.n,
+      )}</span></span></span></div>
       ${offs
         .map(
           (o, i) =>
             `<div class="${
               i ? 'mstart' : ''
             }"></div><div></div><div class="r num ${x.r[o] ? '' : 'z'}">${fmt(
-              x.r[o] || 0
-            )}</div>`
+              x.r[o] || 0,
+            )}</div>`,
         )
         .join('')}
-    </div>`
+    </div>`,
             )
             .join('')
         );
@@ -3702,7 +3715,7 @@
                     i ? 'mstart' : ''
                   }" style="grid-column:span 3">${mLong(o)}${
                     o === 0 ? '<span class="today">Today</span>' : ''
-                  }</div>`
+                  }</div>`,
               )
               .join('')}</div>`
           : '';
@@ -3715,7 +3728,7 @@
             (o, i) =>
               `<div class="r ${
                 i ? 'mstart' : ''
-              }">Assigned</div><div>Activity</div><div class="r">Available</div>`
+              }">Assigned</div><div>Activity</div><div class="r">Available</div>`,
           )
           .join('')}</div>`;
         const body = g =>
@@ -3726,10 +3739,10 @@
         if (state.layout === 'b' && !multi) {
           return `<div class="ledger-wrap" role="table" aria-label="Envelope budget">${ch}${groups
             .map(
-              g => `<div class="card ledger" role="rowgroup">${body(g)}</div>`
+              g => `<div class="card ledger" role="rowgroup">${body(g)}</div>`,
             )
             .join('')}<div class="card ledger" role="rowgroup">${incomeRows(
-            offs
+            offs,
           )}</div></div>`;
         }
         return `<div class="ledger-wrap card ${
@@ -3759,7 +3772,7 @@
         const line = steps
           .map(
             ([d, v], i) =>
-              `${i ? 'L' : 'M'}${x(d).toFixed(1)},${y(v).toFixed(1)}`
+              `${i ? 'L' : 'M'}${x(d).toFixed(1)},${y(v).toFixed(1)}`,
           )
           .join(' ');
         const col = pi.d.avail < 0 ? 'var(--pillNegativeText)' : accent(c.id);
@@ -3771,16 +3784,16 @@
         const even =
           pi.start > 0
             ? `<line x1="0" y1="${y(0)}" x2="${w}" y2="${y(
-                pi.start
+                pi.start,
               )}" stroke="var(--pageTextFaint)" stroke-width="1.5" stroke-dasharray="4 5" vector-effect="non-scaling-stroke"/>
           <line x1="0" y1="${y(pi.start)}" x2="${w}" y2="${y(
-                pi.start
-              )}" stroke="var(--progressTrack)" stroke-width="1" vector-effect="non-scaling-stroke"/>`
+            pi.start,
+          )}" stroke="var(--progressTrack)" stroke-width="1" vector-effect="non-scaling-stroke"/>`
             : '';
         const today =
           off === 0
             ? `<line x1="${x(pi.upto)}" y1="4" x2="${x(
-                pi.upto
+                pi.upto,
               )}" y2="${h}" stroke="var(--pageTextFaint)" stroke-width="1" stroke-dasharray="2 3" vector-effect="non-scaling-stroke"/>`
             : '';
         return `<div class="chart"><svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" aria-hidden="true">
@@ -3797,7 +3810,7 @@
         let summary;
         if (off > 0) {
           summary = `${fmt(Math.max(0, pi.start))} to spend from ${mAbbr(
-            off
+            off,
           )} 1`;
         } else if (pi.start <= 0) {
           summary = 'Nothing assigned, so no pace line';
@@ -3818,7 +3831,7 @@
           off > 0
             ? `${mName(off)} has not started. ${summary}.`
             : `Spent ${fmt(pi.spent)} of ${fmt(
-                Math.max(0, pi.start)
+                Math.max(0, pi.start),
               )} by ${mAbbr(off)} ${pi.upto}. ${summary}.`;
         return `<div>
         <div class="sec-title">Pace <span>${mAbbr(off)} 1 – ${
@@ -3843,10 +3856,10 @@
         if (L.mode === 'rail') {
           return `<aside class="card rail" aria-label="Category details, collapsed">
         <button class="icon-btn" data-set="ov" data-val="true" aria-label="Show details for ${esc(
-          c.n
+          c.n,
         )}">${I.panel}</button>
         <button class="rail-tile" data-set="ov" data-val="true" aria-label="Show details for ${esc(
-          c.n
+          c.n,
         )}">${tile(c)}</button>
         <span class="rail-label">Details</span>
         <button class="icon-btn" data-toggle="panel" aria-label="Turn off the details panel">${
@@ -3865,14 +3878,14 @@
           L.mode === 'overlay' ? 'overlay' : ''
         }" aria-label="Category details: ${esc(c.n)}">
       <div class="d-top">${tile(
-        c
+        c,
       )}<div class="d-head"><div class="d-title">${esc(c.n)}</div>
         <div class="d-sub">${esc(g.name)}${
           c.hidden ? ' · Hidden' : ''
         } · <span class="d-month"><button data-pm="-1" aria-label="Previous month">${
           I.chevL
         }</button><b>${mShort(
-          off
+          off,
         )}</b><button data-pm="1" aria-label="Next month">${
           I.chevR
         }</button></span></div></div>
@@ -3888,13 +3901,13 @@
             ? `<div class="flag">${
                 I.arrowR
               }<span>Overspending rolls over to ${mName(
-                off + 1
+                off + 1,
               )} instead of reducing Ready to Assign</span></div>`
             : k === 'neg'
-            ? `<div class="flag neg">If it isn't covered, this comes out of ${mName(
-                off + 1
-              )}'s Ready to Assign</div>`
-            : ''
+              ? `<div class="flag neg">If it isn't covered, this comes out of ${mName(
+                  off + 1,
+                )}'s Ready to Assign</div>`
+              : ''
         }
         <div class="bar" style="margin-top:10px;height:7px" aria-hidden="true"><i style="width:${
           p.fill * 100
@@ -3904,10 +3917,10 @@
       </div>
       <div class="minis">
         <div class="mini"><div class="l">From ${mAbbr(
-          off - 1
+          off - 1,
         )}</div><div class="v num">${fmt(d.carry)}</div></div>
         <div class="mini"><div class="l">Assigned</div><div class="v num">${fmt(
-          d.b
+          d.b,
         )}</div></div>
         <div class="mini"><div class="l">Activity</div><div class="v num">${
           d.s < 0 ? '+' + fmt(-d.s) : fmt(-d.s)
@@ -3941,14 +3954,14 @@
                 .map(
                   t =>
                     `<div class="txn"><div class="payee" style="color:${accent(
-                      c.id
+                      c.id,
                     )}">${firstGrapheme(t.p)}</div><div class="m"><b>${esc(
-                      t.p
+                      t.p,
                     )}</b><span>${mAbbr(off)} ${t.day} · ${
                       t.a
                     }</span></div><div class="amt num ${
                       t.amt > 0 ? 'in' : ''
-                    }">${fmtC(t.amt)}</div></div>`
+                    }">${fmtC(t.amt)}</div></div>`,
                 )
                 .join('')
             : `<div class="note"><span class="muted">${
@@ -3979,7 +3992,7 @@
             k = rtaKind(s.rta);
           const line = (l, v, cls = '') =>
             `<div class="bd-row ${cls}"><span>${l}</span><span class="num">${fmt(
-              v
+              v,
             )}</span></div>`;
           const acts = [
             s.rta > 0 ? mi('Move to a category') : '',
@@ -3988,14 +4001,14 @@
             s.hold > 0 ? mi("Reset next month's buffer") : '',
           ].join('');
           return `<div class="bd" style="width:300px"><div class="bd-title">${mLong(
-            off
+            off,
           )}</div>
           ${line('Available funds', s.af)}
           ${line(`Overspent in ${mName(off - 1)}`, -s.prevOver)}
           ${line('Assigned', -s.assigned)}
           ${line('For next month', -s.hold)}
           <div class="bd-row total ${k}"><span>Ready to Assign</span><span class="num">${fmt(
-            s.rta
+            s.rta,
           )}</span></div></div>
           ${acts ? '<hr>' + acts : ''}`;
         }
@@ -4004,41 +4017,41 @@
             c = all.find(x => x.id === id),
             d = cell(c, Number(o));
           return `<div class="bd-title" style="padding:8px 10px 4px">${esc(
-            c.n
+            c.n,
           )} · ${mAbbr(Number(o))}</div>
           ${d.avail > 0 ? mi('Transfer to another category') : ''}
           ${d.avail < 0 ? mi('Cover overspending') : ''}
           ${mi(
-            c.roll ? 'Remove overspending rollover' : 'Rollover overspending'
+            c.roll ? 'Remove overspending rollover' : 'Rollover overspending',
           )}`;
         }
         if (m === 'catmenu') {
           const c = all.find(x => x.id === f);
           return `${mi('Rename')}${mi(c && c.hidden ? 'Show' : 'Hide')}${mi(
-            'Delete'
+            'Delete',
           )}`;
         }
         if (m === 'groupmenu') {
           return `${mi('Rename')}${mi('Hide')}${mi('Delete')}<hr>${mi(
-            'Sort A to Z'
+            'Sort A to Z',
           )}${mi('Sort Z to A')}<hr>${mi('Overwrite with templates', opt)}`;
         }
         if (m === 'month') {
           const off = Number(f);
           return `<div class="bd-title" style="padding:8px 10px 4px">${mLong(
-            off
+            off,
           )}</div>
           ${mi("Copy last month's budget")}${mi('Set budgets to zero')}${mi(
-            'Set budgets to 3 month average'
+            'Set budgets to 3 month average',
           )}${mi('Set budgets to 6 month average')}${mi(
-            'Set budgets to 12 month average'
+            'Set budgets to 12 month average',
           )}
           <hr>${mi('Check templates', opt)}${mi(
             'Apply budget template',
-            opt
+            opt,
           )}${mi('Overwrite with budget template', opt)}${mi(
             'End of month cleanup',
-            opt
+            opt,
           )}`;
         }
         if (m === 'column') {
@@ -4047,9 +4060,9 @@
             state.showHidden
               ? '<span class="amt">On</span>'
               : '<span class="amt muted">Off</span>',
-            'data-toggle="showHidden"'
+            'data-toggle="showHidden"',
           )}${mi('Expand all')}${mi('Collapse all')}<hr>${mi('Add group')}${mi(
-            'Widen category column'
+            'Widen category column',
           )}`;
         }
         if (m === 'recon') {
@@ -4073,14 +4086,14 @@
           ? `${state.menu}:${state.menuFor}`
           : state.menu;
         const a = [...document.querySelectorAll('[data-anchor]')].find(
-          el => el.dataset.anchor === key && el.getClientRects().length
+          el => el.dataset.anchor === key && el.getClientRects().length,
         );
         if (!a) return void pop.remove();
         const r = a.getBoundingClientRect(),
           pw = pop.offsetWidth,
           ph = pop.offsetHeight;
         const alignRight = ['balance', 'month', 'groupmenu'].includes(
-          state.menu
+          state.menu,
         );
         let left = alignRight ? r.right - pw : r.left;
         left = clamp(left, 12, innerWidth - pw - 12);
@@ -4096,7 +4109,7 @@
             `<button class="ap-dot" data-set="page" data-val="account" title="${
               a.n
             } ${fmt(a.v)}" aria-label="${a.n}, ${fmt(
-              a.v
+              a.v,
             )}"><span class="ap-av">${firstGrapheme(a.n)}</span>${
               a.st
                 ? `<span class="acct-status" style="background:${
@@ -4129,7 +4142,7 @@
               ([v, l]) =>
                 `<button class="${
                   String(state[key]) === String(v) ? 'on' : ''
-                }" data-set="${key}" data-val="${v}">${l}</button>`
+                }" data-set="${key}" data-val="${v}">${l}</button>`,
             )
             .join('')}</div>`;
         const common = [
@@ -4367,7 +4380,7 @@
         ].join(' ');
         const catCell = t.cat
           ? `<div class="cat-cell"><span class="cat-dot" style="background:${accent(
-              t.cat
+              t.cat,
             )}"></span><span class="ell">${t.cn}</span></div>`
           : `<div class="cat-cell"><span class="ell" style="color:var(--pageTextSubdued)">${t.cn}</span></div>`;
         const status = t.sched
@@ -4383,10 +4396,10 @@
           t.c === 'c'
             ? `<span class="clr c" title="Cleared">${check}</span>`
             : t.c === 'u'
-            ? '<span class="clr u" title="Uncleared"></span>'
-            : t.c === 'r'
-            ? `<span class="clr r" title="Reconciled">${lock}</span>`
-            : '';
+              ? '<span class="clr u" title="Uncleared"></span>'
+              : t.c === 'r'
+                ? `<span class="clr r" title="Reconciled">${lock}</span>`
+                : '';
         return `<div class="rcols trow ${cls}" role="row">
           <div>${
             t.child
@@ -4397,16 +4410,16 @@
           }</div>
           <div class="num">${t.d || ''}</div>
           <div class="payee-cell ${t.child ? 'indent' : ''}">${
-          t.child
-            ? ''
-            : `<div class="payee" style="color:${
-                t.cat ? accent(t.cat) : 'var(--pageTextSubdued)'
-              }">${firstGrapheme(t.p)}</div>`
-        }<span class="ell">${t.split ? '↳ ' : ''}${t.p}</span></div>
+            t.child
+              ? ''
+              : `<div class="payee" style="color:${
+                  t.cat ? accent(t.cat) : 'var(--pageTextSubdued)'
+                }">${firstGrapheme(t.p)}</div>`
+          }<span class="ell">${t.split ? '↳ ' : ''}${t.p}</span></div>
           <div class="ell">${(t.tags || [])
             .map(
               ([n, c]) =>
-                `<span class="tag" style="background:${c}">${n}</span>`
+                `<span class="tag" style="background:${c}">${n}</span>`,
             )
             .join(' ')} ${t.notes || ''}</div>
           <div>${status}</div>
@@ -4435,7 +4448,7 @@
                 h -
                 4 -
                 ((v - min) / (max - min)) * (h - 8)
-              ).toFixed(1)}`
+              ).toFixed(1)}`,
           )
           .join(' ');
         return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" role="img" aria-label="Balance over the last 30 days">
@@ -4461,7 +4474,7 @@
               .map(t => ({
                 d: `${String(mDate(foff).getMonth() + 1).padStart(
                   2,
-                  '0'
+                  '0',
                 )}/${String(t.day).padStart(2, '0')}/2026`,
                 p: t.p,
                 notes: t.a,
@@ -4492,7 +4505,7 @@
                 ${
                   fc
                     ? `<span class="chip">Filtered <b class="num">${fmtC(
-                        sum(txnsFor(fc, foff), t => t.amt)
+                        sum(txnsFor(fc, foff), t => t.amt),
                       )}</b></span>`
                     : `<span class="chip ok">${lock} Reconciled 3 days ago</span>`
                 }
@@ -4531,11 +4544,11 @@
             ${
               fc
                 ? `<span class="filter-pill">Category is ${esc(
-                    fc.n
+                    fc.n,
                   )} <button data-set="filter" data-val="" aria-label="Remove filter">${
                     I.x
                   }</button></span><span class="filter-pill">Date is ${mLong(
-                    foff
+                    foff,
                   )}</span>`
                 : ''
             }
@@ -4683,7 +4696,7 @@
 
       document.addEventListener('click', e => {
         const t = e.target.closest(
-          '[data-set],[data-menu],[data-toggle],[data-close],[data-open],[data-edit-start],[data-activity],[data-collapse],[data-step],[data-pm],[data-close-panel],[data-reload]'
+          '[data-set],[data-menu],[data-toggle],[data-close],[data-open],[data-edit-start],[data-activity],[data-collapse],[data-step],[data-pm],[data-close-panel],[data-reload]',
         );
         if (!t) {
           if (state.menu !== 'none' && !e.target.closest('.pop')) {
