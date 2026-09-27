@@ -1,0 +1,2342 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Budget Prototype</title>
+    <!--
+  DESIGN-01 prototype: fictional data only, no connection to Actual's code.
+  Open with a local file URL after `yarn install` (fonts load from node_modules).
+  URL params: layout=a|b, header=cards|trend, theme=light|dark|midnight,
+  panel=0|1, menu=none|accounts|more|budget|drawer, privacy=0|1, controls=0|1
+-->
+    <style>
+      @font-face {
+        font-family: 'Inter Variable';
+        src: url('../../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2')
+          format('woff2');
+        font-weight: 100 900;
+      }
+      @font-face {
+        font-family: 'Redacted Script';
+        src: url('../../../node_modules/@fontsource/redacted-script/files/redacted-script-latin-400-normal.woff2')
+          format('woff2');
+      }
+
+      /*
+   * Proposed Stage 2 theme roles. Names mirror Actual's camelCase theme keys.
+   * Existing-role equivalents are noted where one exists.
+   */
+      :root,
+      [data-theme='light'] {
+        --pageBackground: #f4f4f7; /* existing: pageBackground */
+        --pageGlow: radial-gradient(
+          1100px 420px at 8% -18%,
+          rgba(135, 25, 224, 0.07),
+          transparent 60%
+        );
+        --pageText: #15151c; /* existing: pageText */
+        --pageTextSubdued: #62626e; /* existing: pageTextSubdued */
+        --pageTextFaint: #8d8d99;
+        --cardBackground: #ffffff; /* existing: cardBackground */
+        --cardBorder: rgba(15, 15, 30, 0.07);
+        --cardShadow:
+          0 1px 2px rgba(15, 15, 30, 0.04), 0 10px 28px rgba(15, 15, 30, 0.05);
+        --cardInset: #f6f6f9;
+        --controlBackground: #ffffff;
+        --navTrack: rgba(15, 15, 30, 0.05);
+        --navActive: #ffffff;
+        --navActiveShadow: 0 1px 3px rgba(15, 15, 30, 0.12);
+        --accent: #8719e0; /* existing: buttonPrimaryBackground */
+        --selectionBackground: rgba(135, 25, 224, 0.06);
+        --selectionBorder: #8719e0;
+        --tableRowHover: rgba(15, 15, 30, 0.025);
+        --groupRowBackground: #fafafc;
+        --progressTrack: rgba(15, 15, 30, 0.07);
+        --pillPositiveBackground: rgba(20, 125, 100, 0.11);
+        --pillPositiveText: #0f6e57; /* derived from numberPositive #147d64 for AA on tint */
+        --pillNeutralBackground: rgba(15, 15, 30, 0.05);
+        --pillNeutralText: #6b6b76;
+        --pillNegativeBackground: rgba(225, 45, 57, 0.11);
+        --pillNegativeText: #c21f2c; /* numberNegative */
+        --heroGlow: rgba(20, 125, 100, 0.12);
+        --popoverShadow:
+          0 16px 40px rgba(15, 15, 30, 0.16), 0 2px 6px rgba(15, 15, 30, 0.06);
+        --scrim: rgba(15, 15, 30, 0.28);
+        --categoryAccent1: #6366f1;
+        --categoryAccent2: #10b981;
+        --categoryAccent3: #d97706;
+        --categoryAccent4: #3b82f6;
+        --categoryAccent5: #db2777;
+        --categoryAccent6: #ea580c;
+        --categoryAccent7: #0891b2;
+        --categoryAccent8: #7c3aed;
+        --categoryAccent9: #65a30d;
+        --categoryAccent10: #e11d48;
+        --tileAlpha: 0.13;
+      }
+      [data-theme='dark'] {
+        --pageBackground: #0b0b0f;
+        --pageGlow:
+          radial-gradient(
+            1100px 460px at 12% -12%,
+            rgba(129, 140, 248, 0.13),
+            transparent 60%
+          ),
+          radial-gradient(
+            800px 420px at 100% -5%,
+            rgba(236, 72, 153, 0.06),
+            transparent 60%
+          );
+        --pageText: #f4f4f6;
+        --pageTextSubdued: #a3a3ad;
+        --pageTextFaint: #74747f;
+        --cardBackground: #141419;
+        --cardBorder: rgba(255, 255, 255, 0.065);
+        --cardShadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.03),
+          0 18px 36px rgba(0, 0, 0, 0.32);
+        --cardInset: rgba(255, 255, 255, 0.04);
+        --controlBackground: #16161c;
+        --navTrack: #141419;
+        --navActive: rgba(255, 255, 255, 0.1);
+        --navActiveShadow: none;
+        --accent: #a78bfa;
+        --selectionBackground: rgba(129, 140, 248, 0.11);
+        --selectionBorder: #818cf8;
+        --tableRowHover: rgba(255, 255, 255, 0.025);
+        --groupRowBackground: rgba(255, 255, 255, 0.02);
+        --progressTrack: rgba(255, 255, 255, 0.075);
+        --pillPositiveBackground: rgba(74, 222, 128, 0.13);
+        --pillPositiveText: #4ade80;
+        --pillNeutralBackground: rgba(255, 255, 255, 0.06);
+        --pillNeutralText: #a3a3ad;
+        --pillNegativeBackground: rgba(248, 113, 113, 0.15);
+        --pillNegativeText: #f87171;
+        --heroGlow: rgba(74, 222, 128, 0.2);
+        --popoverShadow:
+          0 20px 50px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
+        --scrim: rgba(0, 0, 0, 0.5);
+        --categoryAccent1: #818cf8;
+        --categoryAccent2: #34d399;
+        --categoryAccent3: #fbbf24;
+        --categoryAccent4: #60a5fa;
+        --categoryAccent5: #f472b6;
+        --categoryAccent6: #fb923c;
+        --categoryAccent7: #22d3ee;
+        --categoryAccent8: #a78bfa;
+        --categoryAccent9: #a3e635;
+        --categoryAccent10: #fb7185;
+        --tileAlpha: 0.17;
+      }
+      [data-theme='midnight'] {
+        --pageBackground: #0a0812;
+        --pageGlow: radial-gradient(
+          1100px 460px at 12% -12%,
+          rgba(135, 25, 224, 0.2),
+          transparent 60%
+        );
+        --pageText: #efeaf8;
+        --pageTextSubdued: #a59cba;
+        --pageTextFaint: #766e8a;
+        --cardBackground: #13101d;
+        --cardBorder: rgba(200, 170, 255, 0.08);
+        --cardShadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.03),
+          0 18px 36px rgba(0, 0, 0, 0.4);
+        --cardInset: rgba(200, 170, 255, 0.05);
+        --controlBackground: #15111f;
+        --navTrack: #13101d;
+        --navActive: rgba(163, 104, 252, 0.2);
+        --navActiveShadow: none;
+        --accent: #b58cff;
+        --selectionBackground: rgba(163, 104, 252, 0.13);
+        --selectionBorder: #a368fc;
+        --tableRowHover: rgba(200, 170, 255, 0.03);
+        --groupRowBackground: rgba(200, 170, 255, 0.03);
+        --progressTrack: rgba(200, 170, 255, 0.09);
+        --pillPositiveBackground: rgba(74, 222, 128, 0.13);
+        --pillPositiveText: #4ade80;
+        --pillNeutralBackground: rgba(200, 170, 255, 0.07);
+        --pillNeutralText: #a59cba;
+        --pillNegativeBackground: rgba(248, 113, 113, 0.15);
+        --pillNegativeText: #f87171;
+        --heroGlow: rgba(74, 222, 128, 0.18);
+        --popoverShadow:
+          0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(200, 170, 255, 0.08);
+        --scrim: rgba(0, 0, 0, 0.55);
+        --categoryAccent1: #a5b4fc;
+        --categoryAccent2: #34d399;
+        --categoryAccent3: #fbbf24;
+        --categoryAccent4: #7dd3fc;
+        --categoryAccent5: #f472b6;
+        --categoryAccent6: #fb923c;
+        --categoryAccent7: #22d3ee;
+        --categoryAccent8: #c4b5fd;
+        --categoryAccent9: #a3e635;
+        --categoryAccent10: #fb7185;
+        --tileAlpha: 0.18;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family:
+          'Inter Variable',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        font-feature-settings: 'ss01', 'ss04';
+        background: var(--pageGlow), var(--pageBackground);
+        background-attachment: fixed;
+        color: var(--pageText);
+        -webkit-font-smoothing: antialiased;
+        font-size: 14px;
+        overflow: hidden;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+        background: none;
+        border: 0;
+        cursor: pointer;
+      }
+      .num {
+        font-feature-settings: 'tnum', 'ss01', 'ss04';
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+      }
+      body.privacy .num {
+        font-family: 'Redacted Script', sans-serif;
+        letter-spacing: 0;
+      }
+      :focus-visible {
+        outline: 2px solid var(--selectionBorder);
+        outline-offset: 2px;
+        border-radius: 8px;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+      }
+
+      /* Prototype controls (not part of the design) */
+      .proto {
+        position: fixed;
+        left: 50%;
+        bottom: 14px;
+        transform: translateX(-50%);
+        z-index: 100;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 14px;
+        background: #1d1d24;
+        color: #ddd;
+        font-size: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        white-space: nowrap;
+      }
+      .proto b {
+        color: #888;
+        font-weight: 600;
+        margin-right: 4px;
+      }
+      .proto button {
+        padding: 4px 8px;
+        border-radius: 7px;
+        color: #bbb;
+      }
+      .proto button.on {
+        background: #8719e0;
+        color: #fff;
+      }
+      .proto .grp {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+      body.no-controls .proto {
+        display: none;
+      }
+
+      /* App frame */
+      .app {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        height: 60px;
+        padding: 0 24px;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 20;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: -0.02em;
+      }
+      .brand-mark {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        background: var(--accent);
+        display: grid;
+        place-items: center;
+        color: white;
+        font-size: 13px;
+        font-weight: 800;
+      }
+      [data-theme='dark'] .brand-mark,
+      [data-theme='midnight'] .brand-mark {
+        color: #1a1030;
+      }
+      .nav {
+        display: flex;
+        gap: 2px;
+        padding: 3px;
+        border-radius: 13px;
+        background: var(--navTrack);
+        border: 1px solid var(--cardBorder);
+      }
+      [data-theme='light'] .nav {
+        border-color: transparent;
+      }
+      .nav button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border-radius: 10px;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--pageTextSubdued);
+        position: relative;
+      }
+      .nav button:hover {
+        color: var(--pageText);
+      }
+      .nav button.on {
+        background: var(--navActive);
+        color: var(--pageText);
+        font-weight: 600;
+        box-shadow: var(--navActiveShadow);
+      }
+      .nav button.open {
+        color: var(--pageText);
+        background: var(--tableRowHover);
+      }
+      .nav .chev {
+        opacity: 0.6;
+      }
+      .top-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .icon-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        color: var(--pageTextSubdued);
+        background: var(--controlBackground);
+        border: 1px solid var(--cardBorder);
+        position: relative;
+      }
+      .icon-btn:hover {
+        color: var(--pageText);
+      }
+      .icon-btn.burger {
+        display: none;
+      }
+      .uncat {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        height: 34px;
+        padding: 0 12px;
+        border-radius: 10px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--pageText);
+        background: var(--controlBackground);
+        border: 1px solid var(--cardBorder);
+      }
+      .uncat .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--categoryAccent3);
+      }
+      .sync-dot {
+        position: absolute;
+        right: 6px;
+        top: 6px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--pillPositiveText);
+        box-shadow: 0 0 0 2px var(--controlBackground);
+      }
+      .switcher {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 34px;
+        padding: 0 10px 0 5px;
+        border-radius: 10px;
+        background: var(--controlBackground);
+        border: 1px solid var(--cardBorder);
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .switcher .av {
+        width: 24px;
+        height: 24px;
+        border-radius: 7px;
+        background: var(--selectionBackground);
+        color: var(--accent);
+        display: grid;
+        place-items: center;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      /* Popovers */
+      .pop {
+        position: absolute;
+        top: 52px;
+        z-index: 30;
+        min-width: 220px;
+        padding: 6px;
+        border-radius: 16px;
+        background: var(--cardBackground);
+        border: 1px solid var(--cardBorder);
+        box-shadow: var(--popoverShadow);
+        display: none;
+      }
+      .pop.show {
+        display: block;
+      }
+      .pop .sec {
+        padding: 8px 10px 4px;
+        font-size: 11px;
+        font-weight: 650;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--pageTextFaint);
+        display: flex;
+        justify-content: space-between;
+      }
+      .pop .item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-size: 13.5px;
+        text-align: left;
+      }
+      .pop .item:hover,
+      .pop .item.hl {
+        background: var(--tableRowHover);
+      }
+      .pop .item .amt {
+        margin-left: auto;
+        font-size: 13px;
+        color: var(--pageTextSubdued);
+      }
+      .pop .item .amt.neg {
+        color: var(--pillNegativeText);
+      }
+      .pop hr {
+        border: 0;
+        border-top: 1px solid var(--cardBorder);
+        margin: 6px 4px;
+      }
+      .pop .ico {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        background: var(--cardInset);
+        color: var(--pageTextSubdued);
+        flex-shrink: 0;
+      }
+      .pop .total {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 10px 10px 8px;
+      }
+      .pop .total b {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .pop .muted {
+        color: var(--pageTextFaint);
+        font-size: 12px;
+      }
+      .pop .acct-status {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      #pop-accounts {
+        width: 320px;
+      }
+      #pop-more {
+        width: 230px;
+      }
+      #pop-budget {
+        width: 230px;
+        right: 24px;
+      }
+
+      /* Page */
+      .page {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        gap: 18px;
+        padding: 4px 24px 20px;
+      }
+      .main {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .head {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+      }
+      .eyebrow {
+        font-size: 12.5px;
+        color: var(--pageTextFaint);
+        font-weight: 500;
+      }
+      h1 {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+      }
+      .head-controls {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .seg {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        padding: 3px;
+        border-radius: 12px;
+        background: var(--controlBackground);
+        border: 1px solid var(--cardBorder);
+      }
+      .seg > button {
+        height: 30px;
+        min-width: 30px;
+        padding: 0 8px;
+        border-radius: 9px;
+        color: var(--pageTextSubdued);
+        display: grid;
+        place-items: center;
+        font-weight: 600;
+        font-size: 13px;
+      }
+      .seg > button:hover {
+        background: var(--tableRowHover);
+        color: var(--pageText);
+      }
+      .seg .label {
+        padding: 0 10px;
+        color: var(--pageText);
+      }
+      .months button.on {
+        background: var(--navActive);
+        color: var(--pageText);
+        box-shadow: var(--navActiveShadow);
+      }
+      [data-theme='light'] .months {
+        background: var(--navTrack);
+        border-color: transparent;
+      }
+
+      .card {
+        background: var(--cardBackground);
+        border: 1px solid var(--cardBorder);
+        border-radius: 18px;
+        box-shadow: var(--cardShadow);
+      }
+
+      /* Summary cards */
+      .summary {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr 1fr;
+        gap: 12px;
+        flex-shrink: 0;
+      }
+      .stat {
+        padding: 16px 18px;
+        position: relative;
+        overflow: hidden;
+      }
+      .stat .label {
+        font-size: 12.5px;
+        color: var(--pageTextSubdued);
+        font-weight: 500;
+      }
+      .stat .value {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        margin-top: 4px;
+      }
+      .stat .sub {
+        font-size: 12px;
+        color: var(--pageTextFaint);
+        margin-top: 3px;
+      }
+      .stat.hero {
+        cursor: pointer;
+      }
+      .stat.hero::after {
+        content: '';
+        position: absolute;
+        right: -70px;
+        top: -90px;
+        width: 240px;
+        height: 240px;
+        border-radius: 50%;
+        background: radial-gradient(circle, var(--heroGlow), transparent 65%);
+        pointer-events: none;
+      }
+      .stat.hero .value {
+        color: var(--pillPositiveText);
+        font-size: 30px;
+      }
+      .stat.hero .more {
+        position: absolute;
+        right: 14px;
+        top: 14px;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--pageTextSubdued);
+        padding: 5px 8px;
+        border-radius: 8px;
+        background: var(--cardInset);
+      }
+      .stackbar {
+        display: flex;
+        gap: 2px;
+        height: 7px;
+        margin-top: 12px;
+        border-radius: 99px;
+        overflow: hidden;
+      }
+      .stackbar i {
+        display: block;
+        height: 100%;
+      }
+
+      /* Trend header (Concept C) */
+      .summary.trend {
+        grid-template-columns: 1.55fr 1fr;
+      }
+      .trendcard {
+        padding: 16px 18px 12px;
+        display: flex;
+        flex-direction: column;
+      }
+      .trendcard .row-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .delta {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--pillPositiveText);
+        background: var(--pillPositiveBackground);
+        padding: 3px 8px;
+        border-radius: 99px;
+        vertical-align: middle;
+        margin-left: 6px;
+        letter-spacing: 0;
+      }
+      .legend {
+        display: flex;
+        gap: 14px;
+        font-size: 11px;
+        color: var(--pageTextFaint);
+        margin-top: 4px;
+      }
+      .legend i {
+        display: inline-block;
+        width: 10px;
+        height: 3px;
+        border-radius: 2px;
+        vertical-align: middle;
+        margin-right: 5px;
+      }
+      .stack2 {
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        gap: 12px;
+      }
+      .stack2 .stat {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 18px;
+      }
+      .stack2 .stat .value {
+        font-size: 24px;
+      }
+      .stack2 .stat.hero .value {
+        font-size: 26px;
+      }
+      .ring {
+        width: 54px;
+        height: 54px;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Ledger */
+      .ledger-wrap {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        border-radius: 18px;
+      }
+      .ledger {
+        overflow: hidden;
+      }
+      .cols {
+        display: grid;
+        grid-template-columns:
+          minmax(160px, 1fr) 120px minmax(150px, 230px)
+          120px;
+        column-gap: 20px;
+        align-items: center;
+        padding: 0 18px;
+      }
+      .lhead {
+        height: 40px;
+        font-size: 11px;
+        font-weight: 650;
+        color: var(--pageTextFaint);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        border-bottom: 1px solid var(--cardBorder);
+        position: sticky;
+        top: 0;
+        background: var(--cardBackground);
+        z-index: 2;
+      }
+      .r {
+        text-align: right;
+      }
+      .grow {
+        height: 44px;
+        font-weight: 650;
+        font-size: 13.5px;
+        background: var(--groupRowBackground);
+        border-bottom: 1px solid var(--cardBorder);
+      }
+      .grow .name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .caret {
+        color: var(--pageTextFaint);
+        width: 14px;
+        display: grid;
+        place-items: center;
+      }
+      .crow {
+        height: 50px;
+        border-bottom: 1px solid var(--cardBorder);
+        position: relative;
+      }
+      .crow:last-child {
+        border-bottom: 0;
+      }
+      .crow:hover {
+        background: var(--tableRowHover);
+      }
+      .crow .name {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding-left: 22px;
+        font-weight: 500;
+        min-width: 0;
+      }
+      .crow .name span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .crow.sel {
+        background: var(--selectionBackground);
+      }
+      .crow.sel::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 9px;
+        bottom: 9px;
+        width: 3px;
+        border-radius: 0 3px 3px 0;
+        background: var(--selectionBorder);
+      }
+      .tile {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+        font-size: 13px;
+        font-weight: 700;
+        flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+      }
+      .tile::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: currentColor;
+        opacity: var(--tileAlpha);
+      }
+      .assigned {
+        font-weight: 500;
+        padding: 5px 8px;
+        margin-right: -8px;
+        border-radius: 8px;
+      }
+      .crow:hover .assigned {
+        box-shadow: inset 0 0 0 1px var(--cardBorder);
+        background: var(--controlBackground);
+      }
+      .act {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .act .t {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12.5px;
+      }
+      .act .t .pct {
+        color: var(--pageTextFaint);
+      }
+      .bar {
+        height: 6px;
+        border-radius: 99px;
+        background: var(--progressTrack);
+        overflow: hidden;
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+        border-radius: 99px;
+      }
+      .pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 99px;
+        font-weight: 650;
+        font-size: 12.5px;
+      }
+      .pill.pos {
+        background: var(--pillPositiveBackground);
+        color: var(--pillPositiveText);
+      }
+      .pill.zero {
+        background: var(--pillNeutralBackground);
+        color: var(--pillNeutralText);
+      }
+      .pill.neg {
+        background: var(--pillNegativeBackground);
+        color: var(--pillNegativeText);
+      }
+      .gt {
+        color: var(--pageTextSubdued);
+        font-weight: 600;
+      }
+
+      /* Layout B: groups as cards */
+      .layout-b .ledger-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border-radius: 0;
+      }
+      .layout-b .lhead {
+        background: transparent;
+        border: 0;
+        height: 18px;
+        position: static;
+      }
+      .layout-b .grow {
+        background: transparent;
+        height: 50px;
+        font-size: 14.5px;
+      }
+      .layout-b .ledger.card {
+        flex-shrink: 0;
+      }
+
+      /* Details panel */
+      .detail {
+        width: 360px;
+        flex-shrink: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        overflow: auto;
+      }
+      .detail[hidden] {
+        display: none;
+      }
+      .d-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .d-top .tile {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        font-size: 19px;
+      }
+      .d-title {
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .d-sub {
+        font-size: 12.5px;
+        color: var(--pageTextFaint);
+        margin-top: 1px;
+      }
+      .d-close {
+        margin-left: auto;
+      }
+      .big {
+        font-size: 36px;
+        font-weight: 750;
+        letter-spacing: -0.04em;
+      }
+      .big small {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--pageTextSubdued);
+        letter-spacing: 0;
+        margin-left: 6px;
+      }
+      .minis {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+      .mini {
+        padding: 9px 11px;
+        border-radius: 12px;
+        background: var(--cardInset);
+      }
+      .mini .l {
+        font-size: 11px;
+        color: var(--pageTextFaint);
+        font-weight: 500;
+      }
+      .mini .v {
+        font-size: 14.5px;
+        font-weight: 650;
+        margin-top: 2px;
+      }
+      .sec-title {
+        font-size: 12.5px;
+        font-weight: 650;
+        color: var(--pageTextSubdued);
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+      .sec-title span {
+        font-weight: 500;
+        color: var(--pageTextFaint);
+        font-size: 12px;
+      }
+      .note {
+        font-size: 13px;
+        color: var(--pageTextSubdued);
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: var(--cardInset);
+      }
+      .txn {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--cardBorder);
+      }
+      .txn:last-child {
+        border-bottom: 0;
+      }
+      .payee {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 13px;
+        position: relative;
+        overflow: hidden;
+      }
+      .payee::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: currentColor;
+        opacity: var(--tileAlpha);
+      }
+      .txn .m {
+        flex: 1;
+        min-width: 0;
+      }
+      .txn .m b {
+        display: block;
+        font-size: 13.5px;
+        font-weight: 600;
+      }
+      .txn .m span {
+        font-size: 12px;
+        color: var(--pageTextFaint);
+      }
+      .txn .amt {
+        font-weight: 600;
+        font-size: 13.5px;
+      }
+      .scrim {
+        display: none;
+      }
+
+      /* ~1000px: compress */
+      @media (max-width: 1279px) {
+        .page {
+          gap: 14px;
+          padding: 4px 16px 16px;
+        }
+        .top {
+          padding: 0 16px;
+          gap: 12px;
+        }
+        .uncat .txt,
+        .switcher .txt {
+          display: none;
+        }
+        .uncat {
+          padding: 0 10px;
+        }
+        .detail {
+          width: 320px;
+          padding: 18px;
+        }
+        .cols {
+          grid-template-columns:
+            minmax(140px, 1fr) 100px minmax(120px, 180px)
+            104px;
+          column-gap: 14px;
+          padding: 0 14px;
+        }
+        .crow .name {
+          padding-left: 18px;
+        }
+        .summary {
+          gap: 10px;
+        }
+        .stat {
+          padding: 13px 15px;
+        }
+        .stat .value {
+          font-size: 22px;
+        }
+        .stat.hero .value {
+          font-size: 24px;
+        }
+        .stat .sub {
+          display: none;
+        }
+        .stat.hero .more .txt {
+          display: none;
+        }
+        h1 {
+          font-size: 24px;
+        }
+        .big {
+          font-size: 30px;
+        }
+        body.panel-open .act .t .pct {
+          display: none;
+        }
+        body.panel-open .cols {
+          grid-template-columns:
+            minmax(120px, 1fr) 88px minmax(90px, 140px)
+            96px;
+          column-gap: 12px;
+        }
+        body.panel-open .summary.trend {
+          grid-template-columns: 1fr;
+        }
+        body.panel-open .summary.trend .stack2 {
+          display: none;
+        }
+      }
+      /* Narrow: nav collapses to a drawer; panel becomes an overlay */
+      @media (max-width: 899px) {
+        .nav,
+        .uncat,
+        .switcher,
+        .help-btn {
+          display: none;
+        }
+        .icon-btn.burger {
+          display: grid;
+        }
+        .detail {
+          position: fixed;
+          right: 12px;
+          top: 12px;
+          bottom: 12px;
+          z-index: 40;
+          width: min(360px, calc(100vw - 24px));
+        }
+        body.panel-open .scrim {
+          display: block;
+          position: fixed;
+          inset: 0;
+          background: var(--scrim);
+          z-index: 35;
+        }
+        .summary {
+          grid-template-columns: 1fr 1fr;
+        }
+        .summary .stat:nth-child(3) {
+          display: none;
+        }
+        .summary.trend .trendcard {
+          display: none;
+        }
+        .summary.trend {
+          grid-template-columns: 1fr;
+        }
+        .cols {
+          grid-template-columns: minmax(120px, 1fr) 84px 96px;
+        }
+        .cols > :nth-child(3) {
+          display: none;
+        }
+        .head {
+          flex-wrap: wrap;
+        }
+      }
+      .drawer {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 290px;
+        z-index: 50;
+        background: var(--cardBackground);
+        border-right: 1px solid var(--cardBorder);
+        box-shadow: var(--popoverShadow);
+        padding: 14px 10px;
+        overflow: auto;
+        display: none;
+      }
+      .drawer.show {
+        display: block;
+      }
+      .drawer-scrim {
+        position: fixed;
+        inset: 0;
+        background: var(--scrim);
+        z-index: 45;
+        display: none;
+      }
+      .drawer-scrim.show {
+        display: block;
+      }
+      .drawer .pop {
+        position: static;
+        display: block;
+        box-shadow: none;
+        border: 0;
+        padding: 0;
+        width: auto;
+        min-width: 0;
+      }
+
+      /* Account register page */
+      .acct-head {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 420px);
+        gap: 12px;
+        flex-shrink: 0;
+      }
+      .acct-hero {
+        padding: 16px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        position: relative;
+        overflow: hidden;
+      }
+      .acct-hero .title-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .acct-hero h1 {
+        font-size: 24px;
+      }
+      .acct-hero .bal {
+        font-size: 32px;
+        font-weight: 750;
+        letter-spacing: -0.035em;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: 99px;
+        font-size: 12px;
+        font-weight: 600;
+        background: var(--cardInset);
+        color: var(--pageTextSubdued);
+      }
+      .chip b {
+        color: var(--pageText);
+        font-weight: 650;
+      }
+      .chip.ok {
+        background: var(--pillPositiveBackground);
+        color: var(--pillPositiveText);
+      }
+      .acct-chart {
+        padding: 14px 16px 10px;
+        display: flex;
+        flex-direction: column;
+      }
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .tbtn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 34px;
+        padding: 0 12px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        background: var(--controlBackground);
+        border: 1px solid var(--cardBorder);
+        color: var(--pageText);
+      }
+      .tbtn.primary {
+        background: var(--accent);
+        border-color: transparent;
+        color: #fff;
+      }
+      [data-theme='dark'] .tbtn.primary,
+      [data-theme='midnight'] .tbtn.primary {
+        color: #16101f;
+      }
+      .tbtn.sel {
+        background: var(--selectionBackground);
+        border-color: var(--selectionBorder);
+        color: var(--pageText);
+      }
+      .search {
+        flex: 0 1 280px;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 34px;
+        padding: 0 12px;
+        border-radius: 10px;
+        background: var(--controlBackground);
+        border: 1px solid var(--cardBorder);
+        color: var(--pageTextFaint);
+        font-size: 13px;
+      }
+      .filter-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 28px;
+        padding: 0 10px;
+        border-radius: 99px;
+        background: var(--selectionBackground);
+        color: var(--pageText);
+        font-size: 12.5px;
+        font-weight: 600;
+      }
+      .register {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+      }
+      .rcols {
+        display: grid;
+        grid-template-columns:
+          34px 96px minmax(130px, 1.3fr) minmax(100px, 1fr)
+          minmax(120px, 1fr) 96px 96px 104px 30px;
+        align-items: center;
+        column-gap: 12px;
+        padding: 0 12px 0 8px;
+      }
+      .rhead {
+        height: 38px;
+        font-size: 11px;
+        font-weight: 650;
+        color: var(--pageTextFaint);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        border-bottom: 1px solid var(--cardBorder);
+        position: sticky;
+        top: 0;
+        background: var(--cardBackground);
+        z-index: 2;
+      }
+      .trow {
+        height: 36px;
+        border-bottom: 1px solid var(--cardBorder);
+        font-size: 13px;
+      }
+      .trow:hover {
+        background: var(--tableRowHover);
+      }
+      .trow.sched {
+        color: var(--pageTextSubdued);
+        font-style: italic;
+      }
+      .trow.child {
+        color: var(--pageTextSubdued);
+      }
+      .trow.child .indent {
+        padding-left: 14px;
+      }
+      .trow.selected {
+        background: var(--selectionBackground);
+      }
+      .trow.editing {
+        background: var(--cardInset);
+        height: 44px;
+      }
+      .trow.editing .cell-edit {
+        height: 28px;
+        border-radius: 7px;
+        border: 1.5px solid var(--selectionBorder);
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        background: var(--controlBackground);
+      }
+      .trow .ell {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .cb {
+        width: 15px;
+        height: 15px;
+        border-radius: 5px;
+        border: 1.5px solid var(--pageTextFaint);
+        display: grid;
+        place-items: center;
+        margin-left: 6px;
+      }
+      .cb.on {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      .payee-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+      .payee-cell .payee {
+        width: 22px;
+        height: 22px;
+        font-size: 10.5px;
+        flex-shrink: 0;
+      }
+      .cat-cell {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        min-width: 0;
+      }
+      .cat-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
+      .tag {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #fff;
+        font-style: normal;
+      }
+      .status {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 11.5px;
+        font-weight: 600;
+        font-style: normal;
+      }
+      .clr {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+      }
+      .clr.c {
+        background: var(--pillPositiveBackground);
+        color: var(--pillPositiveText);
+      }
+      .clr.u {
+        border: 1.5px solid var(--pageTextFaint);
+      }
+      .clr.r {
+        color: var(--pageTextFaint);
+      }
+      .runbal {
+        color: var(--pageTextSubdued);
+      }
+      .newrow-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--cardBorder);
+        background: var(--cardInset);
+      }
+      @media (max-width: 1279px) {
+        .rcols {
+          grid-template-columns:
+            30px 84px minmax(110px, 1.2fr) minmax(70px, 0.8fr)
+            minmax(100px, 1fr) 84px 84px 30px;
+          column-gap: 10px;
+        }
+        .rcols > .col-bal {
+          display: none;
+        }
+        .payee-cell .payee {
+          display: none;
+        }
+        .acct-head {
+          grid-template-columns: 1fr;
+        }
+        .acct-chart {
+          display: none;
+        }
+        .acct-hero {
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 6px 16px;
+          padding: 12px 16px;
+        }
+        .acct-hero .title-row {
+          order: 0;
+          flex: 1 1 auto;
+        }
+        .acct-hero h1 {
+          font-size: 20px;
+        }
+        .acct-hero .bal {
+          order: 1;
+          font-size: 24px;
+        }
+        .acct-hero .chips {
+          order: 2;
+          flex-basis: 100%;
+        }
+        .acct-hero .chip {
+          padding: 3px 8px;
+          font-size: 11.5px;
+        }
+        .tbtn .txt {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      const params = new URLSearchParams(location.search);
+      const state = {
+        layout: params.get('layout') || 'a',
+        header: params.get('header') || 'cards',
+        theme: params.get('theme') || 'dark',
+        panel: params.get('panel') !== '0',
+        menu: params.get('menu') || 'none',
+        privacy: params.get('privacy') === '1',
+        controls: params.get('controls') !== '0',
+        page: params.get('page') || 'budget',
+        sel: params.get('sel') === '1',
+        adding: params.get('adding') === '1',
+      };
+
+      // Fictional data (matches plan §17)
+      const groups = [
+        {
+          id: 'g1',
+          name: 'Monthly expenses',
+          cats: [
+            { id: 'c-rent', n: 'Rent', b: 1800, s: 1800 },
+            { id: 'c-groc', n: 'Groceries', b: 600, s: 240 },
+            { id: 'c-util', n: 'Utilities', b: 250, s: 160 },
+            { id: 'c-trans', n: 'Transport', b: 200, s: 80 },
+            { id: 'c-subs', n: 'Subscriptions', b: 100, s: 60 },
+            { id: 'c-dine', n: 'Dining out', b: 250, s: 100 },
+          ],
+        },
+        {
+          id: 'g2',
+          name: 'Savings',
+          cats: [
+            { id: 'c-emerg', n: 'Emergency fund', b: 700, s: 0 },
+            { id: 'c-vac', n: 'Vacation', b: 300, s: 0 },
+          ],
+        },
+      ];
+      const accounts = {
+        on: [
+          { n: 'Checking', v: 4250, st: 'ok' },
+          { n: 'Savings', v: 6800, st: 'ok' },
+          { n: 'Credit Card', v: -950, st: 'warn' },
+          { n: 'Cash', v: 300 },
+        ],
+        off: [
+          { n: 'Brokerage', v: 18420, st: 'ok' },
+          { n: 'Mortgage', v: -214300 },
+        ],
+      };
+      const selected = 'c-groc';
+
+      // Presentation helpers (Stage 2 UI-03 candidates)
+      function stableHash(str) {
+        let h = 2166136261;
+        for (const ch of str) h = Math.imul(h ^ ch.codePointAt(0), 16777619);
+        return h >>> 0;
+      }
+      // Prototype pins accents so the fixture reads well; the app uses stableHash(id).
+      const pinned = {
+        'c-rent': 1,
+        'c-groc': 2,
+        'c-util': 3,
+        'c-trans': 4,
+        'c-subs': 5,
+        'c-dine': 6,
+        'c-emerg': 7,
+        'c-vac': 8,
+      };
+      const accent = id =>
+        `var(--categoryAccent${pinned[id] ?? (stableHash(id) % 10) + 1})`;
+      const firstGrapheme = s =>
+        [
+          ...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(
+            s,
+          ),
+        ][0]?.segment ?? '?';
+      function progress(activity, available) {
+        const spent = Math.max(0, -activity);
+        if (available < 0) return { fill: 1, over: true };
+        const start = spent + available;
+        return {
+          fill: start > 0 && spent > 0 ? spent / start : 0,
+          over: false,
+        };
+      }
+      const fmt = n =>
+        (n < 0 ? '−' : '') + '$' + Math.abs(n).toLocaleString('en-US');
+      const sum = (a, f) => a.reduce((t, x) => t + f(x), 0);
+
+      const I = {
+        chevD:
+          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+        chevL:
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
+        chevR:
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+        eye: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
+        eyeOff:
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.2A10 10 0 0 1 12 4c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M6.6 6.6A18 18 0 0 0 2 12s3.6 7 10 7a10 10 0 0 0 5.4-1.6"/><path d="m2 2 20 20"/></svg>',
+        help: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>',
+        cloud:
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9Z"/></svg>',
+        menu: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>',
+        dots: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+        x: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+        plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+        payees:
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-5-6.7"/></svg>',
+        rules:
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M4 12h16M4 18h7"/><circle cx="18" cy="6" r="2"/><circle cx="15" cy="18" r="2"/></svg>',
+        bank: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18L12 4 3 10Z"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/></svg>',
+        tag: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
+        gear: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>',
+        wallet:
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5"/><path d="M16 14h.01"/></svg>',
+        archive:
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/></svg>',
+        file: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>',
+        pencil:
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
+        calendar:
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+      };
+
+      const tile = (c, cls = '') =>
+        `<div class="tile ${cls}" style="color:${accent(c.id)}" aria-hidden="true">${firstGrapheme(c.n)}</div>`;
+      const pill = n =>
+        `<span class="pill ${n > 0 ? 'pos' : n < 0 ? 'neg' : 'zero'} num">${fmt(n)}</span>`;
+
+      function topbar() {
+        const navBtn = (label, key, opts = {}) =>
+          `<button class="${(state.page === 'account' ? 'accounts' : 'budget') === key ? 'on' : ''} ${state.menu === key ? 'open' : ''}" ${opts.menu ? `data-menu="${key}"` : key === 'budget' ? 'data-set="page" data-val="budget"' : ''}
+        aria-haspopup="${opts.menu ? 'menu' : 'false'}" aria-expanded="${state.menu === key}">${label}${opts.menu ? `<span class="chev">${I.chevD}</span>` : ''}</button>`;
+        return `
+    <header class="top">
+      <button class="icon-btn burger" data-menu="drawer" aria-label="Menu">${I.menu}</button>
+      <div class="brand"><div class="brand-mark" aria-hidden="true">A</div>Actual</div>
+      <nav class="nav" aria-label="Primary">
+        ${navBtn('Budget', 'budget')}
+        ${navBtn('Accounts', 'accounts', { menu: true })}
+        ${navBtn('Reports', 'reports')}
+        ${navBtn('Schedules', 'schedules')}
+        ${navBtn('More', 'more', { menu: true })}
+      </nav>
+      <div class="top-right">
+        <button class="uncat" title="12 uncategorized transactions"><span class="dot"></span><span class="num">12</span><span class="txt">uncategorized</span></button>
+        <button class="icon-btn" aria-label="Server sync: synced">${I.cloud}<span class="sync-dot"></span></button>
+        <button class="icon-btn" data-toggle="privacy" aria-label="${state.privacy ? 'Disable' : 'Enable'} privacy mode">${state.privacy ? I.eyeOff : I.eye}</button>
+        <button class="icon-btn help-btn" aria-label="Help">${I.help}</button>
+        <button class="switcher" data-menu="budget" aria-haspopup="menu" aria-expanded="${state.menu === 'budget'}"><span class="av">MB</span><span class="txt">My Budget</span>${I.chevD}</button>
+      </div>
+      ${accountsPop()}
+      ${morePop()}
+      ${budgetPop()}
+    </header>`;
+      }
+
+      function accountsPop(inDrawer) {
+        const row = a =>
+          `<button class="item" data-set="page" data-val="account"><span class="acct-status" style="background:${a.st === 'ok' ? 'var(--pillPositiveText)' : a.st === 'warn' ? 'var(--categoryAccent3)' : 'transparent'}"></span>${a.n}<span class="amt num ${a.v < 0 ? 'neg' : ''}">${fmt(a.v)}</span></button>`;
+        const on = sum(accounts.on, a => a.v),
+          off = sum(accounts.off, a => a.v);
+        return `<div class="pop ${state.menu === 'accounts' || inDrawer ? 'show' : ''}" ${inDrawer ? '' : 'id="pop-accounts" role="menu"'} style="left:${inDrawer ? 0 : 208}px">
+      <button class="item hl"><span class="ico">${I.wallet}</span>All accounts<span class="amt num ${on + off < 0 ? 'neg' : ''}">${fmt(on + off)}</span></button>
+      <div class="sec"><span>On budget</span><span class="num">${fmt(on)}</span></div>
+      ${accounts.on.map(row).join('')}
+      <div class="sec"><span>Off budget</span><span class="num">${fmt(off)}</span></div>
+      ${accounts.off.map(row).join('')}
+      <hr>
+      <button class="item"><span class="ico">${I.archive}</span>Closed accounts <span class="muted">(2)</span></button>
+      <button class="item"><span class="ico">${I.plus}</span>Add account</button>
+    </div>`;
+      }
+
+      function morePop(inDrawer) {
+        const it = (i, l, extra = '') =>
+          `<button class="item"><span class="ico">${i}</span>${l}${extra}</button>`;
+        return `<div class="pop ${state.menu === 'more' || inDrawer ? 'show' : ''}" ${inDrawer ? '' : 'id="pop-more" role="menu"'} style="left:${inDrawer ? 0 : 440}px">
+      ${it(I.payees, 'Payees')}${it(I.rules, 'Rules')}${it(I.bank, 'Bank Sync', '<span class="amt muted">if enabled</span>')}${it(I.tag, 'Tags')}
+      <hr>${it(I.gear, 'Settings')}
+    </div>`;
+      }
+
+      function budgetPop() {
+        const it = (i, l) =>
+          `<button class="item"><span class="ico">${i}</span>${l}</button>`;
+        return `<div class="pop ${state.menu === 'budget' ? 'show' : ''}" id="pop-budget" role="menu">
+      <div class="total"><div><b style="font-size:15px">My Budget</b><div class="muted">Envelope budget · Local file</div></div></div>
+      <hr>${it(I.pencil, 'Rename budget')}${it(I.gear, 'Settings')}${it(I.archive, 'Load backup…')}${it(I.file, 'Switch file')}
+    </div>`;
+      }
+
+      function drawer() {
+        const it = (l, on) =>
+          `<button class="item ${on ? 'hl' : ''}" style="font-weight:${on ? 650 : 500}">${l}</button>`;
+        return `<div class="drawer-scrim ${state.menu === 'drawer' ? 'show' : ''}" data-close></div>
+    <aside class="drawer ${state.menu === 'drawer' ? 'show' : ''}" aria-label="Navigation">
+      <div class="brand" style="padding:4px 10px 12px"><div class="brand-mark">A</div>Actual</div>
+      <div class="pop show" style="position:static;box-shadow:none;border:0;padding:0">
+        ${it('Budget', true)}${it('Reports')}${it('Schedules')}
+        <button class="item"><span class="ico"><span class="acct-status" style="background:var(--categoryAccent3)"></span></span>Uncategorized<span class="amt num">12</span></button>
+        <div class="sec"><span>Accounts</span></div>
+      </div>
+      ${accountsPop(true).replace('class="pop ', 'class="pop show ')}
+      <div class="pop show" style="position:static;box-shadow:none;border:0;padding:0"><div class="sec"><span>More</span></div></div>
+      ${morePop(true)}
+      <div class="pop show" style="position:static;box-shadow:none;border:0;padding:0"><hr>
+        <button class="item"><span class="ico">${I.help}</span>Help</button>
+        <button class="item"><span class="ico">${I.file}</span>My Budget<span class="amt">${I.chevD}</span></button>
+      </div>
+    </aside>`;
+      }
+
+      function header() {
+        return `<div class="head">
+      <div><div class="eyebrow">Budget</div><h1>September 2026</h1></div>
+      <div class="head-controls">
+        <div class="seg months" role="group" aria-label="Months shown">
+          <button class="on" aria-pressed="true">1</button><button>2</button><button>3</button>
+        </div>
+        <div class="seg" role="group" aria-label="Month">
+          <button aria-label="Previous month">${I.chevL}</button>
+          <button class="label">Sep 2026</button>
+          <button aria-label="Next month">${I.chevR}</button>
+        </div>
+        <div class="seg"><button>Today</button></div>
+        <div class="seg"><button aria-label="Budget menu">${I.dots}</button></div>
+      </div>
+    </div>`;
+      }
+
+      const all = groups.flatMap(g => g.cats);
+      const totB = sum(all, c => c.b),
+        totS = sum(all, c => c.s);
+
+      function summaryCards() {
+        const spentCats = [...all]
+          .filter(c => c.s > 0)
+          .sort((a, b) => b.s - a.s);
+        return `<section class="summary" aria-label="Month summary">
+      <div class="card stat hero" role="button" tabindex="0" aria-label="Ready to Assign $1,000. Open breakdown and actions">
+        <div class="more"><span class="txt">Breakdown</span>${I.chevD}</div>
+        <div class="label">Ready to Assign</div>
+        <div class="value num">${fmt(1000)}</div>
+        <div class="sub num">of ${fmt(5200)} available funds</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Assigned</div>
+        <div class="value num">${fmt(totB)}</div>
+        <div class="sub">across ${all.length} categories</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Activity</div>
+        <div class="value num">${fmt(-totS)}</div>
+        <div class="stackbar" aria-hidden="true">${spentCats.map(c => `<i style="flex:${c.s};background:${accent(c.id)}"></i>`).join('')}<i style="flex:${totB - totS};background:var(--progressTrack)"></i></div>
+      </div>
+    </section>`;
+      }
+
+      function ring(pct, color) {
+        const r = 22,
+          c = 2 * Math.PI * r;
+        return `<svg class="ring" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="${r}" fill="none" stroke="var(--progressTrack)" stroke-width="6"/>
+      <circle cx="27" cy="27" r="${r}" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(c * pct).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 27 27)"/></svg>`;
+      }
+
+      function trendSvg() {
+        const w = 600,
+          h = 96,
+          days = 30;
+        const cur = [
+          [0, 1800],
+          [1, 1830],
+          [3, 1905],
+          [6, 2040],
+          [9, 2110],
+          [12, 2180],
+          [14, 2330],
+          [18, 2380],
+          [22, 2410],
+          [26, 2440],
+        ];
+        const prev = [
+          [0, 1800],
+          [3, 1990],
+          [7, 2260],
+          [11, 2520],
+          [15, 2790],
+          [19, 3050],
+          [23, 3310],
+          [27, 3560],
+          [30, 3720],
+        ];
+        const x = d => (d / days) * w,
+          y = v => h - 6 - ((v - 1750) / (3800 - 1750)) * (h - 14);
+        const p = a =>
+          a
+            .map(
+              ([d, v], i) =>
+                `${i ? 'L' : 'M'}${x(d).toFixed(1)},${y(v).toFixed(1)}`,
+            )
+            .join(' ');
+        return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" style="margin-top:8px" role="img" aria-label="Spending this month is below last month's pace">
+      <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--categoryAccent1)" stop-opacity=".35"/><stop offset="1" stop-color="var(--categoryAccent1)" stop-opacity="0"/></linearGradient></defs>
+      <path d="${p(prev)}" fill="none" stroke="var(--pageTextFaint)" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+      <path d="${p(cur)} L${x(26)},${h} L0,${h} Z" fill="url(#tg)"/>
+      <path d="${p(cur)}" fill="none" stroke="var(--categoryAccent1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    </svg>`;
+      }
+
+      function summaryTrend() {
+        return `<section class="summary trend" aria-label="Month summary">
+      <div class="card trendcard">
+        <div class="row-top"><div>
+          <div class="label" style="font-size:12.5px;color:var(--pageTextSubdued);font-weight:500">Activity this month</div>
+          <div class="num" style="font-size:26px;font-weight:700;letter-spacing:-.03em;margin-top:3px">${fmt(-totS)}<span class="delta">$520 less than August</span></div>
+        </div></div>
+        ${trendSvg()}
+        <div class="legend"><span><i style="background:var(--categoryAccent1)"></i>September</span><span><i style="background:var(--pageTextFaint)"></i>August</span></div>
+      </div>
+      <div class="stack2">
+        <div class="card stat hero" role="button" tabindex="0"><div><div class="label">Ready to Assign</div><div class="value num">${fmt(1000)}</div></div>${ring(0.81, 'var(--pillPositiveText)')}</div>
+        <div class="card stat"><div><div class="label">Assigned</div><div class="value num">${fmt(totB)}</div></div>${ring(0.58, 'var(--categoryAccent1)')}</div>
+      </div>
+    </section>`;
+      }
+
+      function catRow(c) {
+        const avail = c.b - c.s;
+        const p = progress(-c.s, avail);
+        return `<div class="cols crow ${c.id === selected && state.panel ? 'sel' : ''}" role="row">
+      <div class="name" role="rowheader">${tile(c)}<span>${c.n}</span></div>
+      <div class="r num"><span class="assigned">${fmt(c.b)}</span></div>
+      <div class="act">
+        <div class="t num"><span>${fmt(-c.s)}</span><span class="pct">${Math.round(p.fill * 100)}%</span></div>
+        <div class="bar" aria-hidden="true"><i style="width:${p.fill * 100}%;background:${p.over ? 'var(--pillNegativeText)' : accent(c.id)}"></i></div>
+      </div>
+      <div class="r">${pill(avail)}</div>
+    </div>`;
+      }
+
+      function groupRow(g) {
+        const b = sum(g.cats, c => c.b),
+          s = sum(g.cats, c => c.s);
+        return `<div class="cols grow" role="row">
+      <div class="name" role="rowheader"><span class="caret">${I.chevD}</span>${g.name}</div>
+      <div class="r num">${fmt(b)}</div>
+      <div class="num gt">${fmt(-s)}</div>
+      <div class="r">${pill(b - s)}</div>
+    </div>`;
+      }
+
+      const colHead = `<div class="cols lhead" role="row"><div>Category</div><div class="r">Assigned</div><div>Activity</div><div class="r">Available</div></div>`;
+
+      function ledger() {
+        if (state.layout === 'b') {
+          return `<div class="ledger-wrap" role="table" aria-label="Envelope budget">${colHead}${groups
+            .map(
+              g =>
+                `<div class="card ledger" role="rowgroup">${groupRow(g)}${g.cats.map(catRow).join('')}</div>`,
+            )
+            .join('')}</div>`;
+        }
+        return `<div class="ledger-wrap card" role="table" aria-label="Envelope budget"><div class="ledger">${colHead}${groups
+          .map(g => groupRow(g) + g.cats.map(catRow).join(''))
+          .join('')}</div></div>`;
+      }
+
+      function paceSvg() {
+        const w = 320,
+          h = 110,
+          days = 30,
+          max = 600;
+        const pts = [
+          [0, 0],
+          [5, 0],
+          [6, 100],
+          [13, 100],
+          [14, 240],
+          [26, 240],
+        ];
+        const x = d => (d / days) * w,
+          y = v => h - 6 - (v / max) * (h - 14);
+        const line = pts
+          .map(
+            ([d, v], i) =>
+              `${i ? 'L' : 'M'}${x(d).toFixed(1)},${y(v).toFixed(1)}`,
+          )
+          .join(' ');
+        return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" role="img" aria-label="Groceries activity is $140 under an even pace">
+      <defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--categoryAccent2)" stop-opacity=".32"/><stop offset="1" stop-color="var(--categoryAccent2)" stop-opacity="0"/></linearGradient></defs>
+      <line x1="0" y1="${y(0)}" x2="${w}" y2="${y(max)}" stroke="var(--pageTextFaint)" stroke-width="1.5" stroke-dasharray="4 5" vector-effect="non-scaling-stroke"/>
+      <path d="${line} L${x(26)},${h} L0,${h} Z" fill="url(#pg)"/>
+      <path d="${line}" fill="none" stroke="var(--categoryAccent2)" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    </svg>`;
+      }
+
+      function panel() {
+        const c = all.find(x => x.id === selected);
+        const avail = c.b - c.s,
+          p = progress(-c.s, avail);
+        return `<aside class="card detail" ${state.panel ? '' : 'hidden'} aria-label="Category details: ${c.n}">
+      <div class="d-top">${tile(c)}<div><div class="d-title">${c.n}</div><div class="d-sub">Monthly expenses · Sep 2026</div></div>
+        <button class="icon-btn d-close" data-toggle="panel" aria-label="Close details">${I.x}</button></div>
+      <div>
+        <div class="big num">${fmt(avail)}<small>Available</small></div>
+        <div class="bar" style="margin-top:10px;height:7px" aria-hidden="true"><i style="width:${p.fill * 100}%;background:${accent(c.id)}"></i></div>
+      </div>
+      <div class="minis">
+        <div class="mini"><div class="l">Assigned</div><div class="v num">${fmt(c.b)}</div></div>
+        <div class="mini"><div class="l">Activity</div><div class="v num">${fmt(-c.s)}</div></div>
+        <div class="mini"><div class="l">Last month</div><div class="v num">${fmt(-512)}</div></div>
+      </div>
+      <div>
+        <div class="sec-title">Pace <span>Sep 1 – 30</span></div>
+        <div style="margin-top:8px">${state.privacy ? '<div class="note">Hidden in privacy mode</div>' : paceSvg()}</div>
+        <div class="legend"><span><i style="background:var(--categoryAccent2)"></i>Activity</span><span><i style="background:var(--pageTextFaint)"></i>Even pace</span><span style="margin-left:auto" class="num">$140 under pace</span></div>
+      </div>
+      <div><div class="sec-title" style="margin-bottom:6px">Notes</div><div class="note">Weekly food shop</div></div>
+      <div>
+        <div class="sec-title">Transactions <span>2</span></div>
+        <div class="txn"><div class="payee" style="color:var(--categoryAccent2)">S</div><div class="m"><b>SuperMart</b><span>Sep 14 · Checking</span></div><div class="amt num">${fmt(-140)}.00</div></div>
+        <div class="txn"><div class="payee" style="color:var(--categoryAccent6)">L</div><div class="m"><b>Local Market</b><span>Sep 6 · Credit Card</span></div><div class="amt num">${fmt(-100)}.00</div></div>
+      </div>
+    </aside>`;
+      }
+
+      function controls() {
+        const grp = (label, key, opts) =>
+          `<div class="grp"><b>${label}</b>${opts
+            .map(
+              ([v, l]) =>
+                `<button class="${String(state[key]) === String(v) ? 'on' : ''}" data-set="${key}" data-val="${v}">${l}</button>`,
+            )
+            .join('')}</div>`;
+        return `<div class="proto" aria-label="Prototype controls">
+      ${grp('Page', 'page', [
+        ['budget', 'Budget'],
+        ['account', 'Account'],
+      ])}
+      ${grp('Layout', 'layout', [
+        ['a', 'A table'],
+        ['b', 'B cards'],
+      ])}
+      ${grp('Header', 'header', [
+        ['cards', 'Cards'],
+        ['trend', 'C trend'],
+      ])}
+      ${grp('Theme', 'theme', [
+        ['light', 'Light'],
+        ['dark', 'Dark'],
+        ['midnight', 'Midnight'],
+      ])}
+      ${grp('Panel', 'panel', [
+        [true, 'Open'],
+        [false, 'Closed'],
+      ])}
+    </div>`;
+      }
+
+      // Account register page (fictional data)
+      const txns = [
+        {
+          sched: 'Upcoming',
+          d: '10/01/2026',
+          p: 'Landlord Co',
+          notes: 'Rent',
+          cat: 'c-rent',
+          cn: 'Rent',
+          out: 1800,
+        },
+        {
+          sched: 'Due',
+          d: '09/28/2026',
+          p: 'City Power',
+          notes: 'Electric bill',
+          cat: 'c-util',
+          cn: 'Utilities',
+          out: 120,
+        },
+        {
+          d: '09/27/2026',
+          p: 'SuperMart',
+          notes: '',
+          tags: [['#groceries', '#2f855a']],
+          cat: 'c-groc',
+          cn: 'Groceries',
+          out: 86.12,
+          bal: 4250,
+          c: 'c',
+        },
+        {
+          d: '09/26/2026',
+          p: 'Payroll',
+          notes: 'September pay',
+          cat: null,
+          cn: 'Income',
+          inn: 2600,
+          bal: 4336.12,
+          c: 'c',
+        },
+        {
+          d: '09/25/2026',
+          p: 'Hardware Hub',
+          split: true,
+          cn: 'Split',
+          out: 64.5,
+          bal: 1736.12,
+          c: 'u',
+        },
+        {
+          child: true,
+          p: 'Hardware Hub',
+          cat: 'c-util',
+          cn: 'Utilities',
+          out: 24.5,
+          tags: [['#home', '#6b46c1']],
+        },
+        {
+          child: true,
+          p: 'Hardware Hub',
+          cat: 'c-dine',
+          cn: 'Dining out',
+          out: 40,
+        },
+        {
+          d: '09/24/2026',
+          p: 'Transfer: Savings',
+          notes: '',
+          cat: null,
+          cn: 'Transfer',
+          out: 300,
+          bal: 1800.62,
+          c: 'c',
+          sel: true,
+        },
+        {
+          d: '09/22/2026',
+          p: 'Metro Transit',
+          notes: 'Monthly pass',
+          cat: 'c-trans',
+          cn: 'Transport',
+          out: 80,
+          bal: 2100.62,
+          c: 'c',
+          sel: true,
+        },
+        {
+          d: '09/20/2026',
+          p: 'StreamFlix',
+          notes: '',
+          tags: [['#subscriptions', '#c05621']],
+          cat: 'c-subs',
+          cn: 'Subscriptions',
+          out: 15.99,
+          bal: 2180.62,
+          c: 'r',
+        },
+        {
+          d: '09/18/2026',
+          p: 'Noodle Bar',
+          notes: 'Friday dinner',
+          cat: 'c-dine',
+          cn: 'Dining out',
+          out: 42.3,
+          bal: 2196.61,
+          c: 'r',
+        },
+        {
+          d: '09/14/2026',
+          p: 'SuperMart',
+          notes: '',
+          tags: [['#groceries', '#2f855a']],
+          cat: 'c-groc',
+          cn: 'Groceries',
+          out: 140,
+          bal: 2238.91,
+          c: 'r',
+        },
+        {
+          d: '09/10/2026',
+          p: 'Web Phone',
+          notes: '',
+          cat: 'c-subs',
+          cn: 'Subscriptions',
+          out: 44.01,
+          bal: 2378.91,
+          c: 'r',
+        },
+        {
+          d: '09/06/2026',
+          p: 'Local Market',
+          notes: '',
+          cat: 'c-groc',
+          cn: 'Groceries',
+          out: 100,
+          bal: 2422.92,
+          c: 'r',
+        },
+        {
+          d: '09/03/2026',
+          p: 'Fuel Stop',
+          notes: '',
+          cat: 'c-trans',
+          cn: 'Transport',
+          out: 38.2,
+          bal: 2522.92,
+          c: 'r',
+        },
+        {
+          d: '09/01/2026',
+          p: 'Landlord Co',
+          notes: 'Rent',
+          cat: 'c-rent',
+          cn: 'Rent',
+          out: 1800,
+          bal: 2561.12,
+          c: 'r',
+        },
+      ];
+      const money = n =>
+        n == null
+          ? ''
+          : n.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            });
+      const check =
+        '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+      const lock =
+        '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+
+      function txnRow(t) {
+        const cls = [
+          t.sched ? 'sched' : '',
+          t.child ? 'child' : '',
+          t.sel && state.sel ? 'selected' : '',
+        ].join(' ');
+        const catCell = t.cat
+          ? `<div class="cat-cell"><span class="cat-dot" style="background:${accent(t.cat)}"></span><span class="ell">${t.cn}</span></div>`
+          : `<div class="cat-cell"><span class="ell" style="color:var(--pageTextSubdued)">${t.cn}</span></div>`;
+        const status = t.sched
+          ? `<span class="status" style="background:${t.sched === 'Due' ? 'var(--pillNegativeBackground)' : 'var(--selectionBackground)'};color:${t.sched === 'Due' ? 'var(--pillNegativeText)' : 'var(--accent)'}">${t.sched}</span>`
+          : catCell;
+        const clr =
+          t.c === 'c'
+            ? `<span class="clr c" title="Cleared">${check}</span>`
+            : t.c === 'u'
+              ? '<span class="clr u" title="Uncleared"></span>'
+              : t.c === 'r'
+                ? `<span class="clr r" title="Reconciled">${lock}</span>`
+                : '';
+        return `<div class="rcols trow ${cls}" role="row">
+          <div>${t.child ? '' : `<span class="cb ${t.sel && state.sel ? 'on' : ''}">${t.sel && state.sel ? check : ''}</span>`}</div>
+          <div class="num">${t.d || ''}</div>
+          <div class="payee-cell ${t.child ? 'indent' : ''}">${t.child ? '' : `<div class="payee" style="color:${t.cat ? accent(t.cat) : 'var(--pageTextSubdued)'}">${firstGrapheme(t.p)}</div>`}<span class="ell">${t.split ? '↳ ' : ''}${t.p}</span></div>
+          <div class="ell">${(t.tags || []).map(([n, c]) => `<span class="tag" style="background:${c}">${n}</span>`).join(' ')} ${t.notes || ''}</div>
+          <div>${status}</div>
+          <div class="r num">${money(t.out)}</div>
+          <div class="r num">${money(t.inn)}</div>
+          <div class="r num runbal col-bal">${t.child || t.sched ? '' : money(t.bal)}</div>
+          <div>${clr}</div>
+        </div>`;
+      }
+
+      function balanceSpark() {
+        const pts = [
+          2561, 2523, 2423, 2379, 2239, 2197, 2181, 2101, 1801, 1736, 4336,
+          4250,
+        ];
+        const w = 380,
+          h = 64,
+          min = 1500,
+          max = 4600;
+        const d = pts
+          .map(
+            (v, i) =>
+              `${i ? 'L' : 'M'}${((i / (pts.length - 1)) * w).toFixed(1)},${(h - 4 - ((v - min) / (max - min)) * (h - 8)).toFixed(1)}`,
+          )
+          .join(' ');
+        return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" role="img" aria-label="Balance over the last 30 days">
+          <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--categoryAccent4)" stop-opacity=".3"/><stop offset="1" stop-color="var(--categoryAccent4)" stop-opacity="0"/></linearGradient></defs>
+          <path d="${d} L${w},${h} L0,${h} Z" fill="url(#bg)"/><path d="${d}" fill="none" stroke="var(--categoryAccent4)" stroke-width="2.25" vector-effect="non-scaling-stroke"/></svg>`;
+      }
+
+      function accountPage() {
+        const selBtn = state.sel
+          ? `<button class="tbtn sel"><span class="num">2</span> transactions ${I.chevD}</button>`
+          : `<button class="tbtn"><span>${I.file}</span><span class="txt">Import</span></button><button class="tbtn primary">${I.plus}<span class="txt">Add New</span></button>`;
+        return `<main class="main">
+          <section class="acct-head">
+            <div class="card acct-hero">
+              <div class="title-row"><div><div class="eyebrow">On budget · Checking</div><h1>Everyday Checking</h1></div>
+                <div style="margin-left:auto;display:flex;gap:8px"><button class="tbtn">${I.cloud}<span class="txt">Bank Sync</span></button><button class="tbtn" aria-label="Reconcile">${lock}<span class="txt">Reconcile</span></button></div></div>
+              <div class="bal num">$4,250.00</div>
+              <div class="chips">
+                <span class="chip">Cleared <b class="num">$4,335.00</b></span>
+                <span class="chip">Uncleared <b class="num">−$85.00</b></span>
+                ${state.sel ? '<span class="chip">Selected <b class="num">−$380.00</b></span>' : ''}
+                <span class="chip ok">${lock} Reconciled 3 days ago</span>
+              </div>
+            </div>
+            <div class="card acct-chart">
+              <div class="sec-title">Balance <span>Last 30 days · optional</span></div>
+              <div style="margin-top:6px">${state.privacy ? '<div class="note">Hidden in privacy mode</div>' : balanceSpark()}</div>
+            </div>
+          </section>
+          <div class="toolbar">
+            ${selBtn}
+            <button class="tbtn">${I.rules}<span class="txt">Filter</span></button>
+            
+            <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Search</div>
+            <button class="icon-btn" aria-label="Collapse split transactions">${I.chevD}</button>
+            <button class="icon-btn" aria-label="Account menu">${I.dots}</button>
+          </div>
+          <div class="card register" role="table" aria-label="Transactions">
+            <div class="rcols rhead" role="row"><div><span class="cb"></span></div><div>Date</div><div>Payee</div><div>Notes</div><div>Category</div><div class="r">Payment</div><div class="r">Deposit</div><div class="r col-bal">Balance</div><div>✓</div></div>
+            ${state.adding ? `<div class="rcols trow editing"><div></div><div class="cell-edit num">09/27/2026</div><div class="cell-edit" style="color:var(--pageTextFaint)">Payee</div><div class="cell-edit"></div><div class="cell-edit" style="color:var(--accent)">Categorize</div><div class="cell-edit num" style="justify-content:flex-end">0.00</div><div class="cell-edit"></div><div class="col-bal"></div><div><span class="clr u"></span></div></div><div class="newrow-actions"><button class="tbtn">Cancel</button><button class="tbtn primary">Add</button></div>` : ''}
+            ${txns.map(txnRow).join('')}
+          </div>
+        </main>`;
+      }
+
+      function render() {
+        document.documentElement.dataset.theme = state.theme;
+        document.body.className = [
+          state.layout === 'b' ? 'layout-b' : 'layout-a',
+          state.panel && state.page === 'budget' ? 'panel-open' : '',
+          state.privacy ? 'privacy' : '',
+          state.controls ? '' : 'no-controls',
+        ].join(' ');
+        document.getElementById('app').innerHTML = `
+      <div class="app">
+        ${topbar()}
+        <div class="page">
+          ${
+            state.page === 'account'
+              ? accountPage()
+              : `<main class="main">
+            ${header()}
+            ${state.header === 'trend' ? summaryTrend() : summaryCards()}
+            ${ledger()}
+          </main>
+          <div class="scrim" data-toggle="panel"></div>
+          ${panel()}`
+          }
+        </div>
+      </div>
+      ${drawer()}
+      ${controls()}`;
+        const u = new URL(location.href);
+        for (const k of ['page', 'layout', 'header', 'theme', 'menu'])
+          u.searchParams.set(k, state[k]);
+        u.searchParams.set('panel', state.panel ? '1' : '0');
+        u.searchParams.set('privacy', state.privacy ? '1' : '0');
+        history.replaceState(null, '', u);
+      }
+
+      document.addEventListener('click', e => {
+        const t = e.target.closest(
+          '[data-set],[data-menu],[data-toggle],[data-close],.crow',
+        );
+        if (!t) {
+          if (state.menu !== 'none' && !e.target.closest('.pop')) {
+            state.menu = 'none';
+            render();
+          }
+          return;
+        }
+        if (t.dataset.set)
+          state[t.dataset.set] =
+            t.dataset.val === 'true'
+              ? true
+              : t.dataset.val === 'false'
+                ? false
+                : t.dataset.val;
+        if (t.dataset.set === 'page') state.menu = 'none';
+        else if (t.dataset.menu)
+          state.menu = state.menu === t.dataset.menu ? 'none' : t.dataset.menu;
+        else if (t.dataset.toggle)
+          state[t.dataset.toggle] = !state[t.dataset.toggle];
+        else if (t.dataset.close !== undefined) state.menu = 'none';
+        else if (t.classList.contains('crow')) state.panel = true;
+        render();
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          if (state.menu !== 'none') state.menu = 'none';
+          else state.panel = false;
+          render();
+        }
+      });
+      render();
+    </script>
+  </body>
+</html>
