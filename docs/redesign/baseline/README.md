@@ -6,12 +6,12 @@ touched to produce this record.
 
 ## Commands and results
 
-| Check      | Command                                                             | Result                                                            |
-| ---------- | -------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| Typecheck  | `node .yarn/releases/yarn-4.17.1.cjs typecheck`                      | Pass — 10 workspace tasks, 0 failed                                 |
-| Lint       | `node .yarn/releases/yarn-4.17.1.cjs lint`                           | Pass — 0 formatting issues, 0 lint errors                          |
-| Unit tests | `node .yarn/releases/yarn-4.17.1.cjs test`                           | Pass — 10 workspace tasks, 0 failed                                 |
-| Baseline e2e capture | see below                                                  | 73/74 passed; 1 known viewport-dependent assumption (not a defect) |
+| Check               | Command                                         | Result                                                       |
+| ------------------- | ----------------------------------------------- | ------------------------------------------------------------ |
+| Typecheck           | `node .yarn/releases/yarn-4.17.1.cjs typecheck` | Pass — 10 workspace tasks, 0 failed                          |
+| Lint                | `node .yarn/releases/yarn-4.17.1.cjs lint`      | Pass — 0 formatting issues, 0 lint errors                    |
+| Unit tests          | `node .yarn/releases/yarn-4.17.1.cjs test`      | Pass — 10 workspace tasks, 0 failed                          |
+| Baseline e2e checks | see below                                       | 58 passed, 1 failed, 15 skipped — incomplete at desktop-1440 |
 
 Lint initially failed on `scripts/redesign-baseline.config.ts` for importing
 `@playwright/test` without declaring it (`no-extraneous-dependencies`). Fixed
@@ -20,7 +20,7 @@ uses, `1.61.1`) to the root `package.json` devDependencies and updating
 `yarn.lock`. This is a planning-tooling dependency declaration only; no
 application package was touched.
 
-## Baseline e2e capture
+## Baseline e2e checks
 
 Command:
 
@@ -34,16 +34,27 @@ E2E_START_URL=http://127.0.0.1:3018 node .yarn/releases/yarn-4.17.1.cjs \
 
 Scope: `budget.test.ts`, `accounts.test.ts`, `reports.test.ts`, each run at
 two viewports (`desktop-1000` = 1000×700, `desktop-1440` = 1440×900), for 74
-total test executions. Screenshots are saved under
-`docs/redesign/baseline/screenshots/{desktop-1000,desktop-1440}/`.
+scheduled test cases. The command above checks behavior; screenshot capture
+requires `VRT=true` (see the [handbook](../README.md)). Previously captured
+screenshots are under `docs/redesign/baseline/screenshots/`.
 
-**Result: 58 passed, 1 failed, 15 skipped (same describe block as the
-failure), all at `desktop-1440`.** `desktop-1000` (37/37) passed in full.
+**Result: 58 passed, 1 failed, 15 skipped.**
+
+| Viewport     | Passed | Failed | Skipped | Total |
+| ------------ | -----: | -----: | ------: | ----: |
+| desktop-1000 |     37 |      0 |       0 |    37 |
+| desktop-1440 |     21 |      1 |      15 |    37 |
+| Total        |     58 |      1 |      15 |    74 |
+
+The failed test and all 15 skipped tests belong to `desktop-1440`.
+Skipped tests are unverified, not passes. These are the previously recorded
+run results, corrected for consistency; this documentation correction does
+not represent a new test run.
 
 ### The one failure — not a redesign regression
 
 `e2e/reports.test.ts:33` (`Reports › loads net worth and cash flow reports`)
-asserts a fixed list of five available report cards. At the 1440-wide
+asserts a fixed list of nine available report cards. At the 1440-wide
 viewport the app shows two additional cards, `Transaction Calendar` and
 `Recent Net Worth Change`, that are not present at the repo's own default
 test viewport.
@@ -63,7 +74,7 @@ viewport widths**, so any redesigned reports/dashboard surface (Stage 6) must
 account for a viewport-dependent widget set rather than a fixed list. The
 remaining 15 skipped tests are later cases in the same `reports.test.ts`
 describe block at `desktop-1440`; they were not run because Playwright
-stopped after the first failure in that block, not because they failed.
+stopped after the first failure in that block, not because they failed. Their behavior at this viewport remains unverified.
 
 ## What this establishes
 
@@ -73,8 +84,11 @@ stopped after the first failure in that block, not because they failed.
   `scripts/redesign-baseline.config.ts`) runs the existing Playwright suite
   against isolated ports without needing a sync server or real budget.
 - The only discrepancy found is a viewport-dependent product behavior, not a
-  bug introduced by this project, and it is now a recorded constraint for
-  later design stages rather than an open question.
+  bug introduced by this project, and it is recorded for later design stages. The wider Reports suite
+  is not fully verified: resolve the viewport-specific test expectation in
+  APP-03, then rerun all Reports cases at both widths and record the results.
+  Do not remove actual widgets to satisfy the old expectation or count the
+  default-viewport single-test rerun as coverage of the skipped cases.
 
 ## Not covered here
 
