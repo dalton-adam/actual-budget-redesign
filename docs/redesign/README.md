@@ -62,4 +62,4 @@ Create a small task branch from `redesign/main`, for example `redesign/budget-to
 
 The repository's inherited instructions prohibit agents from creating GitHub issues. The versioned Markdown backlog is the working tracker; this does not block implementation. Follow the inherited commit/PR naming and template rules if a PR is created. No upstream PR should be opened for this personal redesign unless explicitly requested.
 
-The next stage is DESIGN-01: a fictional-data prototype. Stage 0 setup does not approve a final layout or begin the UI implementation.
+The next stage is DESIGN-01: a fictional-data prototype comparing Copilot-inspired concepts A, B, and C (`design-concepts/copilot/`). The owner decisions recorded in plan §1.1 (visual language, YNAB wording, automatic category colors, built-in themes first) are settled; the final layout is not.
