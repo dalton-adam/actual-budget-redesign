@@ -5,10 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Budget Prototype</title>
     <!--
-  DESIGN-01 prototype: fictional data only, no connection to Actual's code.
+  DESIGN-01/02 prototype: fictional data only, no connection to Actual's code.
   Open with a local file URL after `yarn install` (fonts load from node_modules).
-  URL params: layout=a|b, header=cards|trend, theme=light|dark|midnight,
-  panel=0|1, menu=none|accounts|more|budget|drawer, privacy=0|1, controls=0|1
+  URL params: layout=a|b, header=cards|trend, theme=light|dark|midnight|custom,
+  panel=0|1, privacy=0|1, controls=0|1, page=budget|account
+  DESIGN-02: data=basic|states|many, density=50|44|38, rta=pos|zero|neg,
+  when=past|current|future, cat=<category id>, pm=<panel month>, hover=<id>, edit=<id>:<month>,
+  compact=1, hidden=0, collapsed=<group ids>, pane=open|collapsed, recon=0|diff|done,
+  filter=<id>:<month>, menu=accounts|more|budget|drawer|breakdown|balance|
+  catmenu|groupmenu|month|column|recon with for=<anchor id>
 -->
     <style>
       @font-face {
@@ -40,8 +45,8 @@
         --pageTextFaint: #8d8d99;
         --cardBackground: #ffffff; /* existing: cardBackground */
         --cardBorder: rgba(15, 15, 30, 0.07);
-        --cardShadow:
-          0 1px 2px rgba(15, 15, 30, 0.04), 0 10px 28px rgba(15, 15, 30, 0.05);
+        --cardShadow: 0 1px 2px rgba(15, 15, 30, 0.04),
+          0 10px 28px rgba(15, 15, 30, 0.05);
         --cardInset: #f6f6f9;
         --controlBackground: #ffffff;
         --navTrack: rgba(15, 15, 30, 0.05);
@@ -60,8 +65,8 @@
         --pillNegativeBackground: rgba(225, 45, 57, 0.11);
         --pillNegativeText: #c21f2c; /* numberNegative */
         --heroGlow: rgba(20, 125, 100, 0.12);
-        --popoverShadow:
-          0 16px 40px rgba(15, 15, 30, 0.16), 0 2px 6px rgba(15, 15, 30, 0.06);
+        --popoverShadow: 0 16px 40px rgba(15, 15, 30, 0.16),
+          0 2px 6px rgba(15, 15, 30, 0.06);
         --scrim: rgba(15, 15, 30, 0.28);
         --categoryAccent1: #6366f1;
         --categoryAccent2: #10b981;
@@ -77,8 +82,7 @@
       }
       [data-theme='dark'] {
         --pageBackground: #0b0b0f;
-        --pageGlow:
-          radial-gradient(
+        --pageGlow: radial-gradient(
             1100px 460px at 12% -12%,
             rgba(129, 140, 248, 0.13),
             transparent 60%
@@ -93,8 +97,7 @@
         --pageTextFaint: #74747f;
         --cardBackground: #141419;
         --cardBorder: rgba(255, 255, 255, 0.065);
-        --cardShadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.03),
+        --cardShadow: inset 0 1px 0 rgba(255, 255, 255, 0.03),
           0 18px 36px rgba(0, 0, 0, 0.32);
         --cardInset: rgba(255, 255, 255, 0.04);
         --controlBackground: #16161c;
@@ -114,8 +117,8 @@
         --pillNegativeBackground: rgba(248, 113, 113, 0.15);
         --pillNegativeText: #f87171;
         --heroGlow: rgba(74, 222, 128, 0.2);
-        --popoverShadow:
-          0 20px 50px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
+        --popoverShadow: 0 20px 50px rgba(0, 0, 0, 0.55),
+          0 0 0 1px rgba(255, 255, 255, 0.06);
         --scrim: rgba(0, 0, 0, 0.5);
         --categoryAccent1: #818cf8;
         --categoryAccent2: #34d399;
@@ -141,8 +144,7 @@
         --pageTextFaint: #766e8a;
         --cardBackground: #13101d;
         --cardBorder: rgba(200, 170, 255, 0.08);
-        --cardShadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.03),
+        --cardShadow: inset 0 1px 0 rgba(255, 255, 255, 0.03),
           0 18px 36px rgba(0, 0, 0, 0.4);
         --cardInset: rgba(200, 170, 255, 0.05);
         --controlBackground: #15111f;
@@ -162,8 +164,8 @@
         --pillNegativeBackground: rgba(248, 113, 113, 0.15);
         --pillNegativeText: #f87171;
         --heroGlow: rgba(74, 222, 128, 0.18);
-        --popoverShadow:
-          0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(200, 170, 255, 0.08);
+        --popoverShadow: 0 20px 50px rgba(0, 0, 0, 0.6),
+          0 0 0 1px rgba(200, 170, 255, 0.08);
         --scrim: rgba(0, 0, 0, 0.55);
         --categoryAccent1: #a5b4fc;
         --categoryAccent2: #34d399;
@@ -188,13 +190,8 @@
         height: 100%;
       }
       body {
-        font-family:
-          'Inter Variable',
-          -apple-system,
-          BlinkMacSystemFont,
-          'Segoe UI',
-          Roboto,
-          sans-serif;
+        font-family: 'Inter Variable', -apple-system, BlinkMacSystemFont,
+          'Segoe UI', Roboto, sans-serif;
         font-feature-settings: 'ss01', 'ss04';
         background: var(--pageGlow), var(--pageBackground);
         background-attachment: fixed;
@@ -1527,7 +1524,8 @@
           order: 1;
           font-size: 24px;
         }
-        .acct-hero .chips {
+        .acct-hero .chips,
+        .acct-hero .recon {
           order: 2;
           flex-basis: 100%;
         }
@@ -1537,6 +1535,1041 @@
         }
         .tbtn .txt {
           display: none;
+        }
+      }
+
+      /* ===================== DESIGN-02 additions ===================== */
+
+      /* Warning pill: template underfunded (existing role templateNumberUnderFunded) */
+      :root,
+      [data-theme='light'] {
+        --pillWarningBackground: rgba(217, 119, 6, 0.12);
+        --pillWarningText: #a15c07;
+        --heroGlowNegative: rgba(225, 45, 57, 0.1);
+      }
+      [data-theme='dark'] {
+        --pillWarningBackground: rgba(251, 191, 36, 0.14);
+        --pillWarningText: #fbbf24;
+        --heroGlowNegative: rgba(248, 113, 113, 0.16);
+      }
+      [data-theme='midnight'] {
+        --pillWarningBackground: rgba(251, 191, 36, 0.14);
+        --pillWarningText: #fbbf24;
+        --heroGlowNegative: rgba(248, 113, 113, 0.16);
+      }
+
+      /*
+       * Custom theme test. A custom theme loads on top of a built-in base
+       * (dark here) and overrides EXISTING roles only. The second half is the
+       * proposed UI-01 fallback layer: every new role is derived from an
+       * existing role, so the new surfaces follow the custom palette.
+       */
+      [data-theme='custom'] {
+        /* What the custom theme itself sets (existing Actual roles) */
+        --x-pageBackground: #002b36;
+        --x-pageText: #eee8d5;
+        --x-pageTextSubdued: #93a1a1;
+        --x-cardBackground: #073642;
+        --x-tableBorder: rgba(147, 161, 161, 0.2);
+        --x-buttonPrimaryBackground: #b58900;
+        --x-numberPositive: #859900;
+        --x-numberNegative: #dc322f;
+        --x-templateNumberUnderFunded: #cb4b16;
+
+        /* Fallback layer: new roles expressed through existing ones */
+        --pageBackground: var(--x-pageBackground);
+        --pageGlow: none;
+        --pageText: var(--x-pageText);
+        --pageTextSubdued: var(--x-pageTextSubdued);
+        --pageTextFaint: color-mix(
+          in srgb,
+          var(--x-pageTextSubdued) 70%,
+          var(--x-pageBackground)
+        );
+        --cardBackground: var(--x-cardBackground);
+        --cardBorder: var(--x-tableBorder);
+        --cardShadow: none;
+        --cardInset: color-mix(in srgb, var(--x-pageText) 6%, transparent);
+        --controlBackground: var(--x-cardBackground);
+        --navTrack: var(--x-cardBackground);
+        --navActive: color-mix(in srgb, var(--x-pageText) 12%, transparent);
+        --navActiveShadow: none;
+        --accent: var(--x-buttonPrimaryBackground);
+        --selectionBackground: color-mix(
+          in srgb,
+          var(--x-buttonPrimaryBackground) 16%,
+          transparent
+        );
+        --selectionBorder: var(--x-buttonPrimaryBackground);
+        --tableRowHover: color-mix(in srgb, var(--x-pageText) 4%, transparent);
+        --groupRowBackground: color-mix(
+          in srgb,
+          var(--x-pageText) 3%,
+          transparent
+        );
+        --progressTrack: color-mix(in srgb, var(--x-pageText) 10%, transparent);
+        --pillPositiveBackground: color-mix(
+          in srgb,
+          var(--x-numberPositive) 18%,
+          transparent
+        );
+        --pillPositiveText: var(--x-numberPositive);
+        --pillNeutralBackground: color-mix(
+          in srgb,
+          var(--x-pageText) 8%,
+          transparent
+        );
+        --pillNeutralText: var(--x-pageTextSubdued);
+        --pillNegativeBackground: color-mix(
+          in srgb,
+          var(--x-numberNegative) 18%,
+          transparent
+        );
+        --pillNegativeText: var(--x-numberNegative);
+        --pillWarningBackground: color-mix(
+          in srgb,
+          var(--x-templateNumberUnderFunded) 18%,
+          transparent
+        );
+        --pillWarningText: var(--x-templateNumberUnderFunded);
+        --heroGlow: transparent;
+        --heroGlowNegative: transparent;
+        --popoverShadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+        --scrim: rgba(0, 0, 0, 0.5);
+        /* Category accents are not overridden: the built-in dark set shows */
+        --categoryAccent1: #818cf8;
+        --categoryAccent2: #34d399;
+        --categoryAccent3: #fbbf24;
+        --categoryAccent4: #60a5fa;
+        --categoryAccent5: #f472b6;
+        --categoryAccent6: #fb923c;
+        --categoryAccent7: #22d3ee;
+        --categoryAccent8: #a78bfa;
+        --categoryAccent9: #a3e635;
+        --categoryAccent10: #fb7185;
+        --tileAlpha: 0.17;
+      }
+      [data-theme='custom'] .brand-mark,
+      [data-theme='custom'] .tbtn.primary {
+        color: #002b36;
+      }
+
+      /* Controls bar wraps on small windows */
+      .proto {
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: calc(100vw - 24px);
+        row-gap: 6px;
+      }
+      .proto button[data-reload] {
+        color: #888;
+      }
+
+      /* Density. Tiles and pills shrink with the row. */
+      .d50 .crow {
+        height: 50px;
+      }
+      .d44 .crow {
+        height: 44px;
+      }
+      .d38 .crow {
+        height: 38px;
+      }
+      .d44 .grow {
+        height: 40px;
+      }
+      .d38 .grow {
+        height: 34px;
+      }
+      .d44 .crow .tile {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        font-size: 12px;
+      }
+      .d38 .crow .tile {
+        width: 22px;
+        height: 22px;
+        border-radius: 7px;
+        font-size: 11px;
+      }
+      .d38 .pill {
+        padding: 2px 9px;
+        font-size: 12px;
+      }
+      .d38 .bar {
+        height: 4px;
+      }
+      .d38 .act {
+        gap: 3px;
+      }
+      .d38 .act .t {
+        font-size: 12px;
+      }
+      .d38 .crow .cap {
+        display: none;
+      }
+      .d38 .crow .name {
+        gap: 9px;
+      }
+
+      /* Category name cell: dedicated details opener, tools on hover */
+      .crow .name,
+      .grow .name {
+        position: relative;
+      }
+      .cname {
+        display: flex;
+        align-items: center;
+        gap: inherit;
+        min-width: 0;
+        flex: 1;
+        text-align: left;
+        border-radius: 8px;
+        padding: 2px 0;
+      }
+      .cname.static {
+        cursor: default;
+      }
+      .crow .name .ntext {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        line-height: 1.2;
+      }
+      .crow .name .nlabel {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .crow .name span {
+        white-space: nowrap;
+      }
+      .cname:hover .nlabel {
+        text-decoration: underline;
+        text-decoration-color: var(--pageTextFaint);
+        text-underline-offset: 3px;
+      }
+      .cap {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--pageTextFaint);
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .hid {
+        font-size: 10.5px;
+        font-weight: 650;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--pageTextFaint);
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: var(--cardInset);
+        flex-shrink: 0;
+      }
+      .crow.hidden-cat .name,
+      .crow.hidden-cat .r,
+      .crow.hidden-cat .act {
+        opacity: 0.5;
+      }
+      .drag {
+        position: absolute;
+        left: 2px;
+        color: var(--pageTextFaint);
+        opacity: 0;
+        display: grid;
+        cursor: grab;
+      }
+      /* Row tools take no width until hover or keyboard focus */
+      .tools {
+        display: none;
+        gap: 2px;
+        margin-left: auto;
+        flex-shrink: 0;
+      }
+      .crow:hover .tools,
+      .crow.hover .tools,
+      .crow:focus-within .tools,
+      .grow:hover .tools,
+      .grow:focus-within .tools {
+        display: flex;
+      }
+      .note-ind {
+        display: grid;
+        color: var(--pageTextFaint);
+        flex-shrink: 0;
+      }
+      .crow:hover .note-ind,
+      .crow.hover .note-ind,
+      .crow:focus-within .note-ind {
+        display: none;
+      }
+      .tool {
+        width: 24px;
+        height: 24px;
+        border-radius: 7px;
+        display: grid;
+        place-items: center;
+        color: var(--pageTextFaint);
+        opacity: 0;
+      }
+      .tool:hover {
+        background: var(--tableRowHover);
+        color: var(--pageText);
+      }
+      .tool.on {
+        opacity: 1;
+        color: var(--pageTextSubdued);
+      }
+      .crow:hover .tool,
+      .crow.hover .tool,
+      .crow:focus-within .tool,
+      .grow:hover .tool,
+      .grow:focus-within .tool,
+      .lhead .tool,
+      .mcard .tool,
+      .acct-rail .tool,
+      .crow:hover .drag,
+      .crow.hover .drag {
+        opacity: 1;
+      }
+      .crow.hover {
+        background: var(--tableRowHover);
+      }
+      .crow.hover .assigned {
+        box-shadow: inset 0 0 0 1px var(--cardBorder);
+        background: var(--controlBackground);
+      }
+      .crow .assigned {
+        cursor: text;
+      }
+      .assigned.z,
+      .z {
+        color: var(--pageTextFaint);
+      }
+      .ch-name {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .ch-name .tool {
+        width: 20px;
+        height: 20px;
+      }
+      .grow .gname {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .caret {
+        border-radius: 6px;
+        height: 20px;
+      }
+      .caret:hover {
+        background: var(--tableRowHover);
+        color: var(--pageText);
+      }
+
+      /* Editing the Assigned amount */
+      .amt-input {
+        width: 100%;
+        max-width: 110px;
+        height: 30px;
+        text-align: right;
+        font: inherit;
+        font-weight: 600;
+        color: var(--pageText);
+        background: var(--controlBackground);
+        border: 1.5px solid var(--selectionBorder);
+        border-radius: 8px;
+        padding: 0 8px;
+        outline: 3px solid var(--selectionBackground);
+        font-feature-settings: 'tnum';
+      }
+      .d38 .amt-input {
+        height: 26px;
+      }
+      .crow.editing {
+        background: var(--selectionBackground);
+      }
+
+      /* Activity link, pills, goal and carryover markers */
+      .actlink {
+        border-radius: 6px;
+      }
+      .actlink:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      button.pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 650;
+      }
+      button.pill:hover {
+        box-shadow: inset 0 0 0 1px currentColor;
+      }
+      .pill.warn {
+        background: var(--pillWarningBackground);
+        color: var(--pillWarningText);
+      }
+      .pill .gi,
+      .pill .carry {
+        display: inline-grid;
+        opacity: 0.85;
+      }
+      .goalbox {
+        padding: 11px 12px;
+        border-radius: 12px;
+        background: var(--cardInset);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .gb-top {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+      }
+      .goalbox.under .gb-top {
+        color: var(--pillWarningText);
+      }
+      .goalbox.ok .gb-top {
+        color: var(--pillPositiveText);
+      }
+      .gb-top .gi {
+        display: grid;
+      }
+      .gb-sub {
+        font-size: 12px;
+        color: var(--pageTextSubdued);
+      }
+      .goalbox .bar {
+        height: 5px;
+      }
+      .flag {
+        display: flex;
+        gap: 7px;
+        align-items: flex-start;
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--pageTextSubdued);
+      }
+      .flag svg {
+        margin-top: 2px;
+        flex-shrink: 0;
+      }
+      .big.neg {
+        color: var(--pillNegativeText);
+      }
+      .big.zero {
+        color: var(--pageTextSubdued);
+      }
+
+      /* Ready to Assign states */
+      .badge {
+        display: inline-block;
+        margin-left: 6px;
+        padding: 2px 7px;
+        border-radius: 99px;
+        font-size: 11px;
+        font-weight: 650;
+        letter-spacing: 0;
+        background: var(--pillNeutralBackground);
+        color: var(--pillNeutralText);
+        vertical-align: 1px;
+      }
+      .badge.neg {
+        background: var(--pillNegativeBackground);
+        color: var(--pillNegativeText);
+      }
+      .stat.hero.zero .value {
+        color: var(--pageText);
+      }
+      .stat.hero.zero::after {
+        display: none;
+      }
+      .stat.hero.neg .value {
+        color: var(--pillNegativeText);
+      }
+      .stat.hero.neg::after {
+        background: radial-gradient(
+          circle,
+          var(--heroGlowNegative),
+          transparent 65%
+        );
+      }
+      .stat.hero:focus-visible {
+        outline-offset: 2px;
+        border-radius: 18px;
+      }
+
+      /* Compact summary strip, shown once the table scrolls on short windows */
+      .cstrip {
+        display: none;
+        align-items: center;
+        gap: 22px;
+        height: 46px;
+        padding: 0 8px 0 6px;
+        flex-shrink: 0;
+        border-radius: 14px;
+      }
+      body.compact .summary.cards {
+        display: none;
+      }
+      body.compact .cstrip {
+        display: flex;
+      }
+      .cs-rta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 34px;
+        padding: 0 10px;
+        border-radius: 10px;
+        background: var(--cardInset);
+      }
+      .cstrip .l {
+        font-size: 12.5px;
+        color: var(--pageTextSubdued);
+        font-weight: 500;
+      }
+      .cstrip b {
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .cs-rta.pos b {
+        color: var(--pillPositiveText);
+      }
+      .cs-rta.neg b {
+        color: var(--pillNegativeText);
+      }
+      .cs-rta .badge {
+        margin-left: 0;
+      }
+      .cs-item {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+
+      /* Breakdown and anchored menus */
+      .pop.apop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 60;
+        max-width: calc(100vw - 24px);
+      }
+      .bd {
+        padding: 4px 4px 2px;
+      }
+      .bd-title {
+        font-size: 12px;
+        font-weight: 650;
+        color: var(--pageTextFaint);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 6px 6px 8px;
+      }
+      .bd-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 6px;
+        font-size: 13px;
+        color: var(--pageTextSubdued);
+      }
+      .bd-row .num {
+        color: var(--pageText);
+        font-weight: 550;
+      }
+      .bd-row.total {
+        margin-top: 6px;
+        padding-top: 10px;
+        border-top: 1px solid var(--cardBorder);
+        font-weight: 650;
+        color: var(--pageText);
+        font-size: 14px;
+      }
+      .bd-row.total.pos .num {
+        color: var(--pillPositiveText);
+      }
+      .bd-row.total.neg .num {
+        color: var(--pillNegativeText);
+      }
+
+      /* Multi-month */
+      .mstart {
+        position: relative;
+      }
+      .mstart::before {
+        content: '';
+        position: absolute;
+        left: calc(var(--gap, 20px) / -2);
+        top: -40px;
+        bottom: -40px;
+        width: 1px;
+        background: var(--cardBorder);
+      }
+      .cols {
+        overflow: hidden;
+      }
+      .mhead {
+        height: 34px;
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        background: var(--cardBackground);
+        font-size: 13px;
+        font-weight: 650;
+      }
+      .multi .lhead {
+        top: 34px;
+      }
+      .mh {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .today {
+        font-size: 10.5px;
+        font-weight: 650;
+        padding: 2px 7px;
+        border-radius: 99px;
+        background: var(--selectionBackground);
+        color: var(--accent);
+        text-transform: none;
+        letter-spacing: 0;
+      }
+      .msummary {
+        display: grid;
+        align-items: stretch;
+        padding: 0 19px;
+        flex-shrink: 0;
+      }
+      .ms-lead {
+        align-self: center;
+      }
+      .ms-hint {
+        font-size: 12px;
+        color: var(--pageTextFaint);
+        margin-top: 2px;
+        max-width: 170px;
+      }
+      .mcard {
+        padding: 10px 12px 11px;
+        border-radius: 14px;
+        margin-left: calc(var(--gap, 20px) / -2);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+      .mcard.focus {
+        box-shadow: var(--cardShadow), inset 0 0 0 1px var(--selectionBorder);
+      }
+      .mc-top {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+      }
+      .mc-tools {
+        margin-left: auto;
+        display: flex;
+        gap: 2px;
+      }
+      .mc-rta {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        text-align: left;
+        border-radius: 8px;
+        flex-wrap: wrap;
+      }
+      .mc-rta .l {
+        font-size: 12px;
+        color: var(--pageTextSubdued);
+        width: 100%;
+      }
+      .mc-rta .v {
+        font-size: 21px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+      .mc-rta .badge {
+        margin-left: 0;
+      }
+      .mcard.pos .v {
+        color: var(--pillPositiveText);
+      }
+      .mcard.neg .v {
+        color: var(--pillNegativeText);
+      }
+      .mc-line {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-size: 11.5px;
+        color: var(--pageTextFaint);
+      }
+      .multi .act .t {
+        justify-content: flex-start;
+      }
+      @media (max-width: 1279px) {
+        .msummary {
+          padding: 0 15px;
+        }
+        .mc-rta .v {
+          font-size: 18px;
+        }
+        .multi-month .ms-hint {
+          display: none;
+        }
+        .multi-month .cols .pill {
+          padding: 3px 8px;
+          font-size: 12px;
+        }
+      }
+
+      /* Income section */
+      .grow.inc {
+        margin-top: 0;
+      }
+      .rl {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--pageTextFaint);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-right: 6px;
+      }
+      .irow .r {
+        font-weight: 550;
+      }
+
+      /* Details panel: rail and overlay modes for multi-month views */
+      .page {
+        position: relative;
+      }
+      .rail {
+        width: 62px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 0;
+        align-self: flex-start;
+      }
+      .rail-tile {
+        border-radius: 10px;
+      }
+      .rail-label {
+        writing-mode: vertical-rl;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--pageTextFaint);
+        letter-spacing: 0.04em;
+      }
+      .detail.overlay {
+        position: absolute;
+        right: 24px;
+        top: 62px;
+        bottom: 20px;
+        z-index: 25;
+        box-shadow: var(--popoverShadow);
+      }
+      .d-head {
+        min-width: 0;
+      }
+      .d-title {
+        overflow-wrap: anywhere;
+        line-height: 1.2;
+      }
+      .d-month {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        vertical-align: middle;
+      }
+      .d-month button {
+        width: 20px;
+        height: 20px;
+        border-radius: 6px;
+        display: grid;
+        place-items: center;
+      }
+      .d-month button:hover {
+        background: var(--tableRowHover);
+        color: var(--pageText);
+      }
+      .d-month b {
+        color: var(--pageTextSubdued);
+        font-weight: 600;
+      }
+      .chart {
+        position: relative;
+      }
+      .chart-empty {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--pageTextFaint);
+      }
+      .chart-empty span {
+        padding: 3px 10px;
+        border-radius: 99px;
+        background: var(--cardBackground);
+        box-shadow: 0 0 0 1px var(--cardBorder);
+      }
+      .legend {
+        flex-wrap: wrap;
+        row-gap: 2px;
+      }
+      .legend span {
+        white-space: nowrap;
+      }
+      .crow .name .ntext {
+        min-width: 48px;
+      }
+      .multi .crow .cap {
+        display: none;
+      }
+      .legend i.dash {
+        width: 1px;
+        height: 10px;
+        background: var(--pageTextFaint);
+      }
+      .pace-sum {
+        color: var(--pageTextSubdued);
+        font-weight: 600;
+      }
+      .txn .amt.in {
+        color: var(--pillPositiveText);
+      }
+      .muted {
+        color: var(--pageTextFaint);
+      }
+      .linkbtn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 8px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--accent);
+        border-radius: 6px;
+      }
+      .head .seg button.on {
+        background: var(--navActive);
+        color: var(--pageText);
+        box-shadow: var(--navActiveShadow);
+      }
+
+      /* Pinned accounts rail (optional, replaces the sidebar's pin) */
+      .acct-rail {
+        width: 236px;
+        flex-shrink: 0;
+        padding: 10px 6px;
+        overflow: auto;
+        align-self: stretch;
+      }
+      .acct-rail.collapsed {
+        width: 56px;
+        padding: 10px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+      .ap-dot {
+        position: relative;
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--pageTextSubdued);
+        background: var(--cardInset);
+      }
+      .ap-dot:hover {
+        color: var(--pageText);
+        background: var(--tableRowHover);
+      }
+      .ap-dot .acct-status {
+        position: absolute;
+        right: -1px;
+        top: -1px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px var(--cardBackground);
+      }
+      .acct-rail .ar-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2px 8px 6px 10px;
+        font-size: 13px;
+      }
+      .acct-rail .pop {
+        position: static;
+        display: block;
+        box-shadow: none;
+        border: 0;
+        padding: 0;
+        width: auto;
+        min-width: 0;
+        background: transparent;
+      }
+      .acct-rail .pop .item,
+      .drawer .pop .item {
+        white-space: nowrap;
+      }
+      .acct-rail .pop .item {
+        padding: 7px 8px;
+        font-size: 13px;
+      }
+      .pin-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 650;
+        color: var(--pageTextSubdued);
+        text-transform: none;
+        letter-spacing: 0;
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+      .pin-btn:hover {
+        background: var(--tableRowHover);
+        color: var(--pageText);
+      }
+
+      /* Reconciliation mode in the account hero */
+      .recon {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 12px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: var(--cardInset);
+        font-size: 13px;
+        color: var(--pageTextSubdued);
+      }
+      .recon b {
+        color: var(--pageText);
+      }
+      .recon-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+      }
+      .chip.neg {
+        background: var(--pillNegativeBackground);
+        color: var(--pillNegativeText);
+      }
+      .chip.neg b {
+        color: inherit;
+      }
+      .acct-hero.reconciling {
+        box-shadow: var(--cardShadow), inset 0 0 0 1.5px var(--selectionBorder);
+      }
+      .register.reconciling .clr-head {
+        color: var(--accent);
+      }
+      .register.reconciling .clr.u {
+        border-color: var(--accent);
+      }
+      .rc {
+        width: 290px;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--pageTextSubdued);
+      }
+      .rc-input {
+        height: 36px;
+        border-radius: 10px;
+        border: 1.5px solid var(--selectionBorder);
+        background: var(--controlBackground);
+        color: var(--pageText);
+        font: inherit;
+        font-size: 15px;
+        font-weight: 600;
+        text-align: right;
+        padding: 0 10px;
+      }
+      .rc-bank {
+        text-align: right;
+        font-size: 12px;
+      }
+      .rc-bank b {
+        color: var(--pageText);
+      }
+      .rc-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+      .filter-pill button {
+        display: grid;
+        place-items: center;
+        border-radius: 99px;
+        width: 18px;
+        height: 18px;
+      }
+      @media (max-width: 1279px) {
+        .recon-actions {
+          margin-left: 0;
+        }
+        .acct-rail {
+          width: 210px;
+        }
+      }
+      @media (max-width: 899px) {
+        .rail {
+          display: none;
+        }
+        .cstrip .cs-item:last-child {
+          display: none;
+        }
+      }
+      /* Accounts pane and details panel both open: narrower Activity */
+      @media (min-width: 1280px) {
+        body.pane-open.panel-open .cols {
+          grid-template-columns:
+            minmax(150px, 1fr) 104px minmax(100px, 170px)
+            108px;
+          column-gap: 16px;
+        }
+        body.pane-open.panel-open .act .t .pct {
+          display: none;
+        }
+      }
+      @media (max-width: 1279px) and (min-width: 900px) {
+        body.panel-open .cols {
+          grid-template-columns:
+            minmax(120px, 1fr) 84px minmax(72px, 120px)
+            92px;
+        }
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .bar i {
+          transition: width 0.2s ease;
         }
       }
     </style>
@@ -1551,36 +2584,261 @@
         theme: params.get('theme') || 'dark',
         panel: params.get('panel') !== '0',
         menu: params.get('menu') || 'none',
+        menuFor: params.get('for') || '',
         privacy: params.get('privacy') === '1',
         controls: params.get('controls') !== '0',
         page: params.get('page') || 'budget',
         sel: params.get('sel') === '1',
         adding: params.get('adding') === '1',
+        // DESIGN-02
+        data: params.get('data') || 'states',
+        density: params.get('density') || '44',
+        rta: params.get('rta') || 'pos',
+        months: Number(params.get('months')) || 1,
+        when: params.get('when') || 'current',
+        pm: params.has('pm') ? Number(params.get('pm')) : null,
+        cat: params.get('cat') || 'c-groc',
+        edit: params.get('edit') || '',
+        hover: params.get('hover') || '',
+        compact: params.get('compact') === '1',
+        ov: params.get('ov') === '1',
+        showHidden: params.get('hidden') !== '0',
+        collapsed: new Set(
+          (params.get('collapsed') || '').split(',').filter(Boolean)
+        ),
+        filter: params.get('filter') || '',
+        recon: params.get('recon') || '0',
+        // Accounts pane: open or collapsed (device-local). Default: open at
+        // 1280px and wider, collapsed below.
+        pane:
+          params.get('pane') ||
+          (window.innerWidth >= 1280 ? 'open' : 'collapsed'),
       };
 
-      // Fictional data (matches plan §17)
-      const groups = [
-        {
-          id: 'g1',
-          name: 'Monthly expenses',
-          cats: [
-            { id: 'c-rent', n: 'Rent', b: 1800, s: 1800 },
-            { id: 'c-groc', n: 'Groceries', b: 600, s: 240 },
-            { id: 'c-util', n: 'Utilities', b: 250, s: 160 },
-            { id: 'c-trans', n: 'Transport', b: 200, s: 80 },
-            { id: 'c-subs', n: 'Subscriptions', b: 100, s: 60 },
-            { id: 'c-dine', n: 'Dining out', b: 250, s: 100 },
+      // Fictional data. Whole dollars. For each category: b = assigned and
+      // s = outflow this month (September 2026; negative s is a net refund),
+      // aug = [assigned, outflow] for August, jul = balance carried into August,
+      // goal = template or long-term goal amount, roll = overspending rollover.
+      const fixtures = {
+        basic: [
+          {
+            id: 'g1',
+            name: 'Monthly expenses',
+            cats: [
+              { id: 'c-rent', n: 'Rent', b: 1800, s: 1800 },
+              { id: 'c-groc', n: 'Groceries', b: 600, s: 240 },
+              { id: 'c-util', n: 'Utilities', b: 250, s: 160 },
+              { id: 'c-trans', n: 'Transport', b: 200, s: 80 },
+              { id: 'c-subs', n: 'Subscriptions', b: 100, s: 60 },
+              { id: 'c-dine', n: 'Dining out', b: 250, s: 100 },
+            ],
+          },
+          {
+            id: 'g2',
+            name: 'Savings',
+            cats: [
+              { id: 'c-emerg', n: 'Emergency fund', b: 700, s: 0 },
+              { id: 'c-vac', n: 'Vacation', b: 300, s: 0 },
+            ],
+          },
+        ],
+        states: [
+          {
+            id: 'g1',
+            name: 'Monthly bills',
+            cats: [
+              {
+                id: 'c-rent',
+                n: 'Rent',
+                b: 1800,
+                s: 1800,
+                aug: [1800, 1800],
+                goal: 1800,
+                notes: 'Due on the 1st',
+              },
+              {
+                id: 'c-groc',
+                n: 'Groceries',
+                b: 600,
+                s: 240,
+                aug: [600, 640],
+                notes: 'Weekly food shop',
+              },
+              {
+                id: 'c-util',
+                n: 'Utilities',
+                b: 250,
+                s: 160,
+                aug: [250, 230],
+                goal: 280,
+              },
+              { id: 'c-trans', n: 'Transport', b: 200, s: 80, aug: [200, 80] },
+              {
+                id: 'c-subs',
+                n: 'Subscriptions',
+                b: 100,
+                s: 60,
+                aug: [100, 60],
+              },
+            ],
+          },
+          {
+            id: 'g2',
+            name: 'Everyday',
+            cats: [
+              {
+                id: 'c-dine',
+                n: 'Dining out',
+                b: 250,
+                s: 326,
+                aug: [250, 242],
+              },
+              {
+                id: 'c-med',
+                n: 'Medical',
+                b: 0,
+                s: 45,
+                aug: [0, 20],
+                roll: true,
+                notes: 'Overspending rolls over until the insurance refund',
+              },
+              { id: 'c-cloth', n: 'Clothing', b: 0, s: -35, aug: [50, 50] },
+              { id: 'c-gift', n: 'Gifts', b: 0, s: 0, aug: [0, 0] },
+              {
+                id: 'c-car',
+                n: 'Old car loan',
+                b: 0,
+                s: 0,
+                aug: [0, 0],
+                hidden: true,
+              },
+            ],
+          },
+          {
+            id: 'g3',
+            name: 'Family & hobbies',
+            cats: [
+              {
+                id: 'c-kids',
+                n: "Kids' extracurricular activities, lessons & summer camps",
+                b: 400,
+                s: 125,
+                aug: [400, 380],
+              },
+              { id: 'c-hobby', n: '🎸 Hobbies', b: 80, s: 96, aug: [80, 40] },
+              {
+                id: 'c-home',
+                n: '日用品 Household goods',
+                b: 60,
+                s: 22,
+                aug: [60, 60],
+              },
+            ],
+          },
+          {
+            id: 'g4',
+            name: 'Savings',
+            cats: [
+              {
+                id: 'c-emerg',
+                n: 'Emergency fund',
+                b: 700,
+                s: 0,
+                aug: [700, 0],
+                jul: 3500,
+                goal: 10000,
+                longGoal: true,
+              },
+              {
+                id: 'c-vac',
+                n: 'Ταξίδια — Greece trip',
+                b: 300,
+                s: 0,
+                aug: [300, 0],
+                jul: 650,
+              },
+            ],
+          },
+        ],
+        many: manyFixture(),
+      };
+      function manyFixture() {
+        const spec = [
+          [
+            'Housing',
+            ['Rent', 'Home insurance', 'Repairs', 'Furniture', 'Property tax'],
           ],
-        },
-        {
-          id: 'g2',
-          name: 'Savings',
-          cats: [
-            { id: 'c-emerg', n: 'Emergency fund', b: 700, s: 0 },
-            { id: 'c-vac', n: 'Vacation', b: 300, s: 0 },
+          [
+            'Bills',
+            [
+              'Electricity',
+              'Water',
+              'Internet',
+              'Phone',
+              'Streaming',
+              'Software',
+            ],
           ],
-        },
+          [
+            'Food',
+            ['Groceries', 'Dining out', 'Coffee', 'Work lunches', 'Takeaway'],
+          ],
+          [
+            'Transport',
+            [
+              'Fuel',
+              'Transit pass',
+              'Parking',
+              'Car service',
+              'Car insurance',
+              'Rideshare',
+            ],
+          ],
+          [
+            'Personal',
+            [
+              'Clothing',
+              'Haircuts',
+              'Medical',
+              'Pharmacy',
+              'Gym',
+              'Books',
+              'Gifts',
+            ],
+          ],
+          [
+            'Goals',
+            [
+              'Emergency fund',
+              'Vacation',
+              'New laptop',
+              'Wedding',
+              'Retirement top-up',
+            ],
+          ],
+        ];
+        return spec.map(([name, cats], gi) => ({
+          id: 'mg' + gi,
+          name,
+          cats: cats.map(n => {
+            const id =
+              n === 'Groceries'
+                ? 'c-groc'
+                : 'm-' + n.toLowerCase().replace(/\W+/g, '-');
+            const h = stableHash(id);
+            const b = n === 'Rent' ? 1800 : 20 + (h % 30) * 10;
+            const r = ((h >>> 8) % 100) / 100;
+            const s = gi === 5 ? 0 : Math.round((b * r * 1.2) / 5) * 5;
+            return { id, n, b, s, aug: [b, Math.round(b * 0.9)] };
+          }),
+        }));
+      }
+      const income = [
+        { id: 'i-sal', n: 'Salary', r: { '-2': 5200, '-1': 5200, 0: 5200 } },
+        { id: 'i-side', n: 'Side gigs', r: { '-2': 90, '-1': 150, 0: 300 } },
       ];
+      const groups = fixtures[state.data] || fixtures.states;
+      const all = groups.flatMap(g => g.cats);
       const accounts = {
         on: [
           { n: 'Checking', v: 4250, st: 'ok' },
@@ -1593,7 +2851,6 @@
           { n: 'Mortgage', v: -214300 },
         ],
       };
-      const selected = 'c-groc';
 
       // Presentation helpers (Stage 2 UI-03 candidates)
       function stableHash(str) {
@@ -1611,18 +2868,29 @@
         'c-dine': 6,
         'c-emerg': 7,
         'c-vac': 8,
+        'c-med': 10,
+        'c-cloth': 5,
+        'c-gift': 9,
+        'c-car': 7,
+        'c-kids': 1,
+        'c-hobby': 6,
+        'c-home': 3,
       };
       const accent = id =>
         `var(--categoryAccent${pinned[id] ?? (stableHash(id) % 10) + 1})`;
       const firstGrapheme = s =>
         [
           ...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(
-            s,
+            s
           ),
         ][0]?.segment ?? '?';
       function progress(activity, available) {
         const spent = Math.max(0, -activity);
-        if (available < 0) return { fill: 1, over: true };
+        // Owner decision (Sep 27, 2026): the bar only shows spending this
+        // month. Negative Available with no spending leaves the bar empty;
+        // the negative pill carries the warning.
+        if (available < 0)
+          return spent > 0 ? { fill: 1, over: true } : { fill: 0, over: false };
         const start = spent + available;
         return {
           fill: start > 0 && spent > 0 ? spent / start : 0,
@@ -1666,20 +2934,49 @@
           '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
         calendar:
           '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+        grip: '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.7"/><circle cx="15" cy="6" r="1.7"/><circle cx="9" cy="12" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="9" cy="18" r="1.7"/><circle cx="15" cy="18" r="1.7"/></svg>',
+        note: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v11l-5 5H4Z"/><path d="M15 20v-5h5M8 9h8M8 13h5"/></svg>',
+        target:
+          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>',
+        arrowR:
+          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>',
+        panel:
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M15 4v16"/></svg>',
+        pin: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5M8 3h8l-1 6 3 4H6l3-4Z"/></svg>',
       };
 
       const tile = (c, cls = '') =>
-        `<div class="tile ${cls}" style="color:${accent(c.id)}" aria-hidden="true">${firstGrapheme(c.n)}</div>`;
+        `<div class="tile ${cls}" style="color:${accent(
+          c.id
+        )}" aria-hidden="true">${firstGrapheme(c.n)}</div>`;
       const pill = n =>
-        `<span class="pill ${n > 0 ? 'pos' : n < 0 ? 'neg' : 'zero'} num">${fmt(n)}</span>`;
+        `<span class="pill ${n > 0 ? 'pos' : n < 0 ? 'neg' : 'zero'} num">${fmt(
+          n
+        )}</span>`;
 
       function topbar() {
         const navBtn = (label, key, opts = {}) =>
-          `<button class="${(state.page === 'account' ? 'accounts' : 'budget') === key ? 'on' : ''} ${state.menu === key ? 'open' : ''}" ${opts.menu ? `data-menu="${key}"` : key === 'budget' ? 'data-set="page" data-val="budget"' : ''}
-        aria-haspopup="${opts.menu ? 'menu' : 'false'}" aria-expanded="${state.menu === key}">${label}${opts.menu ? `<span class="chev">${I.chevD}</span>` : ''}</button>`;
+          `<button class="${
+            (state.page === 'account' ? 'accounts' : 'budget') === key
+              ? 'on'
+              : ''
+          } ${state.menu === key ? 'open' : ''}" ${
+            opts.menu
+              ? `data-menu="${key}"`
+              : key === 'budget'
+              ? 'data-set="page" data-val="budget"'
+              : ''
+          }
+        aria-haspopup="${opts.menu ? 'menu' : 'false'}" aria-expanded="${
+            state.menu === key
+          }">${label}${
+            opts.menu ? `<span class="chev">${I.chevD}</span>` : ''
+          }</button>`;
         return `
     <header class="top">
-      <button class="icon-btn burger" data-menu="drawer" aria-label="Menu">${I.menu}</button>
+      <button class="icon-btn burger" data-menu="drawer" aria-label="Menu">${
+        I.menu
+      }</button>
       <div class="brand"><div class="brand-mark" aria-hidden="true">A</div>Actual</div>
       <nav class="nav" aria-label="Primary">
         ${navBtn('Budget', 'budget')}
@@ -1690,10 +2987,18 @@
       </nav>
       <div class="top-right">
         <button class="uncat" title="12 uncategorized transactions"><span class="dot"></span><span class="num">12</span><span class="txt">uncategorized</span></button>
-        <button class="icon-btn" aria-label="Server sync: synced">${I.cloud}<span class="sync-dot"></span></button>
-        <button class="icon-btn" data-toggle="privacy" aria-label="${state.privacy ? 'Disable' : 'Enable'} privacy mode">${state.privacy ? I.eyeOff : I.eye}</button>
+        <button class="icon-btn" aria-label="Server sync: synced">${
+          I.cloud
+        }<span class="sync-dot"></span></button>
+        <button class="icon-btn" data-toggle="privacy" aria-label="${
+          state.privacy ? 'Disable' : 'Enable'
+        } privacy mode">${state.privacy ? I.eyeOff : I.eye}</button>
         <button class="icon-btn help-btn" aria-label="Help">${I.help}</button>
-        <button class="switcher" data-menu="budget" aria-haspopup="menu" aria-expanded="${state.menu === 'budget'}"><span class="av">MB</span><span class="txt">My Budget</span>${I.chevD}</button>
+        <button class="switcher" data-menu="budget" aria-haspopup="menu" aria-expanded="${
+          state.menu === 'budget'
+        }"><span class="av">MB</span><span class="txt">My Budget</span>${
+          I.chevD
+        }</button>
       </div>
       ${accountsPop()}
       ${morePop()}
@@ -1703,26 +3008,58 @@
 
       function accountsPop(inDrawer) {
         const row = a =>
-          `<button class="item" data-set="page" data-val="account"><span class="acct-status" style="background:${a.st === 'ok' ? 'var(--pillPositiveText)' : a.st === 'warn' ? 'var(--categoryAccent3)' : 'transparent'}"></span>${a.n}<span class="amt num ${a.v < 0 ? 'neg' : ''}">${fmt(a.v)}</span></button>`;
+          `<button class="item" data-set="page" data-val="account"><span class="acct-status" style="background:${
+            a.st === 'ok'
+              ? 'var(--pillPositiveText)'
+              : a.st === 'warn'
+              ? 'var(--categoryAccent3)'
+              : 'transparent'
+          }"></span>${a.n}<span class="amt num ${a.v < 0 ? 'neg' : ''}">${fmt(
+            a.v
+          )}</span></button>`;
         const on = sum(accounts.on, a => a.v),
           off = sum(accounts.off, a => a.v);
-        return `<div class="pop ${state.menu === 'accounts' || inDrawer ? 'show' : ''}" ${inDrawer ? '' : 'id="pop-accounts" role="menu"'} style="left:${inDrawer ? 0 : 208}px">
-      <button class="item hl"><span class="ico">${I.wallet}</span>All accounts<span class="amt num ${on + off < 0 ? 'neg' : ''}">${fmt(on + off)}</span></button>
-      <div class="sec"><span>On budget</span><span class="num">${fmt(on)}</span></div>
+        return `<div class="pop ${
+          state.menu === 'accounts' || inDrawer ? 'show' : ''
+        }" ${inDrawer ? '' : 'id="pop-accounts" role="menu"'} style="left:${
+          inDrawer ? 0 : 208
+        }px">
+      <button class="item hl"><span class="ico">${
+        I.wallet
+      }</span>All accounts<span class="amt num ${
+          on + off < 0 ? 'neg' : ''
+        }">${fmt(on + off)}</span></button>
+      <div class="sec"><span>On budget</span><span class="num">${fmt(
+        on
+      )}</span></div>
       ${accounts.on.map(row).join('')}
-      <div class="sec"><span>Off budget</span><span class="num">${fmt(off)}</span></div>
+      <div class="sec"><span>Off budget</span><span class="num">${fmt(
+        off
+      )}</span></div>
       ${accounts.off.map(row).join('')}
       <hr>
-      <button class="item"><span class="ico">${I.archive}</span>Closed accounts <span class="muted">(2)</span></button>
-      <button class="item"><span class="ico">${I.plus}</span>Add account</button>
+      <button class="item"><span class="ico">${
+        I.archive
+      }</span>Closed accounts <span class="muted">(2)</span></button>
+      <button class="item"><span class="ico">${
+        I.plus
+      }</span>Add account</button>
     </div>`;
       }
 
       function morePop(inDrawer) {
         const it = (i, l, extra = '') =>
           `<button class="item"><span class="ico">${i}</span>${l}${extra}</button>`;
-        return `<div class="pop ${state.menu === 'more' || inDrawer ? 'show' : ''}" ${inDrawer ? '' : 'id="pop-more" role="menu"'} style="left:${inDrawer ? 0 : 440}px">
-      ${it(I.payees, 'Payees')}${it(I.rules, 'Rules')}${it(I.bank, 'Bank Sync', '<span class="amt muted">if enabled</span>')}${it(I.tag, 'Tags')}
+        return `<div class="pop ${
+          state.menu === 'more' || inDrawer ? 'show' : ''
+        }" ${inDrawer ? '' : 'id="pop-more" role="menu"'} style="left:${
+          inDrawer ? 0 : 440
+        }px">
+      ${it(I.payees, 'Payees')}${it(I.rules, 'Rules')}${it(
+          I.bank,
+          'Bank Sync',
+          '<span class="amt muted">if enabled</span>'
+        )}${it(I.tag, 'Tags')}
       <hr>${it(I.gear, 'Settings')}
     </div>`;
       }
@@ -1730,17 +3067,28 @@
       function budgetPop() {
         const it = (i, l) =>
           `<button class="item"><span class="ico">${i}</span>${l}</button>`;
-        return `<div class="pop ${state.menu === 'budget' ? 'show' : ''}" id="pop-budget" role="menu">
+        return `<div class="pop ${
+          state.menu === 'budget' ? 'show' : ''
+        }" id="pop-budget" role="menu">
       <div class="total"><div><b style="font-size:15px">My Budget</b><div class="muted">Envelope budget · Local file</div></div></div>
-      <hr>${it(I.pencil, 'Rename budget')}${it(I.gear, 'Settings')}${it(I.archive, 'Load backup…')}${it(I.file, 'Switch file')}
+      <hr>${it(I.pencil, 'Rename budget')}${it(I.gear, 'Settings')}${it(
+          I.archive,
+          'Load backup…'
+        )}${it(I.file, 'Switch file')}
     </div>`;
       }
 
       function drawer() {
         const it = (l, on) =>
-          `<button class="item ${on ? 'hl' : ''}" style="font-weight:${on ? 650 : 500}">${l}</button>`;
-        return `<div class="drawer-scrim ${state.menu === 'drawer' ? 'show' : ''}" data-close></div>
-    <aside class="drawer ${state.menu === 'drawer' ? 'show' : ''}" aria-label="Navigation">
+          `<button class="item ${on ? 'hl' : ''}" style="font-weight:${
+            on ? 650 : 500
+          }">${l}</button>`;
+        return `<div class="drawer-scrim ${
+          state.menu === 'drawer' ? 'show' : ''
+        }" data-close></div>
+    <aside class="drawer ${
+      state.menu === 'drawer' ? 'show' : ''
+    }" aria-label="Navigation">
       <div class="brand" style="padding:4px 10px 12px"><div class="brand-mark">A</div>Actual</div>
       <div class="pop show" style="position:static;box-shadow:none;border:0;padding:0">
         ${it('Budget', true)}${it('Reports')}${it('Schedules')}
@@ -1752,62 +3100,20 @@
       ${morePop(true)}
       <div class="pop show" style="position:static;box-shadow:none;border:0;padding:0"><hr>
         <button class="item"><span class="ico">${I.help}</span>Help</button>
-        <button class="item"><span class="ico">${I.file}</span>My Budget<span class="amt">${I.chevD}</span></button>
+        <button class="item"><span class="ico">${
+          I.file
+        }</span>My Budget<span class="amt">${I.chevD}</span></button>
       </div>
     </aside>`;
-      }
-
-      function header() {
-        return `<div class="head">
-      <div><div class="eyebrow">Budget</div><h1>September 2026</h1></div>
-      <div class="head-controls">
-        <div class="seg months" role="group" aria-label="Months shown">
-          <button class="on" aria-pressed="true">1</button><button>2</button><button>3</button>
-        </div>
-        <div class="seg" role="group" aria-label="Month">
-          <button aria-label="Previous month">${I.chevL}</button>
-          <button class="label">Sep 2026</button>
-          <button aria-label="Next month">${I.chevR}</button>
-        </div>
-        <div class="seg"><button>Today</button></div>
-        <div class="seg"><button aria-label="Budget menu">${I.dots}</button></div>
-      </div>
-    </div>`;
-      }
-
-      const all = groups.flatMap(g => g.cats);
-      const totB = sum(all, c => c.b),
-        totS = sum(all, c => c.s);
-
-      function summaryCards() {
-        const spentCats = [...all]
-          .filter(c => c.s > 0)
-          .sort((a, b) => b.s - a.s);
-        return `<section class="summary" aria-label="Month summary">
-      <div class="card stat hero" role="button" tabindex="0" aria-label="Ready to Assign $1,000. Open breakdown and actions">
-        <div class="more"><span class="txt">Breakdown</span>${I.chevD}</div>
-        <div class="label">Ready to Assign</div>
-        <div class="value num">${fmt(1000)}</div>
-        <div class="sub num">of ${fmt(5200)} available funds</div>
-      </div>
-      <div class="card stat">
-        <div class="label">Assigned</div>
-        <div class="value num">${fmt(totB)}</div>
-        <div class="sub">across ${all.length} categories</div>
-      </div>
-      <div class="card stat">
-        <div class="label">Activity</div>
-        <div class="value num">${fmt(-totS)}</div>
-        <div class="stackbar" aria-hidden="true">${spentCats.map(c => `<i style="flex:${c.s};background:${accent(c.id)}"></i>`).join('')}<i style="flex:${totB - totS};background:var(--progressTrack)"></i></div>
-      </div>
-    </section>`;
       }
 
       function ring(pct, color) {
         const r = 22,
           c = 2 * Math.PI * r;
         return `<svg class="ring" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="${r}" fill="none" stroke="var(--progressTrack)" stroke-width="6"/>
-      <circle cx="27" cy="27" r="${r}" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(c * pct).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 27 27)"/></svg>`;
+      <circle cx="27" cy="27" r="${r}" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(
+          c * pct
+        ).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 27 27)"/></svg>`;
       }
 
       function trendSvg() {
@@ -1843,14 +3149,18 @@
           a
             .map(
               ([d, v], i) =>
-                `${i ? 'L' : 'M'}${x(d).toFixed(1)},${y(v).toFixed(1)}`,
+                `${i ? 'L' : 'M'}${x(d).toFixed(1)},${y(v).toFixed(1)}`
             )
             .join(' ');
         return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" style="margin-top:8px" role="img" aria-label="Spending this month is below last month's pace">
       <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--categoryAccent1)" stop-opacity=".35"/><stop offset="1" stop-color="var(--categoryAccent1)" stop-opacity="0"/></linearGradient></defs>
-      <path d="${p(prev)}" fill="none" stroke="var(--pageTextFaint)" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+      <path d="${p(
+        prev
+      )}" fill="none" stroke="var(--pageTextFaint)" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
       <path d="${p(cur)} L${x(26)},${h} L0,${h} Z" fill="url(#tg)"/>
-      <path d="${p(cur)}" fill="none" stroke="var(--categoryAccent1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+      <path d="${p(
+        cur
+      )}" fill="none" stroke="var(--categoryAccent1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
     </svg>`;
       }
 
@@ -1859,115 +3169,956 @@
       <div class="card trendcard">
         <div class="row-top"><div>
           <div class="label" style="font-size:12.5px;color:var(--pageTextSubdued);font-weight:500">Activity this month</div>
-          <div class="num" style="font-size:26px;font-weight:700;letter-spacing:-.03em;margin-top:3px">${fmt(-totS)}<span class="delta">$520 less than August</span></div>
+          <div class="num" style="font-size:26px;font-weight:700;letter-spacing:-.03em;margin-top:3px">${fmt(
+            -totS
+          )}<span class="delta">$520 less than August</span></div>
         </div></div>
         ${trendSvg()}
         <div class="legend"><span><i style="background:var(--categoryAccent1)"></i>September</span><span><i style="background:var(--pageTextFaint)"></i>August</span></div>
       </div>
       <div class="stack2">
-        <div class="card stat hero" role="button" tabindex="0"><div><div class="label">Ready to Assign</div><div class="value num">${fmt(1000)}</div></div>${ring(0.81, 'var(--pillPositiveText)')}</div>
-        <div class="card stat"><div><div class="label">Assigned</div><div class="value num">${fmt(totB)}</div></div>${ring(0.58, 'var(--categoryAccent1)')}</div>
+        <div class="card stat hero" role="button" tabindex="0"><div><div class="label">Ready to Assign</div><div class="value num">${fmt(
+          1000
+        )}</div></div>${ring(0.81, 'var(--pillPositiveText)')}</div>
+        <div class="card stat"><div><div class="label">Assigned</div><div class="value num">${fmt(
+          totB
+        )}</div></div>${ring(0.58, 'var(--categoryAccent1)')}</div>
       </div>
     </section>`;
       }
 
-      function catRow(c) {
-        const avail = c.b - c.s;
-        const p = progress(-c.s, avail);
-        return `<div class="cols crow ${c.id === selected && state.panel ? 'sel' : ''}" role="row">
-      <div class="name" role="rowheader">${tile(c)}<span>${c.n}</span></div>
-      <div class="r num"><span class="assigned">${fmt(c.b)}</span></div>
-      <div class="act">
-        <div class="t num"><span>${fmt(-c.s)}</span><span class="pct">${Math.round(p.fill * 100)}%</span></div>
-        <div class="bar" aria-hidden="true"><i style="width:${p.fill * 100}%;background:${p.over ? 'var(--pillNegativeText)' : accent(c.id)}"></i></div>
-      </div>
-      <div class="r">${pill(avail)}</div>
-    </div>`;
-      }
+      // ---- Month model (illustration only; the app reads these from the spreadsheet) ----
+      const TODAY_DAY = 27; // "today" is September 27, 2026 (month offset 0)
+      const mDate = off => new Date(2026, 8 + off, 1);
+      const mLong = off =>
+        mDate(off).toLocaleString('en-US', { month: 'long', year: 'numeric' });
+      const mShort = off =>
+        mDate(off).toLocaleString('en-US', { month: 'short', year: 'numeric' });
+      const mName = off =>
+        mDate(off).toLocaleString('en-US', { month: 'long' });
+      const mAbbr = off =>
+        mDate(off).toLocaleString('en-US', { month: 'short' });
+      const daysIn = off => new Date(2026, 9 + off, 0).getDate();
+      const WHEN = { past: -1, current: 0, future: 1 };
+      const whenOff = () => WHEN[state.when] ?? (Number(state.when) || 0);
+      const offWhen = o =>
+        Object.keys(WHEN).find(k => WHEN[k] === o) ?? String(o);
+      const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+      const esc = s =>
+        String(s).replace(
+          /[&<>"]/g,
+          ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch])
+        );
+      const fmtC = n =>
+        (n < 0 ? '−' : '+') +
+        '$' +
+        Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2 });
 
-      function groupRow(g) {
-        const b = sum(g.cats, c => c.b),
-          s = sum(g.cats, c => c.s);
-        return `<div class="cols grow" role="row">
-      <div class="name" role="rowheader"><span class="caret">${I.chevD}</span>${g.name}</div>
-      <div class="r num">${fmt(b)}</div>
-      <div class="num gt">${fmt(-s)}</div>
-      <div class="r">${pill(b - s)}</div>
-    </div>`;
-      }
-
-      const colHead = `<div class="cols lhead" role="row"><div>Category</div><div class="r">Assigned</div><div>Activity</div><div class="r">Available</div></div>`;
-
-      function ledger() {
-        if (state.layout === 'b') {
-          return `<div class="ledger-wrap" role="table" aria-label="Envelope budget">${colHead}${groups
-            .map(
-              g =>
-                `<div class="card ledger" role="rowgroup">${groupRow(g)}${g.cats.map(catRow).join('')}</div>`,
-            )
-            .join('')}</div>`;
+      // Envelope rules as Actual applies them: positive balances carry forward;
+      // negative balances carry only when overspending rollover is on,
+      // otherwise they reduce next month's Ready to Assign.
+      function cell(c, off) {
+        let avail = 0,
+          out;
+        for (let o = -3; o <= off; o++) {
+          const carry = avail > 0 || c.roll ? avail : 0;
+          let b, s;
+          if (o <= -2) [b, s] = [c.b, c.b];
+          else if (o === -1) [b, s] = c.aug || [c.b, c.b];
+          else if (o === 0) [b, s] = [c.b, c.s];
+          else [b, s] = [o === 1 && !c.hidden ? c.b : 0, 0];
+          if (c.bo && o in c.bo) b = c.bo[o];
+          const extra = o === -2 ? c.jul || 0 : 0;
+          avail = carry + extra + b - s;
+          out = { b, s, carry: carry + extra, avail };
         }
-        return `<div class="ledger-wrap card" role="table" aria-label="Envelope budget"><div class="ledger">${colHead}${groups
-          .map(g => groupRow(g) + g.cats.map(catRow).join(''))
-          .join('')}</div></div>`;
+        return out;
+      }
+      const rtaNow = { pos: 1000, zero: 0, neg: -240 }[state.rta] ?? 1000;
+      const monthTotals = off => ({
+        assigned: sum(all, c => cell(c, off).b),
+        activity: -sum(all, c => cell(c, off).s),
+        over: sum(all, c => {
+          const a = cell(c, off).avail;
+          return !c.roll && a < 0 ? -a : 0;
+        }),
+        received: sum(income, i => i.r[off] || 0),
+      });
+      // Mirrors TotalsList: Available funds − Overspent last month − Assigned − For next month.
+      function summaryFor(off) {
+        const t = monthTotals(off);
+        const prevOver = monthTotals(off - 1).over;
+        if (off < 0) {
+          return { ...t, prevOver, hold: 0, rta: 0, af: prevOver + t.assigned };
+        }
+        if (off === 0) {
+          const next = monthTotals(1);
+          const hold =
+            state.rta === 'pos'
+              ? Math.max(
+                  0,
+                  Math.ceil((next.assigned + t.over - rtaNow + 200) / 100) * 100
+                )
+              : 0;
+          return {
+            ...t,
+            prevOver,
+            hold,
+            rta: rtaNow,
+            af: rtaNow + prevOver + t.assigned + hold,
+          };
+        }
+        const prev = summaryFor(off - 1);
+        const af = prev.rta + prev.hold + t.received;
+        return { ...t, prevOver, hold: 0, af, rta: af - prevOver - t.assigned };
+      }
+      function goalInfo(c, off) {
+        if (!c.goal) return null;
+        const d = cell(c, off);
+        if (c.longGoal) {
+          const pct = clamp(d.avail / c.goal, 0, 1);
+          return {
+            under: d.avail < c.goal,
+            pct,
+            text: `Goal ${fmt(c.goal)} · ${Math.round(pct * 100)}% saved`,
+            long: `Long-term goal of ${fmt(c.goal)}. ${fmt(
+              c.goal - d.avail
+            )} to go.`,
+          };
+        }
+        const short = c.goal - d.b;
+        return {
+          under: short > 0,
+          pct: clamp(d.b / c.goal, 0, 1),
+          text:
+            short > 0
+              ? `Template ${fmt(c.goal)} · ${fmt(short)} short`
+              : `Template ${fmt(c.goal)} · Funded`,
+          long:
+            short > 0
+              ? `Template asks for ${fmt(c.goal)} a month. Underfunded by ${fmt(
+                  short
+                )}.`
+              : `Template asks for ${fmt(c.goal)} a month. Fully funded.`,
+        };
+      }
+      const availKind = (c, off) => {
+        const d = cell(c, off),
+          gi = goalInfo(c, off);
+        return d.avail < 0
+          ? 'neg'
+          : gi && gi.under
+          ? 'warn'
+          : d.avail > 0
+          ? 'pos'
+          : 'zero';
+      };
+
+      // Illustrative transactions, generated so that they add up to each month's activity.
+      const payeeNames = {
+        'c-rent': ['Landlord Co'],
+        'c-dine': ['Noodle Bar', 'Café Luna', 'Pizza Place', 'Taco Stand'],
+        'c-util': ['City Power', 'Water Co'],
+        'c-trans': ['Metro Card', 'Fuel Stop'],
+        'c-subs': ['StreamFlix', 'Cloud Storage'],
+        'c-med': ['Pharmacy'],
+        'c-cloth': ['Outfitters'],
+        'c-kids': ['Swim School', 'Art Club'],
+        'c-hobby': ['Music Store', 'Strings Online'],
+        'c-home': ['Hardware Hub'],
+      };
+      const acctNames = ['Checking', 'Credit Card', 'Checking', 'Cash'];
+      function txnsFor(c, off) {
+        const d = cell(c, off);
+        if (off > 0 || d.s === 0) return [];
+        const last = off === 0 ? TODAY_DAY : daysIn(off);
+        const names = payeeNames[c.id] || ['Corner Shop', 'Online order'];
+        if (d.s < 0) {
+          return [
+            { day: 9, amt: -d.s, p: names[0] + ' refund', a: 'Credit Card' },
+          ];
+        }
+        if (c.id === 'c-groc' && off === 0 && d.s === 240) {
+          return [
+            { day: 6, amt: -100, p: 'Local Market', a: 'Credit Card' },
+            { day: 14, amt: -140, p: 'SuperMart', a: 'Checking' },
+          ];
+        }
+        const k = c.id === 'c-rent' ? 1 : clamp(Math.round(d.s / 70), 1, 5);
+        const out = [];
+        let left = d.s;
+        for (let i = 0; i < k; i++) {
+          const amt = i === k - 1 ? left : Math.round(d.s / k);
+          left -= amt;
+          out.push({
+            day:
+              c.id === 'c-rent'
+                ? 1
+                : 1 + (stableHash(c.id + off + ':' + i) % last),
+            amt: -amt,
+            p: names[i % names.length],
+            a: acctNames[(stableHash(c.id + i) >>> 3) % acctNames.length],
+          });
+        }
+        return out.sort((a, b) => a.day - b.day);
+      }
+      // Pace: money available at the start of the month (carry + assigned),
+      // spread evenly over the month, compared with cumulative outflow.
+      function paceInfo(c, off) {
+        const d = cell(c, off),
+          days = daysIn(off);
+        const start = d.carry + d.b;
+        const tx = txnsFor(c, off);
+        const upto = off === 0 ? TODAY_DAY : off < 0 ? days : 0;
+        const spent = -sum(
+          tx.filter(t => t.day <= upto),
+          t => t.amt
+        );
+        const expected = start > 0 ? (start * upto) / days : 0;
+        return {
+          d,
+          days,
+          start,
+          tx,
+          upto,
+          spent,
+          expected,
+          diff: expected - spent,
+        };
       }
 
-      function paceSvg() {
+      // ---- Layout: months that fit, and how the panel behaves ----
+      // Owner decision (Sep 27, 2026): the budget shows one month at a time.
+      function layoutInfo() {
+        const w = window.innerWidth;
+        const narrow = w < 900;
+        const off = whenOff();
+        const mode =
+          state.page !== 'budget' || !state.panel ? 'closed' : 'push';
+        return { w, narrow, fit: 1, n: 1, off, start: off, mode, tpl: '' };
+      }
+      const L = layoutInfo();
+      const offsets = () => Array.from({ length: L.n }, (_, i) => L.start + i);
+      const panelOff = () => (state.pm == null ? L.off : state.pm);
+
+      function header() {
+        const off = L.off;
+        const title =
+          L.n === 1
+            ? mLong(off)
+            : `${mAbbr(L.start)} – ${mShort(L.start + L.n - 1)}`;
+        const rel =
+          off < 0 ? ' · Past month' : off > 0 ? ' · Future month' : '';
+        const monthTools =
+          L.n === 1
+            ? `<div class="seg"><button aria-label="${mName(off)} notes">${
+                I.note
+              }</button><button data-menu="month" data-for="${off}" data-anchor="month:${off}" aria-label="${mName(
+                off
+              )} budget menu" aria-haspopup="menu">${I.dots}</button></div>`
+            : '';
+        return `<div class="head">
+      <div><div class="eyebrow">Budget${rel}</div><h1>${title}</h1></div>
+      <div class="head-controls">
+        <div class="seg" role="group" aria-label="Month">
+          <button aria-label="Previous month" data-step="-1">${I.chevL}</button>
+          <button class="label">${mShort(off)}</button>
+          <button aria-label="Next month" data-step="1">${I.chevR}</button>
+        </div>
+        ${
+          off !== 0
+            ? '<div class="seg"><button data-set="when" data-val="current">Today</button></div>'
+            : ''
+        }
+        ${monthTools}
+        <div class="seg"><button class="${
+          state.panel ? 'on' : ''
+        }" data-toggle="panel" aria-pressed="${state.panel}" aria-label="${
+          state.panel ? 'Hide' : 'Show'
+        } category details">${I.panel}</button></div>
+      </div>
+    </div>`;
+      }
+
+      const rtaKind = v => (v > 0 ? 'pos' : v < 0 ? 'neg' : 'zero');
+      const rtaBadge = k =>
+        k === 'neg'
+          ? '<span class="badge neg">Overassigned</span>'
+          : k === 'zero'
+          ? '<span class="badge">All assigned</span>'
+          : '';
+
+      function summaryCards(off) {
+        const s = summaryFor(off),
+          k = rtaKind(s.rta);
+        const spent = all
+          .map(c => [c, cell(c, off).s])
+          .filter(([, v]) => v > 0)
+          .sort((a, b) => b[1] - a[1]);
+        const top = spent.slice(0, 6),
+          other = sum(spent.slice(6), x => x[1]);
+        const sub =
+          k === 'pos'
+            ? `${fmt(s.af)} available funds`
+            : k === 'zero'
+            ? 'Every dollar has a job'
+            : 'More assigned than you have';
+        return `<section class="summary cards" aria-label="Month summary">
+      <div class="card stat hero ${k}" role="button" tabindex="0" data-menu="breakdown" data-for="${off}" data-anchor="breakdown:${off}" aria-haspopup="dialog" aria-label="Ready to Assign ${fmt(
+          s.rta
+        )}. Open breakdown and actions">
+        <div class="more"><span class="txt">Breakdown</span>${I.chevD}</div>
+        <div class="label">Ready to Assign ${rtaBadge(k)}</div>
+        <div class="value num">${fmt(s.rta)}</div>
+        <div class="sub num">${sub}</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Assigned</div>
+        <div class="value num">${fmt(s.assigned)}</div>
+        <div class="sub">across ${all.length} categories</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Activity</div>
+        <div class="value num">${fmt(s.activity)}</div>
+        <div class="stackbar" aria-hidden="true">${top
+          .map(
+            ([c, v]) => `<i style="flex:${v};background:${accent(c.id)}"></i>`
+          )
+          .join('')}${
+          other
+            ? `<i style="flex:${other};background:var(--pageTextFaint)"></i>`
+            : ''
+        }<i style="flex:${Math.max(
+          0,
+          s.assigned + s.activity
+        )};background:var(--progressTrack)"></i></div>
+      </div>
+    </section>
+    <div class="card cstrip" aria-label="Month summary">
+      <button class="cs-rta ${k}" data-menu="breakdown" data-for="${off}" data-anchor="breakdown:${off}"><span class="l">Ready to Assign</span><b class="num">${fmt(
+          s.rta
+        )}</b>${rtaBadge(k)}${I.chevD}</button>
+      <span class="cs-item"><span class="l">Assigned</span><b class="num">${fmt(
+        s.assigned
+      )}</b></span>
+      <span class="cs-item"><span class="l">Activity</span><b class="num">${fmt(
+        s.activity
+      )}</b></span>
+    </div>`;
+      }
+
+      function nameCell(c) {
+        const gi = goalInfo(c, panelOff());
+        return `<div class="name" role="rowheader">
+        <span class="drag" aria-hidden="true">${I.grip}</span>
+        <button class="cname" data-open="${c.id}" data-anchor="catmenu:${
+          c.id
+        }" aria-label="${esc(c.n)}. Open details">${tile(
+          c
+        )}<span class="ntext"><span class="nlabel">${esc(c.n)}</span>${
+          gi ? `<span class="cap">${gi.text}</span>` : ''
+        }</span>${
+          c.notes
+            ? `<span class="note-ind" aria-hidden="true">${I.note}</span>`
+            : ''
+        }${c.hidden ? '<span class="hid">Hidden</span>' : ''}</button>
+        <span class="tools">
+          <button class="tool ${c.notes ? 'on' : ''}" aria-label="${
+          c.notes ? 'Notes: ' + esc(c.notes) : 'Add notes'
+        }" title="${esc(c.notes || 'Add notes')}">${I.note}</button>
+          <button class="tool" data-menu="catmenu" data-for="${
+            c.id
+          }" aria-label="${esc(c.n)} menu" aria-haspopup="menu">${
+          I.dots
+        }</button>
+        </span>
+      </div>`;
+      }
+      function monthCells(c, off, first) {
+        const d = cell(c, off),
+          p = progress(-d.s, d.avail),
+          k = availKind(c, off),
+          gi = goalInfo(c, off),
+          key = `${c.id}:${off}`,
+          multi = L.n > 1;
+        const assigned =
+          state.edit === key
+            ? `<input class="amt-input num" data-edit="${key}" value="${d.b.toFixed(
+                2
+              )}" inputmode="decimal" aria-label="Assigned to ${esc(
+                c.n
+              )} in ${mLong(off)}">`
+            : `<button class="assigned num ${
+                d.b === 0 ? 'z' : ''
+              }" data-edit-start="${key}" aria-label="Assigned ${fmt(
+                d.b
+              )} in ${mName(off)}. Edit">${fmt(d.b)}</button>`;
+        const act =
+          d.s === 0
+            ? `<span class="z">${fmt(0)}</span>`
+            : d.s < 0
+            ? `+${fmt(-d.s)}`
+            : fmt(-d.s);
+        const pct = p.over
+          ? 'Over'
+          : d.s > 0
+          ? Math.round(p.fill * 100) + '%'
+          : '';
+        const arrow = c.roll
+          ? `<span class="carry" title="Overspending rolls over to ${mName(
+              off + 1
+            )}">${I.arrowR}</span>`
+          : '';
+        return `<div class="r ${first ? '' : 'mstart'}">${assigned}</div>
+      <div class="act">
+        <div class="t num"><button class="actlink" data-activity="${key}" aria-label="Activity ${act.replace(
+          /<[^>]+>/g,
+          ''
+        )}. Show transactions">${act}</button>${
+          multi ? '' : `<span class="pct">${pct}</span>`
+        }</div>
+        <div class="bar" aria-hidden="true"><i style="width:${
+          p.fill * 100
+        }%;background:${
+          p.over ? 'var(--pillNegativeText)' : accent(c.id)
+        }"></i></div>
+      </div>
+      <div class="r"><button class="pill ${k} num" data-menu="balance" data-for="${key}" data-anchor="balance:${key}" aria-haspopup="menu" aria-label="Available ${fmt(
+          d.avail
+        )}${gi ? '. ' + gi.long : ''}${
+          c.roll ? '. Overspending rolls over' : ''
+        }. Open balance menu">${
+          gi ? `<span class="gi" aria-hidden="true">${I.target}</span>` : ''
+        }${fmt(d.avail)}${arrow}</button></div>`;
+      }
+      function catRow(c, offs) {
+        if (c.hidden && !state.showHidden) return '';
+        const cls = [
+          'cols',
+          'crow',
+          c.id === state.cat && L.mode !== 'closed' ? 'sel' : '',
+          state.hover === c.id ? 'hover' : '',
+          c.hidden ? 'hidden-cat' : '',
+          state.edit.startsWith(c.id + ':') ? 'editing' : '',
+          goalInfo(c, panelOff()) ? 'has-cap' : '',
+        ].join(' ');
+        return `<div class="${cls}" role="row" style="${L.tpl}">${nameCell(
+          c
+        )}${offs.map((o, i) => monthCells(c, o, i === 0)).join('')}</div>`;
+      }
+      function groupRow(g, offs) {
+        const collapsed = state.collapsed.has(g.id);
+        const cats = g.cats.filter(c => !c.hidden || state.showHidden);
+        return `<div class="cols grow" role="row" style="${L.tpl}">
+      <div class="name" role="rowheader"><button class="caret" data-collapse="${
+        g.id
+      }" aria-expanded="${!collapsed}" aria-label="${
+          collapsed ? 'Expand' : 'Collapse'
+        } ${esc(g.name)}">${
+          collapsed ? I.chevR : I.chevD
+        }</button><span class="gname">${esc(g.name)}</span>
+        <span class="tools"><button class="tool" aria-label="Add category to ${esc(
+          g.name
+        )}">${I.plus}</button><button class="tool" aria-label="Group notes">${
+          I.note
+        }</button><button class="tool" data-menu="groupmenu" data-for="${
+          g.id
+        }" data-anchor="groupmenu:${g.id}" aria-label="${esc(
+          g.name
+        )} menu" aria-haspopup="menu">${I.dots}</button></span></div>
+      ${offs
+        .map((o, i) => {
+          const b = sum(cats, c => cell(c, o).b),
+            s = sum(cats, c => cell(c, o).s),
+            a = sum(cats, c => cell(c, o).avail);
+          return `<div class="r num ${i ? 'mstart' : ''}">${fmt(
+            b
+          )}</div><div class="num gt">${fmt(
+            -s
+          )}</div><div class="r"><span class="pill ${rtaKind(a)} num">${fmt(
+            a
+          )}</span></div>`;
+        })
+        .join('')}
+    </div>`;
+      }
+      function incomeRows(offs) {
+        const collapsed = state.collapsed.has('inc');
+        const head = `<div class="cols grow inc" role="row" style="${L.tpl}">
+      <div class="name" role="rowheader"><button class="caret" data-collapse="inc" aria-expanded="${!collapsed}" aria-label="${
+          collapsed ? 'Expand' : 'Collapse'
+        } Income">${
+          collapsed ? I.chevR : I.chevD
+        }</button><span class="gname">Income</span><span class="rl" style="margin-left:auto">Received</span></div>
+      ${offs
+        .map(
+          (o, i) =>
+            `<div class="${
+              i ? 'mstart' : ''
+            }"></div><div></div><div class="r num">${fmt(
+              sum(income, x => x.r[o] || 0)
+            )}</div>`
+        )
+        .join('')}
+    </div>`;
+        if (collapsed) return head;
+        return (
+          head +
+          income
+            .map(
+              x => `<div class="cols crow irow" role="row" style="${L.tpl}">
+      <div class="name" role="rowheader"><span class="drag" aria-hidden="true">${
+        I.grip
+      }</span><span class="cname static">${tile(
+                x
+              )}<span class="ntext"><span class="nlabel">${esc(
+                x.n
+              )}</span></span></span></div>
+      ${offs
+        .map(
+          (o, i) =>
+            `<div class="${
+              i ? 'mstart' : ''
+            }"></div><div></div><div class="r num ${x.r[o] ? '' : 'z'}">${fmt(
+              x.r[o] || 0
+            )}</div>`
+        )
+        .join('')}
+    </div>`
+            )
+            .join('')
+        );
+      }
+
+      function ledger(offs) {
+        const multi = offs.length > 1;
+        const mh = multi
+          ? `<div class="cols mhead" role="row" style="${
+              L.tpl
+            }"><div></div>${offs
+              .map(
+                (o, i) =>
+                  `<div class="mh ${
+                    i ? 'mstart' : ''
+                  }" style="grid-column:span 3">${mLong(o)}${
+                    o === 0 ? '<span class="today">Today</span>' : ''
+                  }</div>`
+              )
+              .join('')}</div>`
+          : '';
+        const ch = `<div class="cols lhead" role="row" style="${
+          L.tpl
+        }"><div class="ch-name">Category<button class="tool" data-menu="column" data-anchor="column" aria-label="Category column menu" aria-haspopup="menu">${
+          I.dots
+        }</button></div>${offs
+          .map(
+            (o, i) =>
+              `<div class="r ${
+                i ? 'mstart' : ''
+              }">Assigned</div><div>Activity</div><div class="r">Available</div>`
+          )
+          .join('')}</div>`;
+        const body = g =>
+          groupRow(g, offs) +
+          (state.collapsed.has(g.id)
+            ? ''
+            : g.cats.map(c => catRow(c, offs)).join(''));
+        if (state.layout === 'b' && !multi) {
+          return `<div class="ledger-wrap" role="table" aria-label="Envelope budget">${ch}${groups
+            .map(
+              g => `<div class="card ledger" role="rowgroup">${body(g)}</div>`
+            )
+            .join('')}<div class="card ledger" role="rowgroup">${incomeRows(
+            offs
+          )}</div></div>`;
+        }
+        return `<div class="ledger-wrap card ${
+          multi ? 'multi' : ''
+        }" role="table" aria-label="Envelope budget"><div class="ledger">${mh}${ch}${groups
+          .map(body)
+          .join('')}${incomeRows(offs)}</div></div>`;
+      }
+
+      function paceSvg(c, off, pi) {
         const w = 320,
           h = 110,
-          days = 30,
-          max = 600;
-        const pts = [
-          [0, 0],
-          [5, 0],
-          [6, 100],
-          [13, 100],
-          [14, 240],
-          [26, 240],
-        ];
+          days = pi.days;
+        let cum = 0;
+        const steps = [[0, 0]];
+        for (const t of pi.tx) {
+          steps.push([t.day, cum]);
+          cum += -t.amt;
+          steps.push([t.day, cum]);
+        }
+        steps.push([pi.upto, cum]);
+        const vals = steps.map(s => s[1]);
+        const max = Math.max(pi.start, ...vals, 1) * 1.08,
+          min = Math.min(0, ...vals);
         const x = d => (d / days) * w,
-          y = v => h - 6 - (v / max) * (h - 14);
-        const line = pts
+          y = v => h - 6 - ((v - min) / (max - min)) * (h - 14);
+        const line = steps
           .map(
             ([d, v], i) =>
-              `${i ? 'L' : 'M'}${x(d).toFixed(1)},${y(v).toFixed(1)}`,
+              `${i ? 'L' : 'M'}${x(d).toFixed(1)},${y(v).toFixed(1)}`
           )
           .join(' ');
-        return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" role="img" aria-label="Groceries activity is $140 under an even pace">
-      <defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--categoryAccent2)" stop-opacity=".32"/><stop offset="1" stop-color="var(--categoryAccent2)" stop-opacity="0"/></linearGradient></defs>
-      <line x1="0" y1="${y(0)}" x2="${w}" y2="${y(max)}" stroke="var(--pageTextFaint)" stroke-width="1.5" stroke-dasharray="4 5" vector-effect="non-scaling-stroke"/>
-      <path d="${line} L${x(26)},${h} L0,${h} Z" fill="url(#pg)"/>
-      <path d="${line}" fill="none" stroke="var(--categoryAccent2)" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-    </svg>`;
+        const col = pi.d.avail < 0 ? 'var(--pillNegativeText)' : accent(c.id);
+        const series =
+          off > 0
+            ? ''
+            : `<path d="${line} L${x(pi.upto)},${h} L0,${h} Z" fill="url(#pg)"/>
+          <path d="${line}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`;
+        const even =
+          pi.start > 0
+            ? `<line x1="0" y1="${y(0)}" x2="${w}" y2="${y(
+                pi.start
+              )}" stroke="var(--pageTextFaint)" stroke-width="1.5" stroke-dasharray="4 5" vector-effect="non-scaling-stroke"/>
+          <line x1="0" y1="${y(pi.start)}" x2="${w}" y2="${y(
+                pi.start
+              )}" stroke="var(--progressTrack)" stroke-width="1" vector-effect="non-scaling-stroke"/>`
+            : '';
+        const today =
+          off === 0
+            ? `<line x1="${x(pi.upto)}" y1="4" x2="${x(
+                pi.upto
+              )}" y2="${h}" stroke="var(--pageTextFaint)" stroke-width="1" stroke-dasharray="2 3" vector-effect="non-scaling-stroke"/>`
+            : '';
+        return `<div class="chart"><svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" aria-hidden="true">
+      <defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".3"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+      ${even}${series}${today}
+    </svg>${
+      off > 0
+        ? '<div class="chart-empty"><span>No activity yet</span></div>'
+        : ''
+    }</div>`;
+      }
+      function paceSection(c, off, pi) {
+        const d = pi.d;
+        let summary;
+        if (off > 0) {
+          summary = `${fmt(Math.max(0, pi.start))} to spend from ${mAbbr(
+            off
+          )} 1`;
+        } else if (pi.start <= 0) {
+          summary = 'Nothing assigned, so no pace line';
+        } else if (off === 0 && pi.tx.length === 0) {
+          summary = 'No activity yet this month';
+        } else if (off < 0) {
+          summary =
+            d.avail >= 0
+              ? `Finished with ${fmt(d.avail)} left`
+              : `Finished ${fmt(-d.avail)} overspent`;
+        } else {
+          summary =
+            pi.diff >= 0
+              ? `${fmt(Math.round(pi.diff))} under even pace`
+              : `${fmt(Math.round(-pi.diff))} over even pace`;
+        }
+        const text =
+          off > 0
+            ? `${mName(off)} has not started. ${summary}.`
+            : `Spent ${fmt(pi.spent)} of ${fmt(
+                Math.max(0, pi.start)
+              )} by ${mAbbr(off)} ${pi.upto}. ${summary}.`;
+        return `<div>
+        <div class="sec-title">Pace <span>${mAbbr(off)} 1 – ${
+          pi.days
+        }</span></div>
+        <div style="margin-top:8px" role="img" aria-label="${esc(text)}">${
+          state.privacy
+            ? '<div class="note">Hidden in privacy mode</div>'
+            : paceSvg(c, off, pi)
+        }</div>
+        <div class="legend"><span><i style="background:${
+          pi.d.avail < 0 ? 'var(--pillNegativeText)' : accent(c.id)
+        }"></i>Activity</span><span><i style="background:var(--pageTextFaint)"></i>Even pace</span>${
+          off === 0 ? '<span><i class="dash"></i>Today</span>' : ''
+        }<span style="margin-left:auto" class="num pace-sum">${summary}</span></div>
+      </div>`;
       }
 
       function panel() {
-        const c = all.find(x => x.id === selected);
-        const avail = c.b - c.s,
-          p = progress(-c.s, avail);
-        return `<aside class="card detail" ${state.panel ? '' : 'hidden'} aria-label="Category details: ${c.n}">
-      <div class="d-top">${tile(c)}<div><div class="d-title">${c.n}</div><div class="d-sub">Monthly expenses · Sep 2026</div></div>
-        <button class="icon-btn d-close" data-toggle="panel" aria-label="Close details">${I.x}</button></div>
+        const c = all.find(x => x.id === state.cat) || all[0];
+        const g = groups.find(x => x.cats.includes(c));
+        if (L.mode === 'rail') {
+          return `<aside class="card rail" aria-label="Category details, collapsed">
+        <button class="icon-btn" data-set="ov" data-val="true" aria-label="Show details for ${esc(
+          c.n
+        )}">${I.panel}</button>
+        <button class="rail-tile" data-set="ov" data-val="true" aria-label="Show details for ${esc(
+          c.n
+        )}">${tile(c)}</button>
+        <span class="rail-label">Details</span>
+        <button class="icon-btn" data-toggle="panel" aria-label="Turn off the details panel">${
+          I.x
+        }</button>
+      </aside>`;
+        }
+        const off = panelOff(),
+          pi = paceInfo(c, off),
+          d = pi.d,
+          p = progress(-d.s, d.avail),
+          gi = goalInfo(c, off),
+          k = availKind(c, off);
+        const tx = [...pi.tx].reverse();
+        return `<aside class="card detail ${
+          L.mode === 'overlay' ? 'overlay' : ''
+        }" aria-label="Category details: ${esc(c.n)}">
+      <div class="d-top">${tile(
+        c
+      )}<div class="d-head"><div class="d-title">${esc(c.n)}</div>
+        <div class="d-sub">${esc(g.name)}${
+          c.hidden ? ' · Hidden' : ''
+        } · <span class="d-month"><button data-pm="-1" aria-label="Previous month">${
+          I.chevL
+        }</button><b>${mShort(
+          off
+        )}</b><button data-pm="1" aria-label="Next month">${
+          I.chevR
+        }</button></span></div></div>
+        <button class="icon-btn d-close" data-close-panel aria-label="${
+          L.mode === 'overlay' ? 'Collapse details' : 'Close details'
+        }">${I.x}</button></div>
       <div>
-        <div class="big num">${fmt(avail)}<small>Available</small></div>
-        <div class="bar" style="margin-top:10px;height:7px" aria-hidden="true"><i style="width:${p.fill * 100}%;background:${accent(c.id)}"></i></div>
+        <div class="big num ${k}">${fmt(d.avail)}<small>${
+          k === 'neg' ? 'Overspent' : 'Available'
+        }</small></div>
+        ${
+          c.roll
+            ? `<div class="flag">${
+                I.arrowR
+              }<span>Overspending rolls over to ${mName(
+                off + 1
+              )} instead of reducing Ready to Assign</span></div>`
+            : k === 'neg'
+            ? `<div class="flag neg">If it isn't covered, this comes out of ${mName(
+                off + 1
+              )}'s Ready to Assign</div>`
+            : ''
+        }
+        <div class="bar" style="margin-top:10px;height:7px" aria-hidden="true"><i style="width:${
+          p.fill * 100
+        }%;background:${
+          p.over ? 'var(--pillNegativeText)' : accent(c.id)
+        }"></i></div>
       </div>
       <div class="minis">
-        <div class="mini"><div class="l">Assigned</div><div class="v num">${fmt(c.b)}</div></div>
-        <div class="mini"><div class="l">Activity</div><div class="v num">${fmt(-c.s)}</div></div>
-        <div class="mini"><div class="l">Last month</div><div class="v num">${fmt(-512)}</div></div>
+        <div class="mini"><div class="l">From ${mAbbr(
+          off - 1
+        )}</div><div class="v num">${fmt(d.carry)}</div></div>
+        <div class="mini"><div class="l">Assigned</div><div class="v num">${fmt(
+          d.b
+        )}</div></div>
+        <div class="mini"><div class="l">Activity</div><div class="v num">${
+          d.s < 0 ? '+' + fmt(-d.s) : fmt(-d.s)
+        }</div></div>
       </div>
+      ${
+        gi
+          ? `<div class="goalbox ${
+              gi.under ? 'under' : 'ok'
+            }"><div class="gb-top"><span class="gi">${I.target}</span><b>${
+              gi.text
+            }</b></div><div class="bar" aria-hidden="true"><i style="width:${
+              gi.pct * 100
+            }%;background:${
+              gi.under ? 'var(--pillWarningText)' : 'var(--pillPositiveText)'
+            }"></i></div><div class="gb-sub">${gi.long}</div></div>`
+          : ''
+      }
+      ${c.longGoal ? '' : paceSection(c, off, pi)}
+      <div><div class="sec-title" style="margin-bottom:6px">Notes</div><div class="note">${
+        c.notes
+          ? esc(c.notes)
+          : '<span class="muted">No notes. Add one from the notes button.</span>'
+      }</div></div>
       <div>
-        <div class="sec-title">Pace <span>Sep 1 – 30</span></div>
-        <div style="margin-top:8px">${state.privacy ? '<div class="note">Hidden in privacy mode</div>' : paceSvg()}</div>
-        <div class="legend"><span><i style="background:var(--categoryAccent2)"></i>Activity</span><span><i style="background:var(--pageTextFaint)"></i>Even pace</span><span style="margin-left:auto" class="num">$140 under pace</span></div>
+        <div class="sec-title">Transactions <span>${tx.length}</span></div>
+        ${
+          tx.length
+            ? tx
+                .slice(0, 5)
+                .map(
+                  t =>
+                    `<div class="txn"><div class="payee" style="color:${accent(
+                      c.id
+                    )}">${firstGrapheme(t.p)}</div><div class="m"><b>${esc(
+                      t.p
+                    )}</b><span>${mAbbr(off)} ${t.day} · ${
+                      t.a
+                    }</span></div><div class="amt num ${
+                      t.amt > 0 ? 'in' : ''
+                    }">${fmtC(t.amt)}</div></div>`
+                )
+                .join('')
+            : `<div class="note"><span class="muted">${
+                off > 0
+                  ? 'Nothing yet for ' + mName(off)
+                  : 'No transactions this month'
+              }</span></div>`
+        }
+        ${
+          tx.length
+            ? `<button class="linkbtn" data-activity="${c.id}:${off}">View in Accounts ${I.chevR}</button>`
+            : ''
+        }
       </div>
-      <div><div class="sec-title" style="margin-bottom:6px">Notes</div><div class="note">Weekly food shop</div></div>
-      <div>
-        <div class="sec-title">Transactions <span>2</span></div>
-        <div class="txn"><div class="payee" style="color:var(--categoryAccent2)">S</div><div class="m"><b>SuperMart</b><span>Sep 14 · Checking</span></div><div class="amt num">${fmt(-140)}.00</div></div>
-        <div class="txn"><div class="payee" style="color:var(--categoryAccent6)">L</div><div class="m"><b>Local Market</b><span>Sep 6 · Credit Card</span></div><div class="amt num">${fmt(-100)}.00</div></div>
-      </div>
+    </aside>`;
+      }
+
+      // ---- Anchored menus (all items exist in the app today) ----
+      const mi = (label, extra = '', attrs = '') =>
+        `<button class="item" role="menuitem" ${attrs}>${label}${extra}</button>`;
+      const opt = '<span class="amt muted">if templates on</span>';
+      function menuBody() {
+        const m = state.menu,
+          f = state.menuFor;
+        if (m === 'breakdown') {
+          const off = Number(f),
+            s = summaryFor(off),
+            k = rtaKind(s.rta);
+          const line = (l, v, cls = '') =>
+            `<div class="bd-row ${cls}"><span>${l}</span><span class="num">${fmt(
+              v
+            )}</span></div>`;
+          const acts = [
+            s.rta > 0 ? mi('Move to a category') : '',
+            s.rta > 0 ? mi('Hold for next month') : '',
+            s.rta < 0 ? mi('Cover from a category') : '',
+            s.hold > 0 ? mi("Reset next month's buffer") : '',
+          ].join('');
+          return `<div class="bd" style="width:300px"><div class="bd-title">${mLong(
+            off
+          )}</div>
+          ${line('Available funds', s.af)}
+          ${line(`Overspent in ${mName(off - 1)}`, -s.prevOver)}
+          ${line('Assigned', -s.assigned)}
+          ${line('For next month', -s.hold)}
+          <div class="bd-row total ${k}"><span>Ready to Assign</span><span class="num">${fmt(
+            s.rta
+          )}</span></div></div>
+          ${acts ? '<hr>' + acts : ''}`;
+        }
+        if (m === 'balance') {
+          const [id, o] = f.split(':'),
+            c = all.find(x => x.id === id),
+            d = cell(c, Number(o));
+          return `<div class="bd-title" style="padding:8px 10px 4px">${esc(
+            c.n
+          )} · ${mAbbr(Number(o))}</div>
+          ${d.avail > 0 ? mi('Transfer to another category') : ''}
+          ${d.avail < 0 ? mi('Cover overspending') : ''}
+          ${mi(
+            c.roll ? 'Remove overspending rollover' : 'Rollover overspending'
+          )}`;
+        }
+        if (m === 'catmenu') {
+          const c = all.find(x => x.id === f);
+          return `${mi('Rename')}${mi(c && c.hidden ? 'Show' : 'Hide')}${mi(
+            'Delete'
+          )}`;
+        }
+        if (m === 'groupmenu') {
+          return `${mi('Rename')}${mi('Hide')}${mi('Delete')}<hr>${mi(
+            'Sort A to Z'
+          )}${mi('Sort Z to A')}<hr>${mi('Overwrite with templates', opt)}`;
+        }
+        if (m === 'month') {
+          const off = Number(f);
+          return `<div class="bd-title" style="padding:8px 10px 4px">${mLong(
+            off
+          )}</div>
+          ${mi("Copy last month's budget")}${mi('Set budgets to zero')}${mi(
+            'Set budgets to 3 month average'
+          )}${mi('Set budgets to 6 month average')}${mi(
+            'Set budgets to 12 month average'
+          )}
+          <hr>${mi('Check templates', opt)}${mi(
+            'Apply budget template',
+            opt
+          )}${mi('Overwrite with budget template', opt)}${mi(
+            'End of month cleanup',
+            opt
+          )}`;
+        }
+        if (m === 'column') {
+          return `${mi(
+            'Toggle hidden categories',
+            state.showHidden
+              ? '<span class="amt">On</span>'
+              : '<span class="amt muted">Off</span>',
+            'data-toggle="showHidden"'
+          )}${mi('Expand all')}${mi('Collapse all')}<hr>${mi('Add group')}${mi(
+            'Widen category column'
+          )}`;
+        }
+        if (m === 'recon') {
+          return `<div class="rc"><p>Enter the current balance of your bank account that you want to reconcile with:</p>
+          <input class="rc-input num" value="4,300.00" aria-label="Bank balance">
+          <div class="rc-bank">Last balance from bank: <b class="num">$4,300.00</b></div>
+          <div class="rc-actions"><button class="tbtn">Use last synced total</button><button class="tbtn primary" data-set="recon" data-val="diff">Reconcile</button></div></div>`;
+        }
+        return '';
+      }
+      function anchoredMenu() {
+        const body = menuBody();
+        return body
+          ? `<div class="pop show apop" id="apop" role="menu">${body}</div>`
+          : '';
+      }
+      function placeAnchored() {
+        const pop = document.getElementById('apop');
+        if (!pop) return;
+        const key = state.menuFor
+          ? `${state.menu}:${state.menuFor}`
+          : state.menu;
+        const a = [...document.querySelectorAll('[data-anchor]')].find(
+          el => el.dataset.anchor === key && el.getClientRects().length
+        );
+        if (!a) return void pop.remove();
+        const r = a.getBoundingClientRect(),
+          pw = pop.offsetWidth,
+          ph = pop.offsetHeight;
+        const alignRight = ['balance', 'month', 'groupmenu'].includes(
+          state.menu
+        );
+        let left = alignRight ? r.right - pw : r.left;
+        left = clamp(left, 12, innerWidth - pw - 12);
+        let top = r.bottom + 6;
+        if (top + ph > innerHeight - 12) top = Math.max(12, r.top - ph - 6);
+        pop.style.left = left + 'px';
+        pop.style.top = top + 'px';
+      }
+
+      function acctRail() {
+        if (state.pane !== 'open') {
+          const dot = a =>
+            `<button class="ap-dot" data-set="page" data-val="account" title="${
+              a.n
+            } ${fmt(a.v)}" aria-label="${a.n}, ${fmt(
+              a.v
+            )}"><span class="ap-av">${firstGrapheme(a.n)}</span>${
+              a.st
+                ? `<span class="acct-status" style="background:${
+                    a.st === 'ok'
+                      ? 'var(--pillPositiveText)'
+                      : 'var(--categoryAccent3)'
+                  }"></span>`
+                : ''
+            }</button>`;
+          return `<aside class="card acct-rail collapsed" aria-label="Accounts, collapsed">
+      <button class="icon-btn" data-set="pane" data-val="open" aria-expanded="false" aria-label="Expand accounts">${
+        I.chevR
+      }</button>
+      ${[...accounts.on, ...accounts.off].map(dot).join('')}
+      <button class="icon-btn" aria-label="Add account">${I.plus}</button>
+    </aside>`;
+        }
+        return `<aside class="card acct-rail" aria-label="Accounts">
+      <div class="ar-head"><b>Accounts</b><button class="tool" data-set="pane" data-val="collapsed" aria-expanded="true" aria-label="Collapse accounts">${
+        I.chevL
+      }</button></div>
+      ${accountsPop(true)}
     </aside>`;
       }
 
@@ -1976,31 +4127,63 @@
           `<div class="grp"><b>${label}</b>${opts
             .map(
               ([v, l]) =>
-                `<button class="${String(state[key]) === String(v) ? 'on' : ''}" data-set="${key}" data-val="${v}">${l}</button>`,
+                `<button class="${
+                  String(state[key]) === String(v) ? 'on' : ''
+                }" data-set="${key}" data-val="${v}">${l}</button>`
             )
             .join('')}</div>`;
+        const common = [
+          grp('Page', 'page', [
+            ['budget', 'Budget'],
+            ['account', 'Account'],
+          ]),
+          grp('Theme', 'theme', [
+            ['light', 'Light'],
+            ['dark', 'Dark'],
+            ['midnight', 'Midnight'],
+            ['custom', 'Custom'],
+          ]),
+        ];
+        const budget = [
+          grp('Data', 'data', [
+            ['basic', 'Basic'],
+            ['states', 'States'],
+            ['many', '34 cats'],
+          ]),
+          grp('Rows', 'density', [
+            ['50', '50'],
+            ['44', '44'],
+            ['38', '38'],
+          ]),
+          grp('Month', 'when', [
+            ['past', 'Past'],
+            ['current', 'Current'],
+            ['future', 'Future'],
+          ]),
+          grp('Ready', 'rta', [
+            ['pos', '+'],
+            ['zero', '0'],
+            ['neg', '−'],
+          ]),
+          grp('Panel', 'panel', [
+            [true, 'Open'],
+            [false, 'Closed'],
+          ]),
+        ];
+        const acct = [
+          grp('Reconcile', 'recon', [
+            ['0', 'Off'],
+            ['diff', 'Difference'],
+            ['done', 'Matched'],
+          ]),
+        ];
+        const pin = grp('Accounts pane', 'pane', [
+          ['open', 'Open'],
+          ['collapsed', 'Collapsed'],
+        ]);
         return `<div class="proto" aria-label="Prototype controls">
-      ${grp('Page', 'page', [
-        ['budget', 'Budget'],
-        ['account', 'Account'],
-      ])}
-      ${grp('Layout', 'layout', [
-        ['a', 'A table'],
-        ['b', 'B cards'],
-      ])}
-      ${grp('Header', 'header', [
-        ['cards', 'Cards'],
-        ['trend', 'C trend'],
-      ])}
-      ${grp('Theme', 'theme', [
-        ['light', 'Light'],
-        ['dark', 'Dark'],
-        ['midnight', 'Midnight'],
-      ])}
-      ${grp('Panel', 'panel', [
-        [true, 'Open'],
-        [false, 'Closed'],
-      ])}
+      ${[...common, ...(state.page === 'budget' ? budget : acct), pin].join('')}
+      <div class="grp"><button data-reload title="Reload with the fixture's original amounts">Reset</button></div>
     </div>`;
       }
 
@@ -2183,28 +4366,55 @@
           t.sel && state.sel ? 'selected' : '',
         ].join(' ');
         const catCell = t.cat
-          ? `<div class="cat-cell"><span class="cat-dot" style="background:${accent(t.cat)}"></span><span class="ell">${t.cn}</span></div>`
+          ? `<div class="cat-cell"><span class="cat-dot" style="background:${accent(
+              t.cat
+            )}"></span><span class="ell">${t.cn}</span></div>`
           : `<div class="cat-cell"><span class="ell" style="color:var(--pageTextSubdued)">${t.cn}</span></div>`;
         const status = t.sched
-          ? `<span class="status" style="background:${t.sched === 'Due' ? 'var(--pillNegativeBackground)' : 'var(--selectionBackground)'};color:${t.sched === 'Due' ? 'var(--pillNegativeText)' : 'var(--accent)'}">${t.sched}</span>`
+          ? `<span class="status" style="background:${
+              t.sched === 'Due'
+                ? 'var(--pillNegativeBackground)'
+                : 'var(--selectionBackground)'
+            };color:${
+              t.sched === 'Due' ? 'var(--pillNegativeText)' : 'var(--accent)'
+            }">${t.sched}</span>`
           : catCell;
         const clr =
           t.c === 'c'
             ? `<span class="clr c" title="Cleared">${check}</span>`
             : t.c === 'u'
-              ? '<span class="clr u" title="Uncleared"></span>'
-              : t.c === 'r'
-                ? `<span class="clr r" title="Reconciled">${lock}</span>`
-                : '';
+            ? '<span class="clr u" title="Uncleared"></span>'
+            : t.c === 'r'
+            ? `<span class="clr r" title="Reconciled">${lock}</span>`
+            : '';
         return `<div class="rcols trow ${cls}" role="row">
-          <div>${t.child ? '' : `<span class="cb ${t.sel && state.sel ? 'on' : ''}">${t.sel && state.sel ? check : ''}</span>`}</div>
+          <div>${
+            t.child
+              ? ''
+              : `<span class="cb ${t.sel && state.sel ? 'on' : ''}">${
+                  t.sel && state.sel ? check : ''
+                }</span>`
+          }</div>
           <div class="num">${t.d || ''}</div>
-          <div class="payee-cell ${t.child ? 'indent' : ''}">${t.child ? '' : `<div class="payee" style="color:${t.cat ? accent(t.cat) : 'var(--pageTextSubdued)'}">${firstGrapheme(t.p)}</div>`}<span class="ell">${t.split ? '↳ ' : ''}${t.p}</span></div>
-          <div class="ell">${(t.tags || []).map(([n, c]) => `<span class="tag" style="background:${c}">${n}</span>`).join(' ')} ${t.notes || ''}</div>
+          <div class="payee-cell ${t.child ? 'indent' : ''}">${
+          t.child
+            ? ''
+            : `<div class="payee" style="color:${
+                t.cat ? accent(t.cat) : 'var(--pageTextSubdued)'
+              }">${firstGrapheme(t.p)}</div>`
+        }<span class="ell">${t.split ? '↳ ' : ''}${t.p}</span></div>
+          <div class="ell">${(t.tags || [])
+            .map(
+              ([n, c]) =>
+                `<span class="tag" style="background:${c}">${n}</span>`
+            )
+            .join(' ')} ${t.notes || ''}</div>
           <div>${status}</div>
           <div class="r num">${money(t.out)}</div>
           <div class="r num">${money(t.inn)}</div>
-          <div class="r num runbal col-bal">${t.child || t.sched ? '' : money(t.bal)}</div>
+          <div class="r num runbal col-bal">${
+            t.child || t.sched ? '' : money(t.bal)
+          }</div>
           <div>${clr}</div>
         </div>`;
       }
@@ -2221,7 +4431,11 @@
         const d = pts
           .map(
             (v, i) =>
-              `${i ? 'L' : 'M'}${((i / (pts.length - 1)) * w).toFixed(1)},${(h - 4 - ((v - min) / (max - min)) * (h - 8)).toFixed(1)}`,
+              `${i ? 'L' : 'M'}${((i / (pts.length - 1)) * w).toFixed(1)},${(
+                h -
+                4 -
+                ((v - min) / (max - min)) * (h - 8)
+              ).toFixed(1)}`
           )
           .join(' ');
         return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" role="img" aria-label="Balance over the last 30 days">
@@ -2233,78 +4447,243 @@
         const selBtn = state.sel
           ? `<button class="tbtn sel"><span class="num">2</span> transactions ${I.chevD}</button>`
           : `<button class="tbtn"><span>${I.file}</span><span class="txt">Import</span></button><button class="tbtn primary">${I.plus}<span class="txt">Add New</span></button>`;
-        return `<main class="main">
-          <section class="acct-head">
-            <div class="card acct-hero">
-              <div class="title-row"><div><div class="eyebrow">On budget · Checking</div><h1>Everyday Checking</h1></div>
-                <div style="margin-left:auto;display:flex;gap:8px"><button class="tbtn">${I.cloud}<span class="txt">Bank Sync</span></button><button class="tbtn" aria-label="Reconcile">${lock}<span class="txt">Reconcile</span></button></div></div>
-              <div class="bal num">$4,250.00</div>
-              <div class="chips">
+        // Budget → Activity opens all accounts filtered to that category and month.
+        let fc = null,
+          foff = 0;
+        if (state.filter) {
+          const [id, o] = state.filter.split(':');
+          fc = all.find(x => x.id === id);
+          foff = Number(o);
+        }
+        const rows = fc
+          ? txnsFor(fc, foff)
+              .reverse()
+              .map(t => ({
+                d: `${String(mDate(foff).getMonth() + 1).padStart(
+                  2,
+                  '0'
+                )}/${String(t.day).padStart(2, '0')}/2026`,
+                p: t.p,
+                notes: t.a,
+                cat: fc.id,
+                cn: fc.n,
+                out: t.amt < 0 ? -t.amt : null,
+                inn: t.amt > 0 ? t.amt : null,
+                c: foff < 0 ? 'r' : 'c',
+              }))
+          : txns;
+        const reconciling = state.recon !== '0' && !fc;
+        const chips = reconciling
+          ? state.recon === 'diff'
+            ? `<div class="recon"><span class="chip neg">Difference <b class="num">−$35.00</b></span>
+                <span class="recon-txt">Your cleared balance <b class="num">$4,335.00</b> needs <b class="num">−$35.00</b> to match your bank's balance of <b class="num">$4,300.00</b></span>
+                <span class="recon-actions"><button class="tbtn" data-set="recon" data-val="done">Create reconciliation transaction</button><button class="tbtn primary" data-set="recon" data-val="0">Exit reconciliation</button></span></div>`
+            : `<div class="recon ok"><span class="chip ok">${check} All reconciled</span>
+                <span class="recon-txt">Cleared balance matches your bank's balance of <b class="num">$4,300.00</b></span>
+                <span class="recon-actions"><button class="tbtn primary" data-set="recon" data-val="0">Lock transactions</button></span></div>`
+          : `<div class="chips">
                 <span class="chip">Cleared <b class="num">$4,335.00</b></span>
                 <span class="chip">Uncleared <b class="num">−$85.00</b></span>
-                ${state.sel ? '<span class="chip">Selected <b class="num">−$380.00</b></span>' : ''}
-                <span class="chip ok">${lock} Reconciled 3 days ago</span>
-              </div>
+                ${
+                  state.sel
+                    ? '<span class="chip">Selected <b class="num">−$380.00</b></span>'
+                    : ''
+                }
+                ${
+                  fc
+                    ? `<span class="chip">Filtered <b class="num">${fmtC(
+                        sum(txnsFor(fc, foff), t => t.amt)
+                      )}</b></span>`
+                    : `<span class="chip ok">${lock} Reconciled 3 days ago</span>`
+                }
+              </div>`;
+        const heroBtns = fc
+          ? ''
+          : `<button class="tbtn">${
+              I.cloud
+            }<span class="txt">Bank Sync</span></button><button class="tbtn ${
+              reconciling ? 'sel' : ''
+            }" data-menu="recon" data-anchor="recon" aria-haspopup="dialog" aria-label="Reconcile">${lock}<span class="txt">Reconcile</span></button>`;
+        return `<main class="main">
+          <section class="acct-head">
+            <div class="card acct-hero ${reconciling ? 'reconciling' : ''}">
+              <div class="title-row"><div><div class="eyebrow">${
+                fc ? 'All accounts · from Budget' : 'On budget · Checking'
+              }</div><h1>${fc ? 'All accounts' : 'Everyday Checking'}</h1></div>
+                <div style="margin-left:auto;display:flex;gap:8px">${heroBtns}</div></div>
+              <div class="bal num">${fc ? '$10,400.00' : '$4,250.00'}</div>
+              ${chips}
             </div>
             <div class="card acct-chart">
               <div class="sec-title">Balance <span>Last 30 days · optional</span></div>
-              <div style="margin-top:6px">${state.privacy ? '<div class="note">Hidden in privacy mode</div>' : balanceSpark()}</div>
+              <div style="margin-top:6px">${
+                state.privacy
+                  ? '<div class="note">Hidden in privacy mode</div>'
+                  : balanceSpark()
+              }</div>
             </div>
           </section>
           <div class="toolbar">
             ${selBtn}
-            <button class="tbtn">${I.rules}<span class="txt">Filter</span></button>
-            
+            <button class="tbtn">${
+              I.rules
+            }<span class="txt">Filter</span></button>
+            ${
+              fc
+                ? `<span class="filter-pill">Category is ${esc(
+                    fc.n
+                  )} <button data-set="filter" data-val="" aria-label="Remove filter">${
+                    I.x
+                  }</button></span><span class="filter-pill">Date is ${mLong(
+                    foff
+                  )}</span>`
+                : ''
+            }
             <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Search</div>
-            <button class="icon-btn" aria-label="Collapse split transactions">${I.chevD}</button>
-            <button class="icon-btn" aria-label="Account menu">${I.dots}</button>
+            <button class="icon-btn" aria-label="Collapse split transactions">${
+              I.chevD
+            }</button>
+            <button class="icon-btn" aria-label="Account menu">${
+              I.dots
+            }</button>
           </div>
-          <div class="card register" role="table" aria-label="Transactions">
-            <div class="rcols rhead" role="row"><div><span class="cb"></span></div><div>Date</div><div>Payee</div><div>Notes</div><div>Category</div><div class="r">Payment</div><div class="r">Deposit</div><div class="r col-bal">Balance</div><div>✓</div></div>
-            ${state.adding ? `<div class="rcols trow editing"><div></div><div class="cell-edit num">09/27/2026</div><div class="cell-edit" style="color:var(--pageTextFaint)">Payee</div><div class="cell-edit"></div><div class="cell-edit" style="color:var(--accent)">Categorize</div><div class="cell-edit num" style="justify-content:flex-end">0.00</div><div class="cell-edit"></div><div class="col-bal"></div><div><span class="clr u"></span></div></div><div class="newrow-actions"><button class="tbtn">Cancel</button><button class="tbtn primary">Add</button></div>` : ''}
-            ${txns.map(txnRow).join('')}
+          <div class="card register ${
+            reconciling ? 'reconciling' : ''
+          }" role="table" aria-label="Transactions">
+            <div class="rcols rhead" role="row"><div><span class="cb"></span></div><div>Date</div><div>Payee</div><div>Notes</div><div>Category</div><div class="r">Payment</div><div class="r">Deposit</div><div class="r col-bal">Balance</div><div class="clr-head">✓</div></div>
+            ${
+              state.adding
+                ? `<div class="rcols trow editing"><div></div><div class="cell-edit num">09/27/2026</div><div class="cell-edit" style="color:var(--pageTextFaint)">Payee</div><div class="cell-edit"></div><div class="cell-edit" style="color:var(--accent)">Categorize</div><div class="cell-edit num" style="justify-content:flex-end">0.00</div><div class="cell-edit"></div><div class="col-bal"></div><div><span class="clr u"></span></div></div><div class="newrow-actions"><button class="tbtn">Cancel</button><button class="tbtn primary">Add</button></div>`
+                : ''
+            }
+            ${rows.map(txnRow).join('')}
           </div>
         </main>`;
       }
 
+      let totB = 0,
+        totS = 0;
       function render() {
+        const scroller = document.querySelector('.ledger-wrap, .register');
+        const prevScroll = scroller ? scroller.scrollTop : 0;
+        Object.assign(L, layoutInfo());
         document.documentElement.dataset.theme = state.theme;
         document.body.className = [
           state.layout === 'b' ? 'layout-b' : 'layout-a',
-          state.panel && state.page === 'budget' ? 'panel-open' : '',
+          L.mode === 'push' ? 'panel-open' : '',
+          !L.narrow && state.pane === 'open' ? 'pane-open' : '',
+          L.mode === 'overlay' ? 'panel-overlay' : '',
+          L.n > 1 ? 'multi-month' : '',
+          'd' + state.density,
           state.privacy ? 'privacy' : '',
           state.controls ? '' : 'no-controls',
+          state.compact ? 'compact' : '',
         ].join(' ');
+        const offs = offsets();
+        const t = monthTotals(L.off);
+        totB = t.assigned;
+        totS = -t.activity;
+        const summary =
+          state.header === 'trend' ? summaryTrend() : summaryCards(L.off);
         document.getElementById('app').innerHTML = `
       <div class="app">
         ${topbar()}
         <div class="page">
+          ${L.narrow ? '' : acctRail()}
           ${
             state.page === 'account'
               ? accountPage()
               : `<main class="main">
             ${header()}
-            ${state.header === 'trend' ? summaryTrend() : summaryCards()}
-            ${ledger()}
+            ${summary}
+            ${ledger(offs)}
           </main>
-          <div class="scrim" data-toggle="panel"></div>
-          ${panel()}`
+          <div class="scrim" data-close-panel></div>
+          ${L.mode === 'closed' ? '' : panel()}`
           }
         </div>
       </div>
       ${drawer()}
+      ${anchoredMenu()}
       ${controls()}`;
+        placeAnchored();
+        const lw = document.querySelector('.ledger-wrap, .register');
+        if (lw) {
+          lw.scrollTop = prevScroll;
+          if (lw.classList.contains('ledger-wrap')) {
+            const upd = () => {
+              if (state.compact) return;
+              const b = document.body.classList;
+              if (lw.scrollTop > 40 && innerHeight < 900) b.add('compact');
+              else if (lw.scrollTop < 4) b.remove('compact');
+            };
+            upd();
+            lw.addEventListener('scroll', upd, { passive: true });
+          }
+        }
+        const input = document.querySelector('.amt-input');
+        if (input) {
+          input.focus();
+          input.select();
+        }
         const u = new URL(location.href);
-        for (const k of ['page', 'layout', 'header', 'theme', 'menu'])
+        for (const k of [
+          'page',
+          'layout',
+          'header',
+          'theme',
+          'data',
+          'density',
+          'rta',
+          'when',
+          'cat',
+        ]) {
           u.searchParams.set(k, state[k]);
+        }
         u.searchParams.set('panel', state.panel ? '1' : '0');
         u.searchParams.set('privacy', state.privacy ? '1' : '0');
+        u.searchParams.set('pane', state.pane);
+        u.searchParams.set('recon', state.recon);
+        for (const k of [
+          'menu',
+          'for',
+          'edit',
+          'hover',
+          'compact',
+          'ov',
+          'pm',
+          'filter',
+        ]) {
+          u.searchParams.delete(k);
+        }
         history.replaceState(null, '', u);
+      }
+
+      function parseVal(key, v) {
+        if (v === 'true') return true;
+        if (v === 'false') return false;
+        if (key === 'months') return Number(v);
+        return v;
+      }
+      function visibleCats() {
+        return groups
+          .filter(g => !state.collapsed.has(g.id))
+          .flatMap(g => g.cats)
+          .filter(c => !c.hidden || state.showHidden);
+      }
+      function commitEdit(input, step) {
+        const [id, o] = input.dataset.edit.split(':');
+        const c = all.find(x => x.id === id);
+        const v = Number(input.value.replace(/[^0-9.-]/g, ''));
+        if (Number.isFinite(v)) (c.bo ||= {})[o] = Math.round(v);
+        const list = visibleCats();
+        const next = list[list.indexOf(c) + step];
+        state.edit = next ? `${next.id}:${o}` : '';
       }
 
       document.addEventListener('click', e => {
         const t = e.target.closest(
-          '[data-set],[data-menu],[data-toggle],[data-close],.crow',
+          '[data-set],[data-menu],[data-toggle],[data-close],[data-open],[data-edit-start],[data-activity],[data-collapse],[data-step],[data-pm],[data-close-panel],[data-reload]'
         );
         if (!t) {
           if (state.menu !== 'none' && !e.target.closest('.pop')) {
@@ -2313,28 +4692,95 @@
           }
           return;
         }
-        if (t.dataset.set)
-          state[t.dataset.set] =
-            t.dataset.val === 'true'
-              ? true
-              : t.dataset.val === 'false'
-                ? false
-                : t.dataset.val;
-        if (t.dataset.set === 'page') state.menu = 'none';
-        else if (t.dataset.menu)
-          state.menu = state.menu === t.dataset.menu ? 'none' : t.dataset.menu;
-        else if (t.dataset.toggle)
-          state[t.dataset.toggle] = !state[t.dataset.toggle];
-        else if (t.dataset.close !== undefined) state.menu = 'none';
-        else if (t.classList.contains('crow')) state.panel = true;
+        const d = t.dataset;
+        if (d.reload !== undefined) return void location.reload();
+        if (d.set) {
+          state[d.set] = parseVal(d.set, d.val);
+          if (d.set === 'page') state.filter = '';
+          if (d.set === 'when' || d.set === 'months') state.pm = null;
+          if (d.set === 'months') state.ov = false;
+          state.menu = 'none';
+        } else if (d.menu) {
+          const f = d.for ?? '';
+          if (state.menu === d.menu && state.menuFor === f) {
+            state.menu = 'none';
+          } else {
+            state.menu = d.menu;
+            state.menuFor = f;
+          }
+        } else if (d.toggle) {
+          state[d.toggle] = !state[d.toggle];
+          if (d.toggle === 'panel' && state.panel) state.ov = true;
+          state.menu = 'none';
+        } else if (d.close !== undefined) {
+          state.menu = 'none';
+        } else if (d.open) {
+          state.cat = d.open;
+          state.panel = true;
+          state.ov = true;
+          state.menu = 'none';
+        } else if (d.editStart) {
+          state.edit = d.editStart;
+          state.menu = 'none';
+        } else if (d.activity) {
+          state.filter = d.activity;
+          state.page = 'account';
+          state.menu = 'none';
+        } else if (d.collapse) {
+          const s = state.collapsed;
+          s.has(d.collapse) ? s.delete(d.collapse) : s.add(d.collapse);
+        } else if (d.step) {
+          state.when = offWhen(clamp(whenOff() + Number(d.step), -2, 2));
+          state.pm = null;
+        } else if (d.pm) {
+          state.pm = clamp(panelOff() + Number(d.pm), -2, 2);
+        } else if (d.closePanel !== undefined) {
+          if (L.mode === 'overlay') state.ov = false;
+          else state.panel = false;
+        }
+        render();
+      });
+      document.addEventListener('contextmenu', e => {
+        const t = e.target.closest('.cname[data-open]');
+        if (!t) return;
+        e.preventDefault();
+        state.menu = 'catmenu';
+        state.menuFor = t.dataset.open;
         render();
       });
       document.addEventListener('keydown', e => {
+        if (e.target.matches && e.target.matches('.amt-input')) {
+          if (e.key === 'Enter' || e.key === 'Tab') {
+            e.preventDefault();
+            commitEdit(e.target, e.shiftKey ? -1 : 1);
+            render();
+          } else if (e.key === 'Escape') {
+            const key = state.edit;
+            state.edit = '';
+            render();
+            document.querySelector(`[data-edit-start="${key}"]`)?.focus();
+          }
+          return;
+        }
+        if (
+          e.key === 'Enter' &&
+          e.target.matches &&
+          e.target.matches('.hero[data-menu]')
+        ) {
+          e.target.click();
+          return;
+        }
         if (e.key === 'Escape') {
           if (state.menu !== 'none') state.menu = 'none';
+          else if (L.mode === 'overlay') state.ov = false;
           else state.panel = false;
           render();
         }
+      });
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(render, 80);
       });
       render();
     </script>

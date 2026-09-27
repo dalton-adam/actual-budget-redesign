@@ -11,6 +11,10 @@ It does not replace the design specification or authorize a new design direction
   Reports coverage gap: **58 passed, 1 failed, 15 skipped**, not 73 passes.
 - DESIGN-01: **Claude-owned; prototype delivered, review continuing**. Do not
   restart it or edit its files without coordinating with the active owner.
+- DESIGN-02: **done September 27, 2026.** Owner walkthrough decisions (44px
+  rows, collapsible accounts pane, one month at a time, empty bar for negative
+  Available without spending, reconciliation band) are in the
+  [prototype README](prototype/README.md). DESIGN-03 is next.
 - DESIGN-02 and DESIGN-03: continue from Claude's current work. Read
   [prototype decisions](prototype/README.md), [accounts review](accounts-review/README.md)
   and [plan §1.1](plan.md) before assigning anything. Status here is a snapshot,

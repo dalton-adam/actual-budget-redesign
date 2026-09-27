@@ -2,7 +2,7 @@
 
 A static, fictional-data prototype of the redesigned app frame and budget screen. It is not connected to Actual's code and performs no budget calculations beyond the illustration formulas noted below.
 
-Status: **DESIGN-01 ready for owner review.** DESIGN-02 (row states, multi-month, summary breakdown) and DESIGN-03 (decisions record) follow.
+Status: **DESIGN-01 and DESIGN-02 reviewed** (see [DESIGN-02 decisions](#owner-decisions-september-27-2026-walkthrough)). DESIGN-03 (decisions record) is next.
 
 ## Opening it
 
@@ -19,8 +19,11 @@ Clicking a category row opens the panel. Escape closes menus, then the panel. Re
 Regenerate the screenshots:
 
 ```sh
-node scripts/redesign-prototype-shots.cjs
+node scripts/redesign-prototype-shots.cjs              # DESIGN-02 set, 18–50
+node scripts/redesign-prototype-shots.cjs --design-01  # 01–17 from the current prototype
 ```
+
+The DESIGN-01 images (01–17) are kept as the historical record. Regenerating them reproduces their fixture and 50px rows, but the current prototype adds the Income section and row tools, so they will differ slightly.
 
 ## Screenshots
 
@@ -48,29 +51,29 @@ node scripts/redesign-prototype-shots.cjs
 
 Every navigation and global item in [behavior-inventory.md](../behavior-inventory.md), and where it lives in the prototype.
 
-| Item                                                         | Today (source)                                   | Wide window (≥900px)                                               | Narrow window (<900px)                         |
-| ------------------------------------------------------------ | ------------------------------------------------ | ------------------------------------------------------------------ | ---------------------------------------------- |
-| Budget, Reports, Schedules                                   | Sidebar `PrimaryButtons.tsx`                     | Pill tabs in the top bar                                           | Drawer                                         |
-| All accounts, On budget, Off budget (with totals)            | Sidebar `Accounts.tsx`                           | **Accounts ▾** menu                                                | Drawer "Accounts" section                      |
-| Individual accounts, with sync status and balance            | Sidebar `Account.tsx`                            | Accounts ▾ menu rows (status dot and balance)                      | Drawer                                         |
-| Account context menu (right-click)                           | `Account.tsx`                                    | Same menu on right-click of a row in the Accounts menu (not drawn) | Long-press / right-click in drawer (not drawn) |
-| Closed accounts                                              | Sidebar toggle                                   | Accounts ▾ → Closed accounts                                       | Drawer                                         |
-| Add account                                                  | Sidebar button (`Sidebar.tsx`)                   | Accounts ▾ → Add account                                           | Drawer                                         |
-| Payees, Rules, Bank Sync (conditional), Tags, Settings       | Sidebar "More"                                   | **More ▾** menu                                                    | Drawer "More" section                          |
-| Budget switcher: Rename, Settings, Load backup…, Switch file | Sidebar `BudgetName.tsx`                         | Top-right budget button menu                                       | Drawer footer                                  |
-| Uncategorized count                                          | Titlebar `UncategorizedButton`                   | Top-right chip; collapses to the count alone below 1280px          | Drawer item with count                         |
-| Server sync status                                           | Titlebar `ServerSyncButton` (only with a server) | Top-right cloud button with status dot                             | Top bar                                        |
-| Privacy mode                                                 | Titlebar `PrivacyButton`                         | Top-right eye button                                               | Top bar                                        |
-| Help                                                         | Titlebar `HelpMenu`                              | Top-right ? button                                                 | Drawer                                         |
-| Logged-in user (server login)                                | Titlebar `LoggedInUser`                          | **Not drawn.** Proposal: inside the budget switcher menu           | Drawer footer                                  |
-| Months shown (1–N)                                           | Titlebar `MonthCountSelector` on /budget         | Budget header segmented 1 / 2 / 3                                  | Budget header                                  |
-| Previous / next / current month                              | `MonthPicker.tsx`                                | Budget header month pill and **Today**                             | Budget header                                  |
-| Budget page menu                                             | `BudgetPageHeader.tsx`                           | Budget header ⋯ button                                             | Budget header                                  |
-| To Budget menu and breakdown                                 | `budgetsummary/*`                                | Ready to Assign card (click; "Breakdown" affordance)               | Same card                                      |
-| Category activity → transactions                             | `onShowActivity`                                 | Activity amount in each row (unchanged behavior)                   | Same                                           |
-| Command bar (Ctrl/Cmd+K), notifications                      | Global                                           | Unchanged: keyboard shortcut and existing toasts                   | Unchanged                                      |
-| Back button (`location.state.goBack`)                        | Titlebar                                         | **Not drawn.** Proposal: left of the page eyebrow when present     | Same                                           |
-| Desktop window drag region                                   | Titlebar                                         | The top bar becomes the drag region; buttons excluded              | n/a                                            |
+| Item                                                                | Today (source)                                   | Wide window (≥900px)                                                    | Narrow window (<900px)                         |
+| ------------------------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------- | ---------------------------------------------- |
+| Budget, Reports, Schedules                                          | Sidebar `PrimaryButtons.tsx`                     | Pill tabs in the top bar                                                | Drawer                                         |
+| All accounts, On budget, Off budget (with totals)                   | Sidebar `Accounts.tsx`                           | Collapsible **Accounts pane** on the left, plus the **Accounts ▾** menu | Drawer "Accounts" section                      |
+| Individual accounts, with sync status and balance                   | Sidebar `Account.tsx`                            | Accounts ▾ menu rows (status dot and balance)                           | Drawer                                         |
+| Account context menu (right-click)                                  | `Account.tsx`                                    | Same menu on right-click of a row in the Accounts menu (not drawn)      | Long-press / right-click in drawer (not drawn) |
+| Closed accounts                                                     | Sidebar toggle                                   | Accounts ▾ → Closed accounts                                            | Drawer                                         |
+| Add account                                                         | Sidebar button (`Sidebar.tsx`)                   | Accounts ▾ → Add account                                                | Drawer                                         |
+| Payees, Rules, Bank Sync (conditional), Tags, Settings              | Sidebar "More"                                   | **More ▾** menu                                                         | Drawer "More" section                          |
+| Budget switcher: Rename, Settings, Load backup…, Switch file        | Sidebar `BudgetName.tsx`                         | Top-right budget button menu                                            | Drawer footer                                  |
+| Uncategorized count                                                 | Titlebar `UncategorizedButton`                   | Top-right chip; collapses to the count alone below 1280px               | Drawer item with count                         |
+| Server sync status                                                  | Titlebar `ServerSyncButton` (only with a server) | Top-right cloud button with status dot                                  | Top bar                                        |
+| Privacy mode                                                        | Titlebar `PrivacyButton`                         | Top-right eye button                                                    | Top bar                                        |
+| Help                                                                | Titlebar `HelpMenu`                              | Top-right ? button                                                      | Drawer                                         |
+| Logged-in user (server login)                                       | Titlebar `LoggedInUser`                          | **Not drawn.** Proposal: inside the budget switcher menu                | Drawer footer                                  |
+| Months shown (1–N)                                                  | Titlebar `MonthCountSelector` on /budget         | **Removed** (owner decision: one month at a time)                       | Removed                                        |
+| Previous / next / current month                                     | `MonthPicker.tsx`                                | Budget header month pill and **Today**                                  | Budget header                                  |
+| Month menu and month notes (DESIGN-01 called it "budget page menu") | `BudgetMonthMenu.tsx`, `BudgetSummary.tsx`       | Budget header ⋯ button                                                  | Budget header                                  |
+| To Budget menu and breakdown                                        | `budgetsummary/*`                                | Ready to Assign card (click; "Breakdown" affordance)                    | Same card                                      |
+| Category activity → transactions                                    | `onShowActivity`                                 | Activity amount in each row (unchanged behavior)                        | Same                                           |
+| Command bar (Ctrl/Cmd+K), notifications                             | Global                                           | Unchanged: keyboard shortcut and existing toasts                        | Unchanged                                      |
+| Back button (`location.state.goBack`)                               | Titlebar                                         | **Not drawn.** Proposal: left of the page eyebrow when present          | Same                                           |
+| Desktop window drag region                                          | Titlebar                                         | The top bar becomes the drag region; buttons excluded                   | n/a                                            |
 
 ## Findings
 
@@ -96,4 +99,57 @@ Every navigation and global item in [behavior-inventory.md](../behavior-inventor
 3. **All three themes**, light, dark, and midnight, are first-class.
 4. **Details panel** is open by default on the Budget page. It is not used on account registers; see [the accounts review](../accounts-review/README.md). The prototype's **Page → Account** switch shows the register treatment.
 
-Still open for DESIGN-02: row density, whether losing the always-visible account sidebar is acceptable, and reconciliation-mode layout.
+DESIGN-02 took up the open items: row density, whether losing the always-visible account sidebar is acceptable, and reconciliation-mode layout. See below.
+
+## DESIGN-02: states and walkthrough decisions
+
+Prepared September 27, 2026. Still a static, fictional-data prototype; nothing here changes application code. The bar at the bottom gains **Data** (basic, states, 34 categories), **Rows** (50/44/38px, for comparison), **Month** (past, current, future), **Ready** (positive, zero, negative), a **Custom** theme, **Accounts pane** (open or collapsed), and on the account page **Reconcile**. **Reset** reloads the fixture. All URL parameters are listed at the top of `index.html`.
+
+### Owner decisions (September 27, 2026 walkthrough)
+
+1. **Row height: 44px**, with the compact summary strip once the table scrolls.
+2. **Accounts pane: always present and collapsible.** Open, it is the full list (all/on/off budget, closed accounts, add account); collapsed, it is a 56px rail with each account's initial and sync-status dot, plus add account. The Accounts menu in the top bar stays for narrow windows. The open/collapsed state is remembered per device (front-end storage, like the details panel). Prototype default: open at 1280px and wider, collapsed below.
+3. **One month at a time.** The months-shown control is removed from the budget. This deliberately drops an existing feature (`MonthCountSelector` and the `maxMonths` global preference); DESIGN-03 records it as an approved exclusion, and budgets set to show several months today will show one. The multi-month prototype (rail/overlay panel, per-month summary cards) was removed with it.
+4. **Progress bar with a negative Available and no spending this month: empty bar.** The bar only shows this month's spending; the negative pill carries the warning. With spending, an overspent category still shows a full bar in the negative color.
+5. **Reconciliation band approved as drawn** (`44`–`46`).
+
+### What is demonstrated
+
+| Required by backlog / plan §6                                         | Where                                                              |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Normal, hover, selected, editing rows                                 | `18`, `19` (hover on Transport, editing Subscriptions)             |
+| Overspent (negative pill, full negative bar)                          | Dining out; `20`                                                   |
+| Zero assigned, zero available, hidden category                        | Gifts, Rent, Old car loan (faded, "Hidden" tag); `18`              |
+| Carryover: positive carry and overspending rollover (→ marker)        | Transport (From Aug), Medical; `21`                                |
+| Goal/template status: funded, underfunded, long-term goal             | Rent, Utilities (amber pill, caption), Emergency fund; `18`, `22`  |
+| Refund (positive activity)                                            | Clothing                                                           |
+| Ready to Assign positive, zero, negative ("Overassigned")             | `18`, `25`, `26`                                                   |
+| Breakdown expanded (TotalsList lines plus existing To Budget actions) | `26`, `27`                                                         |
+| Pace chart for current, past and future months                        | `18`, `23`, `24`                                                   |
+| Long names, emoji first, non-Latin, 34 categories                     | `35`, `28`–`31`                                                    |
+| Density 50 / 44 / 38px at 1000×700                                    | `28`, `29`, `30`, `31`                                             |
+| Details panel open and closed                                         | `18`, `25`                                                         |
+| Narrow fallback                                                       | `35`, `36`                                                         |
+| Custom theme fallbacks                                                | `37`, `38`                                                         |
+| Every existing menu, drawn with its current items                     | month `39`, column `40`, category `41`, group `42`, Available `43` |
+| Reconciliation mode                                                   | `44`, `45`, `46`                                                   |
+| Activity → filtered transactions                                      | `47`                                                               |
+| Accounts pane collapsed and open                                      | `48`, `49`; open beside the details panel in `18`                  |
+| Privacy mode with the new states                                      | `50`                                                               |
+
+Interactions work in the browser: click a name to open details (right-click for its menu), click Assigned to edit (Enter/Tab moves down, Escape cancels and returns focus), click Available for its menu, click Activity to open the filtered register, collapse groups, step months, collapse and expand the accounts pane.
+
+### Findings
+
+1. **Density measurements.** Categories fully visible at 1000×700 with the details panel open, 34-category fixture: 50px → 6, 44px → 7, 38px → 9; with the compact summary strip: 7, 8 and 10. Today's app shows about 8 at the same size (31px rows, baseline `desktop-1000/budget.test.ts`). At 1440×900: 10 / 11 / 12 (compact 11 / 12 / 14). The approved 44px with the compact strip matches today's count.
+2. **Width with both side panes.** At 1440 with the accounts pane and details panel open, the Activity column narrows to 100–170px and drops its percentage; at 1000 the collapsed rail leaves long names readable. Row tools (notes, menu, drag handle) take no width until hover or keyboard focus; a small notes icon after the name marks categories that have notes.
+3. **The ⋯ in the budget header is the month menu** (`BudgetMonthMenu`: copy last month, set to zero, averages, templates), plus a month-notes button. DESIGN-01 labeled it "budget page menu"; that menu does not exist. The category column's own menu (toggle hidden, expand/collapse all) and the add-group action sit on the Category header. Category and group menus, notes buttons and the drag handle appear on hover and on keyboard focus.
+4. **Goal/template status is never color alone**: a target icon in the pill, a caption under the name ("Template $280 · $30 short"), and the full sentence in the pill's accessible name and the panel. Colors follow `makeBalanceAmountStyle`: underfunded uses the existing `templateNumberUnderFunded` meaning (new `pillWarning*` roles), and a long-term goal shows as underfunded until the balance reaches it, as the app does today.
+5. **Progress bar formula** (with decision 4): spent = this month's outflow net of refunds, floored at 0. If Available < 0: full negative bar when spent > 0, empty bar otherwise. Else fill = spent ÷ (spent + Available).
+6. **Pace chart rules.** Money at the start of the month (carried + assigned) spread evenly across the month, against cumulative outflow; refunds reduce it. Past months show the full month and "Finished with $X left / overspent". Future months show the even-pace line and "No activity yet". No line when nothing was assigned (for example Medical) or for long-term savings goals, where the goal box replaces it. DESIGN-03 records these formulas for UI-03.
+7. **Custom themes.** A custom theme overrides existing roles on top of a built-in base. If new roles are defined as `color-mix()` expressions of existing roles (cards from `cardBackground`/`tableBorder`, pills from `numberPositive`/`numberNegative`/`templateNumberUnderFunded`, selection from `buttonPrimaryBackground`), every new surface follows the custom palette (`37`, `38`, a Solarized-style test). Category accents fall back to the built-in set. This is the proposed UI-01 fallback mechanism; built-in themes keep their tuned literal values.
+8. **Reconciliation mode** is a state of the account hero: the existing reconcile popover (statement balance, last bank balance, "Use last synced total"), then a band with the difference chip, the existing sentence, **Create reconciliation transaction** and **Exit reconciliation**; when the difference is zero, "All reconciled" and **Lock transactions**. The hero gets a selection outline and the cleared column is accented. On the compact hero the band sits below the balance.
+9. **Future months go negative quickly.** With nothing held for next month, October's Ready to Assign in the fixture is −$5,048 (`24`), which is how the app behaves. The "Overassigned" badge makes the state explicit. No change proposed.
+10. **Wording used in this prototype** for DESIGN-03's old → new list: To Budget → Ready to Assign, Overbudgeted → Overassigned, Budgeted → Assigned, Spent → Activity, Balance → Available (budget only; the register's Balance stays), plus the unchanged menu item texts from the source.
+
+Next: DESIGN-03 writes `docs/redesign/design-decisions.md` from these decisions.
