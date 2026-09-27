@@ -20,7 +20,20 @@ It does not replace the design specification or authorize a new design direction
   [design-decisions.md](design-decisions.md). Implementation tasks are released
   in dependency order; items marked "Shown" in its §11 are confirmed with the
   owner before the task that needs them starts.
-- All application implementation below is pending. This document does not
+- UI-01: in review on branch `redesign/ui-01-theme-roles` (status recorded
+  there).
+- UI-03: **in review September 27, 2026**, branch
+  `redesign/ui-03-presentation-helpers`, based on `redesign/main` (it does not
+  depend on UI-01). New files only:
+  `C/budget/categoryPresentation.ts` and `C/budget/categoryPresentation.test.ts`
+  — accent index (§7.3), progress bar (§7.1), pace chart data and summary
+  (§7.2, the "Shown" default in §11 item 2) and summary stacked bar (§7.4).
+  Helpers take amounts and transactions the app already provides and return
+  numbers and summary kinds; wording, formatting and theme roles are left to
+  the components that use them. Nothing calls them yet. Checks: typecheck
+  pass; lint pass; UNIT `src/components/budget/categoryPresentation.test.ts`
+  27/27.
+- All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 
 ## Rules for every task
