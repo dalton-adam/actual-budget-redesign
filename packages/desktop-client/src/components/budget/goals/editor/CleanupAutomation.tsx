@@ -77,9 +77,9 @@ export function CleanupAutomation({
           End of month cleanup is a one-click reallocation of funds. Categories
           you choose to <strong>send leftover</strong> return their surplus to a
           pool; categories you mark to <strong>receive leftover</strong> receive
-          part or all of that pool back. By default, the pool is To Budget. You
-          can also create named pools so the surplus only moves between
-          categories set to use that pool.{' '}
+          part or all of that pool back. By default, the pool is Ready to
+          Assign. You can also create named pools so the surplus only moves
+          between categories set to use that pool.{' '}
           <Link
             variant="external"
             to="https://actualbudget.org/docs/experimental/monthly-cleanup#local-group-source-and-sinks"

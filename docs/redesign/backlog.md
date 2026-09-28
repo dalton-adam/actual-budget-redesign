@@ -194,6 +194,34 @@ src/components/navigation src/components/settings/Themes.test.tsx` passed
   card with a visible ring. **Not yet checked:** a custom theme, reduced
   motion (no new animation added), and the per-month summaries with
   several envelope months visible.
+- TERM-01: **implemented September 28, 2026** on `redesign/term-01`, not yet
+  merged. Design-decisions §9 wording applied as visible text only; the owner
+  approved the "Shown" rows and asked to match YNAB, which added the Cover /
+  Transfer picker entry, the envelope goal tooltip and two automation help
+  sentences (listed under §9 "As implemented"). No identifier, binding,
+  preference, API or `'to-budget'` id changed. Files:
+  `C/budget/{BalanceWithCarryover.tsx,util.ts}`,
+  `C/budget/envelope/EnvelopeBudgetComponents.tsx`,
+  `C/budget/envelope/budgetsummary/{ReadyToAssignBreakdown,ToBudgetAmount,TotalsList}.tsx`,
+  `C/budget/goals/displayTemplateMeta.ts`,
+  `C/budget/goals/editor/CleanupAutomation.tsx`,
+  `C/mobile/budget/{BalanceCell,BudgetCell,BudgetPage,BudgetTable,SpentCell}.tsx`,
+  `C/modals/{EnvelopeBalanceMenuModal,EnvelopeBudgetMenuModal,EnvelopeBudgetSummaryModal}.tsx`,
+  `C/modals/BudgetAutomationsModal/BudgetAutomationsBody.tsx`, and E2E
+  `e2e/budget.test.ts` (breakdown asserts "Assigned"; test title kept so
+  snapshot names don't change) and `e2e/page-models/mobile-budget-page.ts`
+  (envelope and tracking header names). Locale output is gitignored; nothing
+  to stage. Checks: typecheck pass; lint pass; UNIT `src/components/budget`,
+  `src/components/mobile`, `src/components/modals` 194/194;
+  `generate:i18n` ran; E2E(budget, budget.mobile, bud-01,
+  budget-automations.mobile) 51/51. VISUAL on the local test budget
+  (dark): desktop envelope 1440×900 (headers, breakdown, transfer picker
+  shows "Ready to Assign"), mobile envelope 375×812 (Overassigned, headers,
+  "You have assigned more than your available funds"), then switched to
+  tracking: desktop and mobile keep Budgeted / Spent / Balance; switched
+  back to envelope. **Not yet checked:** WIDE, light/midnight themes, the
+  multi-month `ToBudgetAmount` label ("Ready to Assign:" / "Overassigned:")
+  on screen, and Linux VRT snapshots (not regenerated).
 - All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 

@@ -83,7 +83,7 @@ export function getDisplayTemplateMeta(
       return {
         label: t('Whatever is left'),
         description: t(
-          'Split any remaining To Budget across these categories.',
+          'Split any remaining Ready to Assign across these categories.',
         ),
         icon: SvgShare,
       };

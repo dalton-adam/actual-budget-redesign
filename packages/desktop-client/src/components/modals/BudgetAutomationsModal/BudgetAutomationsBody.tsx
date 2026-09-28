@@ -226,8 +226,8 @@ export function BudgetAutomationsBody({
                   <Trans>
                     The projection shows the most that these automations could
                     budget on their own. The actual amount may be smaller when
-                    To Budget is empty or when higher-priority categories run
-                    first.
+                    Ready to Assign is empty or when higher-priority categories
+                    run first.
                   </Trans>
                 </View>
               }
