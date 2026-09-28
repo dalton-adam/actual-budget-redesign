@@ -37,15 +37,13 @@ import { useDispatch, useSelector } from '#redux';
 import type { Binding, SheetFields } from '#spreadsheet';
 
 export const accountNameStyle: CSSProperties = {
-  marginTop: -2,
-  marginBottom: 2,
-  paddingTop: 4,
-  paddingBottom: 4,
-  paddingRight: 15,
-  paddingLeft: 10,
+  minHeight: 32,
+  margin: '1px 6px',
+  padding: '0 8px',
+  borderRadius: 8,
   textDecoration: 'none',
-  color: theme.sidebarItemText,
-  ':hover': { backgroundColor: theme.sidebarItemBackgroundHover },
+  color: theme.pageText,
+  ':hover': { backgroundColor: theme.tableRowBackgroundHover },
   ...styles.smallText,
 };
 
@@ -65,7 +63,18 @@ type AccountProps<FieldName extends SheetFields<'account'>> = {
   titleAccount?: boolean;
   isExactPathMatch?: boolean;
   balanceTestId?: string;
+  compact?: boolean;
+  startEditing?: boolean;
+  onEditComplete?: () => void;
+  onRequestEdit?: () => void;
 };
+
+function firstGrapheme(value: string) {
+  const trimmed = value.trim();
+  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+  const first = segmenter.segment(trimmed)[Symbol.iterator]().next();
+  return first.done ? '?' : first.value.segment.toLocaleUpperCase();
+}
 
 export function Account<FieldName extends SheetFields<'account'>>({
   name,
@@ -83,6 +92,10 @@ export function Account<FieldName extends SheetFields<'account'>>({
   titleAccount,
   isExactPathMatch,
   balanceTestId,
+  compact = false,
+  startEditing = false,
+  onEditComplete,
+  onRequestEdit,
 }: AccountProps<FieldName>) {
   const isTestEnv = useIsTestEnv();
   const { t } = useTranslation();
@@ -116,7 +129,11 @@ export function Account<FieldName extends SheetFields<'account'>>({
 
   const dispatch = useDispatch();
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(startEditing);
+  const finishEditing = () => {
+    setIsEditing(false);
+    onEditComplete?.();
+  };
 
   const accountNote = useNotes(`account-${account?.id}`);
   const isTouchDevice =
@@ -141,7 +158,13 @@ export function Account<FieldName extends SheetFields<'account'>>({
       {
         name: 'account-rename',
         text: t('Rename'),
-        onClick: () => setIsEditing(true),
+        onClick: () => {
+          if (onRequestEdit) {
+            onRequestEdit();
+          } else {
+            setIsEditing(true);
+          }
+        },
       },
       account?.closed
         ? {
@@ -158,7 +181,78 @@ export function Account<FieldName extends SheetFields<'account'>>({
     ],
   });
 
-  const accountRow = (
+  const accountRow = compact ? (
+    <View innerRef={dropRef} style={{ flexShrink: 0, ...outerStyle }}>
+      <View innerRef={triggerRef}>
+        <DropHighlight pos={dropPos} />
+        <View innerRef={handleDragRef}>
+          <Link
+            variant="internal"
+            to={to}
+            isDisabled={isEditing}
+            style={{
+              width: 32,
+              height: 32,
+              padding: 0,
+              borderRadius: 10,
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textDecoration: 'none',
+              color: updated ? theme.pageText : theme.pageTextSecondary,
+              backgroundColor: theme.cardInset,
+              fontWeight: 700,
+              ...styles.smallText,
+              ':hover': { backgroundColor: theme.tableRowBackgroundHover },
+              ':focus-visible': styles.focusRing,
+            }}
+            activeStyle={{
+              color: theme.pageText,
+              backgroundColor: theme.navActive,
+              boxShadow: theme.navActiveShadow,
+            }}
+          >
+            <span
+              className={css({
+                position: 'absolute',
+                width: 1,
+                height: 1,
+                padding: 0,
+                margin: -1,
+                overflow: 'hidden',
+                clip: 'rect(0, 0, 0, 0)',
+                whiteSpace: 'nowrap',
+                border: 0,
+              })}
+            >
+              {name}
+            </span>
+            <span aria-hidden>{firstGrapheme(name)}</span>
+            {connected && (
+              <span
+                aria-hidden
+                className={css({
+                  position: 'absolute',
+                  top: -1,
+                  right: -1,
+                  width: 8,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: pending
+                    ? theme.sidebarItemBackgroundPending
+                    : failed
+                      ? theme.sidebarItemBackgroundFailed
+                      : theme.sidebarItemBackgroundPositive,
+                  boxShadow: `0 0 0 2px ${theme.cardBackground}`,
+                })}
+              />
+            )}
+          </Link>
+        </View>
+      </View>
+    </View>
+  ) : (
     <View innerRef={dropRef} style={{ flexShrink: 0, ...outerStyle }}>
       <View innerRef={triggerRef}>
         <DropHighlight pos={dropPos} />
@@ -172,15 +266,15 @@ export function Account<FieldName extends SheetFields<'account'>>({
               ...accountNameStyle,
               ...style,
               position: 'relative',
-              borderLeft: '4px solid transparent',
               ...(updated && {
                 fontWeight: 700,
-                color: theme.sidebarItemTextUpdated,
+                color: theme.pageText,
               }),
             }}
             activeStyle={{
-              borderColor: theme.sidebarItemAccentSelected,
-              color: theme.sidebarItemTextSelected,
+              backgroundColor: theme.navActive,
+              color: theme.pageText,
+              boxShadow: theme.navActiveShadow,
               // This is kind of a hack, but we don't ever want the account
               // that the user is looking at to be "bolded" which means it
               // has unread transactions. The system does mark is read and
@@ -188,8 +282,7 @@ export function Account<FieldName extends SheetFields<'account'>>({
               // ignores it if it's active
               fontWeight: (style && style.fontWeight) || 'normal',
               '& .dot': {
-                backgroundColor: theme.sidebarItemAccentSelected,
-                transform: 'translateX(-4.5px)',
+                transform: 'scale(1.25)',
               },
             }}
           >
@@ -208,16 +301,16 @@ export function Account<FieldName extends SheetFields<'account'>>({
                   'dot',
                   css({
                     marginRight: 3,
-                    width: 5,
-                    height: 5,
-                    borderRadius: 5,
+                    width: 6,
+                    height: 6,
+                    borderRadius: 6,
                     backgroundColor: pending
                       ? theme.sidebarItemBackgroundPending
                       : failed
                         ? theme.sidebarItemBackgroundFailed
                         : theme.sidebarItemBackgroundPositive,
-                    marginLeft: 2,
-                    transition: 'transform .3s',
+                    marginLeft: 4,
+                    transition: 'transform .15s',
                     opacity: connected ? 1 : 0,
                   }),
                 )}
@@ -227,19 +320,22 @@ export function Account<FieldName extends SheetFields<'account'>>({
             <AlignedText
               style={
                 titleAccount && {
-                  borderBottom: `1.5px solid rgba(255,255,255,0.4)`,
-                  paddingBottom: '3px',
+                  color: theme.pageTextSecondary,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  ...styles.verySmallText,
                 }
               }
               left={
                 isEditing ? (
                   <InitialFocus>
                     <Input
+                      aria-label={t('Account name')}
                       style={{
                         padding: 0,
                         width: '100%',
                       }}
-                      onBlur={() => setIsEditing(false)}
+                      onBlur={finishEditing}
                       onEnter={newAccountName => {
                         if (newAccountName.trim() !== '') {
                           updateAccount.mutate({
@@ -249,9 +345,9 @@ export function Account<FieldName extends SheetFields<'account'>>({
                             },
                           });
                         }
-                        setIsEditing(false);
+                        finishEditing();
                       }}
-                      onEscape={() => setIsEditing(false)}
+                      onEscape={finishEditing}
                       defaultValue={name}
                     />
                   </InitialFocus>

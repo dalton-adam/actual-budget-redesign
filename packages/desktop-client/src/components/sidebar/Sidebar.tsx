@@ -1,141 +1,127 @@
-import React, { useState } from 'react';
-import type { CSSProperties } from 'react';
+import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
-import { useResponsive } from '@actual-app/components/hooks/useResponsive';
+import { Button } from '@actual-app/components/button';
 import { SvgAdd } from '@actual-app/components/icons/v1';
+import {
+  SvgArrowButtonLeft1,
+  SvgArrowButtonRight1,
+} from '@actual-app/components/icons/v2';
 import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
-import * as Platform from '@actual-app/core/shared/platform';
-import { css } from '@emotion/css';
-import { Resizable } from 're-resizable';
 
 import { FeatureErrorFallback } from '#components/FeatureErrorFallback';
-import { useGlobalPref } from '#hooks/useGlobalPref';
-import { useLocalPref } from '#hooks/useLocalPref';
-import { useResizeObserver } from '#hooks/useResizeObserver';
 import { replaceModal } from '#modals/modalsSlice';
 import { useDispatch } from '#redux';
 
 import { Accounts } from './Accounts';
-import { BudgetName } from './BudgetName';
-import { SecondaryButtons } from './SecondaryButtons';
 import { useSidebar } from './SidebarProvider';
-import { ToggleButton } from './ToggleButton';
+
+const EXPANDED_WIDTH = 236;
+const COLLAPSED_WIDTH = 56;
 
 export function Sidebar() {
-  const hasWindowButtons = !Platform.isBrowser && Platform.OS === 'mac';
-
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const sidebar = useSidebar();
-  const { width } = useResponsive();
-  const [isFloating = false, setFloatingSidebarPref] =
-    useGlobalPref('floatingSidebar');
-
-  const [sidebarWidthLocalPref, setSidebarWidthLocalPref] =
-    useLocalPref('sidebarWidth');
-  const DEFAULT_SIDEBAR_WIDTH = 240;
-  const MAX_SIDEBAR_WIDTH = width / 3;
-  const MIN_SIDEBAR_WIDTH = 200;
-
-  const [sidebarWidth, setSidebarWidth] = useState(
-    Math.min(
-      MAX_SIDEBAR_WIDTH,
-      Math.max(
-        MIN_SIDEBAR_WIDTH,
-        sidebarWidthLocalPref || DEFAULT_SIDEBAR_WIDTH,
-      ),
-    ),
-  );
-
-  const onResizeStop = () => {
-    setSidebarWidthLocalPref(sidebarWidth);
-  };
-
-  const onFloat = () => {
-    setFloatingSidebarPref(!isFloating);
-  };
+  const { expanded, setExpanded } = useSidebar();
 
   const onAddAccount = () => {
     dispatch(replaceModal({ modal: { name: 'add-account', options: {} } }));
   };
 
-  const containerRef = useResizeObserver<HTMLDivElement>(rect => {
-    setSidebarWidth(rect.width);
-  });
-
   return (
     <ErrorBoundary FallbackComponent={FeatureErrorFallback}>
-      <Resizable
-        defaultSize={{
-          width: sidebarWidth,
+      <View
+        role="complementary"
+        aria-label={expanded ? t('Accounts') : t('Accounts, collapsed')}
+        data-testid="accounts-pane"
+        data-expanded={expanded}
+        style={{
+          width: expanded ? EXPANDED_WIDTH : COLLAPSED_WIDTH,
+          minWidth: expanded ? EXPANDED_WIDTH : COLLAPSED_WIDTH,
           height: '100%',
-        }}
-        onResizeStop={onResizeStop}
-        maxWidth={MAX_SIDEBAR_WIDTH}
-        minWidth={MIN_SIDEBAR_WIDTH}
-        enable={{
-          top: false,
-          right: true,
-          bottom: false,
-          left: false,
-          topRight: false,
-          bottomRight: false,
-          bottomLeft: false,
-          topLeft: false,
+          overflow: 'hidden',
+          flexShrink: 0,
+          color: theme.pageText,
+          backgroundColor: theme.cardBackground,
+          borderRight: `1px solid ${theme.cardHairline}`,
+          transition: 'width .18s ease, min-width .18s ease',
+          '@media (prefers-reduced-motion: reduce)': {
+            transition: 'none',
+          },
+          ...styles.lightScrollbar,
         }}
       >
         <View
-          innerRef={containerRef}
-          className={css({
-            color: theme.sidebarItemText,
-            height: '100%',
-            backgroundColor: theme.sidebarBackground,
-            '& .float': {
-              opacity: isFloating ? 1 : 0,
-              transition: 'opacity .25s, width .25s',
-              width: hasWindowButtons || isFloating ? null : 0,
-            } as CSSProperties,
-            '&:hover .float': {
-              opacity: 1,
-              width: hasWindowButtons ? null : 'auto',
-            } as CSSProperties,
-            flex: 1,
-            ...styles.darkScrollbar,
-          })}
+          style={{
+            height: 44,
+            padding: expanded ? '0 8px 0 16px' : '0 8px',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: expanded ? 'space-between' : 'center',
+            flexShrink: 0,
+          }}
         >
-          <BudgetName>
-            {!sidebar.alwaysFloats && (
-              <ToggleButton isFloating={isFloating} onFloat={onFloat} />
-            )}
-          </BudgetName>
-
-          <View
+          {expanded && (
+            <strong style={{ ...styles.smallText }}>
+              <Trans>Accounts</Trans>
+            </strong>
+          )}
+          <Button
+            variant="bare"
+            aria-label={
+              expanded ? t('Collapse accounts') : t('Expand accounts')
+            }
+            aria-expanded={expanded}
+            onPress={() => setExpanded(value => !value)}
             style={{
-              flexGrow: 1,
-              '@media screen and (max-height: 480px)': {
-                overflowY: 'auto',
-              },
+              width: 32,
+              height: 32,
+              padding: 0,
+              color: theme.pageTextSecondary,
+              justifyContent: 'center',
             }}
           >
-            <Accounts />
-
-            <SecondaryButtons
-              buttons={[
-                {
-                  title: t('Add account'),
-                  Icon: SvgAdd,
-                  onClick: onAddAccount,
-                  dataTestId: 'sidebar-add-account',
-                },
-              ]}
-            />
-          </View>
+            {expanded ? (
+              <SvgArrowButtonLeft1 width={14} height={14} />
+            ) : (
+              <SvgArrowButtonRight1 width={14} height={14} />
+            )}
+          </Button>
         </View>
-      </Resizable>
+
+        <View style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+          <Accounts collapsed={!expanded} />
+        </View>
+
+        <View
+          style={{
+            padding: '6px 8px 10px',
+            borderTop: `1px solid ${theme.cardHairline}`,
+            flexShrink: 0,
+          }}
+        >
+          <Button
+            data-testid="sidebar-add-account"
+            variant="bare"
+            aria-label={t('Add account')}
+            onPress={onAddAccount}
+            style={{
+              width: '100%',
+              minHeight: 36,
+              padding: expanded ? '0 8px' : 0,
+              justifyContent: expanded ? 'flex-start' : 'center',
+              gap: 8,
+              color: theme.pageText,
+            }}
+          >
+            <SvgAdd width={13} height={13} />
+            {expanded && <Trans>Add account</Trans>}
+          </Button>
+        </View>
+      </View>
     </ErrorBoundary>
   );
 }
