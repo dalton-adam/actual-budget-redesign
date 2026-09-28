@@ -18,6 +18,7 @@ import type {
 import { Row } from '#components/table';
 import { useDragRef } from '#hooks/useDragRef';
 
+import { useCategoryDetails } from './CategoryDetailsContext';
 import {
   ENVELOPE_CATEGORY_ROW_HEIGHT,
   useIsEnvelopeTable,
@@ -80,6 +81,11 @@ export function ExpenseCategory({
   const isEnvelopeTable = useIsEnvelopeTable();
   const isEditingAmount =
     editingCell && editingCell.id === cat.id && editingCell.cell !== 'name';
+  const details = useCategoryDetails();
+  // The details panel's subject: selection tint and a 3px bar on the left
+  // edge (design-decisions §4.2).
+  const isDetailsSubject =
+    !!details && details.isShown && details.selectedCategoryId === cat.id;
 
   return (
     <Row
@@ -90,10 +96,15 @@ export function ExpenseCategory({
         backgroundColor: theme.budgetCurrentMonth,
         opacity: cat.hidden || categoryGroup?.hidden ? 0.5 : undefined,
         ...(isEnvelopeTable && {
-          backgroundColor: isEditingAmount
-            ? theme.selectionBackground
-            : theme.cardBackground,
+          backgroundColor:
+            isEditingAmount || isDetailsSubject
+              ? theme.selectionBackground
+              : theme.cardBackground,
+          ...(isDetailsSubject && {
+            boxShadow: `inset 3px 0 0 ${theme.selectionBorder}`,
+          }),
           ...(!isEditingAmount &&
+            !isDetailsSubject &&
             !dragState && {
               ':hover': { backgroundColor: theme.tableRowHover },
             }),

@@ -5,10 +5,13 @@ import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import type { CSSProperties } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 
+import { useSidebar } from '#components/sidebar/SidebarProvider';
 import { useGlobalPref } from '#hooks/useGlobalPref';
 import { useSheetValue } from '#hooks/useSheetValue';
 import { useSyncedPref } from '#hooks/useSyncedPref';
 import type { Binding, SheetFields } from '#spreadsheet';
+
+import { useCategoryDetails } from './CategoryDetailsContext';
 
 export const ENVELOPE_CATEGORY_ROW_HEIGHT = 44;
 export const ENVELOPE_GROUP_ROW_HEIGHT = 40;
@@ -26,26 +29,74 @@ export type EnvelopeColumnWidths = {
   /** 0 when the Activity column is hidden. */
   activity: number;
   available: number;
+  /** The percentage label is hidden while Activity is at a narrow width. */
+  showActivityPercent: boolean;
+};
+
+type EnvelopeLayoutState = {
+  /** The details panel sits beside the table (not an overlay). */
+  detailsPushed?: boolean;
+  accountsPaneExpanded?: boolean;
 };
 
 /**
  * Column widths by window width (design-decisions §4.1). The table fills the
  * page: Category takes the remaining space and the month columns are fixed,
- * using the upper end of the Activity range. Below 1280px Assigned is 112px
- * (§4.1: 100/84px) because the month notes button shares that cell, and
- * below 900px Available is 104px (§4.1: 96px); the narrower widths clipped
- * amounts such as 1,145.62 and 12,366.00.
+ * using the upper end of the Activity range. Assigned is 112px wherever §4.1
+ * has less (100, 104 or 84px) because the month notes button shares that
+ * cell, and Available is at least 104px (§4.1: 92 or 96px); the narrower
+ * widths clipped amounts such as 1,145.62 and 12,366.00.
  */
 export function getEnvelopeColumnWidths(
   windowWidth: number,
+  {
+    detailsPushed = false,
+    accountsPaneExpanded = false,
+  }: EnvelopeLayoutState = {},
 ): EnvelopeColumnWidths {
   if (windowWidth >= 1280) {
-    return { categoryMin: 160, assigned: 120, activity: 230, available: 120 };
+    if (detailsPushed && accountsPaneExpanded) {
+      return {
+        categoryMin: 150,
+        assigned: 112,
+        activity: 170,
+        available: 108,
+        showActivityPercent: false,
+      };
+    }
+    return {
+      categoryMin: 160,
+      assigned: 120,
+      activity: 230,
+      available: 120,
+      showActivityPercent: true,
+    };
   }
   if (windowWidth >= 900) {
-    return { categoryMin: 140, assigned: 112, activity: 180, available: 104 };
+    if (detailsPushed) {
+      return {
+        categoryMin: 120,
+        assigned: 112,
+        activity: 120,
+        available: 104,
+        showActivityPercent: false,
+      };
+    }
+    return {
+      categoryMin: 140,
+      assigned: 112,
+      activity: 180,
+      available: 104,
+      showActivityPercent: true,
+    };
   }
-  return { categoryMin: 120, assigned: 112, activity: 0, available: 104 };
+  return {
+    categoryMin: 120,
+    assigned: 112,
+    activity: 0,
+    available: 104,
+    showActivityPercent: false,
+  };
 }
 
 export function getEnvelopeMonthWidth({
@@ -58,7 +109,12 @@ export function getEnvelopeMonthWidth({
 
 export function useEnvelopeColumnWidths() {
   const { width } = useResponsive();
-  return getEnvelopeColumnWidths(width);
+  const details = useCategoryDetails();
+  const { expanded } = useSidebar();
+  return getEnvelopeColumnWidths(width, {
+    detailsPushed: !!details && details.mode === 'push' && details.isShown,
+    accountsPaneExpanded: expanded,
+  });
 }
 
 /**

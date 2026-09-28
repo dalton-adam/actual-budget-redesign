@@ -1,20 +1,36 @@
 // @ts-strict-ignore
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { ComponentProps, UIEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { AutoSizer } from 'react-virtualized-auto-sizer';
 
+import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { View } from '@actual-app/components/view';
 import * as monthUtils from '@actual-app/core/shared/months';
 
 import { FeatureErrorFallback } from '#components/FeatureErrorFallback';
+import { useSidebar } from '#components/sidebar/SidebarProvider';
+import { useCategories } from '#hooks/useCategories';
 import { useFeatureFlag } from '#hooks/useFeatureFlag';
 import { useGlobalPref } from '#hooks/useGlobalPref';
 
 import { useBudgetMonthCount } from './BudgetMonthCountContext';
 import { BudgetPageHeader } from './BudgetPageHeader';
 import { BudgetTable } from './BudgetTable';
+import {
+  CategoryDetailsProvider,
+  getDetailsPanelMode,
+  getDetailsPanelWidth,
+} from './CategoryDetailsContext';
+import { CategoryDetailsPanel } from './CategoryDetailsPanel';
+import {
+  getEnvelopeColumnWidths,
+  getEnvelopeMonthWidth,
+} from './envelopeTable';
+
+// Table card border, cell padding and scrollbar beside the columns.
+const ENVELOPE_TABLE_CHROME_WIDTH = 40;
 
 function getNumPossibleMonths(width: number, categoryWidth: number) {
   const estimatedTableWidth = width - categoryWidth;
@@ -67,6 +83,26 @@ const DynamicBudgetTable = ({
     type === 'envelope'
       ? undefined
       : 200 + 100 * categoryExpandedState + 500 * numMonths;
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { width: windowWidth } = useResponsive();
+  const { expanded: accountsPaneExpanded } = useSidebar();
+  const { data: { grouped: categoryGroups } = { grouped: [] } } =
+    useCategories();
+  const hasDetailsPanel = type === 'envelope';
+  const detailsPanelWidth = getDetailsPanelWidth(windowWidth);
+  const pushedColumnWidths = getEnvelopeColumnWidths(windowWidth, {
+    detailsPushed: true,
+    accountsPaneExpanded,
+  });
+  const detailsPanelMode = getDetailsPanelMode({
+    windowWidth,
+    availableWidth: width,
+    minTableWidth:
+      pushedColumnWidths.categoryMin +
+      getEnvelopeMonthWidth(pushedColumnWidths) +
+      ENVELOPE_TABLE_CHROME_WIDTH,
+  });
 
   useEffect(() => {
     setDisplayMax(numPossible);
@@ -157,38 +193,62 @@ const DynamicBudgetTable = ({
     }
   }
 
-  return (
+  const page = (
     <View
+      innerRef={containerRef}
       onScrollCapture={onScrollCapture}
       style={{
         width,
         height,
-        alignItems: 'center',
+        flexDirection: 'row',
         opacity: width <= 0 || height <= 0 ? 0 : 1,
       }}
     >
-      <View style={{ width: '100%', maxWidth }}>
-        <ErrorBoundary FallbackComponent={FeatureErrorFallback}>
-          <BudgetPageHeader
-            type={type}
-            isScrolled={isScrolled}
-            startMonth={prewarmStartMonth}
-            numMonths={numMonths}
-            monthBounds={monthBounds}
-            onMonthSelect={_onMonthSelect}
-          />
-          <BudgetTable
-            type={type}
-            prewarmStartMonth={prewarmStartMonth}
-            startMonth={startMonth}
-            numMonths={numMonths}
-            monthBounds={monthBounds}
-            onBudgetAction={onBudgetAction}
-            {...props}
-          />
-        </ErrorBoundary>
+      <View style={{ flex: 1, minWidth: 0, alignItems: 'center' }}>
+        <View style={{ width: '100%', maxWidth }}>
+          <ErrorBoundary FallbackComponent={FeatureErrorFallback}>
+            <BudgetPageHeader
+              type={type}
+              isScrolled={isScrolled}
+              startMonth={prewarmStartMonth}
+              numMonths={numMonths}
+              monthBounds={monthBounds}
+              onMonthSelect={_onMonthSelect}
+            />
+            <BudgetTable
+              type={type}
+              prewarmStartMonth={prewarmStartMonth}
+              startMonth={startMonth}
+              numMonths={numMonths}
+              monthBounds={monthBounds}
+              onBudgetAction={onBudgetAction}
+              {...props}
+            />
+          </ErrorBoundary>
+        </View>
       </View>
+      {hasDetailsPanel && (
+        <ErrorBoundary FallbackComponent={FeatureErrorFallback}>
+          <CategoryDetailsPanel month={startMonth} width={detailsPanelWidth} />
+        </ErrorBoundary>
+      )}
     </View>
+  );
+
+  if (!hasDetailsPanel) {
+    return page;
+  }
+
+  // The details panel is on the envelope Budget page only
+  // (design-decisions §5).
+  return (
+    <CategoryDetailsProvider
+      mode={detailsPanelMode}
+      categoryGroups={categoryGroups}
+      containerRef={containerRef}
+    >
+      {page}
+    </CategoryDetailsProvider>
   );
 };
 
