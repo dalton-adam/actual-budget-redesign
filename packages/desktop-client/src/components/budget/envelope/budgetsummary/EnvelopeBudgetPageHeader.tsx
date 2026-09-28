@@ -6,6 +6,7 @@ import { View } from '@actual-app/components/view';
 import * as monthUtils from '@actual-app/core/shared/months';
 
 import { BudgetMonthToolbar } from '#components/budget/BudgetMonthToolbar';
+import { CategoryDetailsToggle } from '#components/budget/CategoryDetailsToggle';
 import type { MonthBounds } from '#components/budget/MonthsContext';
 import { NotesButton } from '#components/NotesButton';
 import { SheetNameProvider } from '#hooks/useSheetName';
@@ -55,6 +56,7 @@ export function EnvelopeBudgetPageHeader({
               <BudgetMonthMenuButton month={month}>
                 <SvgDotsHorizontalTriple width={15} height={15} />
               </BudgetMonthMenuButton>
+              <CategoryDetailsToggle />
             </>
           }
         />

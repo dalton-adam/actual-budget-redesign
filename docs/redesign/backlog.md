@@ -321,6 +321,63 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   reveal them; Tab goes month notes → budget menu → Available pill. The
   category menu is still reachable by right-click. DETAIL-01's dedicated
   name opener is the natural place to fix this.
+- DETAIL-01: **implemented September 28, 2026** on `redesign/detail-01`;
+  **awaiting owner review before merging** into `redesign/main`. Panel frame,
+  opener, closing and focus (design-decisions §5); the details themselves
+  (hero, stat tiles, goal box, notes, transactions, the panel's own month
+  stepper) are DETAIL-02 to DETAIL-04, so the panel shows only its header
+  for now: tile, name (wraps), group (plus "Hidden") · month, and ×.
+  Envelope budgets only; tracking budgets have no panel, opener or toggle.
+  **Open state:** device-local browser storage
+  (`actual-budget-details-panel-open`, like the accounts pane); open by
+  default; no synced or core preference. **Layout:** 360px from 1280px,
+  320px below, pushing the header and table. Below 900px, *or* when the
+  table would not keep its minimum width beside the panel (for example
+  1000px with the accounts pane expanded), it becomes an overlay with the
+  `scrim` (react-aria modal: focus stays inside, Escape or a scrim click
+  closes). **Decision to confirm:** the overlay starts closed and opening
+  or closing it never changes the stored choice, so a narrow window is not
+  covered on every visit. **Subject:** the first visible expense category
+  until one is chosen; a deleted choice falls back the same way; income
+  categories have no opener. **Opener:** the tile and name are one button
+  ("Show details for _name_"); click or Enter opens; right-click still opens
+  the category menu (Rename / Hide / Delete); the selected row gets the
+  selection tint and a 3px `selectionBorder` bar. Because the name now takes
+  focus, `:focus-within` reveals the row tools, which fixes the BUD-03
+  finding: Tab goes name → category menu ⌄ → notes → Assigned.
+  **Closing:** × and Escape (inside the panel) close it and return focus to
+  the selected category's name without scrolling; the table's scroll
+  position is put back. The header toggle (after the month menu,
+  `aria-pressed`, "Show / Hide category details") reopens it. **Columns
+  with the panel pushed** (§4.1 rows): 900–1279px: Category ≥120, Assigned
+  112, Activity 120, Available 104; ≥1280px with the accounts pane open:
+  150 / 112 / 170 / 108. Assigned and Available keep BUD-03's anti-clipping
+  minimums instead of §4.1's 84–104 / 92–108. The Activity percentage is
+  hidden at those widths. **Scope grew beyond the card, pending owner
+  approval:** `C/budget/{SidebarCategory,envelopeTable}.ts(x)` (opener;
+  panel-aware widths), `C/budget/envelope/EnvelopeBudgetComponents.tsx`
+  (percentage visibility), `C/budget/envelope/budgetsummary/EnvelopeBudgetPageHeader.tsx`
+  (toggle), `C/budget/envelopeTable.test.ts`. New files:
+  `C/budget/CategoryDetails{Context,Panel,Header,Toggle}.tsx`,
+  `C/budget/CategoryDetailsContext.test.ts`, `e2e/detail-01.test.ts`.
+  `BudgetTable.tsx` and `index.tsx` unchanged; no handler, binding, menu item
+  or preference changed. Checks: typecheck pass; lint pass; UNIT
+  `src/components/budget` 69/69 (13 new: layout, default/fallback subject,
+  storage, toggle, focus return, overlay not stored); `generate:i18n` ran
+  (strings in the gitignored `locale/en.json`); E2E(detail-01) 6/6;
+  E2E(budget, bud-01, accounts, settings, detail-01) 32/32; WIDE 58 passed, 1 failed (known Reports baseline at 1440), 15 did not run.
+  VISUAL (Playwright against the 3018 preview; the in-app browser pane stalls
+  at "Initializing the connection to the local database" for both 3017 and
+  3018): dark 1440×900 with accounts pane open (narrow Activity, no
+  percentage) and collapsed; keyboard focus ring on the name with the row
+  tools shown; light 1000×700 open and closed; a 71-character category name
+  (row ellipsis, panel heading wraps); midnight 1000×700 pushed, then with
+  the accounts pane expanded (falls back to the overlay); dark 820×700
+  overlay. **Not yet checked:** a custom theme; reduced motion on screen (no
+  animation added); privacy mode (the panel shows no amounts yet); Linux VRT
+  snapshots (not regenerated — `budget.test.ts` screenshots at the default
+  viewport now include the open panel, so they will need regenerating in
+  Docker).
 - All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 

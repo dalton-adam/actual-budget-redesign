@@ -1,6 +1,7 @@
 // @ts-strict-ignore
 import React, { useRef } from 'react';
 import type { CSSProperties, Ref } from 'react';
+import { Button as ReactAriaButton } from 'react-aria-components';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { Button } from '@actual-app/components/button';
@@ -14,10 +15,15 @@ import type {
   CategoryEntity,
   CategoryGroupEntity,
 } from '@actual-app/core/types/models';
+import { css } from '@emotion/css';
 
 import { InputCell } from '#components/table';
 import { useContextMenu } from '#hooks/useContextMenu';
 
+import {
+  CATEGORY_DETAILS_PANEL_ID,
+  useCategoryDetails,
+} from './CategoryDetailsContext';
 import { getCategoryAccentIndex } from './categoryPresentation';
 import {
   envelopeCellBorderStyle,
@@ -68,8 +74,13 @@ export function SidebarCategory({
   const { t } = useTranslation();
   const categoryColumnStyle = useCategoryColumnStyle();
   const isEnvelopeTable = useIsEnvelopeTable();
+  const details = useCategoryDetails();
 
   const temporary = category.id === 'new';
+  // The name opens the details panel (design-decisions §4.2, §5). Right-click
+  // still reaches the category menu through the surrounding trigger.
+  const opensDetails =
+    isEnvelopeTable && !!details && !temporary && !category.is_income;
   const triggerRef = useRef(null);
   const { handleContextMenu } = useContextMenu({
     triggerRef,
@@ -116,15 +127,37 @@ export function SidebarCategory({
       }}
       ref={triggerRef}
     >
-      {isEnvelopeTable && !temporary && (
-        <CategoryTile
-          name={category.name}
-          accentIndex={
-            category.is_income ? undefined : getCategoryAccentIndex(category.id)
+      {opensDetails ? (
+        <ReactAriaButton
+          data-details-opener={category.id}
+          aria-label={t('Show details for {{name}}', { name: category.name })}
+          aria-controls={
+            details.isShown ? CATEGORY_DETAILS_PANEL_ID : undefined
           }
-        />
+          onPress={() => details.openCategory(category.id)}
+          className={detailsOpenerClassName}
+        >
+          <CategoryTile
+            name={category.name}
+            accentIndex={getCategoryAccentIndex(category.id)}
+          />
+          <TextOneLine data-testid="category-name">{category.name}</TextOneLine>
+        </ReactAriaButton>
+      ) : (
+        <>
+          {isEnvelopeTable && !temporary && (
+            <CategoryTile
+              name={category.name}
+              accentIndex={
+                category.is_income
+                  ? undefined
+                  : getCategoryAccentIndex(category.id)
+              }
+            />
+          )}
+          <TextOneLine data-testid="category-name">{category.name}</TextOneLine>
+        </>
       )}
-      <TextOneLine data-testid="category-name">{category.name}</TextOneLine>
       {isEnvelopeTable && isHidden && (
         <StatusPill tone="neutral" size="small">
           <Trans>Hidden</Trans>
@@ -225,3 +258,25 @@ export function SidebarCategory({
     </View>
   );
 }
+
+const detailsOpenerClassName = css({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 10,
+  minWidth: 0,
+  padding: 0,
+  margin: 0,
+  border: 'none',
+  borderRadius: 6,
+  background: 'none',
+  color: 'inherit',
+  font: 'inherit',
+  textAlign: 'left',
+  cursor: 'pointer',
+  outline: 'none',
+  // The name cell clips overflow, so the focus ring sits inside the button.
+  '&[data-focus-visible]': {
+    boxShadow: `0 0 0 2px ${theme.selectionBorder}`,
+  },
+});

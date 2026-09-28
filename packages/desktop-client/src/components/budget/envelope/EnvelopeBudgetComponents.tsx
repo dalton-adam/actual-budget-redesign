@@ -515,7 +515,10 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
           style={{ textAlign: 'right', ...envelopeCellBorderStyle }}
           contentStyle={{ padding: '0 8px' }}
         >
-          <CategoryActivityContent categoryId={category.id} showPercent>
+          <CategoryActivityContent
+            categoryId={category.id}
+            showPercent={columnWidths.showActivityPercent}
+          >
             <View
               data-testid="category-month-spent"
               onClick={() => onShowActivity(category.id, month)}
