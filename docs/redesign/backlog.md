@@ -222,8 +222,8 @@ src/components/navigation src/components/settings/Themes.test.tsx` passed
   back to envelope. **Not yet checked:** WIDE, light/midnight themes, the
   multi-month `ToBudgetAmount` label ("Ready to Assign:" / "Overassigned:")
   on screen, and Linux VRT snapshots (not regenerated).
-- BUD-02: **implemented September 28, 2026** on `redesign/bud-02`, not yet
-  merged. Envelope budgets get the design-decisions §4 table; tracking
+- BUD-02: **done September 28, 2026**, merged into `redesign/main` with owner
+  approval (branch `redesign/bud-02`). Envelope budgets get the design-decisions §4 table; tracking
   budgets are unchanged (owner decision, September 28, 2026: gate on
   `budgetType`, as BUD-01 did). 44px category rows and 40px group rows set
   through `Row`'s `height` (shared `ROW_HEIGHT` untouched; the group drop
