@@ -27,12 +27,12 @@ It does not replace the design specification or authorize a new design direction
   depend on UI-01). New files only:
   `C/budget/categoryPresentation.ts` and `C/budget/categoryPresentation.test.ts`
   — accent index (§7.3), progress bar (§7.1), pace chart data and summary
-  (§7.2, the "Shown" default in §11 item 2) and summary stacked bar (§7.4).
+  (§7.2, the "Shown" default in §11 item 2, with the owner's past-month summary change) and summary stacked bar (§7.4).
   Helpers take amounts and transactions the app already provides and return
   numbers and summary kinds; wording, formatting and theme roles are left to
   the components that use them. Nothing calls them yet. Checks: typecheck
   pass; lint pass; UNIT `src/components/budget/categoryPresentation.test.ts`
-  27/27.
+  28/28.
 - All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 

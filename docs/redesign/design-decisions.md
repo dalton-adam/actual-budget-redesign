@@ -241,7 +241,9 @@ even(d)  = start > 0 ? start × d / days : none
   "Finished `$X` overspent".
 - Future month: even-pace line only, a "No activity yet" label, summary
   "`$X` to spend from _Month_ 1".
-- `start ≤ 0`: no pace line; summary "Nothing assigned, so no pace line".
+- `start ≤ 0`: no pace line. A past month keeps its "Finished …" summary
+  (owner decision, September 27, 2026); the current month's summary is
+  "Nothing assigned, so no pace line".
 - Long-term savings goal: no pace chart.
 - Text equivalent: the chart's accessible name states spent, start amount,
   date and the summary.

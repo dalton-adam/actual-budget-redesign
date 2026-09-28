@@ -156,15 +156,16 @@ export function getCategoryPace({
   let summary: PaceSummary;
   if (kind === 'future') {
     summary = { type: 'to-spend', amount: Math.max(0, start), month };
-  } else if (!hasPaceLine) {
-    summary = { type: 'no-pace-line' };
-  } else if (kind === 'current' && inRangeCount === 0) {
-    summary = { type: 'no-activity' };
   } else if (kind === 'past') {
+    // A finished month always reports its result, even without a pace line.
     summary =
       available >= 0
         ? { type: 'finished-left', amount: available }
         : { type: 'finished-overspent', amount: -available };
+  } else if (!hasPaceLine) {
+    summary = { type: 'no-pace-line' };
+  } else if (inRangeCount === 0) {
+    summary = { type: 'no-activity' };
   } else {
     const difference = Math.round((start * upto) / days - spent);
     summary =

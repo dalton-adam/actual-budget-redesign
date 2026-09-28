@@ -303,6 +303,19 @@ describe('getCategoryPace', () => {
       expect(pace.summary).toEqual({ type: 'no-pace-line' });
     }
   });
+
+  it('still reports the result of a finished month with nothing assigned', () => {
+    const pace = getCategoryPace({
+      month: '2026-08',
+      today: '2026-09-12',
+      start: 0,
+      available: -4000,
+      transactions: [{ date: '2026-08-09', amount: -4000 }],
+    });
+    expect(pace.hasPaceLine).toBe(false);
+    expect(pace.series[30]).toBe(4000);
+    expect(pace.summary).toEqual({ type: 'finished-overspent', amount: 4000 });
+  });
 });
 
 describe('getSpendingBarSegments', () => {
