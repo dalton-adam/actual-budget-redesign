@@ -274,6 +274,43 @@ SidebarGroup,BudgetTotals,IncomeCategory,IncomeGroup}.tsx`; new files
   performance with the extra per-row cell subscriptions; Linux VRT
   snapshots (not regenerated). The existing row chevron buttons still have
   no accessible name (upstream).
+- BUD-03: **implemented September 28, 2026** on branch `redesign/bud-03`,
+  awaiting owner review before merging into `redesign/main`. One month only
+  (design-decisions §6): the months-shown control is no longer rendered in
+  `C/Titlebar.tsx` and `C/budget/index.tsx` passes one month; the `maxMonths`
+  global preference is not read, written or migrated. Owner decision
+  (September 28, 2026, "YNAB type behavior"): this applies to tracking
+  budgets too, which keep their old month picker, per-month summary and
+  fixed Category width. Envelope budgets fill the page (§4.1): the Category
+  column flexes (minimum 160 / 140 / 120px) and the month columns are fixed
+  by window width (≥1280: Assigned 120, Activity 230, Available 120;
+  900–1279: 112 / 180 / 104; <900: 112 / hidden / 96). Assigned is 112px
+  below 1280px instead of §4.1's 100 / 84px: the month notes button shares
+  that cell and 84px clipped "1,145.62" at 820px. With Activity hidden, its
+  header total, group total and the row's filtered-transactions link are
+  not shown at that width. Long names end in an ellipsis inside the 44px
+  row. The Category width toggle (Expand / Fully Expand) is hidden for
+  envelope budgets (owner decision; `categoryExpandedState` untouched) and
+  the column ⋯ menu now sits beside the "Category" label (§4.2). No
+  handler, binding, menu item or preference changed. Scope grew, with owner
+  approval, to `C/budget/{SidebarCategory,SidebarGroup,BudgetTotals,
+IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx`,
+  `C/budget/envelopeTable.ts` and new `C/budget/envelopeTable.test.ts`;
+  `ExpenseCategory.tsx`, `ExpenseGroup.tsx` and `BudgetTable.tsx` needed no
+  change. `MonthCountSelector.tsx` and `BudgetMonthCountContext.tsx` are
+  left in place (unused by the UI) so reverting is a small UI change.
+  Checks: typecheck pass; lint pass; UNIT `src/components/budget` 56/56 (3
+  new); E2E(budget, bud-01, accounts, settings) 26/26; WIDE 58 passed, 1
+  failed (known Reports baseline at 1440), 15 did not run. VISUAL on the
+  local test budget (dark): 1440×900, 1000×700 (compact strip too) and
+  820×700 with a temporarily renamed 84-character category (fits at 1440,
+  ellipsis at 1000 and 820; renamed back afterwards); row tools, group tools
+  and the column menu (Toggle hidden categories, Expand all, Collapse all)
+  still appear and work; switched to tracking (one month, old layout) and
+  back. **Not yet checked:** light, midnight and custom themes; keyboard-only
+  pass; privacy mode; five-digit Assigned amounts on screen; a hovered
+  row's budget-menu chevron narrowing Assigned at 112px; Linux VRT
+  snapshots (not regenerated).
 - All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 

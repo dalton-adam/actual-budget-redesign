@@ -16,7 +16,7 @@ import { View } from '@actual-app/components/view';
 
 import { useGlobalPref } from '#hooks/useGlobalPref';
 
-import { useIsEnvelopeTable } from './envelopeTable';
+import { useCategoryColumnStyle, useIsEnvelopeTable } from './envelopeTable';
 import { RenderMonths } from './RenderMonths';
 import { getScrollbarWidth } from './util';
 
@@ -60,6 +60,7 @@ export const BudgetTotals = memo(function BudgetTotals({
 
   const { BudgetTotalsComponent: MonthComponent } = useBudgetComponents();
   const isEnvelopeTable = useIsEnvelopeTable();
+  const categoryColumnStyle = useCategoryColumnStyle();
 
   return (
     <View
@@ -91,7 +92,7 @@ export const BudgetTotals = memo(function BudgetTotals({
     >
       <View
         style={{
-          width: 200 + 100 * categoryExpandedState,
+          ...categoryColumnStyle,
           color: theme.tableHeaderText,
           justifyContent: 'center',
           paddingLeft: 5,
@@ -108,44 +109,50 @@ export const BudgetTotals = memo(function BudgetTotals({
             textTransform: 'uppercase',
             letterSpacing: '0.07em',
             paddingLeft: 10,
+            justifyContent: 'flex-start',
           }),
         }}
       >
-        <Button
-          variant="bare"
-          aria-label={getExpandStateLabel()}
-          onPress={cycleExpandedState}
-          className="hover-visible"
-          style={{
-            color: 'currentColor',
-            padding: 3,
-            marginRight: 10,
-          }}
-        >
-          {categoryExpandedState === 0 ? (
-            <SvgArrowButtonSingleLeft1
-              style={{
-                width: 12,
-                height: 12,
-              }}
-            />
-          ) : categoryExpandedState === 1 ? (
-            <SvgArrowButtonLeft1
-              style={{
-                width: 12,
-                height: 12,
-              }}
-            />
-          ) : (
-            <SvgArrowButtonRight1
-              style={{
-                width: 12,
-                height: 12,
-              }}
-            />
-          )}
-        </Button>
-        <View style={{ flexGrow: '1' }}>
+        {/* Envelope budgets size the Category column to the page
+            (design-decisions §4.1), so the width toggle is not shown. */}
+        {!isEnvelopeTable && (
+          <Button
+            variant="bare"
+            aria-label={getExpandStateLabel()}
+            onPress={cycleExpandedState}
+            className="hover-visible"
+            style={{
+              color: 'currentColor',
+              padding: 3,
+              marginRight: 10,
+            }}
+          >
+            {categoryExpandedState === 0 ? (
+              <SvgArrowButtonSingleLeft1
+                style={{
+                  width: 12,
+                  height: 12,
+                }}
+              />
+            ) : categoryExpandedState === 1 ? (
+              <SvgArrowButtonLeft1
+                style={{
+                  width: 12,
+                  height: 12,
+                }}
+              />
+            ) : (
+              <SvgArrowButtonRight1
+                style={{
+                  width: 12,
+                  height: 12,
+                }}
+              />
+            )}
+          </Button>
+        )}
+        {/* The column menu sits beside the label (design-decisions §4.2). */}
+        <View style={{ flexGrow: isEnvelopeTable ? 0 : '1' }}>
           <Trans>Category</Trans>
         </View>
         <Button
@@ -153,7 +160,11 @@ export const BudgetTotals = memo(function BudgetTotals({
           variant="bare"
           aria-label={t('Menu')}
           onPress={() => setMenuOpen(true)}
-          style={{ color: 'currentColor', padding: 3 }}
+          style={{
+            color: 'currentColor',
+            padding: 3,
+            ...(isEnvelopeTable && { marginLeft: 6 }),
+          }}
         >
           <SvgDotsHorizontalTriple
             width={15}

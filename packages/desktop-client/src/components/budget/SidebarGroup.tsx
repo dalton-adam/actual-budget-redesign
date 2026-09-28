@@ -21,9 +21,12 @@ import { NotesButton } from '#components/NotesButton';
 import { InputCell } from '#components/table';
 import { useContextMenu } from '#hooks/useContextMenu';
 import { useFeatureFlag } from '#hooks/useFeatureFlag';
-import { useGlobalPref } from '#hooks/useGlobalPref';
 
-import { envelopeCellBorderStyle, useIsEnvelopeTable } from './envelopeTable';
+import {
+  envelopeCellBorderStyle,
+  useCategoryColumnStyle,
+  useIsEnvelopeTable,
+} from './envelopeTable';
 
 type SidebarGroupProps = {
   group: CategoryGroupEntity;
@@ -65,8 +68,7 @@ export function SidebarGroup({
 }: SidebarGroupProps) {
   const { t } = useTranslation();
   const isGoalTemplatesEnabled = useFeatureFlag('goalTemplatesEnabled');
-  const [categoryExpandedStatePref] = useGlobalPref('categoryExpandedState');
-  const categoryExpandedState = categoryExpandedStatePref ?? 0;
+  const categoryColumnStyle = useCategoryColumnStyle();
   const isEnvelopeTable = useIsEnvelopeTable();
 
   const temporary = group.id === 'new';
@@ -203,7 +205,7 @@ export function SidebarGroup({
       innerRef={innerRef}
       style={{
         ...style,
-        width: 200 + 100 * categoryExpandedState,
+        ...categoryColumnStyle,
         backgroundColor: theme.budgetHeaderCurrentMonth,
         ...(isEnvelopeTable && {
           // The row paints the group tint (design-decisions §4.1).
