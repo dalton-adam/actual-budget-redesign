@@ -29,7 +29,7 @@ export function getAccentColor(accentIndex: number | undefined) {
     accentIndex < 1 ||
     accentIndex > ACCENT_COUNT
   ) {
-    return theme.pageTextSubdued;
+    return theme.pageTextSecondary;
   }
   return theme[`categoryAccent${accentIndex}` as keyof typeof theme];
 }

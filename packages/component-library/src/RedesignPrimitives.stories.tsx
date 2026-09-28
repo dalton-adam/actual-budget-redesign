@@ -153,7 +153,7 @@ export const AllStates: Story = {
 
       <Row label="Surface cards, including a long label">
         <SurfaceCard style={{ padding: '16px 18px', width: 220 }}>
-          <View style={{ fontSize: 12.5, color: theme.pageTextSubdued }}>
+          <View style={{ fontSize: 12.5, color: theme.pageTextSecondary }}>
             Assigned
           </View>
           <View

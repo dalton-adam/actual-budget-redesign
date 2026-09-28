@@ -79,8 +79,8 @@ const textColor: {
   menuSelected: theme.buttonMenuSelectedText,
   control: theme.pageText,
   controlDisabled: theme.pageText,
-  tab: theme.pageTextSubdued,
-  tabDisabled: theme.pageTextSubdued,
+  tab: theme.pageTextSecondary,
+  tabDisabled: theme.pageTextSecondary,
   tabSelected: theme.pageText,
   tabSelectedDisabled: theme.pageText,
 };

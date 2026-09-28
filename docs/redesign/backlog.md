@@ -39,8 +39,8 @@ It does not replace the design specification or authorize a new design direction
   the components that use them. Nothing calls them yet. Checks: typecheck
   pass; lint pass; UNIT `src/components/budget/categoryPresentation.test.ts`
   28/28.
-- UI-02: **implemented September 27, 2026** on branch `redesign/ui-02`;
-  awaiting owner review before merging. Existing Button variants are
+- UI-02: **done September 27, 2026**, merged into `redesign/main` with owner
+  approval. Existing Button variants are
   unchanged; the new pieces are opt-in. `L/Button.tsx` gains `control`, `tab`
   and `tabSelected` variants (keyboard focus ring in `selectionBorder`,
   disabled dimmed by opacity so it always reads quieter than enabled, colour
@@ -59,10 +59,13 @@ It does not replace the design specification or authorize a new design direction
   palette; Tab reaches each enabled control with a visible ring and skips
   disabled ones; the existing `normal` Button computes the same as before.
   Storybook needed a local, uncommitted change to start on macOS (`src/Themes`
-  and `src/themes` clash on a case-insensitive disk). **Open question for the
-  owner:** in light, the app's `pageTextSubdued` is `#9fb3c8` (the prototype
-  assumed `#62626e`), only 1.81:1 on the page background, so unselected tabs
-  and every "subdued" label are hard to read. Dark is 4.66:1.
+  and `src/themes` clash on a case-insensitive disk). **Resolved with the owner:** in light,
+  the app's `pageTextSubdued` (`#9fb3c8`) reads at only 1.81:1, so a new
+  `pageTextSecondary` role (design-decisions §8, "Added in UI-02") gives the
+  new controls `#62626e` in light (5.07:1 on the page, 4.58:1 on the nav
+  track) and matches `pageTextSubdued` in dark, midnight and custom themes.
+  Rerun after the role: typecheck, lint, component UNIT 42/42, theme UNIT
+  `src/style/` 215/215, light VISUAL.
 - All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 

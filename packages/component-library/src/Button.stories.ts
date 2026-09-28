@@ -129,7 +129,7 @@ export const Tab: Story = {
     docs: {
       description: {
         story: `
-Redesign pill-navigation tab. Opt-in; uses \`--color-pageTextSubdued\`,
+Redesign pill-navigation tab. Opt-in; uses \`--color-pageTextSecondary\`,
 \`--color-pageText\`, \`--color-tableRowHover\` and \`--color-selectionBorder\`.
 `,
       },

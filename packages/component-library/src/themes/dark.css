@@ -266,6 +266,7 @@
       transparent 60%
     );
   --color-pageTextFaint: #74747f;
+  --color-pageTextSecondary: var(--color-pageTextSubdued);
   --color-cardHairline: rgba(255, 255, 255, 0.065);
   --color-cardElevation:
     inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 18px 36px rgba(0, 0, 0, 0.32);

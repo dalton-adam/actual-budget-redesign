@@ -147,10 +147,10 @@ describe('CategoryTile', () => {
   it('maps accent indexes to theme roles and falls back to neutral', () => {
     expect(getAccentColor(1)).toBe(theme.categoryAccent1);
     expect(getAccentColor(10)).toBe(theme.categoryAccent10);
-    expect(getAccentColor(undefined)).toBe(theme.pageTextSubdued);
-    expect(getAccentColor(0)).toBe(theme.pageTextSubdued);
-    expect(getAccentColor(11)).toBe(theme.pageTextSubdued);
-    expect(getAccentColor(2.5)).toBe(theme.pageTextSubdued);
+    expect(getAccentColor(undefined)).toBe(theme.pageTextSecondary);
+    expect(getAccentColor(0)).toBe(theme.pageTextSecondary);
+    expect(getAccentColor(11)).toBe(theme.pageTextSecondary);
+    expect(getAccentColor(2.5)).toBe(theme.pageTextSecondary);
   });
 
   it('is hidden from assistive technology', () => {
