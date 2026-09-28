@@ -493,6 +493,10 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
               borderRadius: 8,
               height: 30,
               alignSelf: 'center',
+              // The default input width is wider than the fixed Assigned
+              // column; keep the editor inside its cell.
+              width: '100%',
+              minWidth: 0,
             },
           }}
           onSave={(parsedIntegerAmount: number | null) => {

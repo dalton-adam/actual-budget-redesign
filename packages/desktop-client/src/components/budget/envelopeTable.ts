@@ -31,9 +31,10 @@ export type EnvelopeColumnWidths = {
 /**
  * Column widths by window width (design-decisions §4.1). The table fills the
  * page: Category takes the remaining space and the month columns are fixed,
- * using the upper end of the Activity range. Assigned is 112px below 1280px
- * rather than §4.1's 100/84px: the month notes button shares that cell, and
- * the narrower widths clipped amounts such as 1,145.62.
+ * using the upper end of the Activity range. Below 1280px Assigned is 112px
+ * (§4.1: 100/84px) because the month notes button shares that cell, and
+ * below 900px Available is 104px (§4.1: 96px); the narrower widths clipped
+ * amounts such as 1,145.62 and 12,366.00.
  */
 export function getEnvelopeColumnWidths(
   windowWidth: number,
@@ -44,7 +45,7 @@ export function getEnvelopeColumnWidths(
   if (windowWidth >= 900) {
     return { categoryMin: 140, assigned: 112, activity: 180, available: 104 };
   }
-  return { categoryMin: 120, assigned: 112, activity: 0, available: 96 };
+  return { categoryMin: 120, assigned: 112, activity: 0, available: 104 };
 }
 
 export function getEnvelopeMonthWidth({

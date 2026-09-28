@@ -32,7 +32,12 @@ describe('getEnvelopeColumnWidths', () => {
 
   it('hides the Activity column below 900px', () => {
     const widths = getEnvelopeColumnWidths(899);
-    expect(widths.activity).toBe(0);
+    expect(widths).toEqual({
+      categoryMin: 120,
+      assigned: 112,
+      activity: 0,
+      available: 104,
+    });
     expect(getEnvelopeMonthWidth(widths)).toBe(
       widths.assigned + widths.available,
     );

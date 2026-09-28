@@ -284,9 +284,7 @@ SidebarGroup,BudgetTotals,IncomeCategory,IncomeGroup}.tsx`; new files
   fixed Category width. Envelope budgets fill the page (§4.1): the Category
   column flexes (minimum 160 / 140 / 120px) and the month columns are fixed
   by window width (≥1280: Assigned 120, Activity 230, Available 120;
-  900–1279: 112 / 180 / 104; <900: 112 / hidden / 96). Assigned is 112px
-  below 1280px instead of §4.1's 100 / 84px: the month notes button shares
-  that cell and 84px clipped "1,145.62" at 820px. With Activity hidden, its
+  900–1279: 112 / 180 / 104; <900: 112 / hidden / 104). Two widths differ from §4.1, which allows tuning for a real overflow: Assigned is 112px below 1280px (§4.1: 100 / 84px) because the month notes button shares that cell and 84px clipped "1,145.62" at 820px; Available is 104px below 900px (§4.1: 96px) because 96px clipped "12,366.00". The Assigned input is held to its cell (the default 156px input spilled into the Category column once columns were fixed). With Activity hidden, its
   header total, group total and the row's filtered-transactions link are
   not shown at that width. Long names end in an ellipsis inside the 44px
   row. The Category width toggle (Expand / Fully Expand) is hidden for
@@ -307,10 +305,22 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   ellipsis at 1000 and 820; renamed back afterwards); row tools, group tools
   and the column menu (Toggle hidden categories, Expand all, Collapse all)
   still appear and work; switched to tracking (one month, old layout) and
-  back. **Not yet checked:** light, midnight and custom themes; keyboard-only
-  pass; privacy mode; five-digit Assigned amounts on screen; a hovered
-  row's budget-menu chevron narrowing Assigned at 112px; Linux VRT
-  snapshots (not regenerated).
+  back. Follow-up pass (Playwright on the preview, fresh demo budgets): light,
+  dark and midnight at 1440×900, 1000×700 and 820×700 with a 12,345.67
+  Assigned amount, at rest and with the row hovered (budget-menu chevron
+  shown) — no Assigned or Available cell clips after the two fixes above;
+  privacy mode redacts every amount and the percentage; the column menu
+  opens with Enter from the keyboard and lists its three items; reduced
+  motion shows the same layout (no animation added). Rerun after the fixes:
+  UNIT 56/56, typecheck, lint, E2E(budget, bud-01, accounts, settings)
+  26/26, WIDE 58 / 1 known Reports failure / 15 did not run.
+  **Not yet checked:** a custom theme; Linux VRT snapshots (not
+  regenerated; Docker is available). **Found, not BUD-03:** category-name
+  row tools (menu chevron) never take keyboard focus because they are
+  `display: none` until hover, so the BUD-02 `:focus-within` rule cannot
+  reveal them; Tab goes month notes → budget menu → Available pill. The
+  category menu is still reachable by right-click. DETAIL-01's dedicated
+  name opener is the natural place to fix this.
 - All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 
