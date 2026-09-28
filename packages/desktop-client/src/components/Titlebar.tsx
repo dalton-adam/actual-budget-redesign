@@ -8,7 +8,6 @@ import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { SvgArrowLeft } from '@actual-app/components/icons/v1';
 import {
   SvgAlertTriangle,
-  SvgNavigationMenu,
   SvgViewHide,
   SvgViewShow,
 } from '@actual-app/components/icons/v2';
@@ -21,7 +20,6 @@ import { Tooltip } from '@actual-app/components/tooltip';
 import { View } from '@actual-app/components/view';
 import { listen } from '@actual-app/core/platform/client/connection';
 import { isDevelopmentEnvironment } from '@actual-app/core/shared/environment';
-import * as Platform from '@actual-app/core/shared/platform';
 import { css } from '@emotion/css';
 
 import { sync } from '#app/appSlice';
@@ -44,7 +42,7 @@ import { LoggedInUser } from './LoggedInUser';
 import { COMPACT_NAV_WIDTH } from './navigation/constants';
 import { TopNav } from './navigation/TopNav';
 import { useServerURL } from './ServerContext';
-import { useSidebar } from './sidebar/SidebarProvider';
+import { BudgetName } from './sidebar/BudgetName';
 import { ThemeSelector } from './ThemeSelector';
 
 function UncategorizedButton() {
@@ -303,14 +301,11 @@ type TitlebarProps = {
 };
 
 export function Titlebar({ style }: TitlebarProps) {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const sidebar = useSidebar();
   const { isNarrowWidth, width } = useResponsive();
   const isCompactNav = width < COMPACT_NAV_WIDTH;
   const serverURL = useServerURL();
-  const [floatingSidebar] = useGlobalPref('floatingSidebar');
   const isTestEnv = useIsTestEnv();
 
   return isNarrowWidth ? null : (
@@ -324,35 +319,9 @@ export function Titlebar({ style }: TitlebarProps) {
         '& *': {
           pointerEvents: 'auto',
         },
-        ...(!Platform.isBrowser && Platform.OS === 'mac' && floatingSidebar
-          ? { paddingLeft: 80 }
-          : {}),
         ...style,
       }}
     >
-      {!isCompactNav && (floatingSidebar || sidebar.alwaysFloats) && (
-        <Button
-          aria-label={t('Sidebar menu')}
-          variant="bare"
-          style={{ marginRight: 8 }}
-          onHoverStart={e => {
-            if (e.pointerType === 'mouse') {
-              sidebar.setHidden(false);
-            }
-          }}
-          onPress={e => {
-            if (e.pointerType !== 'mouse') {
-              sidebar.setHidden(!sidebar.hidden);
-            }
-          }}
-        >
-          <SvgNavigationMenu
-            className="menu"
-            style={{ width: 15, height: 15, left: 0 }}
-          />
-        </Button>
-      )}
-
       <View style={{ marginRight: 12 }}>
         <TopNav />
       </View>
@@ -387,6 +356,7 @@ export function Titlebar({ style }: TitlebarProps) {
         <SharedArrayBufferWarning />
         <LoggedInUser />
         <HelpMenu />
+        {!isCompactNav && <BudgetName />}
       </SpaceBetween>
     </View>
   );

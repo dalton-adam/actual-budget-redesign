@@ -92,6 +92,31 @@ It does not replace the design specification or authorize a new design direction
   current; browser Back restores Budget); keyboard: Enter opens a menu, Tab
   reaches each link with a visible ring, Escape closes and returns focus;
   Escape while renaming cancels only the rename. Reduced motion checked in Playwright against the 3018 preview with `reducedMotion: 'reduce'`: drawer animation `none`, tab and menu-tab transitions `none`; with motion allowed the drawer runs `nav-drawer-in` and tabs fade over 0.15s. `generate:i18n` run: all seven new strings are in `locale/en.json` (git-ignored, so nothing to stage). Custom theme at 1440×900 and 800×700: installed the Alucard catalog theme, with and without a pasted warm palette on top; the tab track, selected tab, unselected text, both menus and the drawer all resolve from the custom palette through the UI-01 fallbacks (`navTrack` → `cardBackground`, `navActive` → 12% `pageText`, `pageTextSecondary` → `pageTextSubdued`). A pasted override on a built-in theme keeps that theme's tuned tab colors, as UI-01 intends. Tour: with owner approval, `C/tour/steps.tsx`'s "Getting around" step now reads "The tabs at the top take you to your budget, accounts, reports, and scheduled transactions…" and points down at the tab bar (placement `bottom`); checked by running the tour to step 6 of 8 at 1000×700. Follow-ups: the drawer's budget file menu repeats `sidebar/BudgetName.tsx`'s items until NAV-02 moves the budget switcher to the top bar; below 900px the tour's navigation and Add account targets are hidden (tabs and sidebar give way to the drawer), which NAV-02 should revisit with the accounts pane.
+- NAV-02: **done September 27, 2026** on `redesign/nav-02`. The old
+  floating/resizable sidebar is now the approved Accounts pane on every
+  desktop page at 900px and wider. It defaults open at 1280px and wider and
+  collapsed below, remembers an explicit choice in device-local browser
+  storage (no core preference or sync change), and respects reduced motion.
+  Open mode retains All / On / Off budget balances, account drag ordering,
+  closed accounts, Add account, account tooltips and right-click Rename /
+  Close / Reopen actions. Collapsed mode is a 56px rail with accessible
+  account initials, connection-status dots, Add account and an expand button;
+  below 900px the NAV-01 drawer remains authoritative. The existing budget
+  name/actions moved to the title bar beside the preserved privacy, server,
+  user and help controls; the compact drawer keeps its budget file menu.
+  Renaming from the collapsed rail expands the pane and opens the inline
+  editor (now labelled "Account name"). UNIT `src/components/sidebar
+src/components/navigation src/components/settings/Themes.test.tsx` passed
+  15/15. CHECK passed: root typecheck and lint (after removing an unused `t`
+  in `C/Titlebar.tsx` and renaming the JSX-free test to
+  `SidebarProvider.test.ts`). Browser build passed. E2E(accounts, budget,
+  settings, nav-02) passed 26/26 against the rebuilt 3018 preview, including
+  the 1279/1280 default, reload persistence, rail rename and proof that All
+  accounts navigation leaves envelope totals unchanged. Rail initials were
+  re-checked at 1100×720 after centring them in their chips. VISUAL inspected light 1440×900, midnight 1000×700,
+  dark 800×700 drawer, dark privacy mode and a simulated warm custom palette;
+  account values redact through the existing `CellValue` privacy path and the
+  No server / Help / budget controls remain reachable.
 - All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 

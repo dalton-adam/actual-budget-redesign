@@ -118,4 +118,26 @@ describe('sidebar Account context menu', () => {
     expect(store.getState().contextMenu.isOpen).toBe(true);
     expect(contextMenuItemNames()).toEqual(['account-rename', 'account-close']);
   });
+
+  it('keeps a compact account accessible and exposes its context actions', async () => {
+    const account = generateAccount('Bank of America');
+
+    await renderRow(
+      <Account
+        name={account.name}
+        account={account}
+        to={`/accounts/${account.id}`}
+        query={bindings.accountBalance(account.id)}
+        compact
+      />,
+    );
+
+    const link = screen.getByRole('link', { name: 'Bank of America' });
+    expect(link).toHaveTextContent('B');
+
+    fireEvent.contextMenu(link);
+
+    expect(store.getState().contextMenu.isOpen).toBe(true);
+    expect(contextMenuItemNames()).toEqual(['account-rename', 'account-close']);
+  });
 });

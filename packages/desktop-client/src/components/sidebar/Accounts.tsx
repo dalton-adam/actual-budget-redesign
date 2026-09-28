@@ -18,12 +18,19 @@ import * as bindings from '#spreadsheet/bindings';
 
 import { Account } from './Account';
 import { SecondaryItem } from './SecondaryItem';
+import { useSidebar } from './SidebarProvider';
 
 const fontWeight = 600;
 
-export function Accounts() {
+type AccountsProps = {
+  collapsed?: boolean;
+};
+
+export function Accounts({ collapsed = false }: AccountsProps) {
   const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
+  const [accountToEdit, setAccountToEdit] = useState<string | null>(null);
+  const { setExpanded } = useSidebar();
   const { data: accounts = [] } = useAccounts();
   const updatedAccounts = useUpdatedAccounts();
   const { data: offbudgetAccounts = [] } = useOffBudgetAccounts();
@@ -71,6 +78,37 @@ export function Accounts() {
     setShowClosedAccountsPref(!showClosedAccounts);
   };
 
+  if (collapsed) {
+    return (
+      <View
+        style={{
+          alignItems: 'center',
+          gap: 8,
+          padding: '4px 8px 10px',
+        }}
+      >
+        {[...onBudgetAccounts, ...offbudgetAccounts].map(account => (
+          <Account
+            key={account.id}
+            name={account.name}
+            account={account}
+            connected={!!account.bank}
+            pending={syncingAccountIds.includes(account.id)}
+            failed={isAccountFailedSync(account)}
+            updated={updatedAccounts.includes(account.id)}
+            to={getAccountPath(account)}
+            query={bindings.accountBalance(account.id)}
+            compact
+            onRequestEdit={() => {
+              setAccountToEdit(account.id);
+              setExpanded(true);
+            }}
+          />
+        ))}
+      </View>
+    );
+  }
+
   return (
     <View
       style={{
@@ -83,8 +121,8 @@ export function Accounts() {
       <View
         style={{
           height: 1,
-          backgroundColor: theme.sidebarItemBackgroundHover,
-          marginTop: 15,
+          backgroundColor: theme.cardHairline,
+          margin: '0 8px 6px',
           flexShrink: 0,
         }}
       />
@@ -94,7 +132,7 @@ export function Accounts() {
           name={t('All accounts')}
           to="/accounts"
           query={bindings.allAccountBalance()}
-          style={{ fontWeight, marginTop: 15 }}
+          style={{ fontWeight }}
           isExactPathMatch
           balanceTestId="sidebar-all-accounts-balance"
         />
@@ -106,8 +144,7 @@ export function Accounts() {
             query={bindings.onBudgetAccountBalance()}
             style={{
               fontWeight,
-              marginTop: 13,
-              marginBottom: 5,
+              marginTop: 8,
             }}
             titleAccount
             balanceTestId="sidebar-on-budget-balance"
@@ -128,6 +165,8 @@ export function Accounts() {
             onDragChange={onDragChange}
             onDrop={onReorder}
             outerStyle={makeDropPadding(i)}
+            startEditing={accountToEdit === account.id}
+            onEditComplete={() => setAccountToEdit(null)}
           />
         ))}
 
@@ -138,8 +177,7 @@ export function Accounts() {
             query={bindings.offBudgetAccountBalance()}
             style={{
               fontWeight,
-              marginTop: 13,
-              marginBottom: 5,
+              marginTop: 8,
             }}
             titleAccount
             balanceTestId="sidebar-off-budget-balance"
@@ -160,12 +198,18 @@ export function Accounts() {
             onDragChange={onDragChange}
             onDrop={onReorder}
             outerStyle={makeDropPadding(i)}
+            startEditing={accountToEdit === account.id}
+            onEditComplete={() => setAccountToEdit(null)}
           />
         ))}
 
         {closedAccounts.length > 0 && (
           <SecondaryItem
-            style={{ marginTop: 15 }}
+            style={{
+              borderTop: `1px solid ${theme.cardHairline}`,
+              margin: '8px 8px 0',
+              paddingTop: 8,
+            }}
             title={
               showClosedAccounts
                 ? t('Closed accounts')
