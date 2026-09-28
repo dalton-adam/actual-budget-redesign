@@ -39,6 +39,30 @@ It does not replace the design specification or authorize a new design direction
   the components that use them. Nothing calls them yet. Checks: typecheck
   pass; lint pass; UNIT `src/components/budget/categoryPresentation.test.ts`
   28/28.
+- UI-02: **implemented September 27, 2026** on branch `redesign/ui-02`;
+  awaiting owner review before merging. Existing Button variants are
+  unchanged; the new pieces are opt-in. `L/Button.tsx` gains `control`, `tab`
+  and `tabSelected` variants (keyboard focus ring in `selectionBorder`,
+  disabled dimmed by opacity so it always reads quieter than enabled, colour
+  transitions only without reduced motion). `L/styles.ts` gains `focusRing`
+  and `surfaceCard`. New files: `L/SurfaceCard.tsx`, `L/StatusPill.tsx`
+  (`StatusPill` and `StatusPillButton`, which requires a full-sentence
+  accessible name), `L/ProgressBar.tsx` (clamped; decorative unless labelled),
+  `L/CategoryTile.tsx` (first grapheme, accent index 1–10 or neutral,
+  `aria-hidden`), `L/RedesignPrimitives.stories.tsx` (state preview) and
+  `L/RedesignPrimitives.web.test.tsx`; new export entries in the
+  component-library `package.json` so the app can import them (outside the
+  card's listed files, same as UI-01). Checks: typecheck pass; lint pass;
+  component UNIT 42/42 (23 new). VISUAL in Storybook at 1000×700 and
+  1440×900: light, dark, midnight, and a simulated custom theme
+  (`fallback.css` plus a custom palette over light) — all surfaces follow the
+  palette; Tab reaches each enabled control with a visible ring and skips
+  disabled ones; the existing `normal` Button computes the same as before.
+  Storybook needed a local, uncommitted change to start on macOS (`src/Themes`
+  and `src/themes` clash on a case-insensitive disk). **Open question for the
+  owner:** in light, the app's `pageTextSubdued` is `#9fb3c8` (the prototype
+  assumed `#62626e`), only 1.81:1 on the page background, so unselected tabs
+  and every "subdued" label are hard to read. Dark is 4.66:1.
 - All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 
