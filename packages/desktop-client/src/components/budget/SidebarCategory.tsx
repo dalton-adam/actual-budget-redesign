@@ -1,10 +1,12 @@
 // @ts-strict-ignore
 import React, { useRef } from 'react';
 import type { CSSProperties, Ref } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button } from '@actual-app/components/button';
+import { CategoryTile } from '@actual-app/components/category-tile';
 import { SvgCheveronDown } from '@actual-app/components/icons/v1';
+import { StatusPill } from '@actual-app/components/status-pill';
 import { TextOneLine } from '@actual-app/components/text-one-line';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -17,6 +19,8 @@ import { InputCell } from '#components/table';
 import { useContextMenu } from '#hooks/useContextMenu';
 import { useGlobalPref } from '#hooks/useGlobalPref';
 
+import { getCategoryAccentIndex } from './categoryPresentation';
+import { envelopeCellBorderStyle, useIsEnvelopeTable } from './envelopeTable';
 import { SidebarCategoryButtons } from './SidebarCategoryButtons';
 
 type SidebarCategoryProps = {
@@ -61,6 +65,7 @@ export function SidebarCategory({
   const { t } = useTranslation();
   const [categoryExpandedStatePref] = useGlobalPref('categoryExpandedState');
   const categoryExpandedState = categoryExpandedStatePref ?? 0;
+  const isEnvelopeTable = useIsEnvelopeTable();
 
   const temporary = category.id === 'new';
   const triggerRef = useRef(null);
@@ -85,6 +90,8 @@ export function SidebarCategory({
     ],
   });
 
+  const isHidden = category.hidden || categoryGroup?.hidden;
+
   const displayed = (
     <View
       style={{
@@ -92,13 +99,35 @@ export function SidebarCategory({
         alignItems: 'center',
         userSelect: 'none',
         WebkitUserSelect: 'none',
-        opacity: category.hidden || categoryGroup?.hidden ? 0.33 : undefined,
+        opacity: isHidden ? 0.33 : undefined,
         backgroundColor: 'transparent',
         height: 20,
+        ...(isEnvelopeTable && {
+          // The row already dims hidden categories to 50% (design-decisions
+          // §4.2); the "Hidden" tag carries the state as text.
+          opacity: undefined,
+          height: 28,
+          gap: 10,
+          fontSize: 13.5,
+          fontWeight: 500,
+        }),
       }}
       ref={triggerRef}
     >
+      {isEnvelopeTable && !temporary && (
+        <CategoryTile
+          name={category.name}
+          accentIndex={
+            category.is_income ? undefined : getCategoryAccentIndex(category.id)
+          }
+        />
+      )}
       <TextOneLine data-testid="category-name">{category.name}</TextOneLine>
+      {isEnvelopeTable && isHidden && (
+        <StatusPill tone="neutral" size="small">
+          <Trans>Hidden</Trans>
+        </StatusPill>
+      )}
       <View style={{ flexShrink: 0, marginLeft: 5 }}>
         <Button
           variant="bare"
@@ -135,6 +164,12 @@ export function SidebarCategory({
             '&:hover .hover-visible': {
               display: 'flex',
             },
+            // Row tools also appear for keyboard users (design-decisions §4.2).
+            ...(isEnvelopeTable && {
+              '&:focus-within .hover-visible': {
+                display: 'flex',
+              },
+            }),
           }),
         ...(dragging && { color: theme.pageTextSubdued }), //always visible color
         // The zIndex here forces the the view on top of a row below
@@ -173,7 +208,14 @@ export function SidebarCategory({
           }
         }}
         onBlur={() => onEditName(null)}
-        style={{ paddingLeft: 13, ...(isLast && { borderBottomWidth: 0 }) }}
+        style={{
+          paddingLeft: 13,
+          ...(isEnvelopeTable && {
+            paddingLeft: 16,
+            ...envelopeCellBorderStyle,
+          }),
+          ...(isLast && { borderBottomWidth: 0 }),
+        }}
         inputProps={{
           placeholder: temporary ? t('New category name') : '',
         }}

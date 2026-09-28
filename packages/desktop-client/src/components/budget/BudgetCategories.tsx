@@ -13,6 +13,7 @@ import type { DragState, OnDropCallback } from '#components/sort';
 import { Row } from '#components/table';
 import { useLocalPref } from '#hooks/useLocalPref';
 
+import { useIsEnvelopeTable } from './envelopeTable';
 import { ExpenseCategory } from './ExpenseCategory';
 import { ExpenseGroup } from './ExpenseGroup';
 import { IncomeCategory } from './IncomeCategory';
@@ -80,6 +81,7 @@ export const BudgetCategories = memo<BudgetCategoriesProps>(
     const [collapsedGroupIds = [], setCollapsedGroupIdsPref] =
       useLocalPref('budget.collapsed');
     const [showHiddenCategories] = useLocalPref('budget.showHiddenCategories');
+    const isEnvelopeTable = useIsEnvelopeTable();
     function onCollapse(value: Array<CategoryGroupEntity['id']>) {
       setCollapsedGroupIdsPref(value);
     }
@@ -247,6 +249,14 @@ export const BudgetCategories = memo<BudgetCategoriesProps>(
           boxShadow: styles.cardShadow,
           borderRadius: '0 0 4px 4px',
           flex: 1,
+          // Body of the envelope table card (design-decisions §4.1).
+          ...(isEnvelopeTable && {
+            backgroundColor: theme.cardBackground,
+            boxShadow: theme.cardElevation,
+            border: '1px solid ' + theme.cardHairline,
+            borderTop: 0,
+            borderRadius: '0 0 18px 18px',
+          }),
         }}
       >
         {items.map((item, idx) => {
@@ -333,7 +343,9 @@ export const BudgetCategories = memo<BudgetCategoriesProps>(
                 <View
                   style={{
                     height: styles.incomeHeaderHeight,
-                    backgroundColor: theme.budgetCurrentMonth,
+                    backgroundColor: isEnvelopeTable
+                      ? theme.cardBackground
+                      : theme.budgetCurrentMonth,
                   }}
                 >
                   <IncomeHeader onShowNewGroup={onShowNewGroup} />
@@ -392,7 +404,8 @@ export const BudgetCategories = memo<BudgetCategoriesProps>(
             >
               <View
                 style={
-                  dragState
+                  // Envelope rows paint their own hover tint.
+                  dragState || isEnvelopeTable
                     ? {}
                     : {
                         ':hover': { backgroundColor: theme.budgetCurrentMonth },

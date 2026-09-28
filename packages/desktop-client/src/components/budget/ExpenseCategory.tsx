@@ -18,6 +18,10 @@ import type {
 import { Row } from '#components/table';
 import { useDragRef } from '#hooks/useDragRef';
 
+import {
+  ENVELOPE_CATEGORY_ROW_HEIGHT,
+  useIsEnvelopeTable,
+} from './envelopeTable';
 import { RenderMonths } from './RenderMonths';
 import { SidebarCategory } from './SidebarCategory';
 
@@ -73,14 +77,27 @@ export function ExpenseCategory({
   });
 
   const { ExpenseCategoryComponent: MonthComponent } = useBudgetComponents();
+  const isEnvelopeTable = useIsEnvelopeTable();
+  const isEditingAmount =
+    editingCell && editingCell.id === cat.id && editingCell.cell !== 'name';
 
   return (
     <Row
       innerRef={dropRef}
       collapsed
+      height={isEnvelopeTable ? ENVELOPE_CATEGORY_ROW_HEIGHT : undefined}
       style={{
         backgroundColor: theme.budgetCurrentMonth,
         opacity: cat.hidden || categoryGroup?.hidden ? 0.5 : undefined,
+        ...(isEnvelopeTable && {
+          backgroundColor: isEditingAmount
+            ? theme.selectionBackground
+            : theme.cardBackground,
+          ...(!isEditingAmount &&
+            !dragState && {
+              ':hover': { backgroundColor: theme.tableRowHover },
+            }),
+        }),
       }}
     >
       <DropHighlight pos={dropPos} offset={{ top: 1 }} />
@@ -102,7 +119,13 @@ export function ExpenseCategory({
           onDelete={onDelete}
         />
 
-        <RenderMonths>
+        <RenderMonths
+          style={
+            isEnvelopeTable
+              ? { borderLeftColor: theme.cardHairline }
+              : undefined
+          }
+        >
           {({ month }) => (
             <MonthComponent
               month={month}

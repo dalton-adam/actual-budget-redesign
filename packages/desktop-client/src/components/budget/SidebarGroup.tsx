@@ -23,6 +23,8 @@ import { useContextMenu } from '#hooks/useContextMenu';
 import { useFeatureFlag } from '#hooks/useFeatureFlag';
 import { useGlobalPref } from '#hooks/useGlobalPref';
 
+import { envelopeCellBorderStyle, useIsEnvelopeTable } from './envelopeTable';
+
 type SidebarGroupProps = {
   group: CategoryGroupEntity;
   editing?: boolean;
@@ -65,6 +67,7 @@ export function SidebarGroup({
   const isGoalTemplatesEnabled = useFeatureFlag('goalTemplatesEnabled');
   const [categoryExpandedStatePref] = useGlobalPref('categoryExpandedState');
   const categoryExpandedState = categoryExpandedStatePref ?? 0;
+  const isEnvelopeTable = useIsEnvelopeTable();
 
   const temporary = group.id === 'new';
   const canSortCategories =
@@ -202,6 +205,11 @@ export function SidebarGroup({
         ...style,
         width: 200 + 100 * categoryExpandedState,
         backgroundColor: theme.budgetHeaderCurrentMonth,
+        ...(isEnvelopeTable && {
+          // The row paints the group tint (design-decisions §4.1).
+          backgroundColor: 'transparent',
+          fontSize: 13.5,
+        }),
         overflow: 'hidden',
         '& .hover-visible': {
           display: 'none',
@@ -210,6 +218,11 @@ export function SidebarGroup({
           '&:hover .hover-visible': {
             display: 'flex',
           },
+          ...(isEnvelopeTable && {
+            '&:focus-within .hover-visible': {
+              display: 'flex',
+            },
+          }),
         }),
         ...(dragPreview && {
           paddingLeft: 10,
@@ -242,7 +255,14 @@ export function SidebarGroup({
           }
         }}
         onBlur={() => onEdit(null)}
-        style={{ fontWeight: 600 }}
+        style={{
+          fontWeight: 600,
+          ...(isEnvelopeTable && {
+            fontWeight: 650,
+            paddingLeft: 6,
+            ...envelopeCellBorderStyle,
+          }),
+        }}
         inputProps={{
           style: { marginLeft: 20 },
           placeholder: temporary ? t('New group name') : '',

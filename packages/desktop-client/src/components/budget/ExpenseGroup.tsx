@@ -18,6 +18,12 @@ import type {
 import { Row, ROW_HEIGHT } from '#components/table';
 import { useDragRef } from '#hooks/useDragRef';
 
+import {
+  ENVELOPE_CATEGORY_ROW_HEIGHT,
+  ENVELOPE_GROUP_ROW_HEIGHT,
+  envelopeGroupRowStyle,
+  useIsEnvelopeTable,
+} from './envelopeTable';
 import { RenderMonths } from './RenderMonths';
 import { SidebarGroup } from './SidebarGroup';
 
@@ -88,14 +94,23 @@ export function ExpenseGroup({
   });
 
   const { ExpenseGroupComponent: MonthComponent } = useBudgetComponents();
+  const isEnvelopeTable = useIsEnvelopeTable();
+  const groupRowHeight = isEnvelopeTable
+    ? ENVELOPE_GROUP_ROW_HEIGHT
+    : ROW_HEIGHT;
+  const categoryRowHeight = isEnvelopeTable
+    ? ENVELOPE_CATEGORY_ROW_HEIGHT
+    : ROW_HEIGHT;
 
   return (
     <Row
       collapsed
+      height={isEnvelopeTable ? ENVELOPE_GROUP_ROW_HEIGHT : undefined}
       style={{
         fontWeight: 600,
         opacity: group.hidden ? 0.33 : undefined,
         backgroundColor: theme.budgetHeaderCurrentMonth, //use budget colors
+        ...(isEnvelopeTable && envelopeGroupRowStyle),
       }}
     >
       {dragState && !dragState.preview && dragState.type === 'group' && (
@@ -106,8 +121,11 @@ export function ExpenseGroup({
             left: 0,
             right: 0,
             height: collapsed
-              ? ROW_HEIGHT - 1
-              : (1 + group.categories.length) * (ROW_HEIGHT - 1) + 1,
+              ? groupRowHeight - 1
+              : groupRowHeight -
+                1 +
+                group.categories.length * (categoryRowHeight - 1) +
+                1,
             zIndex: 10000,
           }}
         >
@@ -143,7 +161,13 @@ export function ExpenseGroup({
           onSortCategories={onSortCategories}
           onShowNewCategory={onShowNewCategory}
         />
-        <RenderMonths>
+        <RenderMonths
+          style={
+            isEnvelopeTable
+              ? { borderLeftColor: theme.cardHairline }
+              : undefined
+          }
+        >
           {({ month }) => <MonthComponent month={month} group={group} />}
         </RenderMonths>
       </View>

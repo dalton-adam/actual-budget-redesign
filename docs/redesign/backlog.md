@@ -222,6 +222,58 @@ src/components/navigation src/components/settings/Themes.test.tsx` passed
   back to envelope. **Not yet checked:** WIDE, light/midnight themes, the
   multi-month `ToBudgetAmount` label ("Ready to Assign:" / "Overassigned:")
   on screen, and Linux VRT snapshots (not regenerated).
+- BUD-02: **implemented September 28, 2026** on `redesign/bud-02`, not yet
+  merged. Envelope budgets get the design-decisions §4 table; tracking
+  budgets are unchanged (owner decision, September 28, 2026: gate on
+  `budgetType`, as BUD-01 did). 44px category rows and 40px group rows set
+  through `Row`'s `height` (shared `ROW_HEIGHT` untouched; the group drop
+  target height uses the new heights); the table is a card with uppercase
+  column headers over the existing totals; tinted group rows; row hover
+  tint; the editing row gets `selectionBackground` and the input a 1.5px
+  `selectionBorder`. Name cell: UI-02 `CategoryTile` (accent from UI-03's
+  `getCategoryAccentIndex`, neutral for income) outside the `category-name`
+  element, a "Hidden" tag for hidden categories, and row tools that also
+  appear on `:focus-within`. Activity: the existing amount (and schedule
+  indicator) plus the §7.1 percentage ("Over" when overspent; hidden in
+  privacy mode and when more than one month is shown) and progress bar.
+  Available: a `StatusPill` inside the existing balance-menu button; tone
+  maps `makeBalanceAmountStyle`'s colour (`envelope/availableStatus.ts`),
+  target icon for templates/goals, carryover arrow inside the pill with a
+  tooltip naming the month, and a full-sentence accessible name; the pill's
+  text is still only the amount. Several months visible (until BUD-03): the
+  new cells render per month column (owner decision). **Scope grew, with
+  owner approval (September 28, 2026)** to `C/budget/{SidebarCategory,
+SidebarGroup,BudgetTotals,IncomeCategory,IncomeGroup}.tsx`; new files
+  `C/budget/envelopeTable.ts`,
+  `C/budget/envelope/{CategoryActivityContent,EnvelopeAvailableButton}.tsx`,
+  `C/budget/envelope/availableStatus{,.test}.ts`; a
+  `#components/budget/envelopeTable` import alias in
+  `packages/desktop-client/package.json`; and E2E page model
+  `e2e/page-models/budget-page.ts`: `scrollToBottom` now waits for BUD-01's
+  compact strip on windows shorter than 900px. Without it "scroll position
+  is restored" failed at 1000px in every full `budget.test.ts` run (saved
+  1384, restored 1299): the strip lowers the maximum scroll by 85px and the
+  heavier rows now render the swap after the click. The same file passed on
+  a `redesign/main` build (8/8), and still passes there with the page-model
+  change (16/16). Checks: typecheck pass; lint pass; UNIT
+  `src/components/budget` 53/53 (6 new); `generate:i18n` ran (new strings
+  in the gitignored `locale/en.json`); E2E(budget, bud-01, accounts,
+  settings) 26/26; `budget.test.ts` with `--repeat-each=3` at both WIDE
+  sizes 48/48; WIDE 58 passed, 1 failed (known Reports baseline at 1440), 15
+  did not run. VISUAL on the local test budget: dark 1440×900 and 1000×700,
+  light and midnight 1000×700, compact strip with the table; keyboard:
+  click to edit, Enter moves down, Shift+Tab moves up, Enter on a focused
+  pill opens the balance menu (Cover / Rollover overspending); Activity
+  click still opens the filtered transactions; switched to tracking (32px
+  rows, no tiles/pills/bars, Budgeted / Spent / Balance) and back.
+  **Not done / not yet checked:** the §4.2 goal/template caption under the
+  name (needs a "% saved" formula not in §7; left out); Escape in the
+  Assigned input resets the value but leaves the cell open (existing shared
+  `Input` behaviour, not changed); a custom theme; reduced motion on screen;
+  several envelope months visible; long labels (BUD-03); scrolling
+  performance with the extra per-row cell subscriptions; Linux VRT
+  snapshots (not regenerated). The existing row chevron buttons still have
+  no accessible name (upstream).
 - All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 
