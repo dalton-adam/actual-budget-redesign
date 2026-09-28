@@ -79,7 +79,7 @@ test.describe('DETAIL-02 category details contents', () => {
     }
   });
 
-  test('lists the month's transactions, newest first', async () => {
+  test("lists the month's transactions, newest first", async () => {
     const name = await budgetPage.getCategoryNameForRow(1);
     await opener(page, name).click();
     const list = panel(page).getByTestId('category-details-transactions');
@@ -89,12 +89,20 @@ test.describe('DETAIL-02 category details contents', () => {
     const count = await rows.count();
     expect(count).toBeGreaterThan(0);
     expect(count).toBeLessThanOrEqual(5);
+    const total = Number(
+      await panel(page)
+        .getByTestId('category-details-transaction-count')
+        .textContent(),
+    );
+    expect(count).toBe(Math.min(total, 5));
 
     // Every listed amount appears in the category's existing Activity view.
     const accountPage = await budgetPage.clickOnSpentAmountForRow(1);
     await expect(accountPage.transactionTableRow.first()).toBeVisible();
-    const total = await accountPage.transactionTable.getByTestId('row').count();
-    expect(total).toBeGreaterThanOrEqual(count);
+    const registerRows = await accountPage.transactionTable
+      .getByTestId('row')
+      .count();
+    expect(registerRows).toBeGreaterThanOrEqual(count);
   });
 
   test('notes show read-only and follow edits made from the row', async () => {

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -7,6 +7,7 @@ import { q } from '@actual-app/core/shared/query';
 import type { CategoryEntity } from '@actual-app/core/types/models';
 
 import { DisplayPayeeProvider } from '#hooks/useDisplayPayee';
+import { useSheetValue } from '#hooks/useSheetValue';
 import { useTransactions } from '#hooks/useTransactions';
 
 import { CategoryDetailsSection } from './CategoryDetailsSection';
@@ -33,18 +34,30 @@ export function CategoryDetailsTransactions({
   category,
   month,
 }: CategoryDetailsTransactionsProps) {
-  const query = useMemo(
+  const { t } = useTranslation();
+  const monthQuery = useMemo(
     () =>
       q('transactions')
         .filter({
           category: category.id,
           date: { $transform: '$month', $eq: month },
         })
-        .options({ splits: 'inline' })
-        .orderBy([{ date: 'desc' }, { sort_order: 'desc' }])
-        .select('*'),
+        .options({ splits: 'inline' }),
     [category.id, month],
   );
+  const query = useMemo(
+    () =>
+      monthQuery
+        .orderBy([{ date: 'desc' }, { sort_order: 'desc' }])
+        .select('*'),
+    [monthQuery],
+  );
+  // How many there are in all; the list shows only the newest few. A live
+  // query cell in the month's sheet, like the account balance bindings.
+  const total = useSheetValue<'balance', `balance-query-${string}`>({
+    name: `balance-query-category-details-count-${category.id}`,
+    query: monthQuery.calculate({ $count: '*' }),
+  });
   const { transactions, isPending, isPlaceholderData, isError } =
     useTransactions({
       query,
@@ -92,7 +105,21 @@ export function CategoryDetailsTransactions({
   }
 
   return (
-    <CategoryDetailsSection title={<Trans>Transactions</Trans>}>
+    <CategoryDetailsSection
+      title={<Trans>Transactions</Trans>}
+      aside={
+        !isLoading && !isError && total != null && total > 0 ? (
+          <span
+            data-testid="category-details-transaction-count"
+            aria-label={t('{{count}} transactions this month', {
+              count: total,
+            })}
+          >
+            {total}
+          </span>
+        ) : null
+      }
+    >
       <View data-testid="category-details-transactions" aria-busy={isLoading}>
         {content}
       </View>
