@@ -274,8 +274,8 @@ SidebarGroup,BudgetTotals,IncomeCategory,IncomeGroup}.tsx`; new files
   performance with the extra per-row cell subscriptions; Linux VRT
   snapshots (not regenerated). The existing row chevron buttons still have
   no accessible name (upstream).
-- BUD-03: **implemented September 28, 2026** on branch `redesign/bud-03`,
-  awaiting owner review before merging into `redesign/main`. One month only
+- BUD-03: **done September 28, 2026**, merged into `redesign/main` with owner
+  approval (branch `redesign/bud-03`). One month only
   (design-decisions §6): the months-shown control is no longer rendered in
   `C/Titlebar.tsx` and `C/budget/index.tsx` passes one month; the `maxMonths`
   global preference is not read, written or migrated. Owner decision
