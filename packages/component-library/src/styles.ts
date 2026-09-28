@@ -161,6 +161,17 @@ export const styles: CSSProperties = {
     padding: 16,
     cursor: 'pointer',
   },
+  // Redesign foundations (docs/redesign/design-decisions.md). Opt-in only.
+  focusRing: {
+    outline: `2px solid ${theme.selectionBorder}`,
+    outlineOffset: 2,
+  },
+  surfaceCard: {
+    backgroundColor: theme.cardBackground,
+    border: `1px solid ${theme.cardHairline}`,
+    borderRadius: 18,
+    boxShadow: theme.cardElevation,
+  },
   tableContainer: {
     flex: 1,
     border: '1px solid ' + theme.tableBorder,

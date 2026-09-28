@@ -6,6 +6,7 @@ import { css, cx } from '@emotion/css';
 
 import { AnimatedLoading } from './icons/AnimatedLoading';
 import { styles } from './styles';
+import type { CSSProperties as StyleObject } from './styles';
 import { theme } from './theme';
 import { View } from './View';
 
@@ -20,6 +21,12 @@ const backgroundColor: {
   bareDisabled: theme.buttonBareDisabledBackground,
   menu: theme.buttonMenuBackground,
   menuSelected: theme.buttonMenuSelectedBackground,
+  control: theme.controlBackground,
+  controlDisabled: theme.controlBackground,
+  tab: 'transparent',
+  tabDisabled: 'transparent',
+  tabSelected: theme.navActive,
+  tabSelectedDisabled: theme.navActive,
 };
 
 const backgroundColorHover: Record<
@@ -31,11 +38,17 @@ const backgroundColorHover: Record<
   bare: theme.buttonBareBackgroundHover,
   menu: theme.buttonMenuBackgroundHover,
   menuSelected: theme.buttonMenuSelectedBackgroundHover,
+  control: theme.tableRowHover,
+  tab: theme.tableRowHover,
+  tabSelected: theme.navActive,
   normalDisabled: 'transparent',
   primaryDisabled: 'transparent',
   bareDisabled: 'transparent',
   menuDisabled: 'transparent',
   menuSelectedDisabled: 'transparent',
+  controlDisabled: theme.controlBackground,
+  tabDisabled: 'transparent',
+  tabSelectedDisabled: theme.navActive,
 };
 
 const borderColor: {
@@ -49,6 +62,8 @@ const borderColor: {
   primaryDisabled: theme.buttonPrimaryDisabledBorder,
   menu: theme.buttonMenuBorder,
   menuSelected: theme.buttonMenuSelectedBorder,
+  control: theme.cardHairline,
+  controlDisabled: theme.cardHairline,
 };
 
 const textColor: {
@@ -62,6 +77,12 @@ const textColor: {
   bareDisabled: theme.buttonBareDisabledText,
   menu: theme.buttonMenuText,
   menuSelected: theme.buttonMenuSelectedText,
+  control: theme.pageText,
+  controlDisabled: theme.pageText,
+  tab: theme.pageTextSecondary,
+  tabDisabled: theme.pageTextSecondary,
+  tabSelected: theme.pageText,
+  tabSelectedDisabled: theme.pageText,
 };
 
 const textColorHover: {
@@ -72,7 +93,22 @@ const textColorHover: {
   bare: theme.buttonBareTextHover,
   menu: theme.buttonMenuTextHover,
   menuSelected: theme.buttonMenuSelectedTextHover,
+  control: theme.pageText,
+  tab: theme.pageText,
+  tabSelected: theme.pageText,
 };
+
+// Redesign variants (docs/redesign/design-decisions.md) are opt-in, so the
+// existing variants and every screen that uses them look the same as before.
+const redesignVariants: ReadonlySet<ButtonVariant> = new Set([
+  'control',
+  'tab',
+  'tabSelected',
+]);
+
+function isRedesignVariant(variant: ButtonVariant) {
+  return redesignVariants.has(variant);
+}
 
 const _getBorder = (
   variant: ButtonVariant,
@@ -80,6 +116,8 @@ const _getBorder = (
 ): string => {
   switch (variant) {
     case 'bare':
+    case 'tab':
+    case 'tabSelected':
       return 'none';
 
     default:
@@ -91,13 +129,18 @@ const _getPadding = (variant: ButtonVariant): string => {
   switch (variant) {
     case 'bare':
       return '5px';
+    case 'control':
+      return '0 10px';
+    case 'tab':
+    case 'tabSelected':
+      return '7px 14px';
     default:
       return '5px 10px';
   }
 };
 
 const _getHoveredStyles = (variant: ButtonVariant): CSSProperties => ({
-  ...(variant !== 'bare' && styles.shadow),
+  ...(variant !== 'bare' && !isRedesignVariant(variant) && styles.shadow),
   backgroundColor: backgroundColorHover[variant],
   color: textColorHover[variant],
   cursor: 'pointer',
@@ -110,6 +153,11 @@ const _getActiveStyles = (
   switch (variant) {
     case 'bare':
       return { backgroundColor: theme.buttonBareBackgroundActive };
+    case 'control':
+    case 'tab':
+      return { backgroundColor: theme.navActive, transition: 'none' };
+    case 'tabSelected':
+      return { transition: 'none' };
     default:
       return {
         transform: bounce ? 'translateY(1px)' : undefined,
@@ -129,7 +177,38 @@ type ButtonProps = ComponentPropsWithoutRef<typeof ReactAriaButton> & {
   children?: ReactNode;
 };
 
-type ButtonVariant = 'normal' | 'primary' | 'bare' | 'menu' | 'menuSelected';
+type ButtonVariant =
+  | 'normal'
+  | 'primary'
+  | 'bare'
+  | 'menu'
+  | 'menuSelected'
+  | 'control'
+  | 'tab'
+  | 'tabSelected';
+
+function _getRedesignStyles(
+  variant: ButtonVariant,
+  isDisabled: boolean,
+): StyleObject {
+  if (!isRedesignVariant(variant)) {
+    return {};
+  }
+  return {
+    borderRadius: variant === 'control' ? 9 : 10,
+    fontWeight: variant === 'tabSelected' ? 600 : 500,
+    ...(variant === 'control' && { minHeight: 30, minWidth: 30 }),
+    ...(variant === 'tabSelected' && { boxShadow: theme.navActiveShadow }),
+    transition: 'none',
+    '@media (prefers-reduced-motion: no-preference)': {
+      transition: 'background-color .15s, color .15s',
+    },
+    '&[data-focus-visible]': styles.focusRing,
+    // Dimmed rather than recolored, so disabled always reads as quieter
+    // than enabled, whatever the theme's text roles are.
+    ...(isDisabled && { cursor: 'default', opacity: 0.45 }),
+  };
+}
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (props, ref) => {
@@ -157,8 +236,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           ...styles.smallText,
           '&[data-hovered]': _getHoveredStyles(variant),
           '&[data-pressed]': _getActiveStyles(variant, bounce),
+          ..._getRedesignStyles(variant, !!props.isDisabled),
         }),
-      [bounce, variant, variantWithDisabled],
+      [bounce, variant, variantWithDisabled, props.isDisabled],
     );
 
     const className = restProps.className;

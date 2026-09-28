@@ -97,3 +97,61 @@ Bare button variant uses the following theme CSS variables:
     },
   },
 };
+
+export const Control: Story = {
+  args: {
+    variant: 'control',
+    children: 'Today',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Redesign control (month stepper, Today, icon buttons). Opt-in; uses:
+  - \`--color-controlBackground\`
+  - \`--color-cardHairline\`
+  - \`--color-tableRowHover\` (hover)
+  - \`--color-navActive\` (pressed)
+  - \`--color-pageText\` (disabled is dimmed with opacity)
+  - \`--color-selectionBorder\` (keyboard focus ring)
+`,
+      },
+    },
+  },
+};
+
+export const Tab: Story = {
+  args: {
+    variant: 'tab',
+    children: 'Reports',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Redesign pill-navigation tab. Opt-in; uses \`--color-pageTextSecondary\`,
+\`--color-pageText\`, \`--color-tableRowHover\` and \`--color-selectionBorder\`.
+`,
+      },
+    },
+  },
+};
+
+export const TabSelected: Story = {
+  args: {
+    variant: 'tabSelected',
+    children: 'Budget',
+    'aria-current': 'page',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Selected pill-navigation tab. Set \`aria-current\` (or \`aria-pressed\`) so the
+state is not conveyed by color alone. Uses \`--color-navActive\` and
+\`--color-navActiveShadow\`.
+`,
+      },
+    },
+  },
+};

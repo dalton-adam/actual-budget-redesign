@@ -334,6 +334,16 @@ should stay legible).
   in light. **Owner accepted them as they are (September 27, 2026):** the
   letter is decorative, since the category name appears alongside it.
 
+### Added in UI-02 (owner decision, September 27, 2026)
+
+- **`pageTextSecondary`**: secondary text for the redesigned controls
+  (unselected tabs, neutral tiles, card labels). The app's light
+  `pageTextSubdued` is `#9fb3c8`, not the `#62626e` the prototype assumed, and
+  reads at only 1.81:1 on the light page background. Light uses `#62626e`;
+  dark and midnight use `var(--color-pageTextSubdued)` (unchanged look); the
+  custom-theme fallback is `pageTextSubdued`. `pageTextSubdued` keeps its
+  value and meaning everywhere else.
+
 ## 9. Wording (TERM-01)
 
 Visible text only; no identifier, binding, preference or API renames.

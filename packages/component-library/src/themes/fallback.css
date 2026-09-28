@@ -12,6 +12,7 @@
     var(--color-pageTextSubdued) 70%,
     var(--color-pageBackground)
   );
+  --color-pageTextSecondary: var(--color-pageTextSubdued);
   --color-cardHairline: var(--color-tableBorder);
   --color-cardElevation: none;
   --color-cardInset: color-mix(in srgb, var(--color-pageText) 6%, transparent);

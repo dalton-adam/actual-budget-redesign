@@ -227,6 +227,7 @@ export const theme = {
   // Redesign roles (docs/redesign/design-decisions.md §8)
   pageGlow: 'var(--color-pageGlow)',
   pageTextFaint: 'var(--color-pageTextFaint)',
+  pageTextSecondary: 'var(--color-pageTextSecondary)',
   cardHairline: 'var(--color-cardHairline)',
   cardElevation: 'var(--color-cardElevation)',
   cardInset: 'var(--color-cardInset)',
