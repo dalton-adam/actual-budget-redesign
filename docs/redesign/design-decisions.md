@@ -43,7 +43,7 @@ figures and "never color alone" stay in force.
 | Every destination in the [destination map](prototype/README.md#destination-map) stays reachable at every width                                                                                                                                                                                   | Approved |
 | **Accounts pane**: on the left of every page, **collapsible**. Open: the full list (All accounts, On/Off budget with totals, each account with sync-status dot and balance, Closed accounts, Add account). Collapsed: 56px rail with initials and status dots, Add account, and an expand button | Approved |
 | Pane open/collapsed state is **device-local** front-end storage (like the details panel); no new stored or synced preference                                                                                                                                                                     | Approved |
-| Pane default: open at 1280px and wider, collapsed below                                                                                                                                                                                                                                          | Shown    |
+| Pane default: open at 1280px and wider, collapsed below                                                                                                                                                                                                                                          | Approved |
 | The **Accounts ▾** menu stays in the top bar (same list); below 900px everything moves into the navigation drawer                                                                                                                                                                                | Approved |
 | Account right-click menu keeps working from the pane and the menu                                                                                                                                                                                                                                | Approved |
 | "All accounts" is navigation, never a filter on envelope totals                                                                                                                                                                                                                                  | Approved |
@@ -407,7 +407,8 @@ Confirm or change these before the named task starts; until then the
 2. Pace chart for past and future months as in §7.2 (the plan said past
    months without a label and future months without a chart) (DETAIL-04).
 3. The "Shown" wording rows in §9 (TERM-01).
-4. Accounts pane default open at ≥1280px, collapsed below (NAV-02).
+4. ~~Accounts pane default open at ≥1280px, collapsed below (NAV-02).~~
+   **Confirmed by the owner September 27, 2026**; now Approved in §2.
 5. Account hero and register treatment in §10 (APP-01, APP-02).
 
 ## 12. Evidence
@@ -417,3 +418,4 @@ Confirm or change these before the named task starts; until then the
 | Sep 27, 2026 | Plan §1.1 owner decisions                                                                                                                                | [plan.md](plan.md) §1.1                                                                                                          |
 | Sep 27, 2026 | DESIGN-01 review: layout A, summary cards, all three themes, panel on Budget only                                                                        | [prototype README](prototype/README.md#owner-decisions-september-27-2026), commit `78f444a86`                                    |
 | Sep 27, 2026 | DESIGN-02 walkthrough: 44px rows, collapsible accounts pane, one month at a time, empty bar for negative Available without spending, reconciliation band | [prototype README](prototype/README.md#owner-decisions-september-27-2026-walkthrough), commit `aa422ef87`, screenshots `18`–`50` |
+| Sep 27, 2026 | After NAV-01: accounts pane default confirmed (open at 1280px and wider, collapsed below; §2, §11 item 4)                                                | Owner confirmation in the NAV-01 session                                                                                         |
