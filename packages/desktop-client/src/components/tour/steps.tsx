@@ -164,13 +164,13 @@ function getBudgetTourSteps({ navigate, budgetType }: TourStepDeps): Step[] {
     {
       id: 'sidebar-navigation',
       target: '[data-testid="sidebar-primary-buttons"]',
-      placement: 'right',
+      placement: 'bottom',
       title: <Trans>Getting Around</Trans>,
       content: (
         <Trans>
-          The sidebar takes you to your budget, reports, and scheduled
-          transactions. You can find payees, rules, and the settings under{' '}
-          <strong>More</strong>.
+          The tabs at the top take you to your budget, accounts, reports, and
+          scheduled transactions. You can find payees, rules, and the settings
+          under <strong>More</strong>.
         </Trans>
       ),
     },

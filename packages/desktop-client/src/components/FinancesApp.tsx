@@ -31,6 +31,7 @@ import { GlobalKeys } from './GlobalKeys';
 import { MobileBankSyncAccountEditPage } from './mobile/banksync/MobileBankSyncAccountEditPage';
 import { MobileNavTabs } from './mobile/MobileNavTabs';
 import { TransactionEdit } from './mobile/transactions/TransactionEdit';
+import { COMPACT_NAV_WIDTH } from './navigation/constants';
 import { Notifications } from './Notifications';
 import { MobilePageHeaderProvider, MobilePageHeaderSlot } from './Page';
 import { Reports } from './reports';
@@ -89,7 +90,7 @@ function RouterBehaviors() {
 }
 
 export function FinancesApp() {
-  const { isNarrowWidth } = useResponsive();
+  const { isNarrowWidth, width } = useResponsive();
   useMetaThemeColor(theme.mobileViewTheme);
 
   const location = useLocation();
@@ -209,7 +210,8 @@ export function FinancesApp() {
             flex: 1,
           }}
         >
-          <FloatableSidebar />
+          {/* Below the compact width, navigation lives in the drawer */}
+          {width >= COMPACT_NAV_WIDTH && <FloatableSidebar />}
 
           <View
             style={{

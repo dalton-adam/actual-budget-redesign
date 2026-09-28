@@ -41,6 +41,8 @@ import { MonthCountSelector } from './budget/MonthCountSelector';
 import { Link } from './common/Link';
 import { HelpMenu } from './HelpMenu';
 import { LoggedInUser } from './LoggedInUser';
+import { COMPACT_NAV_WIDTH } from './navigation/constants';
+import { TopNav } from './navigation/TopNav';
 import { useServerURL } from './ServerContext';
 import { useSidebar } from './sidebar/SidebarProvider';
 import { ThemeSelector } from './ThemeSelector';
@@ -305,7 +307,8 @@ export function Titlebar({ style }: TitlebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const sidebar = useSidebar();
-  const { isNarrowWidth } = useResponsive();
+  const { isNarrowWidth, width } = useResponsive();
+  const isCompactNav = width < COMPACT_NAV_WIDTH;
   const serverURL = useServerURL();
   const [floatingSidebar] = useGlobalPref('floatingSidebar');
   const isTestEnv = useIsTestEnv();
@@ -327,7 +330,7 @@ export function Titlebar({ style }: TitlebarProps) {
         ...style,
       }}
     >
-      {(floatingSidebar || sidebar.alwaysFloats) && (
+      {!isCompactNav && (floatingSidebar || sidebar.alwaysFloats) && (
         <Button
           aria-label={t('Sidebar menu')}
           variant="bare"
@@ -349,6 +352,10 @@ export function Titlebar({ style }: TitlebarProps) {
           />
         </Button>
       )}
+
+      <View style={{ marginRight: 12 }}>
+        <TopNav />
+      </View>
 
       <Routes>
         <Route
