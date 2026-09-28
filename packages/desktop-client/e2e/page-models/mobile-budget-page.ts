@@ -55,10 +55,10 @@ export class MobileBudgetPage {
 
     // Envelope budget summary buttons
     this.toBudgetButton = this.budgetTableHeader.getByRole('button', {
-      name: 'To Budget',
+      name: 'Ready to Assign',
     });
     this.overbudgetedButton = this.budgetTableHeader.getByRole('button', {
-      name: 'Overbudgeted',
+      name: 'Overassigned',
     });
 
     // Tracking budget summary buttons
@@ -72,11 +72,13 @@ export class MobileBudgetPage {
       name: 'Overspent',
     });
 
+    // Envelope budgets label these columns Assigned and Activity; tracking
+    // budgets keep Budgeted and Spent.
     this.budgetedHeaderButton = this.budgetTableHeader.getByRole('button', {
-      name: 'Budgeted',
+      name: /Budgeted|Assigned/,
     });
     this.spentHeaderButton = this.budgetTableHeader.getByRole('button', {
-      name: 'Spent',
+      name: /Spent|Activity/,
     });
 
     this.budgetTable = page.getByTestId('budget-table');

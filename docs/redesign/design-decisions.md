@@ -360,12 +360,12 @@ translated; accepted for this fork. Run `generate:i18n` after the change.
 | Balance                                                                                                                                                    | Available                                        | envelope column header, EnvelopeBalanceMenuModal, mobile envelope table            | Approved |
 | To Budget / To Budget:                                                                                                                                     | Ready to Assign                                  | ToBudgetAmount, mobile BudgetTable/BudgetPage, BudgetAutomationsBody text          | Approved |
 | Overbudgeted / Overbudgeted:                                                                                                                               | Overassigned                                     | ToBudgetAmount, mobile BudgetTable                                                 | Approved |
-| Cover overbudgeted                                                                                                                                         | Cover overassigned                               | mobile BudgetPage, EnvelopeBudgetSummaryModal                                      | Shown    |
-| Covered overbudgeted from {{categoryName}}                                                                                                                 | Covered overassigned from {{categoryName}}       | notification text                                                                  | Shown    |
-| You have budgeted more than your available funds                                                                                                           | You have assigned more than your available funds | mobile BudgetPage                                                                  | Shown    |
-| Budgeted amount for {{categoryName}} category (aria)                                                                                                       | Assigned amount for {{categoryName}} category    | envelope inputs                                                                    | Shown    |
-| Spent amount for {{categoryName}} category (aria)                                                                                                          | Activity for {{categoryName}} category           | envelope cells                                                                     | Shown    |
-| Balance for {{categoryName}} category (aria)                                                                                                               | Available for {{categoryName}} category          | envelope cells                                                                     | Shown    |
+| Cover overbudgeted                                                                                                                                         | Cover overassigned                               | mobile BudgetPage, EnvelopeBudgetSummaryModal                                      | Approved |
+| Covered overbudgeted from {{categoryName}}                                                                                                                 | Covered overassigned from {{categoryName}}       | notification text                                                                  | Approved |
+| You have budgeted more than your available funds                                                                                                           | You have assigned more than your available funds | mobile BudgetPage                                                                  | Approved |
+| Budgeted amount for {{categoryName}} category (aria)                                                                                                       | Assigned amount for {{categoryName}} category    | envelope inputs                                                                    | Approved |
+| Spent amount for {{categoryName}} category (aria)                                                                                                          | Activity for {{categoryName}} category           | envelope cells                                                                     | Approved |
+| Balance for {{categoryName}} category (aria)                                                                                                               | Available for {{categoryName}} category          | envelope cells                                                                     | Approved |
 | Open balance menu for {{categoryName}} category (aria)                                                                                                     | unchanged                                        |                                                                                    | Shown    |
 | Available funds, Overspent in {{month}}, For next month                                                                                                    | unchanged                                        | TotalsList                                                                         | Shown    |
 | Copy last month's budget, Set budgets to zero, Set budgets to N month average, Apply/Overwrite with budget template, Check templates, End of month cleanup | unchanged                                        | BudgetMonthMenu and mobile equivalents                                             | Shown    |
@@ -376,6 +376,26 @@ translated; accepted for this fork. Run `generate:i18n` after the change.
 If `Balance` in `EnvelopeIncomeBalanceMenuModal` refers to an income
 category's received amount, keep it unchanged; the TERM-01 brief confirms
 from source.
+
+**As implemented (TERM-01, September 28, 2026).** The owner approved the
+"Shown" rewording rows above and asked to match YNAB wherever the envelope
+UI names these amounts, which added three places the table did not list:
+
+| Current                                                 | New                                                        | Where                                                                                  |
+| ------------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| To Budget (source/target in Cover and Transfer pickers) | Ready to Assign                                            | `C/budget/util.ts` `addToBeBudgetedGroup`; mobile "Covered X overspending from"        |
+| Budgeted: / Balance: (goal tooltip)                     | Assigned: / Available:                                     | `C/budget/BalanceWithCarryover.tsx`, envelope only                                     |
+| …the pool is To Budget / Split any remaining To Budget… | …the pool is Ready to Assign / …remaining Ready to Assign… | `C/budget/goals/editor/CleanupAutomation.tsx`, `C/budget/goals/displayTemplateMeta.ts` |
+
+`EnvelopeIncomeBalanceMenuModal` shows `catSumAmount` for an income
+category, which is the received amount, so its "Balance" stays. Mobile
+column headers, cell aria labels and the goal tooltip are shared with
+tracking budgets and pick the wording from the `budgetType` synced pref;
+tracking keeps Budgeted / Spent / Balance. The mobile cell aria labels are
+passed to `CellValue`, which does not render them, so that change has no
+effect on screen readers today (unchanged upstream behavior). Generated
+locale files (`packages/desktop-client/locale/`) are gitignored, so
+`generate:i18n` produces nothing to stage.
 
 ## 10. Accounts screens (APP-01/APP-02 inputs)
 
@@ -406,7 +426,8 @@ Confirm or change these before the named task starts; until then the
    instead of the plan's "last month's Activity" (DETAIL-02).
 2. Pace chart for past and future months as in §7.2 (the plan said past
    months without a label and future months without a chart) (DETAIL-04).
-3. The "Shown" wording rows in §9 (TERM-01).
+3. ~~The "Shown" wording rows in §9 (TERM-01).~~
+   **Confirmed by the owner September 28, 2026**; now Approved in §9.
 4. ~~Accounts pane default open at ≥1280px, collapsed below (NAV-02).~~
    **Confirmed by the owner September 27, 2026**; now Approved in §2.
 5. Account hero and register treatment in §10 (APP-01, APP-02).

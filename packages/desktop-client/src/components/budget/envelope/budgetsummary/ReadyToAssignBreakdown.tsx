@@ -104,7 +104,7 @@ export function ReadyToAssignBreakdown({
         </EnvelopeCellValue>
       </BreakdownRow>
 
-      <BreakdownRow label={<Trans>Budgeted</Trans>}>
+      <BreakdownRow label={<Trans>Assigned</Trans>}>
         <EnvelopeCellValue
           binding={envelopeBudget.totalBudgeted}
           type="financial"

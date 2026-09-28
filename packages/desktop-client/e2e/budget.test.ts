@@ -34,7 +34,7 @@ test.describe('Budget', () => {
 
     await expect(summary.getByText('Available funds')).toBeVisible();
     await expect(summary.getByText(/^Overspent in /)).toBeVisible();
-    await expect(summary.getByText('Budgeted')).toBeVisible();
+    await expect(summary.getByText('Assigned')).toBeVisible();
     await expect(summary.getByText('For next month')).toBeVisible();
     await expect(summary.getByText('Ready to Assign')).toBeVisible();
     await expect(page).toMatchThemeScreenshots();

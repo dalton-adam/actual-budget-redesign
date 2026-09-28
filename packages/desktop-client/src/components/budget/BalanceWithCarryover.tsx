@@ -20,6 +20,7 @@ import { CellValue, CellValueText } from '#components/spreadsheet/CellValue';
 import { useFeatureFlag } from '#hooks/useFeatureFlag';
 import { useFormat } from '#hooks/useFormat';
 import { useSheetValue } from '#hooks/useSheetValue';
+import { useSyncedPref } from '#hooks/useSyncedPref';
 import type { Binding } from '#spreadsheet';
 
 import { makeBalanceAmountStyle } from './util';
@@ -117,6 +118,7 @@ export function BalanceWithCarryover({
   const budgetedValue = useSheetValue(budgeted);
   const longGoalValue = useSheetValue(longGoal);
   const isGoalTemplatesEnabled = useFeatureFlag('goalTemplatesEnabled');
+  const [budgetType = 'envelope'] = useSyncedPref('budgetType');
   const getBalanceAmountStyle = useCallback(
     (balanceValue: number) =>
       makeBalanceAmountStyle(
@@ -213,12 +215,36 @@ export function BalanceWithCarryover({
           </GoalTooltipRow>
           <GoalTooltipRow>
             {longGoalValue !== 1 ? (
+              budgetType === 'envelope' ? (
+                <Trans>
+                  <div>Assigned:</div>
+                  <div>
+                    {
+                      {
+                        amount: format(budgetedValue, 'financial'),
+                      } as TransObjectLiteral
+                    }
+                  </div>
+                </Trans>
+              ) : (
+                <Trans>
+                  <div>Budgeted:</div>
+                  <div>
+                    {
+                      {
+                        amount: format(budgetedValue, 'financial'),
+                      } as TransObjectLiteral
+                    }
+                  </div>
+                </Trans>
+              )
+            ) : budgetType === 'envelope' ? (
               <Trans>
-                <div>Budgeted:</div>
+                <div>Available:</div>
                 <div>
                   {
                     {
-                      amount: format(budgetedValue, 'financial'),
+                      amount: format(balanceValue, type),
                     } as TransObjectLiteral
                   }
                 </div>
@@ -239,7 +265,15 @@ export function BalanceWithCarryover({
         </>
       );
     },
-    [budgetedValue, format, getDifferenceToGoal, goalValue, longGoalValue, t],
+    [
+      budgetType,
+      budgetedValue,
+      format,
+      getDifferenceToGoal,
+      goalValue,
+      longGoalValue,
+      t,
+    ],
   );
 
   return (

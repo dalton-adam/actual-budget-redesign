@@ -86,7 +86,7 @@ export function EnvelopeBudgetSummaryModal({
         modal: {
           name: 'cover',
           options: {
-            title: t('Cover overbudgeted'),
+            title: t('Cover overassigned'),
             month,
             showToBeBudgeted: false,
             amount: sheetValue,
@@ -98,7 +98,7 @@ export function EnvelopeBudgetSummaryModal({
               });
               dispatch(collapseModals({ rootModalName: 'cover' }));
               showUndoNotification({
-                message: t('Covered overbudgeted from {{categoryName}}', {
+                message: t('Covered overassigned from {{categoryName}}', {
                   categoryName: categoriesById[categoryId].name,
                 }),
               });
