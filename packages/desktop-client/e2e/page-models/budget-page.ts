@@ -49,6 +49,23 @@ export class BudgetPage {
     await this.budgetTableScrollContainer.evaluate(el => {
       el.scrollTop = el.scrollHeight;
     });
+
+    // On windows shorter than 900px the envelope summary cards give way to
+    // the compact strip once the table scrolls, which makes the table taller
+    // and lowers its maximum scroll. Wait for that swap so the position read
+    // next is the settled bottom.
+    const viewportHeight = this.page.viewportSize()?.height ?? 900;
+    const hasSummaryCards = await this.page
+      .getByTestId('month-summary-cards')
+      .count();
+    if (viewportHeight < 900 && hasSummaryCards > 0) {
+      await this.page
+        .getByTestId('month-summary-strip')
+        .waitFor({ state: 'visible' });
+      await this.budgetTableScrollContainer.evaluate(el => {
+        el.scrollTop = el.scrollHeight;
+      });
+    }
   }
 
   /**

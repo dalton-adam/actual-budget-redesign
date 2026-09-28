@@ -6,6 +6,11 @@ import type { CategoryGroupEntity } from '@actual-app/core/types/models';
 
 import { Row } from '#components/table';
 
+import {
+  ENVELOPE_GROUP_ROW_HEIGHT,
+  envelopeGroupRowStyle,
+  useIsEnvelopeTable,
+} from './envelopeTable';
 import { RenderMonths } from './RenderMonths';
 import { SidebarGroup } from './SidebarGroup';
 
@@ -36,12 +41,15 @@ export function IncomeGroup({
   onShowNewCategory,
 }: IncomeGroupProps) {
   const { IncomeGroupComponent: MonthComponent } = useBudgetComponents();
+  const isEnvelopeTable = useIsEnvelopeTable();
   return (
     <Row
       collapsed
+      height={isEnvelopeTable ? ENVELOPE_GROUP_ROW_HEIGHT : undefined}
       style={{
         fontWeight: 600,
         backgroundColor: theme.budgetHeaderCurrentMonth, //use budget color
+        ...(isEnvelopeTable && envelopeGroupRowStyle),
       }}
     >
       <SidebarGroup
@@ -58,7 +66,11 @@ export function IncomeGroup({
         onToggleCollapse={onToggleCollapse}
         onShowNewCategory={onShowNewCategory}
       />
-      <RenderMonths>
+      <RenderMonths
+        style={
+          isEnvelopeTable ? { borderLeftColor: theme.cardHairline } : undefined
+        }
+      >
         {({ month }) => <MonthComponent month={month} group={group} />}
       </RenderMonths>
     </Row>

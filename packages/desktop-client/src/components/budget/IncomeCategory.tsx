@@ -2,6 +2,7 @@
 import React from 'react';
 import type { ComponentProps } from 'react';
 
+import { theme } from '@actual-app/components/theme';
 import type { CategoryEntity } from '@actual-app/core/types/models';
 
 import { DropHighlight, useDraggable, useDroppable } from '#components/sort';
@@ -9,6 +10,10 @@ import type { OnDragChangeCallback, OnDropCallback } from '#components/sort';
 import { Row } from '#components/table';
 import { useDragRef } from '#hooks/useDragRef';
 
+import {
+  ENVELOPE_CATEGORY_ROW_HEIGHT,
+  useIsEnvelopeTable,
+} from './envelopeTable';
 import { RenderMonths } from './RenderMonths';
 import { SidebarCategory } from './SidebarCategory';
 
@@ -56,13 +61,19 @@ export function IncomeCategory({
   });
 
   const { IncomeCategoryComponent: MonthComponent } = useBudgetComponents();
+  const isEnvelopeTable = useIsEnvelopeTable();
 
   return (
     <Row
       innerRef={dropRef}
       collapsed
+      height={isEnvelopeTable ? ENVELOPE_CATEGORY_ROW_HEIGHT : undefined}
       style={{
         opacity: cat.hidden ? 0.5 : undefined,
+        ...(isEnvelopeTable && {
+          backgroundColor: theme.cardBackground,
+          ':hover': { backgroundColor: theme.tableRowHover },
+        }),
       }}
     >
       <DropHighlight pos={dropPos} offset={{ top: 1 }} />
@@ -80,7 +91,11 @@ export function IncomeCategory({
         onSave={onSave}
         onDelete={onDelete}
       />
-      <RenderMonths>
+      <RenderMonths
+        style={
+          isEnvelopeTable ? { borderLeftColor: theme.cardHairline } : undefined
+        }
+      >
         {({ month }) => (
           <MonthComponent
             month={month}

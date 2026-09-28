@@ -16,6 +16,7 @@ import { View } from '@actual-app/components/view';
 
 import { useGlobalPref } from '#hooks/useGlobalPref';
 
+import { useIsEnvelopeTable } from './envelopeTable';
 import { RenderMonths } from './RenderMonths';
 import { getScrollbarWidth } from './util';
 
@@ -58,6 +59,7 @@ export const BudgetTotals = memo(function BudgetTotals({
   };
 
   const { BudgetTotalsComponent: MonthComponent } = useBudgetComponents();
+  const isEnvelopeTable = useIsEnvelopeTable();
 
   return (
     <View
@@ -71,11 +73,18 @@ export const BudgetTotals = memo(function BudgetTotals({
         marginRight: 5 + getScrollbarWidth(),
         borderRadius: '4px 4px 0 0',
         borderBottom: '1px solid ' + theme.tableBorder,
+        // Top of the envelope table card (design-decisions §4.1).
+        ...(isEnvelopeTable && {
+          backgroundColor: theme.cardBackground,
+          boxShadow: 'none',
+          border: '1px solid ' + theme.cardHairline,
+          borderRadius: '18px 18px 0 0',
+        }),
         '& .hover-visible': {
           opacity: 0,
           transition: 'opacity .25s',
         },
-        '&:hover .hover-visible': {
+        '&:hover .hover-visible, &:focus-within .hover-visible': {
           opacity: 1,
         },
       }}
@@ -92,6 +101,14 @@ export const BudgetTotals = memo(function BudgetTotals({
           alignItems: 'center',
           userSelect: 'none',
           WebkitUserSelect: 'none',
+          ...(isEnvelopeTable && {
+            color: theme.pageTextFaint,
+            fontSize: 11,
+            fontWeight: 650,
+            textTransform: 'uppercase',
+            letterSpacing: '0.07em',
+            paddingLeft: 10,
+          }),
         }}
       >
         <Button
@@ -141,7 +158,11 @@ export const BudgetTotals = memo(function BudgetTotals({
           <SvgDotsHorizontalTriple
             width={15}
             height={15}
-            style={{ color: theme.tableHeaderText }}
+            style={{
+              color: isEnvelopeTable
+                ? theme.pageTextSecondary
+                : theme.tableHeaderText,
+            }}
           />
         </Button>
 
@@ -179,7 +200,11 @@ export const BudgetTotals = memo(function BudgetTotals({
           />
         </Popover>
       </View>
-      <RenderMonths>
+      <RenderMonths
+        style={
+          isEnvelopeTable ? { borderLeftColor: theme.cardHairline } : undefined
+        }
+      >
         <MonthComponent />
       </RenderMonths>
     </View>
