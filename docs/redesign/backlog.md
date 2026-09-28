@@ -6,382 +6,73 @@ It does not replace the design specification or authorize a new design direction
 
 ## Current handoff and ownership
 
-- DISC-01 and DISC-02: documented in [Stage 0](stage-0.md) and the
-  [behavior inventory](behavior-inventory.md). Baseline has an explicit wider
-  Reports coverage gap: **58 passed, 1 failed, 15 skipped**, not 73 passes.
-- DESIGN-01 and DESIGN-02: **done September 27, 2026.** Owner decisions are in
-  the [prototype README](prototype/README.md); the
-  [accounts review](accounts-review/README.md) covers the register.
-- Current choices: Layout A, summary cards, Inter, all three built-in themes,
-  44px rows, one month at a time, collapsible accounts pane, Budget-only
-  details panel open by default with device-local open state. Concept B and
-  Concept C's Budget header are reference material, not tasks to build.
-- DESIGN-03: **done September 27, 2026** —
-  [design-decisions.md](design-decisions.md). Implementation tasks are released
-  in dependency order; items marked "Shown" in its §11 are confirmed with the
-  owner before the task that needs them starts.
-- UI-01: **done September 27, 2026**, merged into `redesign/main` with owner
-  approval. Scope grew, with owner approval, to cover the fallback layer:
-  `L/themes/fallback.css`, the component-library `package.json` export, and
-  `packages/desktop-client/src/style/theme.tsx` plus an adjacent test. Results
-  and the accepted light-theme contrast shortfalls are in design-decisions §8 "As
-  implemented". Checks: typecheck pass; theme-related UNIT 256/256; E2E(settings)
-  2/2; VISUAL in light, dark, midnight and a custom theme at 1440×900 and
-  1000×700. Rebased onto `redesign/main` after the prototype lint fixes and
-  UI-03; typecheck, lint and theme UNIT rerun after the rebase.
-- UI-03: **done September 27, 2026**, merged into `redesign/main`. New files
-  only: `C/budget/categoryPresentation.ts` and
-  `C/budget/categoryPresentation.test.ts` — accent index (§7.3), progress bar
-  (§7.1), pace chart data and summary (§7.2, the "Shown" default in §11 item 2,
-  with the owner's past-month summary change) and summary stacked bar (§7.4).
-  Helpers take amounts and transactions the app already provides and return
-  numbers and summary kinds; wording, formatting and theme roles are left to
-  the components that use them. Nothing calls them yet. Checks: typecheck
-  pass; lint pass; UNIT `src/components/budget/categoryPresentation.test.ts`
-  28/28.
-- UI-02: **done September 27, 2026**, merged into `redesign/main` with owner
-  approval. Existing Button variants are
-  unchanged; the new pieces are opt-in. `L/Button.tsx` gains `control`, `tab`
-  and `tabSelected` variants (keyboard focus ring in `selectionBorder`,
-  disabled dimmed by opacity so it always reads quieter than enabled, colour
-  transitions only without reduced motion). `L/styles.ts` gains `focusRing`
-  and `surfaceCard`. New files: `L/SurfaceCard.tsx`, `L/StatusPill.tsx`
-  (`StatusPill` and `StatusPillButton`, which requires a full-sentence
-  accessible name), `L/ProgressBar.tsx` (clamped; decorative unless labelled),
-  `L/CategoryTile.tsx` (first grapheme, accent index 1–10 or neutral,
-  `aria-hidden`), `L/RedesignPrimitives.stories.tsx` (state preview) and
-  `L/RedesignPrimitives.web.test.tsx`; new export entries in the
-  component-library `package.json` so the app can import them (outside the
-  card's listed files, same as UI-01). Checks: typecheck pass; lint pass;
-  component UNIT 42/42 (23 new). VISUAL in Storybook at 1000×700 and
-  1440×900: light, dark, midnight, and a simulated custom theme
-  (`fallback.css` plus a custom palette over light) — all surfaces follow the
-  palette; Tab reaches each enabled control with a visible ring and skips
-  disabled ones; the existing `normal` Button computes the same as before.
-  Storybook needed a local, uncommitted change to start on macOS (`src/Themes`
-  and `src/themes` clash on a case-insensitive disk). **Resolved with the owner:** in light,
-  the app's `pageTextSubdued` (`#9fb3c8`) reads at only 1.81:1, so a new
-  `pageTextSecondary` role (design-decisions §8, "Added in UI-02") gives the
-  new controls `#62626e` in light (5.07:1 on the page, 4.58:1 on the nav
-  track) and matches `pageTextSubdued` in dark, midnight and custom themes.
-  Rerun after the role: typecheck, lint, component UNIT 42/42, theme UNIT
-  `src/style/` 215/215, light VISUAL.
-- NAV-01: **done September 27, 2026**, merged into `redesign/main` with
-  owner approval. Scope grew, with owner approval, to
-  `C/Titlebar.tsx` (the tabs render in its left slot; right-side buttons
-  unchanged) and to building the Accounts ▾ menu here rather than in NAV-02.
-  Top bar: pill tabs **Budget, Accounts ▾, Reports, Schedules, More ▾**
-  (`C/navigation/`). Accounts ▾ lists All / On / Off budget with totals, each
-  account with sync-status dot and balance, Closed accounts, Add account, and
-  the same right-click menu (Rename, Close/Reopen). More ▾ lists Payees,
-  Rules, Bank Sync (same condition as before), Tags, Settings. Below 900px the
-  tabs and sidebar give way to a drawer with every destination plus the budget
-  file menu (Rename, Settings, Load backup, Switch file). Menus are
-  disclosure navigation (buttons + links), so links keep `role=link` and
-  `aria-current`; the selected menu tab also carries `aria-current`. Removed
-  `sidebar/{PrimaryButtons,Item}.tsx`; the sidebar keeps the budget name,
-  account list and Add account until NAV-02. The tab track keeps
-  `data-testid="sidebar-primary-buttons"` so the tour's "Getting around"
-  step still anchors. Checks: typecheck pass; lint pass; UNIT
-  `src/components/navigation src/components/sidebar` 6/6 (3 new);
-  E2E(help-menu, accounts, settings) 16/16; also E2E(payees, rules,
-  schedules, transactions, budget, bank-sync, reports) 52/52 (default
-  config against the 3018 preview). VISUAL on Try the demo: dark, light and
-  midnight at 1000×700; drawer at 800×700; route matrix (every tab, More and
-  Accounts destination lands on the right path and marks the right tab
-  current; browser Back restores Budget); keyboard: Enter opens a menu, Tab
-  reaches each link with a visible ring, Escape closes and returns focus;
-  Escape while renaming cancels only the rename. Reduced motion checked in Playwright against the 3018 preview with `reducedMotion: 'reduce'`: drawer animation `none`, tab and menu-tab transitions `none`; with motion allowed the drawer runs `nav-drawer-in` and tabs fade over 0.15s. `generate:i18n` run: all seven new strings are in `locale/en.json` (git-ignored, so nothing to stage). Custom theme at 1440×900 and 800×700: installed the Alucard catalog theme, with and without a pasted warm palette on top; the tab track, selected tab, unselected text, both menus and the drawer all resolve from the custom palette through the UI-01 fallbacks (`navTrack` → `cardBackground`, `navActive` → 12% `pageText`, `pageTextSecondary` → `pageTextSubdued`). A pasted override on a built-in theme keeps that theme's tuned tab colors, as UI-01 intends. Tour: with owner approval, `C/tour/steps.tsx`'s "Getting around" step now reads "The tabs at the top take you to your budget, accounts, reports, and scheduled transactions…" and points down at the tab bar (placement `bottom`); checked by running the tour to step 6 of 8 at 1000×700. Follow-ups: the drawer's budget file menu repeats `sidebar/BudgetName.tsx`'s items until NAV-02 moves the budget switcher to the top bar; below 900px the tour's navigation and Add account targets are hidden (tabs and sidebar give way to the drawer), which NAV-02 should revisit with the accounts pane.
-- NAV-02: **done September 27, 2026** on `redesign/nav-02`. The old
-  floating/resizable sidebar is now the approved Accounts pane on every
-  desktop page at 900px and wider. It defaults open at 1280px and wider and
-  collapsed below, remembers an explicit choice in device-local browser
-  storage (no core preference or sync change), and respects reduced motion.
-  Open mode retains All / On / Off budget balances, account drag ordering,
-  closed accounts, Add account, account tooltips and right-click Rename /
-  Close / Reopen actions. Collapsed mode is a 56px rail with accessible
-  account initials, connection-status dots, Add account and an expand button;
-  below 900px the NAV-01 drawer remains authoritative. The existing budget
-  name/actions moved to the title bar beside the preserved privacy, server,
-  user and help controls; the compact drawer keeps its budget file menu.
-  Renaming from the collapsed rail expands the pane and opens the inline
-  editor (now labelled "Account name"). UNIT `src/components/sidebar
-src/components/navigation src/components/settings/Themes.test.tsx` passed
-  15/15. CHECK passed: root typecheck and lint (after removing an unused `t`
-  in `C/Titlebar.tsx` and renaming the JSX-free test to
-  `SidebarProvider.test.ts`). Browser build passed. E2E(accounts, budget,
-  settings, nav-02) passed 26/26 against the rebuilt 3018 preview, including
-  the 1279/1280 default, reload persistence, rail rename and proof that All
-  accounts navigation leaves envelope totals unchanged. Rail initials were
-  re-checked at 1100×720 after centring them in their chips. VISUAL inspected light 1440×900, midnight 1000×700,
-  dark 800×700 drawer, dark privacy mode and a simulated warm custom palette;
-  account values redact through the existing `CellValue` privacy path and the
-  No server / Help / budget controls remain reachable.
-- NAV-02 follow-up (E2E page model): **done September 27, 2026** on
-  `redesign/fix-accounts-e2e-1000`. The WIDE run failed
-  `accounts.test.ts:242` at 1000px on `redesign/main` because the collapsed
-  rail has no All / On / Off budget links. `Navigation.goToAccountPage` in
-  `packages/desktop-client/e2e/page-models/navigation.ts` now clicks the
-  accounts-pane link when it is visible and otherwise goes through the
-  top-bar Accounts ▾ menu, so it never changes the pane state. The app and
-  the NAV-02 default are unchanged. Browser build passed. WIDE against a
-  preview of this branch's build: 58 passed, 1 failed (the known Reports
-  baseline `reports.test.ts:33` at 1440), 15 did not run. Other
-  `goToAccountPage` callers (rules, schedules, transactions, onboarding,
-  nav-02) at both widths: 62/62 passed. `transactions.test.ts:247`
-  ("creates a transfer test transaction") had also failed at 1000px, because
-  it reads `sidebar-all-accounts-balance` / `sidebar-on-budget-balance`,
-  which only render when the pane is open. It now calls the new
-  `Navigation.expandAccountsPane()` before entering the transaction. That
-  helper clicks "Expand accounts" only when the pane is collapsed, so runs
-  at 1280px and wider (including the default VRT viewport) are unaffected.
-  CHECK passed (root typecheck and lint).
-- BUD-01: **done September 27, 2026**, merged into `redesign/main` with
-  owner approval. Envelope budgets get the design-decisions §3
-  header: "Budget" eyebrow (plus "· Past month" / "· Future month"), the
-  month as an `h1`, a month stepper (‹ Sep 2026 ›, disabled at the budget
-  bounds), **Today** away from the current month, the month notes button and
-  the month menu ⋯ (`BudgetMonthMenu` items and undo messages unchanged, now
-  shared through `BudgetMonthMenuButton`). Below it, three cards for the
-  focused month: **Ready to Assign** (positive colour and glow with "`X`
-  available funds"; zero neutral with "All assigned" and "Every dollar has a
-  job"; negative with "Overassigned", "More assigned than you have" and the
-  negative glow), **Assigned** ("across N categories") and **Activity** with
-  the §7.4 stacked bar from UI-03's `getSpendingBarSegments`. Pressing or
-  right-clicking the Ready to Assign card opens one popover: the existing
-  breakdown (Available funds with its Income / From Last Month tooltip,
-  Overspent in _previous month_, Budgeted, For next month, then Ready to
-  Assign) followed by the existing To Budget menu and its Move / Hold / Cover
-  steps, extracted unchanged from `ToBudget` as `ToBudgetPopover`. Once the
-  table scrolls past 40px on windows shorter than 900px the cards give way to
-  the 46px strip, returning at the top. Every value is an existing envelope
-  spreadsheet cell; no total or formula was added. Owner decisions (September 27, 2026): tracking budgets keep the old month
-  picker and per-month summaries; with more than one envelope month visible
-  (until BUD-03) the cards describe the first month and the per-month column
-  summaries stay; the stepper replaces the 12-month strip (←, → and 0
-  shortcuts unchanged) and its month label opens a **month picker** (a year
-  of months with previous/next year, months outside the budget disabled);
-  "N categories" counts **all** expense categories, hidden included, because
-  the Assigned total includes their money; the breakdown keeps "Budgeted"
-  until TERM-01; zero uses neutral `pageText` rather than the green-leaning
-  `toBudgetZero`; the details-panel toggle is added with DETAIL-01. The card
-  subscribes to the breakdown and menu cells while it is shown, because the
-  spreadsheet cache only refreshes subscribed cells and the popover mounts on
-  demand. **Scope grew beyond the card, with owner approval (September 27, 2026):**
-  `C/budget/DynamicBudgetTable.tsx` (passes type and scroll state to the
-  header), `C/budget/BudgetTable.tsx` (hides the per-month summary row for a
-  single envelope month), new `C/budget/BudgetMonthToolbar.tsx`, a
-  `#components/budget/categoryPresentation` import alias in
-  `packages/desktop-client/package.json`, and E2E updates:
-  `e2e/page-models/budget-page.ts` (Ready to Assign locator and breakdown
-  helper; next-month button by role or title), `e2e/budget.test.ts` (summary
-  test opens the breakdown; same four labels asserted plus the total) and new
-  `e2e/bud-01.test.ts`. Checks: typecheck pass; lint pass; UNIT
-  `src/components/budget` 47/47. E2E(bud-01, budget) 12/12 (after adding the month picker); E2E(accounts,
-  settings, nav-02, help-menu, transactions, schedules) 37/37. WIDE: 57
-  passed, 2 failed, 15 not run — the known Reports failure (1440) and
-  `accounts.test.ts:242` at 1000px, which failed the same way on
-  `redesign/main` without BUD-01 (the NAV-02 collapsed pane hid the "On
-  budget" link the page model clicked; fixed by the NAV-02 follow-up above,
-  not a BUD-01 regression). WIDE rerun on the merged `redesign/main`: 58 passed, 1 failed (the known
-  Reports baseline at 1440), 15 did not run — back to baseline. VISUAL on Try the demo: dark 1440×900 in all three Ready to
-  Assign states (zero, positive after "Reset next month's buffer", negative
-  after assigning 9,000 to Food; the breakdown sums to the card each time);
-  light 1000×700 including the compact strip and its popover; midnight
-  1440×900 with privacy mode (amounts redact, hover reveals as elsewhere);
-  midnight 800×700 drawer layout; keyboard: Enter on the card opens the
-  popover with focus in the menu, Escape closes and returns focus to the
-  card with a visible ring. **Not yet checked:** a custom theme, reduced
-  motion (no new animation added), and the per-month summaries with
-  several envelope months visible.
-- TERM-01: **done September 28, 2026**, merged into `redesign/main` with owner
-  approval (branch `redesign/term-01`). Design-decisions §9 wording applied as visible text only; the owner
-  approved the "Shown" rows and asked to match YNAB, which added the Cover /
-  Transfer picker entry, the envelope goal tooltip and two automation help
-  sentences (listed under §9 "As implemented"). No identifier, binding,
-  preference, API or `'to-budget'` id changed. Files:
-  `C/budget/{BalanceWithCarryover.tsx,util.ts}`,
-  `C/budget/envelope/EnvelopeBudgetComponents.tsx`,
-  `C/budget/envelope/budgetsummary/{ReadyToAssignBreakdown,ToBudgetAmount,TotalsList}.tsx`,
-  `C/budget/goals/displayTemplateMeta.ts`,
-  `C/budget/goals/editor/CleanupAutomation.tsx`,
-  `C/mobile/budget/{BalanceCell,BudgetCell,BudgetPage,BudgetTable,SpentCell}.tsx`,
-  `C/modals/{EnvelopeBalanceMenuModal,EnvelopeBudgetMenuModal,EnvelopeBudgetSummaryModal}.tsx`,
-  `C/modals/BudgetAutomationsModal/BudgetAutomationsBody.tsx`, and E2E
-  `e2e/budget.test.ts` (breakdown asserts "Assigned"; test title kept so
-  snapshot names don't change) and `e2e/page-models/mobile-budget-page.ts`
-  (envelope and tracking header names). Locale output is gitignored; nothing
-  to stage. Checks: typecheck pass; lint pass; UNIT `src/components/budget`,
-  `src/components/mobile`, `src/components/modals` 194/194;
-  `generate:i18n` ran; E2E(budget, budget.mobile, bud-01,
-  budget-automations.mobile) 51/51. VISUAL on the local test budget
-  (dark): desktop envelope 1440×900 (headers, breakdown, transfer picker
-  shows "Ready to Assign"), mobile envelope 375×812 (Overassigned, headers,
-  "You have assigned more than your available funds"), then switched to
-  tracking: desktop and mobile keep Budgeted / Spent / Balance; switched
-  back to envelope. **Not yet checked:** WIDE, light/midnight themes, the
-  multi-month `ToBudgetAmount` label ("Ready to Assign:" / "Overassigned:")
-  on screen, and Linux VRT snapshots (not regenerated).
-- BUD-02: **done September 28, 2026**, merged into `redesign/main` with owner
-  approval (branch `redesign/bud-02`). Envelope budgets get the design-decisions §4 table; tracking
-  budgets are unchanged (owner decision, September 28, 2026: gate on
-  `budgetType`, as BUD-01 did). 44px category rows and 40px group rows set
-  through `Row`'s `height` (shared `ROW_HEIGHT` untouched; the group drop
-  target height uses the new heights); the table is a card with uppercase
-  column headers over the existing totals; tinted group rows; row hover
-  tint; the editing row gets `selectionBackground` and the input a 1.5px
-  `selectionBorder`. Name cell: UI-02 `CategoryTile` (accent from UI-03's
-  `getCategoryAccentIndex`, neutral for income) outside the `category-name`
-  element, a "Hidden" tag for hidden categories, and row tools that also
-  appear on `:focus-within`. Activity: the existing amount (and schedule
-  indicator) plus the §7.1 percentage ("Over" when overspent; hidden in
-  privacy mode and when more than one month is shown) and progress bar.
-  Available: a `StatusPill` inside the existing balance-menu button; tone
-  maps `makeBalanceAmountStyle`'s colour (`envelope/availableStatus.ts`),
-  target icon for templates/goals, carryover arrow inside the pill with a
-  tooltip naming the month, and a full-sentence accessible name; the pill's
-  text is still only the amount. Several months visible (until BUD-03): the
-  new cells render per month column (owner decision). **Scope grew, with
-  owner approval (September 28, 2026)** to `C/budget/{SidebarCategory,
-SidebarGroup,BudgetTotals,IncomeCategory,IncomeGroup}.tsx`; new files
-  `C/budget/envelopeTable.ts`,
-  `C/budget/envelope/{CategoryActivityContent,EnvelopeAvailableButton}.tsx`,
-  `C/budget/envelope/availableStatus{,.test}.ts`; a
-  `#components/budget/envelopeTable` import alias in
-  `packages/desktop-client/package.json`; and E2E page model
-  `e2e/page-models/budget-page.ts`: `scrollToBottom` now waits for BUD-01's
-  compact strip on windows shorter than 900px. Without it "scroll position
-  is restored" failed at 1000px in every full `budget.test.ts` run (saved
-  1384, restored 1299): the strip lowers the maximum scroll by 85px and the
-  heavier rows now render the swap after the click. The same file passed on
-  a `redesign/main` build (8/8), and still passes there with the page-model
-  change (16/16). Checks: typecheck pass; lint pass; UNIT
-  `src/components/budget` 53/53 (6 new); `generate:i18n` ran (new strings
-  in the gitignored `locale/en.json`); E2E(budget, bud-01, accounts,
-  settings) 26/26; `budget.test.ts` with `--repeat-each=3` at both WIDE
-  sizes 48/48; WIDE 58 passed, 1 failed (known Reports baseline at 1440), 15
-  did not run. VISUAL on the local test budget: dark 1440×900 and 1000×700,
-  light and midnight 1000×700, compact strip with the table; keyboard:
-  click to edit, Enter moves down, Shift+Tab moves up, Enter on a focused
-  pill opens the balance menu (Cover / Rollover overspending); Activity
-  click still opens the filtered transactions; switched to tracking (32px
-  rows, no tiles/pills/bars, Budgeted / Spent / Balance) and back.
-  **Not done / not yet checked:** the §4.2 goal/template caption under the
-  name (needs a "% saved" formula not in §7; left out); Escape in the
-  Assigned input resets the value but leaves the cell open (existing shared
-  `Input` behaviour, not changed); a custom theme; reduced motion on screen;
-  several envelope months visible; long labels (BUD-03); scrolling
-  performance with the extra per-row cell subscriptions; Linux VRT
-  snapshots (not regenerated). The existing row chevron buttons still have
-  no accessible name (upstream).
-- BUD-03: **done September 28, 2026**, merged into `redesign/main` with owner
-  approval (branch `redesign/bud-03`). One month only
-  (design-decisions §6): the months-shown control is no longer rendered in
-  `C/Titlebar.tsx` and `C/budget/index.tsx` passes one month; the `maxMonths`
-  global preference is not read, written or migrated. Owner decision
-  (September 28, 2026, "YNAB type behavior"): this applies to tracking
-  budgets too, which keep their old month picker, per-month summary and
-  fixed Category width. Envelope budgets fill the page (§4.1): the Category
-  column flexes (minimum 160 / 140 / 120px) and the month columns are fixed
-  by window width (≥1280: Assigned 120, Activity 230, Available 120;
-  900–1279: 112 / 180 / 104; <900: 112 / hidden / 104). Two widths differ from §4.1, which allows tuning for a real overflow: Assigned is 112px below 1280px (§4.1: 100 / 84px) because the month notes button shares that cell and 84px clipped "1,145.62" at 820px; Available is 104px below 900px (§4.1: 96px) because 96px clipped "12,366.00". The Assigned input is held to its cell (the default 156px input spilled into the Category column once columns were fixed). With Activity hidden, its
-  header total, group total and the row's filtered-transactions link are
-  not shown at that width. Long names end in an ellipsis inside the 44px
-  row. The Category width toggle (Expand / Fully Expand) is hidden for
-  envelope budgets (owner decision; `categoryExpandedState` untouched) and
-  the column ⋯ menu now sits beside the "Category" label (§4.2). No
-  handler, binding, menu item or preference changed. Scope grew, with owner
-  approval, to `C/budget/{SidebarCategory,SidebarGroup,BudgetTotals,
-IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx`,
-  `C/budget/envelopeTable.ts` and new `C/budget/envelopeTable.test.ts`;
-  `ExpenseCategory.tsx`, `ExpenseGroup.tsx` and `BudgetTable.tsx` needed no
-  change. `MonthCountSelector.tsx` and `BudgetMonthCountContext.tsx` are
-  left in place (unused by the UI) so reverting is a small UI change.
-  Checks: typecheck pass; lint pass; UNIT `src/components/budget` 56/56 (3
-  new); E2E(budget, bud-01, accounts, settings) 26/26; WIDE 58 passed, 1
-  failed (known Reports baseline at 1440), 15 did not run. VISUAL on the
-  local test budget (dark): 1440×900, 1000×700 (compact strip too) and
-  820×700 with a temporarily renamed 84-character category (fits at 1440,
-  ellipsis at 1000 and 820; renamed back afterwards); row tools, group tools
-  and the column menu (Toggle hidden categories, Expand all, Collapse all)
-  still appear and work; switched to tracking (one month, old layout) and
-  back. Follow-up pass (Playwright on the preview, fresh demo budgets): light,
-  dark and midnight at 1440×900, 1000×700 and 820×700 with a 12,345.67
-  Assigned amount, at rest and with the row hovered (budget-menu chevron
-  shown) — no Assigned or Available cell clips after the two fixes above;
-  privacy mode redacts every amount and the percentage; the column menu
-  opens with Enter from the keyboard and lists its three items; reduced
-  motion shows the same layout (no animation added). Rerun after the fixes:
-  UNIT 56/56, typecheck, lint, E2E(budget, bud-01, accounts, settings)
-  26/26, WIDE 58 / 1 known Reports failure / 15 did not run.
-  **Not yet checked:** a custom theme; Linux VRT snapshots (not
-  regenerated; Docker is available). **Found, not BUD-03:** category-name
-  row tools (menu chevron) never take keyboard focus because they are
-  `display: none` until hover, so the BUD-02 `:focus-within` rule cannot
-  reveal them; Tab goes month notes → budget menu → Available pill. The
-  category menu is still reachable by right-click. DETAIL-01's dedicated
-  name opener is the natural place to fix this.
-- DETAIL-01: **done September 28, 2026**, merged into `redesign/main` with
-  owner approval (branch `redesign/detail-01`). The owner approved the
-  overlay, fallback, default-subject, column-width and scope decisions below
-  (September 28, 2026). Panel frame,
-  opener, closing and focus (design-decisions §5); the details themselves
-  (hero, stat tiles, goal box, notes, transactions, the panel's own month
-  stepper) are DETAIL-02 to DETAIL-04, so the panel shows only its header
-  for now: tile, name (wraps), group (plus "Hidden") · month, and ×.
-  Envelope budgets only; tracking budgets have no panel, opener or toggle.
-  **Open state:** device-local browser storage
-  (`actual-budget-details-panel-open`, like the accounts pane); open by
-  default; no synced or core preference. **Layout:** 360px from 1280px,
-  320px below, pushing the header and table. Below 900px, _or_ when the
-  table would not keep its minimum width beside the panel (for example
-  1000px with the accounts pane expanded), it becomes an overlay with the
-  `scrim` (react-aria modal: focus stays inside, Escape or a scrim click
-  closes). **Owner decision:** the overlay starts closed and opening
-  or closing it never changes the stored choice, so a narrow window is not
-  covered on every visit. **Subject:** the first visible expense category
-  until one is chosen; a deleted choice falls back the same way; income
-  categories have no opener. **Opener:** the tile and name are one button
-  ("Show details for _name_"); click or Enter opens; right-click still opens
-  the category menu (Rename / Hide / Delete); the selected row gets the
-  selection tint and a 3px `selectionBorder` bar. Because the name now takes
-  focus, `:focus-within` reveals the row tools, which fixes the BUD-03
-  finding: Tab goes name → category menu ⌄ → notes → Assigned.
-  **Closing:** × and Escape (inside the panel) close it and return focus to
-  the selected category's name without scrolling; the table's scroll
-  position is put back. The header toggle (after the month menu,
-  `aria-pressed`, "Show / Hide category details") reopens it. **Columns
-  with the panel pushed** (§4.1 rows): 900–1279px: Category ≥120, Assigned
-  112, Activity 120, Available 104; ≥1280px with the accounts pane open:
-  150 / 112 / 170 / 108. Assigned and Available keep BUD-03's anti-clipping
-  minimums instead of §4.1's 84–104 / 92–108. The Activity percentage is
-  hidden at those widths. **Scope grew beyond the card, with owner
-  approval:** `C/budget/{SidebarCategory,envelopeTable}.ts(x)` (opener;
-  panel-aware widths), `C/budget/envelope/EnvelopeBudgetComponents.tsx`
-  (percentage visibility), `C/budget/envelope/budgetsummary/EnvelopeBudgetPageHeader.tsx`
-  (toggle), `C/budget/envelopeTable.test.ts`. New files:
-  `C/budget/CategoryDetails{Context,Panel,Header,Toggle}.tsx`,
-  `C/budget/CategoryDetailsContext.test.ts`, `e2e/detail-01.test.ts`.
-  `BudgetTable.tsx` and `index.tsx` unchanged; no handler, binding, menu item
-  or preference changed. Checks: typecheck pass; lint pass; UNIT
-  `src/components/budget` 69/69 (13 new: layout, default/fallback subject,
-  storage, toggle, focus return, overlay not stored); `generate:i18n` ran
-  (strings in the gitignored `locale/en.json`); E2E(detail-01) 6/6;
-  E2E(budget, bud-01, accounts, settings, detail-01) 32/32; WIDE 58 passed, 1 failed (known Reports baseline at 1440), 15 did not run.
-  VISUAL (Playwright against the 3018 preview; the in-app browser pane stalls
-  at "Initializing the connection to the local database" for both 3017 and
-  3018): dark 1440×900 with accounts pane open (narrow Activity, no
-  percentage) and collapsed; keyboard focus ring on the name with the row
-  tools shown; light 1000×700 open and closed; a 71-character category name
-  (row ellipsis, panel heading wraps); midnight 1000×700 pushed, then with
-  the accounts pane expanded (falls back to the overlay); dark 820×700
-  overlay. **Not yet checked:** a custom theme; reduced motion on screen (no
-  animation added); privacy mode (the panel shows no amounts yet); Linux VRT
-  snapshots (not regenerated — `budget.test.ts` screenshots at the default
-  viewport now include the open panel, so they will need regenerating in
-  Docker).
-- All other application implementation below is pending. This document does not
-  claim Claude's prototype is production-ready.
+Full completion reports (scope changes, checks with counts, evidence, gaps)
+are in [task-reports.md](task-reports.md). This section is the plan §16 status
+ledger: keep it short and update it when a task changes state.
+
+Current choices: Layout A, summary cards, Inter, all three built-in themes,
+44px rows, one month at a time, collapsible accounts pane, Budget-only details
+panel open by default with device-local open state. Concept B and Concept C's
+Budget header are reference material, not tasks to build.
+
+### Status ledger
+
+| ID                   | State       | Merged                   | Open gaps carried forward                                                                                      |
+| -------------------- | ----------- | ------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| DISC-01, DISC-02     | verified    | Stage 0 docs             | Reports baseline: 58 passed, 1 failed, 15 skipped. No performance baseline (→ QA-00).                          |
+| DESIGN-01 – 03       | verified    | docs                     | design-decisions §11 items 1, 2, 5 still "Shown".                                                              |
+| UI-01                | verified    | `4b7b82ea6`              | Accepted light contrast shortfalls (design-decisions §8).                                                      |
+| UI-02                | verified    | `3dd3144a3`              | Storybook needs a local case-sensitivity workaround on macOS.                                                  |
+| UI-03                | verified    | `0e57f083c`, `0129f2c00` | —                                                                                                              |
+| NAV-01               | verified    | `7eea259f3`              | —                                                                                                              |
+| NAV-02 (+ e2e fix)   | verified    | `f02e5ff5e`, `ed654319e` | Collapsed-rail initials are ambiguous (→ BUD-04).                                                              |
+| BUD-01               | verified    | `03e9150c3`              | Custom theme (→ QA-00).                                                                                        |
+| TERM-01              | verified    | `f771c251d`              | Light/midnight wording pass; Linux VRT (→ QA-00).                                                              |
+| BUD-02               | verified    | `b732f170f`              | Goal caption left out (→ decision D-3); scroll performance, custom theme, Linux VRT (→ QA-00).                 |
+| BUD-03               | verified    | `6b53968b8`              | Custom theme, Linux VRT (→ QA-00).                                                                             |
+| DETAIL-01            | verified    | `5f238b120`              | Panel is open by default but shows only its header until DETAIL-02 (→ D-2). Custom theme, Linux VRT (→ QA-00). |
+| **DETAIL-02**        | **next**    | —                        | —                                                                                                              |
+| THEME-02             | ready       | —                        | Needs owner approval of the retuned values (D-4).                                                              |
+| QA-00                | ready       | —                        | —                                                                                                              |
+| ELEC-01              | not started | —                        | Needs an isolation review first (stage-0.md "Electron").                                                       |
+| BUD-04               | ready       | —                        | —                                                                                                              |
+| DETAIL-03, DETAIL-04 | not started | —                        | —                                                                                                              |
+| SYNC-01              | blocked     | —                        | Waiting on owner decision D-1.                                                                                 |
+| APP-01 – APP-06      | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                    |
+| QA-01, RELEASE-01    | not started | —                        | —                                                                                                              |
+
+States follow plan §16: not started, ready, in progress, review, verified,
+blocked. All application work not marked verified is pending; this document
+does not claim Claude's prototype is production-ready.
+
+### Order from here (mid-project review, September 28, 2026)
+
+1. **DETAIL-02**: the panel is open by default, so it should show content
+   before anything else lands.
+2. **THEME-02**: dark and midnight surfaces match across every page.
+3. **QA-00**: clear the checks carried forward above and record a
+   performance baseline.
+4. **BUD-04**: small Budget-page polish found in the review.
+5. **DETAIL-03**, then **DETAIL-04**.
+6. **ELEC-01** once its isolation review is written; before RELEASE-01 at the
+   latest.
+7. **SYNC-01** according to decision D-1.
+8. **APP-01** onward, then QA-01 and RELEASE-01.
+
+The review's reasoning is in plan §19.
+
+### Open owner decisions
+
+| ID  | Question                                                                                                                                      | Default until decided                                                                                                                                                   |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D-1 | How closely should this fork follow upstream Actual releases? (plan §19.2)                                                                    | Stay on v26.9.0; merge upstream once, deliberately, before RELEASE-01; review each upstream release's notes for security, data or bank-sync fixes worth taking earlier. |
+| D-2 | If DETAIL-02 is not merged soon, should the panel start closed until it has content?                                                          | Keep open by default; do DETAIL-02 next.                                                                                                                                |
+| D-3 | Goal/template caption under the category name (design-decisions §4.2): build it from goal values Actual already exposes, or drop it for good? | Left out, as BUD-02 shipped. The target icon in the Available pill stays.                                                                                               |
+| D-4 | THEME-02 changes the values of existing dark and midnight roles (plan §2 requires a reviewed decision).                                       | Proceed to a proposal with before/after screenshots; merge only after owner approval.                                                                                   |
+
+Mobile is **deferred** (plan §19.4): only the TERM-01 wording applies to the
+mobile envelope screens. Keep mobile E2E passing; don't restyle it.
+claim Claude's prototype is production-ready.
 
 ## Rules for every task
 
@@ -395,6 +86,14 @@ Paths below are relative to the repository root. `C/` abbreviates
 to rewrite the directory. Before a task starts, enumerate the exact existing files
 and proposed new files in its brief. New components/tests stay beside the related
 code. If the current code no longer matches the map, refresh the brief first.
+
+The allowlists in the task cards below were written before implementation and
+have been wrong for every task so far: each of NAV-01 through DETAIL-01 needed
+extra files approved partway through. Before a task starts, trace the change
+through the current source (which component renders the surface, which files
+hold its styles and tests, which E2E page models touch it) and write the brief's
+file list from that, not from the card. Treat the card's scope as a starting
+point and a ceiling on intent, not a verified list.
 
 Backend, financial calculations, data schemas, sync, authentication, bank
 connections, custom-theme parsing, and persisted preference schemas stay protected.
@@ -470,34 +169,39 @@ Each row supplies the task-specific scope, acceptance criteria, and checks.
 Dependencies match plan §14. CHECK applies to application tasks in addition to the
 checks named below. Existing application files are presentation-only scope.
 
-| ID / dependency               | Allowed scope                                                                                                                                         | Done when / verification                                                                                                                                                                                                                                                                                                         |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DISC-01 / none                | `docs/redesign/stage-0.md`, handbook; existing `scripts/redesign.mjs`                                                                                 | Version, remotes, isolation and runnable setup recorded. Delivered; verify setup instructions when environment changes.                                                                                                                                                                                                          |
-| DISC-02 / DISC-01             | Stage 0, `behavior-inventory.md`, `baseline/`, this backlog; `scripts/redesign-baseline.config.ts`                                                    | Code map, protected areas and accurate baseline counts recorded. Delivered with explicit Reports coverage gap; WIDE records skips separately.                                                                                                                                                                                    |
-| DESIGN-01 / DISC-02           | `docs/redesign/prototype/`, `accounts-review/`, design records                                                                                        | Claude-owned. Existing prototype demonstrates navigation/account access at both widths. Preserve latest owner choices; VISUAL and destination inventory review. No production code.                                                                                                                                              |
-| DESIGN-02 / DESIGN-01         | Same prototype and design records, coordinated with Claude                                                                                            | Demonstrate zero/overspent/carryover, long labels, panel open/closed, narrow fallback and multi-month; resolve density/reconciliation questions. VISUAL, owner walkthrough. No app code.                                                                                                                                         |
-| DESIGN-03 / DESIGN-02         | New `docs/redesign/design-decisions.md`; plan and backlog status                                                                                      | Record approved density, layouts, wording, theme fallback, presentation formulas and remaining exclusions with owner review evidence. Do not reopen settled choices. All implementation briefs reference this record.                                                                                                            |
-| UI-01 / DESIGN-03             | `L/themes/{light,dark,midnight}.css`, `L/theme.ts`; related theme tests                                                                               | New roles and values per design-decisions §8, with derived fallbacks; custom themes load; existing roles retain meaning. UNIT for affected themes, E2E(settings), VISUAL. Theme parser stays untouched.                                                                                                                          |
-| UI-02 / UI-01                 | `L/Button.tsx`, `L/styles.ts`; new card/pill/tile/progress presentation components and adjacent tests                                                 | Reusable controls expose hover/focus/disabled/selected states, tabular amounts and accessible names. Component UNIT, VISUAL including keyboard and reduced motion. Limit global impact and check existing screens.                                                                                                               |
-| UI-03 / DESIGN-03             | New presentation helper and adjacent test files under `C/budget/`                                                                                     | Stable accent from ID and progress/pace calculations exactly as design-decisions §7 cover zero, refunds, negative, carryover, overspending and empty months. UNIT with exact new test paths. Helpers never affect saved amounts or financial totals.                                                                             |
-| NAV-01 / UI-02                | `C/FinancesApp.tsx`, `C/sidebar/{Sidebar,PrimaryButtons,Item}.tsx`; new navigation presentation components                                            | Every existing primary/secondary route remains reachable, active state and browser history work, compact navigation works. E2E(help-menu, accounts, settings), VISUAL keyboard/route matrix.                                                                                                                                     |
-| NAV-02 / NAV-01               | `C/sidebar/{Accounts,Account,BudgetName}.tsx`; navigation components from NAV-01                                                                      | Collapsible accounts pane with device-local open state (design-decisions §2); account list, closed/add accounts, budget switching, privacy and connection status retained. Account access never filters envelope totals. E2E(accounts, settings), VISUAL and inventory check.                                                    |
-| BUD-01 / NAV-02               | `C/budget/{BudgetPageHeader,MonthPicker}.tsx`, `C/budget/envelope/budgetsummary/` presentation                                                        | Same focused-month values and full breakdown, current To Budget menu and month navigation preserved. E2E(budget), WIDE, VISUAL; compare fictional fixture totals before/after.                                                                                                                                                   |
-| TERM-01 / BUD-01              | Envelope budget presentation/menu strings; matching `C/mobile/budget/` strings; generated locale output                                               | Wording table in design-decisions §9 applied without identifier/field renames; tracking/account balance labels unchanged. Run `node .yarn/releases/yarn-4.17.1.cjs generate:i18n`, E2E(budget), manually inspect mobile envelope and tracking views. Enumerate locale files before staging.                                      |
-| BUD-02 / TERM-01, UI-03       | `C/budget/{BudgetTable,BudgetCategories,ExpenseCategory,ExpenseGroup}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx`; presentation components | Approved single table density, tiles, pills and progress retain inline edit, collapse, drag, notes and status meanings. E2E(budget), WIDE, VISUAL; keyboard edit and large category list check.                                                                                                                                  |
-| BUD-03 / BUD-02               | `C/budget/{DynamicBudgetTable,BudgetTable,ExpenseCategory,ExpenseGroup}.tsx`; envelope menu presentation                                              | Long labels fit at 44px rows (design-decisions §4); one month only: months-shown control hidden in `C/Titlebar.tsx` and `C/budget/index.tsx` passes one month, `maxMonths` pref untouched (§6); all inventory actions remain available. E2E(budget), WIDE, VISUAL at both widths; handler/binding diff review.                   |
-| DETAIL-01 / BUD-03            | New panel components under `C/budget/`; `C/budget/{DynamicBudgetTable,ExpenseCategory}.tsx` integration                                               | Budget-only default-open panel; device-local open state; dedicated opener preserves edit/right-click actions; close restores focus and scroll; narrow overlay works (design-decisions §5). UNIT for lifecycle/storage, E2E(budget), VISUAL. No synced preference changes.                                                        |
-| DETAIL-02 / DETAIL-01         | New panel components/tests; existing category/month query interfaces read-only                                                                        | Correct selected category/month values, notes and transaction list including splits/refunds; loading/error/empty and rapid switching never show stale details. UNIT, E2E(budget), manual fixture comparison. Reuse current query semantics; do not edit query engine.                                                            |
-| DETAIL-04 / DETAIL-02, UI-03  | Panel chart presentation and helper tests                                                                                                             | Pace chart matches hand-calculated fictional data; past/future/current month rules per design-decisions §7.2, privacy and reduced motion work. UNIT, E2E(budget), VISUAL with textual equivalent; no financial calculation changes.                                                                                              |
-| DETAIL-03 / DETAIL-02         | Panel actions; `C/NotesButton.tsx`, `C/modals/NotesModal.tsx` only if presentation integration requires it                                            | Links open existing transaction view and notes use existing save/cancel handlers. E2E(budget, transactions), UNIT for new interaction, privacy and keyboard checks.                                                                                                                                                              |
-| APP-01 / BUD-03               | `C/accounts/` header/control presentation, exact files named in brief                                                                                 | Account review design applied; search/filter/account actions and reconciliation access remain intact; no budget details panel. E2E(accounts, transactions), VISUAL.                                                                                                                                                              |
-| APP-02 / APP-01               | `C/transactions/` table/editor presentation, exact files named in brief                                                                               | Editing, split transactions, selection, scrolling, cleared/reconciled states and shortcuts preserved. E2E(transactions, accounts), affected UNIT, VISUAL on large fixture; no shared row-height changes without separate scoped review.                                                                                          |
-| APP-03 / UI-02, NAV-02        | `C/reports/` presentation; `e2e/reports.test.ts` under `packages/desktop-client/`                                                                     | Filters, saved layouts and charts unchanged. Resolve viewport expectation without hiding real widgets; run all Reports cases at both widths with zero unexplained skips. E2E(reports), WIDE, VISUAL; preserve old baseline record and add new results.                                                                           |
-| APP-04 / UI-02, NAV-02        | `C/schedules/{index,SchedulesTable,ScheduleEditForm}.tsx` presentation                                                                                | Schedule creation/edit/skip/post behavior unchanged. E2E(schedules), VISUAL; current handlers only.                                                                                                                                                                                                                              |
-| APP-05 / UI-02, NAV-02        | `C/payees/`, `C/rules/`, `C/tags/`, `C/settings/` presentation                                                                                        | Split into APP-05a payees, b rules, c tags, d settings; one exact file allowlist per change. E2E(payees), E2E(rules), tags UNIT, E2E(settings) respectively plus VISUAL. Do not alter rules evaluation, theme parsing or settings persistence.                                                                                   |
-| APP-06 / APP-01–05, DETAIL-03 | Named remaining presentation files from inventory, one surface per brief                                                                              | Dialog/menu/loading/error/empty-state gaps closed; no blanket directory restyle. Affected E2E file and UNIT, VISUAL with focus return/Escape checks. List each covered surface.                                                                                                                                                  |
-| QA-01 / all implementation    | New `docs/redesign/verification.md`; targeted UI regressions/tests only                                                                               | Full matrix covers screens, themes/custom theme, sizes, keyboard, privacy, tracking budgets and performance versus baseline. CHECK, root `node .yarn/releases/yarn-4.17.1.cjs test`, WIDE, desktop E2E files above; record native/mobile checks separately. Protected diff reviewed. Unresolved behavior failures block release. |
-| RELEASE-01 / QA-01            | New `docs/redesign/release.md`; existing build commands, no app replacement                                                                           | Record build revision, walkthrough, installation and rollback instructions. Run `node .yarn/releases/yarn-4.17.1.cjs build:browser`; native distribution requires separately scoped packaging review. Owner validates disposable copy before any installed-app replacement. No automatic production data migration.              |
+| ID / dependency               | Allowed scope                                                                                                                                                    | Done when / verification                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DISC-01 / none                | `docs/redesign/stage-0.md`, handbook; existing `scripts/redesign.mjs`                                                                                            | Version, remotes, isolation and runnable setup recorded. Delivered; verify setup instructions when environment changes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| DISC-02 / DISC-01             | Stage 0, `behavior-inventory.md`, `baseline/`, this backlog; `scripts/redesign-baseline.config.ts`                                                               | Code map, protected areas and accurate baseline counts recorded. Delivered with explicit Reports coverage gap; WIDE records skips separately.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| DESIGN-01 / DISC-02           | `docs/redesign/prototype/`, `accounts-review/`, design records                                                                                                   | Claude-owned. Existing prototype demonstrates navigation/account access at both widths. Preserve latest owner choices; VISUAL and destination inventory review. No production code.                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| DESIGN-02 / DESIGN-01         | Same prototype and design records, coordinated with Claude                                                                                                       | Demonstrate zero/overspent/carryover, long labels, panel open/closed, narrow fallback and multi-month; resolve density/reconciliation questions. VISUAL, owner walkthrough. No app code.                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| DESIGN-03 / DESIGN-02         | New `docs/redesign/design-decisions.md`; plan and backlog status                                                                                                 | Record approved density, layouts, wording, theme fallback, presentation formulas and remaining exclusions with owner review evidence. Do not reopen settled choices. All implementation briefs reference this record.                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| UI-01 / DESIGN-03             | `L/themes/{light,dark,midnight}.css`, `L/theme.ts`; related theme tests                                                                                          | New roles and values per design-decisions §8, with derived fallbacks; custom themes load; existing roles retain meaning. UNIT for affected themes, E2E(settings), VISUAL. Theme parser stays untouched.                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| UI-02 / UI-01                 | `L/Button.tsx`, `L/styles.ts`; new card/pill/tile/progress presentation components and adjacent tests                                                            | Reusable controls expose hover/focus/disabled/selected states, tabular amounts and accessible names. Component UNIT, VISUAL including keyboard and reduced motion. Limit global impact and check existing screens.                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| UI-03 / DESIGN-03             | New presentation helper and adjacent test files under `C/budget/`                                                                                                | Stable accent from ID and progress/pace calculations exactly as design-decisions §7 cover zero, refunds, negative, carryover, overspending and empty months. UNIT with exact new test paths. Helpers never affect saved amounts or financial totals.                                                                                                                                                                                                                                                                                                                                                                                                           |
+| NAV-01 / UI-02                | `C/FinancesApp.tsx`, `C/sidebar/{Sidebar,PrimaryButtons,Item}.tsx`; new navigation presentation components                                                       | Every existing primary/secondary route remains reachable, active state and browser history work, compact navigation works. E2E(help-menu, accounts, settings), VISUAL keyboard/route matrix.                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| NAV-02 / NAV-01               | `C/sidebar/{Accounts,Account,BudgetName}.tsx`; navigation components from NAV-01                                                                                 | Collapsible accounts pane with device-local open state (design-decisions §2); account list, closed/add accounts, budget switching, privacy and connection status retained. Account access never filters envelope totals. E2E(accounts, settings), VISUAL and inventory check.                                                                                                                                                                                                                                                                                                                                                                                  |
+| BUD-01 / NAV-02               | `C/budget/{BudgetPageHeader,MonthPicker}.tsx`, `C/budget/envelope/budgetsummary/` presentation                                                                   | Same focused-month values and full breakdown, current To Budget menu and month navigation preserved. E2E(budget), WIDE, VISUAL; compare fictional fixture totals before/after.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| TERM-01 / BUD-01              | Envelope budget presentation/menu strings; matching `C/mobile/budget/` strings; generated locale output                                                          | Wording table in design-decisions §9 applied without identifier/field renames; tracking/account balance labels unchanged. Run `node .yarn/releases/yarn-4.17.1.cjs generate:i18n`, E2E(budget), manually inspect mobile envelope and tracking views. Enumerate locale files before staging.                                                                                                                                                                                                                                                                                                                                                                    |
+| BUD-02 / TERM-01, UI-03       | `C/budget/{BudgetTable,BudgetCategories,ExpenseCategory,ExpenseGroup}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx`; presentation components            | Approved single table density, tiles, pills and progress retain inline edit, collapse, drag, notes and status meanings. E2E(budget), WIDE, VISUAL; keyboard edit and large category list check.                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| BUD-03 / BUD-02               | `C/budget/{DynamicBudgetTable,BudgetTable,ExpenseCategory,ExpenseGroup}.tsx`; envelope menu presentation                                                         | Long labels fit at 44px rows (design-decisions §4); one month only: months-shown control hidden in `C/Titlebar.tsx` and `C/budget/index.tsx` passes one month, `maxMonths` pref untouched (§6); all inventory actions remain available. E2E(budget), WIDE, VISUAL at both widths; handler/binding diff review.                                                                                                                                                                                                                                                                                                                                                 |
+| DETAIL-01 / BUD-03            | New panel components under `C/budget/`; `C/budget/{DynamicBudgetTable,ExpenseCategory}.tsx` integration                                                          | Budget-only default-open panel; device-local open state; dedicated opener preserves edit/right-click actions; close restores focus and scroll; narrow overlay works (design-decisions §5). UNIT for lifecycle/storage, E2E(budget), VISUAL. No synced preference changes.                                                                                                                                                                                                                                                                                                                                                                                      |
+| DETAIL-02 / DETAIL-01         | New panel components/tests; existing category/month query interfaces read-only                                                                                   | Correct selected category/month values, notes and transaction list including splits/refunds; loading/error/empty and rapid switching never show stale details. UNIT, E2E(budget), manual fixture comparison. Reuse current query semantics; do not edit query engine.                                                                                                                                                                                                                                                                                                                                                                                          |
+| DETAIL-04 / DETAIL-02, UI-03  | Panel chart presentation and helper tests                                                                                                                        | Pace chart matches hand-calculated fictional data; past/future/current month rules per design-decisions §7.2, privacy and reduced motion work. UNIT, E2E(budget), VISUAL with textual equivalent; no financial calculation changes.                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| DETAIL-03 / DETAIL-02         | Panel actions; `C/NotesButton.tsx`, `C/modals/NotesModal.tsx` only if presentation integration requires it                                                       | Links open existing transaction view and notes use existing save/cancel handlers. E2E(budget, transactions), UNIT for new interaction, privacy and keyboard checks.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| THEME-02 / DETAIL-02          | `L/themes/{dark,midnight}.css` existing surface roles (`table*`, `tableHeader*`, `tableRow*`, `cardBackground` and related borders); no component changes        | Pages not yet redesigned (Accounts register, Reports, Schedules, Payees, Rules, Settings, modals) use the same surface family as the Budget page in dark and midnight, instead of the navy `navy700`/`navy800` table surfacing. Values come from the UI-01 roles; existing role meanings unchanged; selection, hover and text contrast stay at or above today's. Light unchanged unless the owner asks. Owner approves before/after screenshots of every main page (decision D-4). VISUAL on every main page and one modal in dark and midnight at 1000×700 and 1440×900 plus a custom theme; theme UNIT; E2E(budget, accounts, reports, schedules, settings). |
+| QA-00 / DETAIL-02             | `docs/redesign/verification.md` (new; QA-01 extends it); a scratch performance script outside the app; Linux VRT snapshots for tests whose screenshots changed   | **Performance baseline:** build the v26.9.0 base (`59fe126f6`) and `redesign/main`, and time the same demo-budget actions on the same machine: first Budget paint, scrolling the full category list, 20 consecutive Assigned edits, month switching, opening an account register. Record medians and the method; these become the QA-01 thresholds (plan §12). **Carried-forward checks:** custom theme across every redesigned surface; reduced motion; regenerate Linux VRT snapshots in Docker for every changed test (`running-vrts` skill), inspecting each diff. Record results; open a task for each regression rather than fixing it inside QA-00.     |
+| BUD-04 / QA-00                | `C/budget/envelope/{EnvelopeBudgetComponents,CategoryActivityContent}.tsx`, `C/sidebar/` rail presentation, `C/budget/envelope/budgetsummary/` card presentation | Activity amounts share a baseline with Assigned and Available in the same row; collapsed-rail entries are distinguishable when initials collide (e.g. two letters or the account's position, with the existing accessible name and tooltip); the Ready to Assign status pill does not wrap under its label at 1000×700. No handler or value changes. VISUAL at 820, 1000 and 1440 in all three themes; E2E(budget, nav-02).                                                                                                                                                                                                                                    |
+| ELEC-01 / QA-00               | Isolation review section in `stage-0.md` first; then no source changes unless a defect is found (each fix is its own task)                                       | Written isolation procedure proving a development or packaged desktop build cannot open the installed app's data directory (stage-0.md warns that packaged builds override `ACTUAL_DATA_DIR`). Then, in that isolated desktop build on macOS: title bar and window dragging with the new tabs, accounts pane and details panel open state persists across restarts, minimum window size, zoom, native menus, and the demo budget's main flows. Screenshots and observations recorded in `verification.md`.                                                                                                                                                     |
+| APP-01 / BUD-03               | `C/accounts/` header/control presentation, exact files named in brief                                                                                            | Account review design applied; search/filter/account actions and reconciliation access remain intact; no budget details panel. E2E(accounts, transactions), VISUAL.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| APP-02 / APP-01               | `C/transactions/` table/editor presentation, exact files named in brief                                                                                          | Editing, split transactions, selection, scrolling, cleared/reconciled states and shortcuts preserved. E2E(transactions, accounts), affected UNIT, VISUAL on large fixture; no shared row-height changes without separate scoped review.                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| APP-03 / UI-02, NAV-02        | `C/reports/` presentation; `e2e/reports.test.ts` under `packages/desktop-client/`                                                                                | Filters, saved layouts and charts unchanged. Resolve viewport expectation without hiding real widgets; run all Reports cases at both widths with zero unexplained skips. E2E(reports), WIDE, VISUAL; preserve old baseline record and add new results.                                                                                                                                                                                                                                                                                                                                                                                                         |
+| APP-04 / UI-02, NAV-02        | `C/schedules/{index,SchedulesTable,ScheduleEditForm}.tsx` presentation                                                                                           | Schedule creation/edit/skip/post behavior unchanged. E2E(schedules), VISUAL; current handlers only.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| APP-05 / UI-02, NAV-02        | `C/payees/`, `C/rules/`, `C/tags/`, `C/settings/` presentation                                                                                                   | Split into APP-05a payees, b rules, c tags, d settings; one exact file allowlist per change. E2E(payees), E2E(rules), tags UNIT, E2E(settings) respectively plus VISUAL. Do not alter rules evaluation, theme parsing or settings persistence.                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| APP-06 / APP-01–05, DETAIL-03 | Named remaining presentation files from inventory, one surface per brief                                                                                         | Dialog/menu/loading/error/empty-state gaps closed; no blanket directory restyle. Affected E2E file and UNIT, VISUAL with focus return/Escape checks. List each covered surface.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| SYNC-01 / decision D-1        | A `redesign/sync-<tag>` branch merging one upstream release tag into `redesign/main`; conflict resolution only                                                   | Per decision D-1 (default: once, before RELEASE-01). Merge one upstream **release tag**, never upstream `master`. Resolve conflicts keeping upstream behaviour and the redesign's presentation; list every conflicted file and how it was resolved; re-read that release's notes for changes to files the redesign touched (`Titlebar.tsx`, `FinancesApp.tsx`, `sidebar/`, themes, budget table). CHECK, root `test`, WIDE, E2E for every redesign test file, VISUAL on the Budget page and navigation. Confirm the installed desktop app's version is not newer than the fork before opening any copy of a real budget.                                       |
+| QA-01 / all implementation    | New `docs/redesign/verification.md`; targeted UI regressions/tests only                                                                                          | Full matrix covers screens, themes/custom theme, sizes, keyboard, privacy, tracking budgets and performance versus baseline. CHECK, root `node .yarn/releases/yarn-4.17.1.cjs test`, WIDE, desktop E2E files above; record native/mobile checks separately. Protected diff reviewed. Unresolved behavior failures block release.                                                                                                                                                                                                                                                                                                                               |
+| RELEASE-01 / QA-01            | New `docs/redesign/release.md`; existing build commands, no app replacement                                                                                      | Record build revision, walkthrough, installation and rollback instructions. Run `node .yarn/releases/yarn-4.17.1.cjs build:browser`; native distribution requires separately scoped packaging review. Owner validates disposable copy before any installed-app replacement. No automatic production data migration.                                                                                                                                                                                                                                                                                                                                            |
 
 For future tasks, resolve every abbreviation into real paths and every recipe into
 exact commands in the copied plan §15 brief. New test files may accompany the

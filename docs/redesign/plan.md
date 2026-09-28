@@ -1,6 +1,6 @@
 # Actual Budget UI overhaul — staged implementation plan
 
-Status: approved implementation plan. Stage 0 and Stage 1 (DESIGN-01–03) complete; next is Stage 2. Design choices are recorded in [design-decisions.md](design-decisions.md), which takes precedence over §3 where they differ.
+Status: approved implementation plan. Stages 0–3 are complete, Stage 4 (the budget header and table) is complete, and Stage 5 has started (DETAIL-01 merged). A mid-project review on September 28, 2026 added tasks and reordered the remaining work; see §19. The live status ledger is in [backlog.md](backlog.md). Design choices are recorded in [design-decisions.md](design-decisions.md), which takes precedence over §3 where they differ.
 Prepared September 27, 2026. Revised September 27, 2026 for the Copilot-inspired visual direction (see §1.1).
 
 ## 1. The outcome we are aiming for
@@ -281,7 +281,7 @@ The coordinating agent can explain exactly where presentation changes belong and
 
 **No production UI implementation should precede this stage.**
 
-**Status: complete.** See [stage-0.md](stage-0.md) and [baseline/README.md](baseline/README.md). The backlog deliverable is the task table in §14; `backlog.md` referenced from the handbook has not been written yet.
+**Status: complete.** See [stage-0.md](stage-0.md) and [baseline/README.md](baseline/README.md). The backlog deliverable is the task table in §14, expanded in [backlog.md](backlog.md).
 
 ## 6. Stage 1 — Resolve the combined design in a prototype
 
@@ -457,7 +457,7 @@ Find problems that individual component checks will not catch.
 
 Use the repository's existing automated checks. Add focused behavior tests where interactions changed, such as panel selection and navigation. Use screenshot comparisons and manual review for visual changes rather than tests that merely repeat CSS values.
 
-Establish concrete performance thresholds from the measured baseline in Stage 0. Do not invent universal timings or claim success without measurement.
+Establish concrete performance thresholds from a measured baseline. Stage 0 deferred profiling, so QA-00 (§19) measures the v26.9.0 base build and `redesign/main` side by side; its medians are the thresholds here. Do not invent universal timings or claim success without measurement.
 
 ### User walkthrough
 
@@ -519,6 +519,11 @@ These are planning IDs, not created GitHub issues. Stage 0 must add verified fil
 | APP-04     | Restyle Schedules                                                    | UI-02, NAV-02            | Existing schedule behaviors checked                                       |
 | APP-05     | Restyle Payees, Rules, Tags, and Settings in separate small changes  | UI-02, NAV-02            | Per-page behavior checks; no logic changes                                |
 | APP-06     | Finish remaining dialogs, menus, loading, empty, and error states    | APP-01–05, DETAIL-03     | Consistency review and keyboard checks                                    |
+| THEME-02   | Align dark/midnight surface roles across all pages (§19.1)           | DETAIL-02                | Owner-approved before/after screenshots of every main page                |
+| QA-00      | Performance baseline and carried-forward checks (§19.3)              | DETAIL-02                | Recorded timings; custom theme, reduced motion, Linux VRT regenerated     |
+| BUD-04     | Budget polish found in the mid-project review                        | QA-00                    | Row alignment, rail initials, card pill at 820/1000/1440                  |
+| ELEC-01    | Desktop (Electron) isolation review and smoke check (§19.3)          | QA-00                    | Written isolation procedure; desktop flows checked and recorded           |
+| SYNC-01    | Merge an upstream release tag (§19.2)                                | Owner decision D-1       | Conflicts listed and resolved; full checks rerun                          |
 | QA-01      | Run cross-screen, theme, accessibility, and performance review       | All implementation tasks | Recorded verification matrix and resolved regressions                     |
 | RELEASE-01 | Prepare build, user walkthrough, delivery, and rollback instructions | QA-01                    | Verified release and recovery path                                        |
 
@@ -610,4 +615,89 @@ The first milestone worth aiming for is:
 
 That provides a useful, testable result before the full cross-app overhaul. The next milestone is the working details panel; the final milestone is consistency and verification across the rest of the app.
 
-Stage 0 (DISC-01, DISC-02) is complete. The next assignment is DESIGN-01. No application source changes have been made yet.
+The first milestone was reached on September 28, 2026 (NAV-01 through BUD-03, with the details panel frame from DETAIL-01). The next milestone is the working details panel (DETAIL-02 to DETAIL-04). Current status and order are in [backlog.md](backlog.md).
+
+## 19. Mid-project review (September 28, 2026)
+
+After DETAIL-01 the coordinating agent rebuilt `redesign/main`, captured every
+main page in dark at 1440×900, light at 1000×700 and mobile at 390×844, and
+reread the task reports. The Budget page matches the approved direction and no
+protected code has changed (`packages/loot-core`, `sync-server` and `crdt` are
+untouched). The findings below change the order of the remaining work, not the
+design direction.
+
+### 19.1 The rest of the app looks like a different product in dark
+
+The new frame (top bar, accounts pane, page background) applies to every page,
+but only the Budget page uses the new surfaces. In dark and midnight the
+Accounts register, Reports, Schedules and settings pages keep the navy `table*`
+and `tableHeader*` roles (`navy700`/`navy800`), which clash with the near-black
+Budget cards in the same window. Light is much milder. Waiting for APP-01–APP-05
+leaves this visible for most of the project.
+
+**Change:** THEME-02 retunes the existing dark and midnight surface roles so
+every page shares the new surface family, before any page layout is restyled.
+This changes existing role values, so plan §2 requires a reviewed decision
+(backlog decision D-4). The APP tasks still restyle layouts later.
+
+### 19.2 Following upstream Actual
+
+The fork is based on the v26.9.0 release. Upstream `master` has moved on (445
+commits at the time of the review) and has already changed 12 files the
+redesign also changes (`Titlebar.tsx`, `FinancesApp.tsx`, the sidebar, the
+three theme files, `ToBudget.tsx`, `theme.tsx` and others). The plan did not
+say whether the fork follows upstream.
+
+Following upstream is optional, but not following it has consequences:
+
+- Upstream bug and security fixes, and bank-sync provider changes, don't
+  arrive unless merged.
+- **Budget files only move forward.** If a real budget is opened in a newer
+  official Actual, its database may be migrated to a version this fork cannot
+  open. Staying on an old base therefore means not upgrading the official app
+  on the same budget.
+- The longer the gap, the harder a later merge becomes.
+
+**Change:** SYNC-01 merges one upstream **release tag** (never `master`) at a
+point the owner chooses (decision D-1; default: once, before RELEASE-01). Keep
+redesign changes additive, in new files where practical, to keep that merge
+small.
+
+### 19.3 Verification debt and the delivery target
+
+- Every task since BUD-01 left the same checks open: a custom theme, reduced
+  motion and regenerated Linux VRT snapshots.
+- §12 requires performance thresholds from a Stage 0 baseline that was never
+  measured, and BUD-02 added per-row cell subscriptions.
+- The owner uses the installed desktop (Electron) app, but everything so far
+  was verified in a browser; stage-0.md warns that desktop builds need their
+  own data-isolation review.
+
+**Change:** QA-00 measures the v26.9.0 base and `redesign/main` side by side
+and clears the carried-forward checks. ELEC-01 writes the desktop isolation
+procedure and smoke-tests the redesign in a desktop build well before
+RELEASE-01.
+
+### 19.4 Scope recorded
+
+- **Mobile is deferred.** Only the TERM-01 wording applies to the mobile
+  envelope screens; they keep the upstream look. Mobile E2E must keep passing.
+  This satisfies §11's requirement to list deferred screens.
+- **Goal captions are an open decision** (backlog D-3): BUD-02 left out the
+  goal/template caption because no approved formula exists.
+- **The details panel is open by default but empty** until DETAIL-02, so
+  DETAIL-02 goes next (backlog D-2 covers starting it closed if that slips).
+
+### 19.5 Process changes
+
+- The backlog keeps a short status ledger (§16); full completion reports move
+  to [task-reports.md](task-reports.md).
+- Every task so far needed extra files approved partway through. Briefs now
+  build their file list from the current source before a task starts (backlog
+  "Rules for every task").
+
+### 19.6 Order from here
+
+DETAIL-02 → THEME-02 → QA-00 → BUD-04 → DETAIL-03 → DETAIL-04 → ELEC-01 →
+SYNC-01 (per D-1) → APP-01 onward → QA-01 → RELEASE-01. The backlog ledger is
+authoritative if this list goes stale.

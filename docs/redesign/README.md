@@ -7,6 +7,7 @@
 3. [Behavior inventory](behavior-inventory.md).
 4. [Design decisions](design-decisions.md): the record implementation tasks follow.
 5. [Implementation backlog](backlog.md).
+   Completed-task evidence: [task reports](task-reports.md).
 6. [Verification record](baseline/README.md).
 7. Root `AGENTS.md`, `CODE_REVIEW_GUIDELINES.md`, and `.github/agents/pr-and-commit-rules.md`.
 
@@ -63,4 +64,4 @@ Create a small task branch from `redesign/main`, for example `redesign/budget-to
 
 The repository's inherited instructions prohibit agents from creating GitHub issues. The versioned Markdown backlog is the working tracker; this does not block implementation. Follow the inherited commit/PR naming and template rules if a PR is created. No upstream PR should be opened for this personal redesign unless explicitly requested.
 
-DESIGN-01 is built and awaiting owner review: see [the Stage 1 prototype](prototype/README.md), which compares Copilot-inspired concepts A, B, and C (`design-concepts/copilot/`). Owner decisions from the first review are recorded there and in plan §1.1, and [the accounts review](accounts-review/README.md) covers the register. DESIGN-02 is next. The owner decisions recorded in plan §1.1 (visual language, YNAB wording, automatic category colors, built-in themes first) are settled; the final layout is not.
+Current status, the order of remaining work and open owner decisions are in the [backlog](backlog.md) ledger; full per-task reports are in [task-reports.md](task-reports.md). The September 28, 2026 mid-project review is plan §19.
