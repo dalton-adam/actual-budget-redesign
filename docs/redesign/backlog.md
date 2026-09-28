@@ -321,8 +321,10 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   reveal them; Tab goes month notes → budget menu → Available pill. The
   category menu is still reachable by right-click. DETAIL-01's dedicated
   name opener is the natural place to fix this.
-- DETAIL-01: **implemented September 28, 2026** on `redesign/detail-01`;
-  **awaiting owner review before merging** into `redesign/main`. Panel frame,
+- DETAIL-01: **done September 28, 2026**, merged into `redesign/main` with
+  owner approval (branch `redesign/detail-01`). The owner approved the
+  overlay, fallback, default-subject, column-width and scope decisions below
+  (September 28, 2026). Panel frame,
   opener, closing and focus (design-decisions §5); the details themselves
   (hero, stat tiles, goal box, notes, transactions, the panel's own month
   stepper) are DETAIL-02 to DETAIL-04, so the panel shows only its header
@@ -335,7 +337,7 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   table would not keep its minimum width beside the panel (for example
   1000px with the accounts pane expanded), it becomes an overlay with the
   `scrim` (react-aria modal: focus stays inside, Escape or a scrim click
-  closes). **Decision to confirm:** the overlay starts closed and opening
+  closes). **Owner decision:** the overlay starts closed and opening
   or closing it never changes the stored choice, so a narrow window is not
   covered on every visit. **Subject:** the first visible expense category
   until one is chosen; a deleted choice falls back the same way; income
@@ -353,7 +355,7 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   112, Activity 120, Available 104; ≥1280px with the accounts pane open:
   150 / 112 / 170 / 108. Assigned and Available keep BUD-03's anti-clipping
   minimums instead of §4.1's 84–104 / 92–108. The Activity percentage is
-  hidden at those widths. **Scope grew beyond the card, pending owner
+  hidden at those widths. **Scope grew beyond the card, with owner
   approval:** `C/budget/{SidebarCategory,envelopeTable}.ts(x)` (opener;
   panel-aware widths), `C/budget/envelope/EnvelopeBudgetComponents.tsx`
   (percentage visibility), `C/budget/envelope/budgetsummary/EnvelopeBudgetPageHeader.tsx`
