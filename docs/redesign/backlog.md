@@ -66,8 +66,8 @@ It does not replace the design specification or authorize a new design direction
   track) and matches `pageTextSubdued` in dark, midnight and custom themes.
   Rerun after the role: typecheck, lint, component UNIT 42/42, theme UNIT
   `src/style/` 215/215, light VISUAL.
-- NAV-01: **implemented September 27, 2026, committed on branch
-  `redesign/nav-01`, awaiting owner review before merging.** Scope grew, with owner approval, to
+- NAV-01: **done September 27, 2026**, merged into `redesign/main` with
+  owner approval. Scope grew, with owner approval, to
   `C/Titlebar.tsx` (the tabs render in its left slot; right-side buttons
   unchanged) and to building the Accounts ▾ menu here rather than in NAV-02.
   Top bar: pill tabs **Budget, Accounts ▾, Reports, Schedules, More ▾**
