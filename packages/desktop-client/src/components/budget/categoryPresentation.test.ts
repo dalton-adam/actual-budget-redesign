@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  getCarriedIn,
   getCategoryAccentIndex,
   getCategoryPace,
   getCategoryProgress,
@@ -130,6 +131,40 @@ describe('getCategoryProgress', () => {
       isOverspent: false,
       percent: null,
     });
+  });
+});
+
+describe('getCarriedIn', () => {
+  it('is zero for an empty month with nothing carried in', () => {
+    expect(getCarriedIn({ available: 0, assigned: 0, activity: 0 })).toBe(0);
+  });
+
+  it('reads back a positive balance carried in', () => {
+    // $50 carried in, $600 assigned, $240 spent: $410 available.
+    expect(
+      getCarriedIn({ available: 41000, assigned: 60000, activity: -24000 }),
+    ).toBe(5000);
+  });
+
+  it('reads back a negative balance rolled over', () => {
+    // -$20 rolled over, $100 assigned, $30 spent: $50 available.
+    expect(
+      getCarriedIn({ available: 5000, assigned: 10000, activity: -3000 }),
+    ).toBe(-2000);
+  });
+
+  it('counts a refund as money in', () => {
+    // $10 carried in, nothing assigned, a $35 refund: $45 available.
+    expect(getCarriedIn({ available: 4500, assigned: 0, activity: 3500 })).toBe(
+      1000,
+    );
+  });
+
+  it('works when the month is overspent', () => {
+    // $8 carried in, $250 assigned, $326 spent: -$68 available.
+    expect(
+      getCarriedIn({ available: -6800, assigned: 25000, activity: -32600 }),
+    ).toBe(800);
   });
 });
 
