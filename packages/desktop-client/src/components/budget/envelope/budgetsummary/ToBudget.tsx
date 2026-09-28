@@ -1,5 +1,11 @@
 import React, { useCallback, useRef, useState } from 'react';
-import type { CSSProperties, MouseEvent } from 'react';
+import type {
+  ComponentProps,
+  CSSProperties,
+  MouseEvent,
+  ReactNode,
+  RefObject,
+} from 'react';
 
 import { Popover } from '@actual-app/components/popover';
 import { View } from '@actual-app/components/view';
@@ -30,28 +36,7 @@ export function ToBudget({
   amountStyle,
   isCollapsed = false,
 }: ToBudgetProps) {
-  const [menuStep, _setMenuStep] = useState<string>('actions');
   const triggerRef = useRef(null);
-  const format = useFormat();
-
-  const ref = useRef<HTMLSpanElement>(null);
-  const setMenuStep = useCallback(
-    (menu: string) => {
-      if (menu) ref.current?.focus();
-      _setMenuStep(menu);
-    },
-    [ref, _setMenuStep],
-  );
-  const availableValue = useEnvelopeSheetValue({
-    name: envelopeBudget.toBudget,
-    value: 0,
-  });
-  if (typeof availableValue !== 'number' && availableValue !== null) {
-    throw new Error(
-      'Expected availableValue to be a number but got ' + availableValue,
-    );
-  }
-
   const [menuOpen, setMenuOpen] = useState(false);
   const [position, setPosition] = useState({ crossOffset: 0, offset: 0 });
   const resetPosition = (crossOffset = 0, offset = 0) =>
@@ -83,68 +68,128 @@ export function ToBudget({
         />
       </View>
 
-      <Popover
+      <ToBudgetPopover
         triggerRef={triggerRef}
-        placement="bottom"
         isOpen={menuOpen}
-        onOpenChange={() => {
-          setMenuStep('actions');
-          setMenuOpen(false);
-        }}
+        onClose={() => setMenuOpen(false)}
+        month={month}
+        onBudgetAction={onBudgetAction}
         style={{ width: 200, margin: 1 }}
-        isNonModal
         {...position}
-      >
-        <span tabIndex={-1} ref={ref}>
-          {menuStep === 'actions' && (
+      />
+    </>
+  );
+}
+
+type ToBudgetPopoverProps = {
+  triggerRef: RefObject<Element | null>;
+  isOpen: boolean;
+  onClose: () => void;
+  month: string;
+  onBudgetAction: (month: string, action: string, arg?: unknown) => void;
+  /** Shown above the actions, and hidden while a follow-up step is open. */
+  header?: ReactNode;
+} & Pick<
+  ComponentProps<typeof Popover>,
+  'placement' | 'style' | 'offset' | 'crossOffset'
+>;
+
+/** The existing To Budget actions and their follow-up steps. */
+export function ToBudgetPopover({
+  triggerRef,
+  isOpen,
+  onClose,
+  month,
+  onBudgetAction,
+  header,
+  placement = 'bottom',
+  ...popoverProps
+}: ToBudgetPopoverProps) {
+  const [menuStep, _setMenuStep] = useState<string>('actions');
+  const format = useFormat();
+
+  const ref = useRef<HTMLSpanElement>(null);
+  const setMenuStep = useCallback(
+    (menu: string) => {
+      if (menu) ref.current?.focus();
+      _setMenuStep(menu);
+    },
+    [ref, _setMenuStep],
+  );
+  const availableValue = useEnvelopeSheetValue({
+    name: envelopeBudget.toBudget,
+    value: 0,
+  });
+  if (typeof availableValue !== 'number' && availableValue !== null) {
+    throw new Error(
+      'Expected availableValue to be a number but got ' + availableValue,
+    );
+  }
+
+  return (
+    <Popover
+      triggerRef={triggerRef}
+      placement={placement}
+      isOpen={isOpen}
+      onOpenChange={() => {
+        setMenuStep('actions');
+        onClose();
+      }}
+      isNonModal
+      {...popoverProps}
+    >
+      <span tabIndex={-1} ref={ref}>
+        {menuStep === 'actions' && (
+          <>
+            {header}
             <ToBudgetMenu
               onTransfer={() => setMenuStep('transfer')}
               onCover={() => setMenuStep('cover')}
               onHoldBuffer={() => setMenuStep('buffer')}
               onResetHoldBuffer={() => {
                 onBudgetAction(month, 'reset-hold');
-                setMenuOpen(false);
+                onClose();
               }}
               month={month}
               onBudgetAction={onBudgetAction}
             />
-          )}
-          {menuStep === 'buffer' && (
-            <HoldMenu
-              onClose={() => setMenuOpen(false)}
-              onSubmit={amount => {
-                onBudgetAction(month, 'hold', { amount });
-              }}
-            />
-          )}
-          {menuStep === 'transfer' && (
-            <TransferMenu
-              initialAmount={availableValue}
-              onClose={() => setMenuOpen(false)}
-              onSubmit={(amount, categoryId) => {
-                onBudgetAction(month, 'transfer-available', {
-                  amount,
-                  category: categoryId,
-                });
-              }}
-            />
-          )}
-          {menuStep === 'cover' && (
-            <CoverMenu
-              showToBeBudgeted={false}
-              initialAmount={availableValue}
-              onClose={() => setMenuOpen(false)}
-              onSubmit={(amount, categoryId) => {
-                onBudgetAction(month, 'cover-overbudgeted', {
-                  category: categoryId,
-                  amount,
-                  currencyCode: format.currency.code,
-                });
-              }}
-            />
-          )}
-        </span>
-      </Popover>
-    </>
+          </>
+        )}
+        {menuStep === 'buffer' && (
+          <HoldMenu
+            onClose={onClose}
+            onSubmit={amount => {
+              onBudgetAction(month, 'hold', { amount });
+            }}
+          />
+        )}
+        {menuStep === 'transfer' && (
+          <TransferMenu
+            initialAmount={availableValue}
+            onClose={onClose}
+            onSubmit={(amount, categoryId) => {
+              onBudgetAction(month, 'transfer-available', {
+                amount,
+                category: categoryId,
+              });
+            }}
+          />
+        )}
+        {menuStep === 'cover' && (
+          <CoverMenu
+            showToBeBudgeted={false}
+            initialAmount={availableValue}
+            onClose={onClose}
+            onSubmit={(amount, categoryId) => {
+              onBudgetAction(month, 'cover-overbudgeted', {
+                category: categoryId,
+                amount,
+                currencyCode: format.currency.code,
+              });
+            }}
+          />
+        )}
+      </span>
+    </Popover>
   );
 }

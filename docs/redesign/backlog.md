@@ -136,6 +136,64 @@ src/components/navigation src/components/settings/Themes.test.tsx` passed
   helper clicks "Expand accounts" only when the pane is collapsed, so runs
   at 1280px and wider (including the default VRT viewport) are unaffected.
   CHECK passed (root typecheck and lint).
+- BUD-01: **done September 27, 2026**, merged into `redesign/main` with
+  owner approval. Envelope budgets get the design-decisions §3
+  header: "Budget" eyebrow (plus "· Past month" / "· Future month"), the
+  month as an `h1`, a month stepper (‹ Sep 2026 ›, disabled at the budget
+  bounds), **Today** away from the current month, the month notes button and
+  the month menu ⋯ (`BudgetMonthMenu` items and undo messages unchanged, now
+  shared through `BudgetMonthMenuButton`). Below it, three cards for the
+  focused month: **Ready to Assign** (positive colour and glow with "`X`
+  available funds"; zero neutral with "All assigned" and "Every dollar has a
+  job"; negative with "Overassigned", "More assigned than you have" and the
+  negative glow), **Assigned** ("across N categories") and **Activity** with
+  the §7.4 stacked bar from UI-03's `getSpendingBarSegments`. Pressing or
+  right-clicking the Ready to Assign card opens one popover: the existing
+  breakdown (Available funds with its Income / From Last Month tooltip,
+  Overspent in _previous month_, Budgeted, For next month, then Ready to
+  Assign) followed by the existing To Budget menu and its Move / Hold / Cover
+  steps, extracted unchanged from `ToBudget` as `ToBudgetPopover`. Once the
+  table scrolls past 40px on windows shorter than 900px the cards give way to
+  the 46px strip, returning at the top. Every value is an existing envelope
+  spreadsheet cell; no total or formula was added. Owner decisions (September 27, 2026): tracking budgets keep the old month
+  picker and per-month summaries; with more than one envelope month visible
+  (until BUD-03) the cards describe the first month and the per-month column
+  summaries stay; the stepper replaces the 12-month strip (←, → and 0
+  shortcuts unchanged) and its month label opens a **month picker** (a year
+  of months with previous/next year, months outside the budget disabled);
+  "N categories" counts **all** expense categories, hidden included, because
+  the Assigned total includes their money; the breakdown keeps "Budgeted"
+  until TERM-01; zero uses neutral `pageText` rather than the green-leaning
+  `toBudgetZero`; the details-panel toggle is added with DETAIL-01. The card
+  subscribes to the breakdown and menu cells while it is shown, because the
+  spreadsheet cache only refreshes subscribed cells and the popover mounts on
+  demand. **Scope grew beyond the card, with owner approval (September 27, 2026):**
+  `C/budget/DynamicBudgetTable.tsx` (passes type and scroll state to the
+  header), `C/budget/BudgetTable.tsx` (hides the per-month summary row for a
+  single envelope month), new `C/budget/BudgetMonthToolbar.tsx`, a
+  `#components/budget/categoryPresentation` import alias in
+  `packages/desktop-client/package.json`, and E2E updates:
+  `e2e/page-models/budget-page.ts` (Ready to Assign locator and breakdown
+  helper; next-month button by role or title), `e2e/budget.test.ts` (summary
+  test opens the breakdown; same four labels asserted plus the total) and new
+  `e2e/bud-01.test.ts`. Checks: typecheck pass; lint pass; UNIT
+  `src/components/budget` 47/47. E2E(bud-01, budget) 12/12 (after adding the month picker); E2E(accounts,
+  settings, nav-02, help-menu, transactions, schedules) 37/37. WIDE: 57
+  passed, 2 failed, 15 not run — the known Reports failure (1440) and
+  `accounts.test.ts:242` at 1000px, which failed the same way on
+  `redesign/main` without BUD-01 (the NAV-02 collapsed pane hid the "On
+  budget" link the page model clicked; fixed by the NAV-02 follow-up above,
+  not a BUD-01 regression). WIDE rerun on the merged `redesign/main`: 58 passed, 1 failed (the known
+  Reports baseline at 1440), 15 did not run — back to baseline. VISUAL on Try the demo: dark 1440×900 in all three Ready to
+  Assign states (zero, positive after "Reset next month's buffer", negative
+  after assigning 9,000 to Food; the breakdown sums to the card each time);
+  light 1000×700 including the compact strip and its popover; midnight
+  1440×900 with privacy mode (amounts redact, hover reveals as elsewhere);
+  midnight 800×700 drawer layout; keyboard: Enter on the card opens the
+  popover with focus in the menu, Escape closes and returns focus to the
+  card with a visible ring. **Not yet checked:** a custom theme, reduced
+  motion (no new animation added), and the per-month summaries with
+  several envelope months visible.
 - All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 
