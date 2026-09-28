@@ -1,3 +1,4 @@
+import { expect } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
 
 import { AccountPage } from './account-page';
@@ -93,6 +94,16 @@ export class Navigation {
     }
 
     return new AccountPage(this.page);
+  }
+
+  // Opens the accounts pane when it is collapsed (the default below 1280px),
+  // for tests that read the pane's All / On / Off budget balances.
+  async expandAccountsPane() {
+    const pane = this.page.getByTestId('accounts-pane');
+    if ((await pane.getAttribute('data-expanded')) === 'false') {
+      await this.page.getByRole('button', { name: 'Expand accounts' }).click();
+      await expect(pane).toHaveAttribute('data-expanded', 'true');
+    }
   }
 
   async goToReportsPage() {

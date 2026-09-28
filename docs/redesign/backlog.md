@@ -128,12 +128,14 @@ src/components/navigation src/components/settings/Themes.test.tsx` passed
   preview of this branch's build: 58 passed, 1 failed (the known Reports
   baseline `reports.test.ts:33` at 1440), 15 did not run. Other
   `goToAccountPage` callers (rules, schedules, transactions, onboarding,
-  nav-02) at both widths: 61/62 passed. Open follow-up:
-  `transactions.test.ts:247` ("creates a transfer test transaction") fails
-  at 1000px because it reads `sidebar-all-accounts-balance` /
-  `sidebar-on-budget-balance`, which only render when the pane is open. The
-  cause is the same NAV-02 default, not navigation, and it is outside this
-  fix. CHECK passed (root typecheck and lint).
+  nav-02) at both widths: 62/62 passed. `transactions.test.ts:247`
+  ("creates a transfer test transaction") had also failed at 1000px, because
+  it reads `sidebar-all-accounts-balance` / `sidebar-on-budget-balance`,
+  which only render when the pane is open. It now calls the new
+  `Navigation.expandAccountsPane()` before entering the transaction. That
+  helper clicks "Expand accounts" only when the pane is collapsed, so runs
+  at 1280px and wider (including the default VRT viewport) are unaffected.
+  CHECK passed (root typecheck and lint).
 - All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 
