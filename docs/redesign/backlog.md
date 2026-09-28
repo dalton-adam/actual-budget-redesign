@@ -194,8 +194,8 @@ src/components/navigation src/components/settings/Themes.test.tsx` passed
   card with a visible ring. **Not yet checked:** a custom theme, reduced
   motion (no new animation added), and the per-month summaries with
   several envelope months visible.
-- TERM-01: **implemented September 28, 2026** on `redesign/term-01`, not yet
-  merged. Design-decisions §9 wording applied as visible text only; the owner
+- TERM-01: **done September 28, 2026**, merged into `redesign/main` with owner
+  approval (branch `redesign/term-01`). Design-decisions §9 wording applied as visible text only; the owner
   approved the "Shown" rows and asked to match YNAB, which added the Cover /
   Transfer picker entry, the envelope goal tooltip and two automation help
   sentences (listed under §9 "As implemented"). No identifier, binding,
