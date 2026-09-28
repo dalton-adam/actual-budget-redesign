@@ -117,6 +117,23 @@ src/components/navigation src/components/settings/Themes.test.tsx` passed
   dark 800×700 drawer, dark privacy mode and a simulated warm custom palette;
   account values redact through the existing `CellValue` privacy path and the
   No server / Help / budget controls remain reachable.
+- NAV-02 follow-up (E2E page model): **done September 27, 2026** on
+  `redesign/fix-accounts-e2e-1000`. The WIDE run failed
+  `accounts.test.ts:242` at 1000px on `redesign/main` because the collapsed
+  rail has no All / On / Off budget links. `Navigation.goToAccountPage` in
+  `packages/desktop-client/e2e/page-models/navigation.ts` now clicks the
+  accounts-pane link when it is visible and otherwise goes through the
+  top-bar Accounts ▾ menu, so it never changes the pane state. The app and
+  the NAV-02 default are unchanged. Browser build passed. WIDE against a
+  preview of this branch's build: 58 passed, 1 failed (the known Reports
+  baseline `reports.test.ts:33` at 1440), 15 did not run. Other
+  `goToAccountPage` callers (rules, schedules, transactions, onboarding,
+  nav-02) at both widths: 61/62 passed. Open follow-up:
+  `transactions.test.ts:247` ("creates a transfer test transaction") fails
+  at 1000px because it reads `sidebar-all-accounts-balance` /
+  `sidebar-on-budget-balance`, which only render when the pane is open. The
+  cause is the same NAV-02 default, not navigation, and it is outside this
+  fix. CHECK passed (root typecheck and lint).
 - All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 

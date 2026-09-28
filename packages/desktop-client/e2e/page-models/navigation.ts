@@ -72,9 +72,25 @@ export class Navigation {
   }
 
   async goToAccountPage(accountName: string) {
-    await this.page
-      .getByRole('link', { name: new RegExp(`^${accountName}`) })
-      .click();
+    const name = new RegExp(`^${accountName}`);
+    const paneLink = this.page
+      .getByTestId('accounts-pane')
+      .getByRole('link', { name });
+
+    // Below 1280px the accounts pane defaults to a collapsed rail that lists
+    // individual accounts only, so All / On / Off budget are reached through
+    // the top-bar Accounts menu instead (leaving the pane state untouched).
+    if (await paneLink.isVisible()) {
+      await paneLink.click();
+    } else {
+      await this.page
+        .getByRole('button', { name: 'Accounts', exact: true })
+        .click();
+      await this.page
+        .getByRole('navigation', { name: 'Accounts' })
+        .getByRole('link', { name })
+        .click();
+    }
 
     return new AccountPage(this.page);
   }
