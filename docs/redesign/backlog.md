@@ -66,6 +66,32 @@ It does not replace the design specification or authorize a new design direction
   track) and matches `pageTextSubdued` in dark, midnight and custom themes.
   Rerun after the role: typecheck, lint, component UNIT 42/42, theme UNIT
   `src/style/` 215/215, light VISUAL.
+- NAV-01: **implemented September 27, 2026, committed on branch
+  `redesign/nav-01`, awaiting owner review before merging.** Scope grew, with owner approval, to
+  `C/Titlebar.tsx` (the tabs render in its left slot; right-side buttons
+  unchanged) and to building the Accounts ▾ menu here rather than in NAV-02.
+  Top bar: pill tabs **Budget, Accounts ▾, Reports, Schedules, More ▾**
+  (`C/navigation/`). Accounts ▾ lists All / On / Off budget with totals, each
+  account with sync-status dot and balance, Closed accounts, Add account, and
+  the same right-click menu (Rename, Close/Reopen). More ▾ lists Payees,
+  Rules, Bank Sync (same condition as before), Tags, Settings. Below 900px the
+  tabs and sidebar give way to a drawer with every destination plus the budget
+  file menu (Rename, Settings, Load backup, Switch file). Menus are
+  disclosure navigation (buttons + links), so links keep `role=link` and
+  `aria-current`; the selected menu tab also carries `aria-current`. Removed
+  `sidebar/{PrimaryButtons,Item}.tsx`; the sidebar keeps the budget name,
+  account list and Add account until NAV-02. The tab track keeps
+  `data-testid="sidebar-primary-buttons"` so the tour's "Getting around"
+  step still anchors. Checks: typecheck pass; lint pass; UNIT
+  `src/components/navigation src/components/sidebar` 6/6 (3 new);
+  E2E(help-menu, accounts, settings) 16/16; also E2E(payees, rules,
+  schedules, transactions, budget, bank-sync, reports) 52/52 (default
+  config against the 3018 preview). VISUAL on Try the demo: dark, light and
+  midnight at 1000×700; drawer at 800×700; route matrix (every tab, More and
+  Accounts destination lands on the right path and marks the right tab
+  current; browser Back restores Budget); keyboard: Enter opens a menu, Tab
+  reaches each link with a visible ring, Escape closes and returns focus;
+  Escape while renaming cancels only the rename. Reduced motion checked in Playwright against the 3018 preview with `reducedMotion: 'reduce'`: drawer animation `none`, tab and menu-tab transitions `none`; with motion allowed the drawer runs `nav-drawer-in` and tabs fade over 0.15s. `generate:i18n` run: all seven new strings are in `locale/en.json` (git-ignored, so nothing to stage). Custom theme at 1440×900 and 800×700: installed the Alucard catalog theme, with and without a pasted warm palette on top; the tab track, selected tab, unselected text, both menus and the drawer all resolve from the custom palette through the UI-01 fallbacks (`navTrack` → `cardBackground`, `navActive` → 12% `pageText`, `pageTextSecondary` → `pageTextSubdued`). A pasted override on a built-in theme keeps that theme's tuned tab colors, as UI-01 intends. Tour: with owner approval, `C/tour/steps.tsx`'s "Getting around" step now reads "The tabs at the top take you to your budget, accounts, reports, and scheduled transactions…" and points down at the tab bar (placement `bottom`); checked by running the tour to step 6 of 8 at 1000×700. Follow-ups: the drawer's budget file menu repeats `sidebar/BudgetName.tsx`'s items until NAV-02 moves the budget switcher to the top bar; below 900px the tour's navigation and Add account targets are hidden (tabs and sidebar give way to the drawer), which NAV-02 should revisit with the accounts pane.
 - All other application implementation below is pending. This document does not
   claim Claude's prototype is production-ready.
 
