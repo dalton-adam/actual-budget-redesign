@@ -331,7 +331,7 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   **Open state:** device-local browser storage
   (`actual-budget-details-panel-open`, like the accounts pane); open by
   default; no synced or core preference. **Layout:** 360px from 1280px,
-  320px below, pushing the header and table. Below 900px, *or* when the
+  320px below, pushing the header and table. Below 900px, _or_ when the
   table would not keep its minimum width beside the panel (for example
   1000px with the accounts pane expanded), it becomes an overlay with the
   `scrim` (react-aria modal: focus stays inside, Escape or a scrim click
