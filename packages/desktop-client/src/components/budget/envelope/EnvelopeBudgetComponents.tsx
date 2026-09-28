@@ -1,4 +1,4 @@
-import React, { memo, useContext, useRef, useState } from 'react';
+import React, { memo, useRef, useState } from 'react';
 import type { ComponentProps, CSSProperties, MouseEvent } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
@@ -16,8 +16,10 @@ import { View } from '@actual-app/components/view';
 import { css } from '@emotion/css';
 
 import { BalanceWithCarryover } from '#components/budget/BalanceWithCarryover';
-import { envelopeCellBorderStyle } from '#components/budget/envelopeTable';
-import { MonthsContext } from '#components/budget/MonthsContext';
+import {
+  envelopeCellBorderStyle,
+  useEnvelopeColumnWidths,
+} from '#components/budget/envelopeTable';
 import { makeAmountGrey } from '#components/budget/util';
 import { NotesButton } from '#components/NotesButton';
 import { CellValue, CellValueText } from '#components/spreadsheet/CellValue';
@@ -91,6 +93,8 @@ const groupValueStyle: CSSProperties = { padding: '0 8px' };
 const groupBalanceValueStyle: CSSProperties = { padding: '0 15px 0 8px' };
 
 export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
+  const columnWidths = useEnvelopeColumnWidths();
+
   return (
     <View
       style={{
@@ -102,7 +106,13 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
         gap: 2,
       }}
     >
-      <View style={headerLabelStyle}>
+      <View
+        style={{
+          ...headerLabelStyle,
+          flex: 'none',
+          width: columnWidths.assigned,
+        }}
+      >
         <Text style={headerTextStyle}>
           <Trans>Assigned</Trans>
         </Text>
@@ -115,15 +125,33 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
           )}
         </EnvelopeCellValue>
       </View>
-      <View style={headerLabelStyle}>
-        <Text style={headerTextStyle}>
-          <Trans>Activity</Trans>
-        </Text>
-        <EnvelopeCellValue binding={envelopeBudget.totalSpent} type="financial">
-          {props => <CellValueText {...props} style={cellStyle} />}
-        </EnvelopeCellValue>
-      </View>
-      <View style={{ ...headerLabelStyle, paddingRight: 15 }}>
+      {columnWidths.activity > 0 && (
+        <View
+          style={{
+            ...headerLabelStyle,
+            flex: 'none',
+            width: columnWidths.activity,
+          }}
+        >
+          <Text style={headerTextStyle}>
+            <Trans>Activity</Trans>
+          </Text>
+          <EnvelopeCellValue
+            binding={envelopeBudget.totalSpent}
+            type="financial"
+          >
+            {props => <CellValueText {...props} style={cellStyle} />}
+          </EnvelopeCellValue>
+        </View>
+      )}
+      <View
+        style={{
+          ...headerLabelStyle,
+          flex: 'none',
+          width: columnWidths.available,
+          paddingRight: 15,
+        }}
+      >
         <Text style={headerTextStyle}>
           <Trans>Available</Trans>
         </Text>
@@ -158,6 +186,7 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
   group,
 }: CategoryGroupMonthProps) {
   const { id } = group;
+  const columnWidths = useEnvelopeColumnWidths();
 
   return (
     <View
@@ -170,7 +199,7 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
     >
       <EnvelopeSheetCell
         name="budgeted"
-        width="flex"
+        width={columnWidths.assigned}
         textAlign="right"
         style={{ fontWeight: 600, ...styles.tnum, ...envelopeCellBorderStyle }}
         valueStyle={groupValueStyle}
@@ -179,20 +208,26 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
           type: 'financial',
         }}
       />
-      <EnvelopeSheetCell
-        name="spent"
-        width="flex"
-        textAlign="right"
-        style={{ fontWeight: 600, ...styles.tnum, ...envelopeCellBorderStyle }}
-        valueStyle={groupValueStyle}
-        valueProps={{
-          binding: envelopeBudget.groupSumAmount(id),
-          type: 'financial',
-        }}
-      />
+      {columnWidths.activity > 0 && (
+        <EnvelopeSheetCell
+          name="spent"
+          width={columnWidths.activity}
+          textAlign="right"
+          style={{
+            fontWeight: 600,
+            ...styles.tnum,
+            ...envelopeCellBorderStyle,
+          }}
+          valueStyle={groupValueStyle}
+          valueProps={{
+            binding: envelopeBudget.groupSumAmount(id),
+            type: 'financial',
+          }}
+        />
+      )}
       <EnvelopeSheetCell
         name="balance"
-        width="flex"
+        width={columnWidths.available}
         textAlign="right"
         valueStyle={groupBalanceValueStyle}
         style={{
@@ -275,9 +310,8 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
     });
 
   const showScheduleIndicator = schedule && scheduleStatus;
-  // The Activity percentage is hidden when several month columns share the
-  // width (design-decisions §4.1).
-  const { months } = useContext(MonthsContext);
+  // Activity is hidden below 900px (design-decisions §4.1).
+  const columnWidths = useEnvelopeColumnWidths();
 
   return (
     <View
@@ -313,7 +347,7 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
       <View
         ref={budgetMenuTriggerRef}
         style={{
-          flex: 1,
+          width: columnWidths.assigned,
           flexDirection: 'row',
         }}
         onContextMenu={e => {
@@ -459,6 +493,10 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
               borderRadius: 8,
               height: 30,
               alignSelf: 'center',
+              // The default input width is wider than the fixed Assigned
+              // column; keep the editor inside its cell.
+              width: '100%',
+              minWidth: 0,
             },
           }}
           onSave={(parsedIntegerAmount: number | null) => {
@@ -469,78 +507,77 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
           }}
         />
       </View>
-      <Field
-        name="spent"
-        width="flex"
-        truncate={false}
-        style={{ textAlign: 'right', ...envelopeCellBorderStyle }}
-        contentStyle={{ padding: '0 8px' }}
-      >
-        <CategoryActivityContent
-          categoryId={category.id}
-          showPercent={months.length === 1}
+      {columnWidths.activity > 0 && (
+        <Field
+          name="spent"
+          width={columnWidths.activity}
+          truncate={false}
+          style={{ textAlign: 'right', ...envelopeCellBorderStyle }}
+          contentStyle={{ padding: '0 8px' }}
         >
-          <View
-            data-testid="category-month-spent"
-            onClick={() => onShowActivity(category.id, month)}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: showScheduleIndicator
-                ? 'space-between'
-                : 'flex-end',
-              gap: 2,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {showScheduleIndicator && (
-              <View title={description}>
-                <Button
-                  variant="bare"
-                  style={{
-                    color:
-                      scheduleStatus === 'missed'
-                        ? theme.budgetNumberNegative
-                        : scheduleStatus === 'due'
-                          ? theme.templateNumberUnderFunded
-                          : theme.upcomingText,
-                  }}
-                  onPress={() =>
-                    schedule._account
-                      ? navigate(`/accounts/${schedule._account}`)
-                      : navigate('/accounts')
-                  }
-                >
-                  {isScheduleRecurring ? (
-                    <SvgArrowsSynchronize style={{ width: 12, height: 12 }} />
-                  ) : (
-                    <SvgCalendar3 style={{ width: 12, height: 12 }} />
-                  )}
-                </Button>
-              </View>
-            )}
-            <EnvelopeCellValue
-              binding={envelopeBudget.catSumAmount(category.id)}
-              type="financial"
+          <CategoryActivityContent categoryId={category.id} showPercent>
+            <View
+              data-testid="category-month-spent"
+              onClick={() => onShowActivity(category.id, month)}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: showScheduleIndicator
+                  ? 'space-between'
+                  : 'flex-end',
+                gap: 2,
+                whiteSpace: 'nowrap',
+              }}
             >
-              {props => (
-                <CellValueText
-                  {...props}
-                  className={css({
-                    cursor: 'pointer',
-                    ':hover': { textDecoration: 'underline' },
-                    ...makeAmountGrey(props.value),
-                  })}
-                />
+              {showScheduleIndicator && (
+                <View title={description}>
+                  <Button
+                    variant="bare"
+                    style={{
+                      color:
+                        scheduleStatus === 'missed'
+                          ? theme.budgetNumberNegative
+                          : scheduleStatus === 'due'
+                            ? theme.templateNumberUnderFunded
+                            : theme.upcomingText,
+                    }}
+                    onPress={() =>
+                      schedule._account
+                        ? navigate(`/accounts/${schedule._account}`)
+                        : navigate('/accounts')
+                    }
+                  >
+                    {isScheduleRecurring ? (
+                      <SvgArrowsSynchronize style={{ width: 12, height: 12 }} />
+                    ) : (
+                      <SvgCalendar3 style={{ width: 12, height: 12 }} />
+                    )}
+                  </Button>
+                </View>
               )}
-            </EnvelopeCellValue>
-          </View>
-        </CategoryActivityContent>
-      </Field>
+              <EnvelopeCellValue
+                binding={envelopeBudget.catSumAmount(category.id)}
+                type="financial"
+              >
+                {props => (
+                  <CellValueText
+                    {...props}
+                    className={css({
+                      cursor: 'pointer',
+                      ':hover': { textDecoration: 'underline' },
+                      ...makeAmountGrey(props.value),
+                    })}
+                  />
+                )}
+              </EnvelopeCellValue>
+            </View>
+          </CategoryActivityContent>
+        </Field>
+      )}
       <Field
         ref={balanceMenuTriggerRef}
         name="balance"
-        width="flex"
+        width={columnWidths.available}
         truncate={false}
         style={{
           paddingRight: styles.monthRightPadding,

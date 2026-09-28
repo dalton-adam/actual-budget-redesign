@@ -22,7 +22,6 @@ import {
   useSortCategoriesMutation,
 } from '#budget';
 import { useCategories } from '#hooks/useCategories';
-import { useGlobalPref } from '#hooks/useGlobalPref';
 import { useLocalPref } from '#hooks/useLocalPref';
 import { useNavigate } from '#hooks/useNavigate';
 import { SheetNameProvider } from '#hooks/useSheetName';
@@ -50,8 +49,9 @@ export function Budget() {
     end: startMonth,
   });
   const [budgetType = 'envelope'] = useSyncedPref('budgetType');
-  const [maxMonthsPref] = useGlobalPref('maxMonths');
-  const maxMonths = maxMonthsPref || 1;
+  // The desktop budget shows one month at a time (design-decisions §6). The
+  // stored `maxMonths` preference is left untouched so this stays UI-only.
+  const maxMonths = 1;
   const [initialized, setInitialized] = useState(false);
   const { data: { grouped: categoryGroups } = { grouped: [] } } =
     useCategories();

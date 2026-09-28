@@ -62,7 +62,11 @@ const DynamicBudgetTable = ({
     200 + 100 * categoryExpandedState,
   );
   const numMonths = Math.min(numPossible, maxMonths);
-  const maxWidth = 200 + 100 * categoryExpandedState + 500 * numMonths;
+  // Envelope budgets fill the page (design-decisions §4.1).
+  const maxWidth =
+    type === 'envelope'
+      ? undefined
+      : 200 + 100 * categoryExpandedState + 500 * numMonths;
 
   useEffect(() => {
     setDisplayMax(numPossible);

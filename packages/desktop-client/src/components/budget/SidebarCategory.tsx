@@ -17,10 +17,13 @@ import type {
 
 import { InputCell } from '#components/table';
 import { useContextMenu } from '#hooks/useContextMenu';
-import { useGlobalPref } from '#hooks/useGlobalPref';
 
 import { getCategoryAccentIndex } from './categoryPresentation';
-import { envelopeCellBorderStyle, useIsEnvelopeTable } from './envelopeTable';
+import {
+  envelopeCellBorderStyle,
+  useCategoryColumnStyle,
+  useIsEnvelopeTable,
+} from './envelopeTable';
 import { SidebarCategoryButtons } from './SidebarCategoryButtons';
 
 type SidebarCategoryProps = {
@@ -63,8 +66,7 @@ export function SidebarCategory({
   onHideNewCategory,
 }: SidebarCategoryProps) {
   const { t } = useTranslation();
-  const [categoryExpandedStatePref] = useGlobalPref('categoryExpandedState');
-  const categoryExpandedState = categoryExpandedStatePref ?? 0;
+  const categoryColumnStyle = useCategoryColumnStyle();
   const isEnvelopeTable = useIsEnvelopeTable();
 
   const temporary = category.id === 'new';
@@ -154,7 +156,7 @@ export function SidebarCategory({
     <View
       innerRef={innerRef}
       style={{
-        width: 200 + 100 * categoryExpandedState,
+        ...categoryColumnStyle,
         overflow: 'hidden',
         '& .hover-visible': {
           display: 'none',
