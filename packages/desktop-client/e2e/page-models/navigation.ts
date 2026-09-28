@@ -1,3 +1,4 @@
+import { expect } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
 
 import { AccountPage } from './account-page';
@@ -72,11 +73,37 @@ export class Navigation {
   }
 
   async goToAccountPage(accountName: string) {
-    await this.page
-      .getByRole('link', { name: new RegExp(`^${accountName}`) })
-      .click();
+    const name = new RegExp(`^${accountName}`);
+    const paneLink = this.page
+      .getByTestId('accounts-pane')
+      .getByRole('link', { name });
+
+    // Below 1280px the accounts pane defaults to a collapsed rail that lists
+    // individual accounts only, so All / On / Off budget are reached through
+    // the top-bar Accounts menu instead (leaving the pane state untouched).
+    if (await paneLink.isVisible()) {
+      await paneLink.click();
+    } else {
+      await this.page
+        .getByRole('button', { name: 'Accounts', exact: true })
+        .click();
+      await this.page
+        .getByRole('navigation', { name: 'Accounts' })
+        .getByRole('link', { name })
+        .click();
+    }
 
     return new AccountPage(this.page);
+  }
+
+  // Opens the accounts pane when it is collapsed (the default below 1280px),
+  // for tests that read the pane's All / On / Off budget balances.
+  async expandAccountsPane() {
+    const pane = this.page.getByTestId('accounts-pane');
+    if ((await pane.getAttribute('data-expanded')) === 'false') {
+      await this.page.getByRole('button', { name: 'Expand accounts' }).click();
+      await expect(pane).toHaveAttribute('data-expanded', 'true');
+    }
   }
 
   async goToReportsPage() {

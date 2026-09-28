@@ -245,6 +245,8 @@ test.describe('Transactions', () => {
   });
 
   test('creates a transfer test transaction', async () => {
+    await navigation.expandAccountsPane();
+
     await accountPage.enterSingleTransaction({
       payee: 'Bank of America',
       notes: 'Notes field',
