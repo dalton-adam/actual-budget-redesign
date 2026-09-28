@@ -1,6 +1,6 @@
 // @ts-strict-ignore
-import React, { useEffect } from 'react';
-import type { ComponentProps } from 'react';
+import React, { useEffect, useState } from 'react';
+import type { ComponentProps, UIEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { AutoSizer } from 'react-virtualized-auto-sizer';
@@ -52,6 +52,7 @@ const DynamicBudgetTable = ({
   ...props
 }: DynamicBudgetTableProps) => {
   const { setDisplayMax } = useBudgetMonthCount();
+  const [isScrolled, setIsScrolled] = useState(false);
   const [categoryExpandedStatePref] = useGlobalPref('categoryExpandedState');
   const isGoalTemplatesEnabled = useFeatureFlag('goalTemplatesEnabled');
   const categoryExpandedState = categoryExpandedStatePref ?? 0;
@@ -138,8 +139,23 @@ const DynamicBudgetTable = ({
     [onBudgetAction, startMonth, isGoalTemplatesEnabled],
   );
 
+  // The summary strip replaces the cards once the table has scrolled past
+  // 40px, and the cards return at the top (design-decisions §3).
+  function onScrollCapture(e: UIEvent<HTMLElement>) {
+    const target = e.target as HTMLElement;
+    if (target.dataset?.testid !== 'budget-table-scroll-container') {
+      return;
+    }
+    if (target.scrollTop > 40) {
+      setIsScrolled(true);
+    } else if (target.scrollTop === 0) {
+      setIsScrolled(false);
+    }
+  }
+
   return (
     <View
+      onScrollCapture={onScrollCapture}
       style={{
         width,
         height,
@@ -150,6 +166,8 @@ const DynamicBudgetTable = ({
       <View style={{ width: '100%', maxWidth }}>
         <ErrorBoundary FallbackComponent={FeatureErrorFallback}>
           <BudgetPageHeader
+            type={type}
+            isScrolled={isScrolled}
             startMonth={prewarmStartMonth}
             numMonths={numMonths}
             monthBounds={monthBounds}

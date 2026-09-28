@@ -6,6 +6,7 @@ import { AccountPage } from './account-page';
 export class BudgetPage {
   readonly page: Page;
   readonly budgetSummary: Locator;
+  readonly readyToAssignCard: Locator;
   readonly budgetTable: Locator;
   readonly budgetTableTotals: Locator;
   readonly selectedMonthButton: Locator;
@@ -16,13 +17,28 @@ export class BudgetPage {
     this.page = page;
 
     this.budgetSummary = page.getByTestId('budget-summary');
+    this.readyToAssignCard = page
+      .getByTestId('month-summary-cards')
+      .getByTestId('ready-to-assign');
     this.budgetTable = page.getByTestId('budget-table');
     this.budgetTableTotals = this.budgetTable.getByTestId('budget-totals');
     this.selectedMonthButton = page.getByTestId('selected-budget-month');
-    this.nextMonthButton = page.getByTitle('Next month');
+    // Envelope budgets use the month stepper; tracking budgets keep the
+    // month picker, whose button is labelled by a title.
+    this.nextMonthButton = page
+      .getByRole('button', { name: 'Next month' })
+      .or(page.getByTitle('Next month'));
     this.budgetTableScrollContainer = page.getByTestId(
       'budget-table-scroll-container',
     );
+  }
+
+  /** Opens the Ready to Assign popover and returns its breakdown. */
+  async openReadyToAssignBreakdown() {
+    await this.readyToAssignCard.getByRole('button').click();
+    const breakdown = this.page.getByTestId('ready-to-assign-breakdown');
+    await breakdown.waitFor();
+    return breakdown;
   }
 
   async getScrollTop() {

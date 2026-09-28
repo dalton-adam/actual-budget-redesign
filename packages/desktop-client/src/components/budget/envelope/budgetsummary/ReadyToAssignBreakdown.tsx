@@ -1,72 +1,59 @@
 import React from 'react';
-import type { CSSProperties } from 'react';
 import { Trans } from 'react-i18next';
 
 import { AlignedText } from '@actual-app/components/aligned-text';
-import { Block } from '@actual-app/components/block';
 import { styles } from '@actual-app/components/styles';
+import { theme } from '@actual-app/components/theme';
 import { Tooltip } from '@actual-app/components/tooltip';
 import { View } from '@actual-app/components/view';
+import * as monthUtils from '@actual-app/core/shared/months';
 
 import { EnvelopeCellValue } from '#components/budget/envelope/EnvelopeBudgetComponents';
 import { CellValueText } from '#components/spreadsheet/CellValue';
 import { useFormat } from '#hooks/useFormat';
-import type { FormatType } from '#hooks/useFormat';
+import { useLocale } from '#hooks/useLocale';
 import { envelopeBudget } from '#spreadsheet/bindings';
 
-/**
- * Creates a formatter that displays values with explicit +/- signs.
- * Uses Math.abs to avoid double-negative display (e.g., "--$0.00").
- *
- * @param format - The format function from useFormat hook
- * @param invert - If true, shows '-' for positive and '+' for negative
- */
-export function makeSignedFormatter(
-  format: ReturnType<typeof useFormat>,
-  invert = false,
-) {
-  return (value: number, type?: FormatType) => {
-    const v = format(Math.abs(value), type);
-    if (value === 0) {
-      return '-' + v;
-    }
-    const isPositive = value > 0;
-    return invert
-      ? isPositive
-        ? '-' + v
-        : '+' + v
-      : isPositive
-        ? '+' + v
-        : '-' + v;
-  };
-}
+import { BreakdownRow } from './BreakdownRow';
+import { makeSignedFormatter } from './TotalsList';
 
-type TotalsListProps = {
+type ReadyToAssignBreakdownProps = {
+  month: string;
   prevMonthName: string;
-  style?: CSSProperties;
 };
 
-export function TotalsList({ prevMonthName, style }: TotalsListProps) {
+/**
+ * The existing month breakdown (the same values and signs as `TotalsList`)
+ * laid out as rows, ending in the Ready to Assign total (design-decisions §3).
+ */
+export function ReadyToAssignBreakdown({
+  month,
+  prevMonthName,
+}: ReadyToAssignBreakdownProps) {
+  const locale = useLocale();
   const format = useFormat();
   const signedFormatter = makeSignedFormatter(format);
   const invertedSignedFormatter = makeSignedFormatter(format, true);
+
   return (
     <View
-      style={{
-        flexDirection: 'row',
-        lineHeight: 1.5,
-        justifyContent: 'center',
-        ...styles.smallText,
-        ...style,
-      }}
+      data-testid="ready-to-assign-breakdown"
+      style={{ padding: '12px 14px 4px', ...styles.smallText }}
     >
       <View
         style={{
-          textAlign: 'right',
-          marginRight: 10,
-          minWidth: 50,
+          color: theme.pageTextFaint,
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: 0.6,
+          textTransform: 'uppercase',
+          marginBottom: 6,
         }}
       >
+        {monthUtils.format(month, 'MMMM yyyy', locale)}
+      </View>
+
+      <BreakdownRow label={<Trans>Available funds</Trans>}>
         <Tooltip
           style={{ ...styles.tooltip, lineHeight: 1.5, padding: '6px 10px' }}
           content={
@@ -97,10 +84,12 @@ export function TotalsList({ prevMonthName, style }: TotalsListProps) {
             binding={envelopeBudget.incomeAvailable}
             type="financial"
           >
-            {props => <CellValueText {...props} style={{ fontWeight: 600 }} />}
+            {props => <CellValueText {...props} style={valueStyle} />}
           </EnvelopeCellValue>
         </Tooltip>
+      </BreakdownRow>
 
+      <BreakdownRow label={<Trans>Overspent in {{ prevMonthName }}</Trans>}>
         <EnvelopeCellValue
           binding={envelopeBudget.lastMonthOverspent}
           type="financial"
@@ -108,12 +97,14 @@ export function TotalsList({ prevMonthName, style }: TotalsListProps) {
           {props => (
             <CellValueText
               {...props}
-              style={{ fontWeight: 600 }}
+              style={valueStyle}
               formatter={signedFormatter}
             />
           )}
         </EnvelopeCellValue>
+      </BreakdownRow>
 
+      <BreakdownRow label={<Trans>Budgeted</Trans>}>
         <EnvelopeCellValue
           binding={envelopeBudget.totalBudgeted}
           type="financial"
@@ -121,12 +112,14 @@ export function TotalsList({ prevMonthName, style }: TotalsListProps) {
           {props => (
             <CellValueText
               {...props}
-              style={{ fontWeight: 600 }}
+              style={valueStyle}
               formatter={signedFormatter}
             />
           )}
         </EnvelopeCellValue>
+      </BreakdownRow>
 
+      <BreakdownRow label={<Trans>For next month</Trans>}>
         <EnvelopeCellValue
           binding={envelopeBudget.forNextMonth}
           type="financial"
@@ -134,30 +127,44 @@ export function TotalsList({ prevMonthName, style }: TotalsListProps) {
           {props => (
             <CellValueText
               {...props}
-              style={{ fontWeight: 600 }}
+              style={valueStyle}
               formatter={invertedSignedFormatter}
             />
           )}
         </EnvelopeCellValue>
-      </View>
+      </BreakdownRow>
 
-      <View>
-        <Block>
-          <Trans>Available funds</Trans>
-        </Block>
-
-        <Block>
-          <Trans>Overspent in {{ prevMonthName }}</Trans>
-        </Block>
-
-        <Block>
-          <Trans>Budgeted</Trans>
-        </Block>
-
-        <Block>
-          <Trans>For next month</Trans>
-        </Block>
+      <View
+        style={{
+          borderTop: `1px solid ${theme.cardHairline}`,
+          marginTop: 6,
+          paddingTop: 8,
+          paddingBottom: 8,
+        }}
+      >
+        <BreakdownRow label={<Trans>Ready to Assign</Trans>} isTotal>
+          <EnvelopeCellValue binding={envelopeBudget.toBudget} type="financial">
+            {({ value, ...props }) => (
+              <CellValueText
+                {...props}
+                value={value ?? 0}
+                style={{
+                  ...valueStyle,
+                  fontWeight: 700,
+                  color:
+                    (value ?? 0) > 0
+                      ? theme.toBudgetPositive
+                      : (value ?? 0) < 0
+                        ? theme.toBudgetNegative
+                        : theme.pageText,
+                }}
+              />
+            )}
+          </EnvelopeCellValue>
+        </BreakdownRow>
       </View>
     </View>
   );
 }
+
+const valueStyle = { fontWeight: 600, color: theme.pageText };

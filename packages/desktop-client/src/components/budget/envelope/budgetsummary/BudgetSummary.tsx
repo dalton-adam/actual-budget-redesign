@@ -1,4 +1,4 @@
-import React, { memo, useRef, useState } from 'react';
+import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@actual-app/components/button';
@@ -7,7 +7,6 @@ import {
   SvgArrowButtonDown1,
   SvgArrowButtonUp1,
 } from '@actual-app/components/icons/v2';
-import { Popover } from '@actual-app/components/popover';
 import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -18,9 +17,8 @@ import { useEnvelopeBudget } from '#components/budget/envelope/EnvelopeBudgetCon
 import { NotesButton } from '#components/NotesButton';
 import { useLocale } from '#hooks/useLocale';
 import { SheetNameProvider } from '#hooks/useSheetName';
-import { useUndo } from '#hooks/useUndo';
 
-import { BudgetMonthMenu } from './BudgetMonthMenu';
+import { BudgetMonthMenuButton } from './BudgetMonthMenuButton';
 import { ToBudget } from './ToBudget';
 import { TotalsList } from './TotalsList';
 
@@ -36,18 +34,6 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
     onToggleSummaryCollapse,
   } = useEnvelopeBudget();
 
-  const [menuOpen, setMenuOpen] = useState(false);
-  const triggerRef = useRef(null);
-  const { showUndoNotification } = useUndo();
-
-  function onMenuOpen() {
-    setMenuOpen(true);
-  }
-
-  function onMenuClose() {
-    setMenuOpen(false);
-  }
-
   const prevMonthName = monthUtils.format(
     monthUtils.prevMonth(month),
     'MMM',
@@ -58,7 +44,6 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
     ? SvgArrowButtonDown1
     : SvgArrowButtonUp1;
 
-  const displayMonth = monthUtils.format(month, "MMMM ''yy", locale);
   const { t } = useTranslation();
 
   return (
@@ -155,95 +140,13 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
               />
             </View>
             <View style={{ userSelect: 'none', marginLeft: 2 }}>
-              <Button
-                ref={triggerRef}
-                variant="bare"
-                aria-label={t('Menu')}
-                onPress={onMenuOpen}
-              >
+              <BudgetMonthMenuButton month={month}>
                 <SvgDotsHorizontalTriple
                   width={15}
                   height={15}
                   style={{ color: theme.pageTextLight }}
                 />
-              </Button>
-
-              <Popover
-                triggerRef={triggerRef}
-                isOpen={menuOpen}
-                onOpenChange={onMenuClose}
-              >
-                <BudgetMonthMenu
-                  onCopyLastMonthBudget={() => {
-                    onBudgetAction(month, 'copy-last');
-                    onMenuClose();
-                    showUndoNotification({
-                      message: t(
-                        "{{displayMonth}} budgets have all been set to last month's budgeted amounts.",
-                        { displayMonth },
-                      ),
-                    });
-                  }}
-                  onSetBudgetsToZero={() => {
-                    onBudgetAction(month, 'set-zero');
-                    onMenuClose();
-                    showUndoNotification({
-                      message: t(
-                        '{{displayMonth}} budgets have all been set to zero.',
-                        { displayMonth },
-                      ),
-                    });
-                  }}
-                  onSetMonthsAverage={numberOfMonths => {
-                    onBudgetAction(month, `set-${numberOfMonths}-avg`);
-                    onMenuClose();
-                    showUndoNotification({
-                      message:
-                        numberOfMonths === 12
-                          ? t(
-                              `${displayMonth} budgets have all been set to yearly average.`,
-                            )
-                          : t(
-                              `${displayMonth} budgets have all been set to ${numberOfMonths} month average.`,
-                            ),
-                    });
-                  }}
-                  onCheckTemplates={() => {
-                    onBudgetAction(month, 'check-templates');
-                    onMenuClose();
-                  }}
-                  onApplyBudgetTemplates={() => {
-                    onBudgetAction(month, 'apply-goal-template');
-                    onMenuClose();
-                    showUndoNotification({
-                      message: t(
-                        '{{displayMonth}} budget templates have been applied.',
-                        { displayMonth },
-                      ),
-                    });
-                  }}
-                  onOverwriteWithBudgetTemplates={() => {
-                    onBudgetAction(month, 'overwrite-goal-template');
-                    onMenuClose();
-                    showUndoNotification({
-                      message: t(
-                        '{{displayMonth}} budget templates have been overwritten.',
-                        { displayMonth },
-                      ),
-                    });
-                  }}
-                  onEndOfMonthCleanup={() => {
-                    onBudgetAction(month, 'cleanup-goal-template');
-                    onMenuClose();
-                    showUndoNotification({
-                      message: t(
-                        '{{displayMonth}} end-of-month cleanup templates have been applied.',
-                        { displayMonth },
-                      ),
-                    });
-                  }}
-                />
-              </Popover>
+              </BudgetMonthMenuButton>
             </View>
           </View>
         </View>

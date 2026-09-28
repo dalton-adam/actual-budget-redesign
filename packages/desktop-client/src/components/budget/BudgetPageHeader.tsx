@@ -6,21 +6,36 @@ import { View } from '@actual-app/components/view';
 
 import { useGlobalPref } from '#hooks/useGlobalPref';
 
+import { EnvelopeBudgetPageHeader } from './envelope/budgetsummary/EnvelopeBudgetPageHeader';
 import { MonthPicker } from './MonthPicker';
 import { getScrollbarWidth } from './util';
 
 type BudgetPageHeaderProps = {
+  type: string;
   startMonth: string;
   onMonthSelect: (month: string) => void;
   numMonths: number;
   monthBounds: ComponentProps<typeof MonthPicker>['monthBounds'];
+  isScrolled: boolean;
 };
 
 export const BudgetPageHeader = memo<BudgetPageHeaderProps>(
-  ({ startMonth, onMonthSelect, numMonths, monthBounds }) => {
+  ({ type, startMonth, onMonthSelect, numMonths, monthBounds, isScrolled }) => {
     const [categoryExpandedStatePref] = useGlobalPref('categoryExpandedState');
     const categoryExpandedState = categoryExpandedStatePref ?? 0;
     const offsetMultipleMonths = numMonths === 1 ? 4 : 0;
+
+    if (type === 'envelope') {
+      return (
+        <EnvelopeBudgetPageHeader
+          month={startMonth}
+          numMonths={numMonths}
+          monthBounds={monthBounds}
+          onMonthSelect={onMonthSelect}
+          isScrolled={isScrolled}
+        />
+      );
+    }
 
     return (
       <View

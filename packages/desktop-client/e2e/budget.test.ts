@@ -27,14 +27,16 @@ test.describe('Budget', () => {
   });
 
   test('renders the summary information: available funds, overspent, budgeted and for next month', async () => {
-    const summary = budgetPage.budgetSummary.first();
-
-    await expect(summary.getByText('Available funds')).toBeVisible({
+    await expect(budgetPage.readyToAssignCard).toBeVisible({
       timeout: 10000,
     });
+    const summary = await budgetPage.openReadyToAssignBreakdown();
+
+    await expect(summary.getByText('Available funds')).toBeVisible();
     await expect(summary.getByText(/^Overspent in /)).toBeVisible();
     await expect(summary.getByText('Budgeted')).toBeVisible();
     await expect(summary.getByText('For next month')).toBeVisible();
+    await expect(summary.getByText('Ready to Assign')).toBeVisible();
     await expect(page).toMatchThemeScreenshots();
   });
 
