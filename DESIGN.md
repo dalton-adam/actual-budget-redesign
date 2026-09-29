@@ -324,7 +324,7 @@ Calm and tactile: redesign variants are opt-in, so existing variants and screens
 
 ### Signature Component: The Envelope Table
 
-One continuous table with Eyebrow column headers (Category | Assigned | Activity | Available). Group rows are tinted with Group Row and collapsible. Each category row holds the tile and name (the name is a button that opens the details panel), the editable Assigned amount, and the Activity amount with a percentage and progress bar. The Activity amount sits on the same line as Assigned and Available; the bar hangs 3px below it. It ends with an Available status pill. Row tools (notes, menu, drag handle) take no width and appear only on hover or keyboard focus.
+One continuous table with Eyebrow column headers (Category | Assigned | Activity | Available). Group rows are tinted with Group Row and collapsible. Each category row holds the tile and name (the name is a button that opens the details panel), the editable Assigned amount, and the Activity amount with a percentage and progress bar. The Activity amount sits on the same line as Assigned and Available; the bar hangs 3px below it. It ends with an Available status pill. Row tools (notes, menu, drag handle) take no width and appear only on hover or keyboard focus. The Assigned cell's month notes and budget menu sit just left of the Assigned column, in a 48px gutter the Category cell keeps free, so the amount always has the whole column.
 
 ### Signature Component: Ready to Assign Card
 

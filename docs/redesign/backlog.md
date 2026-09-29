@@ -39,6 +39,7 @@ Budget header are reference material, not tasks to build.
 | BUD-04               | verified    | `c0527171d`              | Adds theme role `navListActive`. Linux VRT not rerun (light Budget and pane snapshots change).        |
 | PERF-01              | verified    | `8f88c6841`              | Edits now 57–59% faster than the base. Adds `C/budget/index.tsx` (owner-approved; may touch SYNC-01). |
 | PERF-02              | verified    | docs only                | PERF-01 fixed it; no source change. 1000×700 hit 33.3 ms in 5 of 7 runs (a pass; QA-01 watches).      |
+| ASSIGN-FIX           | review      | —                        | Awaiting owner approval. Other Linux VRT snapshots stale since BUD-04 (not regenerated here).         |
 | DETAIL-03, DETAIL-04 | not started | —                        | —                                                                                                     |
 | SYNC-01              | blocked     | —                        | Waiting on owner decision D-1.                                                                        |
 | APP-01 – APP-06      | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                           |

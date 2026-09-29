@@ -17,6 +17,7 @@ import { css } from '@emotion/css';
 
 import { BalanceWithCarryover } from '#components/budget/BalanceWithCarryover';
 import {
+  ENVELOPE_ASSIGNED_TOOLS_WIDTH,
   envelopeCellBorderStyle,
   useEnvelopeColumnWidths,
 } from '#components/budget/envelopeTable';
@@ -349,6 +350,7 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
         style={{
           width: columnWidths.assigned,
           flexDirection: 'row',
+          position: 'relative',
         }}
         onContextMenu={e => {
           if (editing) return;
@@ -356,33 +358,33 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
         }}
       >
         {!editing && (
-          <>
-            <View
-              style={{
-                paddingLeft: 3,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderTopWidth: 1,
-                borderBottomWidth: 1,
-                ...envelopeCellBorderStyle,
-              }}
-            >
-              <NotesButton
-                id={`${category.id}-${month}`}
-                defaultColor={theme.pageTextLight}
-              />
-            </View>
+          // Row tools take no width in the Assigned column (design-decisions
+          // §4.2): they sit just left of it, in the gutter the Category cell
+          // keeps free, so the amount always has the whole column.
+          <View
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              right: '100%',
+              width: ENVELOPE_ASSIGNED_TOOLS_WIDTH,
+              zIndex: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}
+          >
+            <NotesButton
+              id={`${category.id}-${month}`}
+              defaultColor={theme.pageTextLight}
+            />
             <View
               className={`hover-expand ${budgetMenuOpen ? 'force-visible' : ''}`}
               style={{
                 flexDirection: 'row',
                 flexShrink: 1,
-                paddingLeft: 3,
+                paddingLeft: 2,
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderTopWidth: 1,
-                borderBottomWidth: 1,
-                ...envelopeCellBorderStyle,
               }}
             >
               <Button
@@ -449,7 +451,7 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
                 />
               </Popover>
             </View>
-          </>
+          </View>
         )}
         <EnvelopeSheetCell
           name="budget"

@@ -18,6 +18,12 @@ import { useCategoryDetails } from './CategoryDetailsContext';
 
 export const ENVELOPE_CATEGORY_ROW_HEIGHT = 44;
 export const ENVELOPE_GROUP_ROW_HEIGHT = 40;
+/**
+ * The Assigned cell's month notes button and budget menu sit in a gutter at
+ * the right edge of the Category cell rather than inside the Assigned
+ * column, so a long amount never shares its width with them.
+ */
+export const ENVELOPE_ASSIGNED_TOOLS_WIDTH = 48;
 
 export type EnvelopeColumnWidths = {
   /** Minimum width of the flexible Category column. */
@@ -40,9 +46,8 @@ type EnvelopeLayoutState = {
  * Column widths by window width (design-decisions §4.1). The table fills the
  * page: Category takes the remaining space and the month columns are fixed,
  * using the upper end of the Activity range. Assigned is 112px wherever §4.1
- * has less (100, 104 or 84px) because the month notes button shares that
- * cell, and Available is at least 104px (§4.1: 92 or 96px); the narrower
- * widths clipped amounts such as 1,145.62 and 12,366.00.
+ * has less (100, 104 or 84px), and Available is at least 104px (§4.1: 92 or
+ * 96px); the narrower widths clipped amounts such as 1,145.62 and 12,366.00.
  */
 export function getEnvelopeColumnWidths(
   windowWidth: number,

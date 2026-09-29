@@ -753,3 +753,71 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   ([1000](verification/perf-02/light-budget-1000-scrolled.png),
   [1440](verification/perf-02/light-budget-1440-scrolled.png)). No
   typecheck, lint or UNIT: no source changed.
+
+- ASSIGN-FIX (bug fix, no task card): **in review September 29, 2026**,
+  not merged; waiting on owner approval (branch
+  `redesign/bud-assigned-hover` from `c53871325`). **Problem:** the Linux
+  VRT `Budget-transfer-funds-to-another-category-2` (1280×720, dark, panel
+  open) showed Food's Assigned as "-755...." beside the month notes icon
+  and budget menu chevron, though design-decisions §4.2 says row tools
+  take no width. **Cause:** in `ExpenseCategoryMonth` the notes button
+  (about 23px, always in the flex row) and the `hover-expand` chevron
+  wrapper (0px at rest, about 23px on hover or focus) sat beside the
+  amount inside the 112px Assigned cell. On hover the amount's box shrank
+  to 66px with the panel open, or 74px with it closed (from 112 or 120px).
+  Measured on the unmodified build: every signed 7-character amount
+  overflowed with the panel open, and `12,366.00` overflowed in every
+  layout. **First attempt, dropped:** laying the tools over the cell's
+  left edge gave the amount the whole column, but at 112px a 9-character
+  amount ran into the chevron and the edit box's hover ring enclosed the
+  icons. **Change:** the tools move into an absolutely positioned layer
+  just left of the Assigned column (`right: 100%`, width
+  `ENVELOPE_ASSIGNED_TOOLS_WIDTH` = 48px, new in `C/budget/envelopeTable.ts`).
+  In envelope budgets the Category cell keeps a matching 48px right
+  padding, so a long name and its own tools end before the gutter. DOM
+  order, tab order, hover and focus rules, the budget menu's anchor (still
+  the Assigned cell), handlers, bindings and saved values are unchanged.
+  Column widths are unchanged. The `getEnvelopeColumnWidths` comment no
+  longer says the notes button shares the cell. DESIGN.md's envelope table
+  paragraph records the gutter. **Files:**
+  `C/budget/envelope/EnvelopeBudgetComponents.tsx`,
+  `C/budget/SidebarCategory.tsx`, `C/budget/envelopeTable.ts`, `DESIGN.md`,
+  three Linux snapshots, and the docs. **Checks:** typecheck pass; lint
+  pass; UNIT `src/components/budget` 74/74; E2E(budget, bud-01, detail-01)
+  18/18 against a fresh `build:browser` preview (port 3028). Impeccable
+  detector on the three changed source files: two `layout-transition`
+  warnings on the `hover-expand` `max-width` rules. The base file has the
+  same two warnings, and they are 0s delayed snaps, not animations.
+  **VISUAL** (scratch Playwright script, not committed, demo budget):
+  1000×700, 1280×720 and 1440×900, light, dark and midnight, panel open
+  and closed, hovering three rows (a signed 7-character amount,
+  `12,366.00`, and a 45-character category name). 54 of 54 cases: the
+  amount's text box is the whole column (96 or 104px) and never overflows,
+  and the long name always ends before the tools (for example 416px
+  against 457px at 1280×720). Before and after:
+  [before](verification/assign-fix/before-dark-1280-panel-hover.png),
+  [after](verification/assign-fix/after-dark-1280-panel-hover.png),
+  [long name, light 1000](verification/assign-fix/after-light-1000-panel-long-name.png),
+  [midnight 1440](verification/assign-fix/after-midnight-1440-hover.png).
+  Keyboard: Tab goes name, category menu, category notes, month notes,
+  budget menu (unchanged), and the month notes focus ring shows. The
+  budget menu opens below the Assigned cell, and the notes popover opens.
+  **Linux VRT** (Playwright v1.61.1 image, HTTPS `vite preview` over the
+  LAN address, one worker): budget, command-bar, help-menu and onboarding
+  had 12 passed, 6 failed. To keep only this change's snapshots, all
+  screenshots in the three failing files were captured from a base build
+  and from this branch. Only the three `transfer funds to another category`
+  snapshots differ (about 645 pixels each, all in the Food row's
+  Assigned and tools area). Those three were updated; the rerun without
+  `--update-snapshots` passed 1/1. **Gaps:** the other failures (the
+  `renders the summary information` budget snapshots, command-bar and
+  help-menu) are identical on the base build. They are BUD-04's layout
+  (Ready to Assign badge, Activity amounts on the centre line), which BUD-04
+  did not regenerate, and are left for a separate VRT refresh. The three
+  updated snapshots also pick up that BUD-04 layout, since a snapshot
+  cannot take one change without the other. Not checked: a custom theme
+  (no colour or theme role changed), WIDE, and pixel-exact `-755.00` in the
+  scratch script (the demo's dates move, so it used other signed
+  7-character amounts; the Linux VRT shows the exact `-755.00` case). At
+  window widths where the Category column is at its minimum, the gutter
+  leaves 48px less for the name.
