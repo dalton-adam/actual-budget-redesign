@@ -171,7 +171,7 @@ Actual is a tool people open every week for years to give each dollar a job, so 
 
 The look borrows Copilot Money's calm card language, applied on top of Actual's existing envelope engine and theme system. It stays restrained. Depth appears only where it was approved, and the category accent colors show identity, never status. The system must look equally correct in light, dark and midnight, and in any custom theme through derived fallbacks.
 
-The redesign is being rolled out page by page. The Budget page, top navigation and accounts pane use this vocabulary now. Account registers, Reports, Schedules and settings still use the upstream vocabulary until their APP tasks land. New work always uses the redesign vocabulary, and existing variants stay untouched so unmigrated screens look the same.
+The redesign is being rolled out page by page. The Budget page, top navigation, accounts pane and the account page header use this vocabulary now. The account register, Reports, Schedules and settings still use the upstream vocabulary until their APP tasks land. New work always uses the redesign vocabulary, and existing variants stay untouched so unmigrated screens look the same.
 
 **Key Characteristics:**
 
@@ -266,7 +266,7 @@ This is a hybrid of hairlines and soft lift. Structure comes first from hairline
 
 ### Shadow Vocabulary
 
-- **Card elevation** (`cardElevation`: `0 1px 2px rgba(15,15,30,.04), 0 10px 28px rgba(15,15,30,.05)` in light): surface cards — the summary cards and the details panel.
+- **Card elevation** (`cardElevation`: `0 1px 2px rgba(15,15,30,.04), 0 10px 28px rgba(15,15,30,.05)` in light): surface cards — the summary cards, the details panel, and the account hero and balance chart cards (approved with design-decisions §10).
 - **Active tab** (`navActiveShadow`: `0 1px 3px rgba(15,15,30,.12)`): the selected pill tab lifting out of its track.
 - **Popover** (`popoverShadow`: `0 16px 40px rgba(15,15,30,.16), 0 2px 6px rgba(15,15,30,.06)`): menus, popovers and the Ready to Assign breakdown.
 - **Hero glow** (`heroGlow` / `heroGlowNegative`): a soft positive or negative wash behind the Ready to Assign card. It is absent at zero.
@@ -328,6 +328,10 @@ Calm and tactile: redesign variants are opt-in, so existing variants and screens
 
 One continuous table with Eyebrow column headers (Category | Assigned | Activity | Available). Group rows are tinted with Group Row and collapsible. Each category row holds the tile and name (the name is a button that opens the details panel), the editable Assigned amount, and the Activity amount with a percentage and progress bar. The Activity amount sits on the same line as Assigned and Available; the bar hangs 3px below it. It ends with an Available status pill. Row tools (notes, menu, drag handle) take no width and appear only on hover or keyboard focus. The Assigned cell's month notes and budget menu sit just left of the Assigned column, in a 48px gutter the Category cell keeps free, so the amount always has the whole column.
 
+### Account Hero
+
+The account page's header (APP-01), a Surface card. From 1280px wide and 900px tall: an On budget / Off budget line in Secondary text, the account name at 28px/700 with its notes and rename buttons, Bank Sync and Reconcile as Control buttons at the top right, the balance as the Hero Amount, then a chip row. Smaller windows get one band: name and chips on the left, icon-only Bank Sync and Reconcile (accessible names kept) and the balance at Display size on the right. Chips are neutral pills for Cleared, Uncleared (after pressing the balance), Selected and Filtered totals; a lock chip for reconciliation status (positive once reconciled); and the bank-sync error as a negative pill that opens its existing popover. While reconciling, the card takes a 1px Actual Purple outline and holds a Card Inset band: a Difference pill (negative) or "All reconciled!" (positive), the existing sentence, and the existing buttons. The optional balance chart is a second Surface card beside the hero, or a short full-width card under the band when compact. Multi-account views show the name, balance and chips only.
+
 ### Signature Component: Ready to Assign Card
 
 The page's hero card, with three states. Positive shows positive text and a hero glow. Zero shows neutral text and an "All assigned" badge. Negative shows negative text, an "Overassigned" badge and the negative glow. The badge sits beside the label; when the card is too narrow for both on one line, it takes the subline's place under the amount instead of wrapping. Clicking the card, or pressing Enter or Space, opens a popover with the existing breakdown and To Budget actions.
@@ -359,5 +363,5 @@ The page's hero card, with three states. Positive shows positive text and a hero
 These are not rules yet. Until they are decided, follow the current behavior and do not record them as rules in this file.
 
 - **Goal caption (D-3):** the caption under the category name for goal and template categories is left out. The target icon in the Available pill stays.
-- **Account hero and register treatment** (design-decisions §10 and §11 item 5, APP-01 and APP-02).
+- **Account register treatment** (design-decisions §10, APP-02).
 - **Mobile** is deferred. Mobile screens keep the upstream look apart from the TERM-01 wording.

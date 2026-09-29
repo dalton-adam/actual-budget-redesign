@@ -44,7 +44,8 @@ Budget header are reference material, not tasks to build.
 | DETAIL-04          | verified    | `9059b8491`              | E2E and WIDE ran against a dev server, not a `build:browser` preview. Linux VRT regenerated (21).                          |
 | TOPBAR-FIX         | verified    | `107560a51`              | Icon-only Help when narrow is still "Shown" (design-decisions §11 item 6). Linux VRT not regenerated.                      |
 | SYNC-01            | blocked     | —                        | No upstream release after v26.9.0 (checked September 29, 2026). Start when v26.10.0 ships; before RELEASE-01 (D-1).        |
-| APP-01 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
+| APP-01             | review      | branch only              | Account hero built; custom theme, Linux VRT, privacy and desktop not yet checked. Adds `C/Titlebar.tsx` (owner-approved).  |
+| APP-02 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                          |
 
 States follow plan §16: not started, ready, in progress, review, verified,
