@@ -914,3 +914,94 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   **Known limits:** the empty-notes button keeps the row's
   30% placeholder opacity, which is faint; notes text is not redacted in
   privacy mode (unchanged from DETAIL-02 and the row's tooltip).
+- DETAIL-04: **in review September 29, 2026** (branch `redesign/detail-04`
+  from `225c5bfc3`). Goal box and pace chart in the details panel
+  (design-decisions §5 items 4 and 5, §7.2; plan §10 Part A). **Owner
+  decisions (September 29, 2026):** past and future months follow §7.2 as
+  shown (§11 item 2, now Approved); the goal box shows the goal values and
+  the category's template sentences. **Goal box:** reads the goal bindings
+  the Available pill reads (`catGoal`, `catLongGoal`), only when goal
+  templates are on and the month has a goal. New `getGoalStatus` compares
+  Assigned for a template and Available for a long-term goal, as
+  `makeBalanceAmountStyle` does. Status line ("Template 250.00 · 30.00
+  short", "Goal 10,000.00 · 49% saved") with the target icon in warning
+  until met, then positive (the percentage stays below 100% until then); a
+  bar; the pill's sentence; then the template sentences through the existing `TemplateSentence`, when the automations UI
+  flag is on (as the automation button's tooltip; `getAutomationEntries` is
+  now exported from `CategoryAutomationButton.tsx` for this). A long-term
+  goal replaces the pace chart. **Pace:** spending by day from the
+  transaction list's filter (category and month, `splits: 'inline'`)
+  grouped by date and summed, into UI-03's `getCategoryPace`; start is
+  Available − Activity (carried in + Assigned). Recharts (already used by
+  Reports), animation off: stepped cumulative line in the accent (negative
+  when Available is negative), dashed even-pace line, dotted today line in
+  the current month; a future month shows the pace line and "No activity
+  yet". Legend and summary below; the accessible name is the text
+  equivalent ("Spent 229.09 of 483.80 by Sep 29. 238.58 under even pace.").
+  Loading and error states. **Privacy:** the chart is replaced by "Chart
+  hidden in privacy mode", its accessible name has no amounts, and the
+  summary and goal text are redacted. **Found and fixed:** the panel's
+  sections squashed and overlapped instead of scrolling once the content was
+  taller than the card (`View` sets `min-height: 0`); the new sections made
+  it show at 1000×700 and 1440×900. `CategoryDetailsPanel.tsx` now stops the
+  card's children from shrinking. Changed files:
+  `C/budget/CategoryDetails{Body,Panel}.tsx`,
+  `C/budget/categoryPresentation{,.test}.ts`,
+  `C/budget/goals/CategoryAutomationButton.tsx` (export only); new
+  `C/budget/CategoryDetails{Outlook,Goal,Pace,PaceChart,LegendKey}.tsx`,
+  `e2e/detail-04.test.ts`. No handler, binding, query engine, preference or
+  saved value changed. Checks: typecheck pass; lint pass; UNIT
+  `src/components/budget` 86/86 (5 new for `getGoalStatus`: long-term goal,
+  template against Assigned, met and capped, overspent goal, zero target);
+  `generate:i18n` ran; E2E(detail-04) 6/6 (the current month's text
+  equivalent and summary match a hand calculation from the panel's tiles and
+  the Sep 1 – 30 range; a past month's "Finished …" matches Available; a
+  future month shows "… to spend from … 1" equal to Available; assigning
+  exactly minus the carried-in amount gives "Nothing assigned, so no pace
+  line" and no pace line; a template 30.00 short and a long-term goal with
+  its percentage, which hides the pace chart; privacy hides the chart and
+  its amounts); E2E(detail-01, detail-02, detail-03, detail-04, budget,
+  bud-01, transactions, accounts, settings, nav-02, tour, help-menu) 69/69
+  with `--ignore-snapshots`. These E2E and WIDE runs used this branch's own
+  Vite dev server on 3027, not a `build:browser` preview: another session
+  was rebuilding loot-core's browser worker while this ran, so a production
+  build here would have raced it, and `build/` backs that session's 3018
+  preview. Impeccable detector: no findings. **Fixture comparison**
+  (hand-calculated, demo budget, September 29): Food, 83.80 carried in,
+  400.00 assigned, 229.09 spent: even pace by day 29 is 483.80 × 29 / 30 =
+  467.67, so 238.58 under, as shown. Clothing, 50.00 template, nothing
+  carried in: 50.00 × 29 / 30 = 48.33 against 495.44 spent, 447.11 over.
+  Food in August: 400.00 − 477.99 = 77.99 overspent. Food in October:
+  September's 230.82 to spend from Oct 1. VISUAL (Playwright against the
+  3027 dev server, demo budget; [screenshots](verification/detail-04/)):
+  dark 1440×900 for a current month, a template and a long-term goal; light
+  1000×700 current, past and future months; midnight 820×700 overlay; dark
+  privacy mode. Found and fixed: the future month's "No activity yet" sat on
+  the pace line, so it has a Card Inset backing. Reduced motion: the chart
+  never animates; the only transitions left in the panel are the notes
+  buttons' existing 0.25s focus shadow. **Custom theme** (DETAIL-03's
+  method: every v26.9.0 role hue-rotated 150°, none of the redesign roles;
+  a template seeded so the goal box shows): 1440×900, 1000×700 and the
+  820×700 overlay in custom dark and custom light. Every computed text,
+  background, border, outline and SVG stroke and fill colour in the panel
+  matched an active role; not set by the custom CSS were `cardInset`,
+  `progressTrack` and `pageTextFaint` (derived by the fallback layer) and
+  the category accents (kept from the base by design). No console errors.
+  **WIDE:** 58 passed, 1 failed (the known Reports baseline at 1440), 15 did
+  not run, matching the recorded baseline.
+  **Linux VRT** (Playwright v1.61.1 image against the HTTPS dev server,
+  one worker): the full run had 169 passed, 6 failed. One was a timeout in
+  `accounts.test.ts`'s setup, the first desktop test while the dev server
+  warmed up. The other five were screenshot mismatches (Budget summary and
+  transfer funds, command bar, help menu, keyboard shortcuts). Pixel
+  comparison put every change inside the panel (x ≥ 931), except 2
+  anti-aliasing pixels on a table progress bar; the changes are the new Pace
+  section and the sections below it moving down. Reviewed by eye: Budget
+  summary (light) and transfer funds (dark; 800.00 carried in − 755.00
+  assigned = 45.00 start, all spent on day 1, 43.55 over even pace, correct),
+  keyboard shortcuts (midnight). 21 snapshots regenerated with
+  `--update-snapshots=changed`, scoped to those five tests. Verification
+  without updating, on budget, command-bar, help-menu and accounts: 24/24.
+  **Known limits:** template sentences appear only with the automations UI
+  flag on, like the automation button's tooltip (checked by hand on the dev
+  server: "Budget 50.00 every 1 months" under the sentence).

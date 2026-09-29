@@ -184,7 +184,12 @@ Contents, top to bottom (`18`, `20`–`24`):
    month's Activity"; the carried-in amount is read back as Available −
    Assigned − Activity, see §11.)
 4. Goal/template box when the category has one: status line with icon,
-   progress toward the target, and the full sentence.
+   progress toward the target, and the full sentence. It reads the goal
+   bindings the Available pill reads (shown only when goal templates are on
+   and the month has a goal); a template compares Assigned, a long-term goal
+   compares Available. Below the sentence it lists the category's template
+   sentences as the automation button does, when the automations UI is on
+   (owner decision, September 29, 2026).
 5. Pace chart (§7.2) with legend and text summary. Omitted for long-term
    savings goals, where the goal box replaces it.
 6. Notes (read-only first).
@@ -239,7 +244,7 @@ else:
 Percentage label: `round(fill × 100)%`, "Over" when overspent, blank when
 nothing was spent.
 
-### 7.2 Pace chart (shown; see §11)
+### 7.2 Pace chart (approved September 29, 2026)
 
 ```
 start    = carried-in balance + assigned       // money at the start of the month
@@ -506,8 +511,9 @@ Confirm or change these before the named task starts; until then the
 1. ~~Details panel third stat tile: **From previous month** (carried in)
    instead of the plan's "last month's Activity" (DETAIL-02).~~
    **Confirmed by the owner September 28, 2026**; now Approved in §5.
-2. Pace chart for past and future months as in §7.2 (the plan said past
-   months without a label and future months without a chart) (DETAIL-04).
+2. ~~Pace chart for past and future months as in §7.2 (the plan said past
+   months without a label and future months without a chart) (DETAIL-04).~~
+   **Confirmed by the owner September 29, 2026**; §7.2 is now Approved.
 3. ~~The "Shown" wording rows in §9 (TERM-01).~~
    **Confirmed by the owner September 28, 2026**; now Approved in §9.
 4. ~~Accounts pane default open at ≥1280px, collapsed below (NAV-02).~~
@@ -523,3 +529,4 @@ Confirm or change these before the named task starts; until then the
 | Sep 27, 2026 | DESIGN-02 walkthrough: 44px rows, collapsible accounts pane, one month at a time, empty bar for negative Available without spending, reconciliation band | [prototype README](prototype/README.md#owner-decisions-september-27-2026-walkthrough), commit `aa422ef87`, screenshots `18`–`50` |
 | Sep 27, 2026 | After NAV-01: accounts pane default confirmed (open at 1280px and wider, collapsed below; §2, §11 item 4)                                                | Owner confirmation in the NAV-01 session                                                                                         |
 | Sep 28, 2026 | DETAIL-02: third stat tile "From previous month" confirmed (§5, §11 item 1); the panel lists posted transactions only                                    | Owner confirmation in the DETAIL-02 session                                                                                      |
+| Sep 29, 2026 | DETAIL-04: pace chart for past and future months as §7.2 (§11 item 2); goal box contents (§5 item 4)                                                     | Owner confirmation in the DETAIL-04 session                                                                                      |
