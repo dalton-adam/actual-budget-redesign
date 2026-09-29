@@ -645,8 +645,8 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   34px hero amount at 1000×700; that is the BUD-01 amount style, not
   this change. The badge thresholds are English; a longer translation of
   the label or badge can still wrap.
-- PERF-01: **ready for review September 29, 2026** (branch
-  `redesign/perf-01` from `6eb4efc7a`; not merged). **Cause, found by
+- PERF-01: **done September 29, 2026**, merged into `redesign/main` with
+  owner approval (`8f88c6841`, branch `redesign/perf-01` from `6eb4efc7a`). **Cause, found by
   profiling:** each Assigned edit re-rendered every category row three
   times, in the base too: once when the edit moved to the next row, and
   once each when the save mutation went pending and settled. The React

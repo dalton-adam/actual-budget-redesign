@@ -37,7 +37,7 @@ Budget header are reference material, not tasks to build.
 | QA-00                | verified    | `1e94b0559`              | VRT: 23 of 204 changed snapshots reviewed by eye, the rest by script. QA-01 thresholds decided (D-6). |
 | ELEC-01              | not started | —                        | Needs an isolation review first (stage-0.md "Electron").                                              |
 | BUD-04               | verified    | `c0527171d`              | Adds theme role `navListActive`. Linux VRT not rerun (light Budget and pane snapshots change).        |
-| PERF-01              | review      | —                        | Edits now 57–59% faster than the base. Adds `C/budget/index.tsx` (owner-approved; may touch SYNC-01). |
+| PERF-01              | verified    | `8f88c6841`              | Edits now 57–59% faster than the base. Adds `C/budget/index.tsx` (owner-approved; may touch SYNC-01). |
 | PERF-02              | ready       | —                        | Opened by QA-00. PERF-01's run saw no scroll frame over 33 ms; confirm and close.                     |
 | DETAIL-03, DETAIL-04 | not started | —                        | —                                                                                                     |
 | SYNC-01              | blocked     | —                        | Waiting on owner decision D-1.                                                                        |
@@ -59,7 +59,8 @@ does not claim Claude's prototype is production-ready.
    [verification.md](verification.md).
 4. ~~**BUD-04**: small Budget-page polish found in the review.~~
    Merged September 29, 2026.
-5. **PERF-01**, **PERF-02**: the Budget table regressions QA-00 measured.
+5. ~~**PERF-01**~~ (merged September 29, 2026), **PERF-02**: the Budget
+   table regressions QA-00 measured.
    After BUD-04, which edits some of the same files.
 6. **DETAIL-03**, then **DETAIL-04**.
 7. **ELEC-01** once its isolation review is written; before RELEASE-01 at the
