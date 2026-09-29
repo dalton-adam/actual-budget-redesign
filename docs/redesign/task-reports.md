@@ -836,7 +836,12 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   failed. Found in review, not caused by this task: the Food row in
   `Budget-transfer-funds-to-another-category-2` shows its Assigned amount
   cut to "-755...." beside the row's hover tools; the committed snapshot
-  already had it (split into its own task). **Not yet checked:** WIDE.
+  already had it (split into its own task).
+  **WIDE** (the recipe's config, pointed at this branch's own production
+  build served on 3028 from a scratch folder, so the other session's 3018
+  preview and `build/` were left alone): 58 passed, 1 failed (the known
+  Reports baseline at 1440: more widgets fit than the test expects), 15 did
+  not run, matching the recorded baseline.
   **Known limits:** the empty-notes button keeps the row's
   30% placeholder opacity, which is faint; notes text is not redacted in
   privacy mode (unchanged from DETAIL-02 and the row's tooltip).
