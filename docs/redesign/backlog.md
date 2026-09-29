@@ -40,7 +40,7 @@ Budget header are reference material, not tasks to build.
 | PERF-01            | verified    | `8f88c6841`              | Edits now 57–59% faster than the base. Adds `C/budget/index.tsx` (owner-approved; may touch SYNC-01).                   |
 | PERF-02            | verified    | docs only                | PERF-01 fixed it; no source change. 1000×700 hit 33.3 ms in 5 of 7 runs (a pass; QA-01 watches).                        |
 | ASSIGN-FIX         | verified    | `cc078bd06`              | Snapshots stale since BUD-04 regenerated in DETAIL-03.                                                                  |
-| DETAIL-03          | review      | —                        | Linux VRT regenerated (177, incl. BUD-04's pane); custom theme and WIDE passed. Session-only category and month memory. |
+| DETAIL-03          | verified    | `658a38c90`              | Linux VRT regenerated (177, incl. BUD-04's pane); custom theme and WIDE passed. Session-only category and month memory. |
 | DETAIL-04          | not started | —                        | —                                                                                                                       |
 | SYNC-01            | blocked     | —                        | Waiting on owner decision D-1.                                                                                          |
 | APP-01 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                             |
@@ -64,7 +64,7 @@ does not claim Claude's prototype is production-ready.
 5. ~~**PERF-01**, **PERF-02**: the Budget table regressions QA-00
    measured.~~ Both closed September 29, 2026.
    After BUD-04, which edits some of the same files.
-6. **DETAIL-03**, then **DETAIL-04**.
+6. ~~**DETAIL-03**~~ Merged September 29, 2026. Then **DETAIL-04**.
 7. **ELEC-01** once its isolation review is written; before RELEASE-01 at the
    latest.
 8. **SYNC-01** according to decision D-1.

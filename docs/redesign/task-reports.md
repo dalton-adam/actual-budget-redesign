@@ -821,8 +821,10 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   7-character amounts; the Linux VRT shows the exact `-755.00` case). At
   window widths where the Category column is at its minimum, the gutter
   leaves 48px less for the name.
-- DETAIL-03: **in review September 29, 2026**, not yet merged (branch
-  `redesign/detail-03` from `c53871325`). Panel actions (design-decisions §5
+- DETAIL-03: **done September 29, 2026**, merged into `redesign/main` with
+  owner approval (`658a38c90`; branch `redesign/detail-03` from
+  `c53871325`). The merge regenerated the three transfer-funds Budget
+  snapshots on top of ASSIGN-FIX. Panel actions (design-decisions §5
   items 1, 6 and 7; plan §10 Part B). **Owner decisions (September 29,
   2026):** the five transaction rows stay read-only (the desktop app has no
   view for a single transaction), and "View in Accounts" under the list is
