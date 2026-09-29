@@ -144,14 +144,27 @@ Medians of the 7 per-run values, in milliseconds (range in brackets).
   the machine, not repeated), and one redesign run at 1000 had several long
   frames mid-scroll (run 2). Medians are used for that reason.
 
-**Thresholds for QA-01 (proposed).** Rerun the same script on this machine
-with the same builds' method. A measure passes when the redesign median is
-no more than 10% above the base median recorded here (the base medians above
-are the reference), and the scroll measure has no frame over 33 ms. As of
-QA-00 the redesign fails Assigned edits, large first-paint settled and
-scroll long frames at both sizes, and passes the rest. If the machine,
-browser or demo changes, measure the base again rather than comparing with
-these numbers.
+**Thresholds for QA-01 (owner decision D-6, September 29, 2026).** QA-01
+reruns `scripts/redesign-perf.mjs` on this machine and measures the v26.9.0
+base again in the same session; the numbers above show the method and
+today's gap, not fixed targets.
+
+- **Blocks release:** Assigned edit median and p90, first paint (first row,
+  demo and large), month switch (label), and opening a register (first
+  rows). Each passes when the redesign median is no more than 10% above the
+  base median from the same session. Scrolling passes with no frame over
+  33 ms (two frames at 60 fps).
+- **Reported, not blocking:** everything "settled" (after load, after a
+  month switch, after opening a register), and demo creation. Settling
+  includes the details panel's own loading, which users see after the first
+  row.
+- **A miss blocks release** unless the owner accepts it in writing as a
+  scope decision (plan §12).
+
+10% is about the run-to-run noise: the base's own per-round edit medians
+ranged from 116 to 165 ms. As of QA-00 the redesign fails Assigned edits and
+scrolling at both sizes (PERF-01, PERF-02) and passes the other blocking
+measures; large first-paint settled (+17–19%) is reported.
 
 ### Custom theme
 
@@ -262,11 +275,25 @@ address), one worker.
 5. **Rerun without updating:** the same 21 files, one worker, no
    retries: 141 passed. The other 22 tests passed in the first run.
 
-**For the owner:** THEME-02's shared roles also changed the mobile screens
-in dark and midnight (budget, accounts, payees, rules, schedules, settings,
-bank sync). Plan §19.4 says mobile keeps the upstream look. The change is
-colours only, and THEME-02's report doesn't mention it. Keep it (every page
-shares the surfaces) or scope the retune away from mobile?
+**Mobile colours (owner decision D-5, September 29, 2026: keep).**
+THEME-02's shared roles also changed the mobile screens in dark and
+midnight (budget, accounts, payees, rules, schedules, settings, bank sync);
+colours only. The owner kept it, so phone and desktop share one set of
+surfaces; plan §19.4 now says mobile keeps the upstream layout, not its
+colours. **Readability check** (375×812, the demo budget, on a fresh
+`build:browser` of `redesign/main` at `b4d34113a`): on Budget, Accounts, an
+account register, new transaction, Payees, Rules, Schedules and Settings,
+every visible text element's contrast against its rendered background was
+measured with THEME-02's values, then again with the pre-THEME-02 values
+(`8d2cf7e6f`) applied over them in the same page. Dark: 247 text elements
+changed, and every one reads better (for example, table text on the navy
+`#243b53` now sits on `#141520`). Midnight: 50 changed; 34 read better and
+16 (the Budget header and group rows) dropped from 14–17:1 to 13–15:1, far
+above the 4.5:1 minimum. No text fell below AA or got worse below it. The
+text that is below AA on mobile (in midnight, for example, zero amounts on
+the Budget at 2.73:1, the Payees "Create rule" badges at 3.22:1 and schedule
+field labels at 4.32:1) was already below AA with the old values, so it
+predates THEME-02; mobile stays deferred.
 
 ### Regressions opened as tasks
 
