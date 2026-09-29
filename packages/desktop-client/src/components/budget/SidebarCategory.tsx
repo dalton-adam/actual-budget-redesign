@@ -26,6 +26,7 @@ import {
 } from './CategoryDetailsContext';
 import { getCategoryAccentIndex } from './categoryPresentation';
 import {
+  ENVELOPE_ASSIGNED_TOOLS_WIDTH,
   envelopeCellBorderStyle,
   useCategoryColumnStyle,
   useIsEnvelopeTable,
@@ -247,6 +248,9 @@ export function SidebarCategory({
           paddingLeft: 13,
           ...(isEnvelopeTable && {
             paddingLeft: 16,
+            // Keeps the gutter where the Assigned cell's month notes and
+            // budget menu appear free of the name and its tools.
+            paddingRight: ENVELOPE_ASSIGNED_TOOLS_WIDTH,
             ...envelopeCellBorderStyle,
           }),
           ...(isLast && { borderBottomWidth: 0 }),
