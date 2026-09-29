@@ -29,7 +29,7 @@
   --color-tableTextHover: var(--palette-gray400);
   --color-tableTextInactive: var(--palette-gray400);
   --color-tableHeaderText: var(--palette-gray200);
-  --color-tableHeaderBackground: var(--palette-gray900);
+  --color-tableHeaderBackground: var(--palette-gray800);
   --color-tableBorder: var(--palette-gray600);
   --color-tableBorderSelected: var(--palette-purple400);
   --color-tableBorderHover: var(--palette-purple300);
@@ -63,7 +63,7 @@
   --color-sidebarItemTextSelected: var(--palette-purple200);
   --color-sidebarBudgetName: var(--palette-gray300);
 
-  --color-menuBackground: var(--palette-gray700);
+  --color-menuBackground: var(--palette-gray800);
   --color-menuItemBackground: var(--palette-gray200);
   --color-menuItemBackgroundHover: var(--palette-gray500);
   --color-menuItemText: var(--palette-gray100);
@@ -126,14 +126,14 @@
 
   --color-buttonNormalText: var(--palette-gray150);
   --color-buttonNormalTextHover: var(--palette-gray150);
-  --color-buttonNormalBackground: var(--palette-gray600);
-  --color-buttonNormalBackgroundHover: var(--palette-gray400);
+  --color-buttonNormalBackground: var(--palette-gray800);
+  --color-buttonNormalBackgroundHover: #525b6c;
   --color-buttonNormalBorder: var(--palette-gray300);
   --color-buttonNormalShadow: rgba(0, 0, 0, 0.4);
   --color-buttonNormalSelectedText: var(--palette-white);
   --color-buttonNormalSelectedBackground: var(--palette-purple500);
   --color-buttonNormalDisabledText: var(--palette-gray400);
-  --color-buttonNormalDisabledBackground: var(--palette-gray700);
+  --color-buttonNormalDisabledBackground: var(--palette-gray800);
   --color-buttonNormalDisabledBorder: var(--palette-gray500);
 
   --color-calendarText: var(--palette-gray50);
@@ -200,7 +200,7 @@
   --color-checkboxToggleBackgroundSelected: var(--palette-purple300);
   --color-checkboxToggleDisabled: var(--palette-gray700);
 
-  --color-pillBackground: var(--palette-gray500);
+  --color-pillBackground: var(--palette-gray800);
   --color-pillBackgroundLight: var(--palette-gray900);
   --color-pillText: var(--palette-gray200);
   --color-pillTextHighlighted: var(--palette-purple200);
