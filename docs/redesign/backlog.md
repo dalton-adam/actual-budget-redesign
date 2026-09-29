@@ -36,7 +36,7 @@ Budget header are reference material, not tasks to build.
 | THEME-02           | verified    | `f9f4e1892`              | Linux VRT baselines regenerated in QA-00; WIDE not run.                                                                 |
 | QA-00              | verified    | `1e94b0559`              | VRT: 23 of 204 changed snapshots reviewed by eye, the rest by script. QA-01 thresholds decided (D-6).                   |
 | ELEC-01            | not started | —                        | Needs an isolation review first (stage-0.md "Electron").                                                                |
-| BUD-04             | verified    | `c0527171d`              | Adds theme role `navListActive`. Linux VRT not rerun (light Budget and pane snapshots change).                          |
+| BUD-04             | verified    | `c0527171d`              | Adds theme role `navListActive`. Linux VRT regenerated in DETAIL-03.                                                    |
 | PERF-01            | verified    | `8f88c6841`              | Edits now 57–59% faster than the base. Adds `C/budget/index.tsx` (owner-approved; may touch SYNC-01).                   |
 | PERF-02            | verified    | docs only                | PERF-01 fixed it; no source change. 1000×700 hit 33.3 ms in 5 of 7 runs (a pass; QA-01 watches).                        |
 | ASSIGN-FIX         | verified    | `cc078bd06`              | Snapshots stale since BUD-04 regenerated in DETAIL-03.                                                                  |
