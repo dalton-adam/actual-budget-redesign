@@ -805,10 +805,38 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   stepped back to an empty month (found and fixed: at 320px the stepper wraps
   and left a dangling "·" after the group name, so the separator was
   removed); midnight 820×700 overlay, with a note saved by Escape and the
-  overlay still open, then Escape closing it. **Not yet checked:** a custom
-  theme (the new controls use existing roles `pageTextSecondary`,
-  `pageText` and `pageTextLink`); Linux VRT (the panel header changed, so
-  Budget-page snapshots at the default viewport will need regenerating in
-  Docker); WIDE. **Known limits:** the empty-notes button keeps the row's
+  overlay still open, then Escape closing it. **Custom theme** (the QA-00
+  method rebuilt: every v26.9.0 `--color-*` role resolved through the
+  palette and hue-rotated 150°, none of the redesign roles; "custom dark" 224
+  roles on base `dark`, "custom light" 226 on base `light`; installed through
+  `installedCustomLightTheme` and reloaded): panel pushed at 1440×900 and
+  1000×700, with and without the notes editor open, and the 820×700 overlay.
+  Every computed text, background, border and outline colour in the panel and
+  the notes popover matched an active theme role. The only roles not set by
+  the custom CSS are `categoryAccent1`–`10` (kept from the base by design,
+  design-decisions §8) and `cardInset` and `progressTrack` (derived by the
+  fallback layer from the custom colours). One colour matched no role: the
+  browser-default fill of react-aria's visually hidden dismiss button inside
+  the popover (also seen in QA-00). No console errors. Screenshots:
+  `custom-dark-1440.png`, `custom-light-1440-notes.png`,
+  `custom-dark-820-overlay.png`, `custom-light-1000.png`. **Linux VRT**
+  (Playwright v1.61.1 image against the HTTPS dev server): the first full
+  run had 123 passed, 31 failed, 15 did not run; all 31 were screenshot
+  mismatches. A script compared each regenerated snapshot with the committed
+  one: 156 of the 177 changed snapshots differ only inside the accounts pane
+  (BUD-04's pane changes, which were never regenerated), and 21 are over the
+  Budget page (Budget ×6, command bar ×3, help menu and keyboard shortcuts
+  ×12), combining BUD-04's shorter summary cards with this task's panel
+  controls. Reviewed by eye: the Budget, command bar and shortcuts shots in
+  dark and midnight, and a pane-only Payees shot. Regenerated with
+  `--update-snapshots=changed` on those 11 files (the long schedules test
+  needed `--timeout=240000`). Verification run without updating: 168 passed,
+  1 flaky (`budget.mobile.test.ts` "set budget to 3 month average", passed
+  on retry; it passed in the first run and this task doesn't touch mobile), 0
+  failed. Found in review, not caused by this task: the Food row in
+  `Budget-transfer-funds-to-another-category-2` shows its Assigned amount
+  cut to "-755...." beside the row's hover tools; the committed snapshot
+  already had it (split into its own task). **Not yet checked:** WIDE.
+  **Known limits:** the empty-notes button keeps the row's
   30% placeholder opacity, which is faint; notes text is not redacted in
   privacy mode (unchanged from DETAIL-02 and the row's tooltip).
