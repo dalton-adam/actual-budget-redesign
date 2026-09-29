@@ -19,6 +19,7 @@ colors:
   group-row: '#fafafc'
   hairline: 'rgba(15, 15, 30, 0.07)'
   nav-track: 'rgba(15, 15, 30, 0.05)'
+  nav-list-active: 'rgba(15, 15, 30, 0.1)'
   row-hover: 'rgba(15, 15, 30, 0.025)'
   progress-track: 'rgba(15, 15, 30, 0.07)'
   positive-green: '#147d64'
@@ -208,6 +209,7 @@ Ten accents — **Indigo, Emerald, Amber, Blue, Pink, Orange, Cyan, Violet, Lime
 - **Faint Text** (`pageTextFaint`): column headers and captions only, never body copy.
 - **Surface White**: cards, table and controls. **Card Inset** fills stat tiles, and **Group Row** tints group rows.
 - **Hairline**, **Row Hover**, **Nav Track** and **Progress Track**: low-alpha ink washes that give structure without borders shouting.
+- **Nav List Active** (`navListActive`): the open account in the accounts pane and its rail chip. Light uses a 10% ink wash, because the white `navActive` of the top tabs vanishes on the white pane; dark and midnight use their `navActive`. No lift shadow.
 - **Navy Ink / Navy Mist**: upstream light-theme sidebar and page colors, still in use on unmigrated screens. In dark and midnight, unmigrated tables, Settings, inputs, menus, tooltips and buttons use the same neutral grays as the Budget cards (THEME-02, design-decisions §8).
 
 ### Named Rules
@@ -317,16 +319,16 @@ Calm and tactile: redesign variants are opt-in, so existing variants and screens
 ### Navigation
 
 - **Top bar:** segmented pill tabs (Budget, Accounts ▾, Reports, Schedules, More ▾), then utility controls on the right.
-- **Accounts pane:** a collapsible list with On/Off budget totals, sync-status dots and balances. Collapsed, it is a 56px rail of initials and status dots.
+- **Accounts pane:** a collapsible list with On/Off budget totals, sync-status dots and balances. Collapsed, it is a 56px rail of initials and status dots. An account keeps one initial unless another account in the rail shares it; those take the first letters of two words (or the first two letters), then the letter plus position ("H1", "H2"). The full name stays the chip's accessible name and tooltip.
 - **Menus:** Eyebrow group labels (0.06em tracking).
 
 ### Signature Component: The Envelope Table
 
-One continuous table with Eyebrow column headers (Category | Assigned | Activity | Available). Group rows are tinted with Group Row and collapsible. Each category row holds the tile and name (the name is a button that opens the details panel), the editable Assigned amount, and the Activity amount with a percentage and progress bar. It ends with an Available status pill. Row tools (notes, menu, drag handle) take no width and appear only on hover or keyboard focus.
+One continuous table with Eyebrow column headers (Category | Assigned | Activity | Available). Group rows are tinted with Group Row and collapsible. Each category row holds the tile and name (the name is a button that opens the details panel), the editable Assigned amount, and the Activity amount with a percentage and progress bar. The Activity amount sits on the same line as Assigned and Available; the bar hangs 3px below it. It ends with an Available status pill. Row tools (notes, menu, drag handle) take no width and appear only on hover or keyboard focus.
 
 ### Signature Component: Ready to Assign Card
 
-The page's hero card, with three states. Positive shows positive text and a hero glow. Zero shows neutral text and an "All assigned" badge. Negative shows negative text, an "Overassigned" badge and the negative glow. Clicking the card, or pressing Enter or Space, opens a popover with the existing breakdown and To Budget actions.
+The page's hero card, with three states. Positive shows positive text and a hero glow. Zero shows neutral text and an "All assigned" badge. Negative shows negative text, an "Overassigned" badge and the negative glow. The badge sits beside the label; when the card is too narrow for both on one line, it takes the subline's place under the amount instead of wrapping. Clicking the card, or pressing Enter or Space, opens a popover with the existing breakdown and To Budget actions.
 
 ## Do's and Don'ts
 

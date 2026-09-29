@@ -63,6 +63,11 @@ figures and "never color alone" stay in force.
     has a job";
   - negative: negative color, **"Overassigned"** badge, subline "More
     assigned than you have", negative-tinted glow.
+  - When the card is too narrow for the label and badge on one line (1000×700
+    with the panel open, or "Overassigned" at 1440×900), the badge takes the
+    subline's place under the amount instead of wrapping under the label; for
+    these two states the subline repeats the badge. The widths are set for
+    the English label and badges (BUD-04, pending owner review).
 - Clicking the card (or Enter/Space) opens **one popover** containing the full
   existing breakdown (Available funds, Overspent in _previous month_,
   Assigned, For next month, = Ready to Assign) followed by the existing To
@@ -126,7 +131,8 @@ breakpoint; the <900px layout is only the in-between width.
   Editing row gets the selection tint; the input has a 1.5px selection
   border.
 - **Activity**: amount (refunds shown with "+"), percentage, progress bar
-  (§7.1). Clicking the amount keeps today's navigation to the filtered
+  (§7.1). The amount sits on the row's centre line with Assigned and
+  Available; the bar hangs 3px below it (BUD-04). Clicking the amount keeps today's navigation to the filtered
   transactions (`47`).
 - **Available**: status pill (§4.3). Clicking it opens the existing balance
   menu (Transfer to another category, Cover overspending, Rollover
@@ -338,6 +344,13 @@ should stay legible).
   in light. **Owner accepted them as they are (September 27, 2026):** the
   letter is decorative, since the category name appears alongside it.
 
+Rail initials (BUD-04, pending owner review): an account keeps its first
+letter unless another account in the rail shares it. Those take the first
+letters of their first two words, or their first two letters ("HSBC" → HS,
+"House Asset" → HA in the demo); any that still collide take the letter and
+their position among the accounts sharing it ("C1", "C2"). The chip's
+accessible name and tooltip stay the full account name.
+
 ### Added in UI-02 (owner decision, September 27, 2026)
 
 - **`pageTextSecondary`**: secondary text for the redesigned controls
@@ -385,6 +398,17 @@ well as the table roles.
   card). Owner accepted these lower edge distinctions: pills against the page
   or a modal (dark 1.73/1.58 → 1.34/1.22; midnight modal 2.04 → 1.22), rule
   chips on a table (1.27 → 1.10) and the dark modal border (2.98 → 1.89).
+
+### Added in BUD-04 (September 29, 2026; pending owner review)
+
+- **`navListActive`**: the open account in the accounts pane and its rail
+  chip. The pane used `navActive`, which is white in light (it is the top
+  tab lifting out of its grey track), so on the white pane the open account
+  had no visible fill (1.00:1, QA-00). Light uses `rgba(15, 15, 30, 0.1)`
+  (1.24:1 on the pane; hover stays at 1.04:1); dark and midnight use
+  `var(--color-navActive)` (unchanged look); the custom-theme fallback is
+  `navActive`. The pane's items drop `navActiveShadow`, which only showed in
+  light. `navActive` keeps its value and meaning for tabs and toggles.
 
 ## 9. Wording (TERM-01)
 

@@ -594,3 +594,54 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   most-changed per test file plus two of the smallest); the other 181 were
   checked by script only (no light change, no size change, rerun passes). No UI file changed, so
   the Impeccable detector does not apply.
+- BUD-04: **in review September 29, 2026** on branch `redesign/bud-04`
+  (not merged). Four Budget-page fixes from the mid-project review and
+  QA-00; no handler, binding, value or query change. **Files:**
+  `C/budget/envelope/CategoryActivityContent.tsx` (the bar is positioned
+  under the amount instead of stacked with it, so only the amount line is
+  centred in the cell); `C/budget/envelope/budgetsummary/ReadyToAssignCard.tsx`
+  (container query on the card: when the label and badge don't fit on one
+  line, the badge takes the subline's place under the amount;
+  thresholds 223px for "All assigned", 243px for "Overassigned", measured
+  from the English label 99px, badges 80/99px, the 32px chevron gap);
+  `C/sidebar/Accounts.tsx`, `C/sidebar/Account.tsx` and new
+  `C/sidebar/railInitials.ts` + `railInitials.test.ts` (collision-aware rail
+  initials; the open account uses the new role; the pane's account name is
+  now centred in its 32px row, which it wasn't in any theme); new role
+  `navListActive` in `L/theme.ts` and `L/themes/{light,dark,midnight,fallback}.css`
+  (design-decisions §8). **Scope beyond the card:** the new theme role (the
+  only way to change light without changing `navActive` for the top tabs or
+  the look of dark and midnight) and the centring fix in the pane.
+  **Measured** (the demo, 3018 preview, Playwright, before on `9fb57f6d6`,
+  after on this branch): the first row's Activity amount was 5.5px above
+  Assigned and Available at 1000×700 and 1440×900 in all three themes; now
+  all three share the row's centre line to 0.1px. The Ready to Assign label
+  row was 37px (badge wrapped) at 1000×700; now one 16px line with the badge
+  under the amount; unchanged at 820 (overlay) and 1440 for "All assigned";
+  "Overassigned" would also have wrapped at 1440 (card 273px) and now moves
+  under the amount there too. Rail at 1000×700: B A C **H** V M **H** R →
+  B A C **HS** V M **HA** R. Open account fill: light white on white
+  (1.00:1) → `rgba(15,15,30,.1)` (1.24:1), no shadow; dark and midnight
+  computed values unchanged. Evidence in `docs/redesign/verification/bud-04/`
+  (activity rows before/after at 1440 light and 1000 dark; Ready to Assign
+  at 1000 before, after zero, after negative in three themes, and negative
+  at 1440; rail before/after; open account before/after in light plus dark
+  and midnight). **Checks:** typecheck pass (7 tasks); `oxlint
+--type-aware --quiet` pass; `oxfmt --check` passes on everything tracked
+  (the root `yarn lint` stops at the gitignored local
+  `.impeccable/design.json`, which is not formatted; not in this diff).
+  UNIT `src/style src/components/budget src/components/sidebar` 304/304
+  (9 new rail tests); `@actual-app/components` 42/42. E2E(budget, nav-02,
+  bud-01, accounts) 28/28 against the rebuilt 3018 preview. Impeccable
+  detector on the changed UI and theme files: one advisory, the upstream
+  tooltip's `0px 5px 5px 0px` radius in `Account.tsx` (not touched here).
+  **Not checked:** a custom theme by eye (the fallback maps `navListActive`
+  to `navActive`, which is what the pane used before, so custom themes
+  should look as QA-00 recorded); keyboard focus on the moved badge (it is
+  not focusable; the card button's accessible name now omits the hidden
+  copy); WIDE and Linux VRT (light budget and account screenshots will
+  change: the Activity row, the rail and the open account). **Seen, not
+  fixed:** a very large negative Ready to Assign (−99,599.00) overflows the
+  34px hero amount at 1000×700; that is the BUD-01 amount style, not
+  this change. The badge thresholds are English; a longer translation of
+  the label or badge can still wrap.
