@@ -8,7 +8,7 @@
 4. [Design decisions](design-decisions.md): the record implementation tasks follow.
 5. [Implementation backlog](backlog.md).
    Completed-task evidence: [task reports](task-reports.md).
-6. [Verification record](baseline/README.md).
+6. [Verification record](verification.md) (QA-00 onward; Stage 0's is [baseline/README.md](baseline/README.md)).
 7. Root `AGENTS.md`, `CODE_REVIEW_GUIDELINES.md`, and `.github/agents/pr-and-commit-rules.md`.
 
 ## Development setup
