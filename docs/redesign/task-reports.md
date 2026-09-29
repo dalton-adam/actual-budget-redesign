@@ -706,7 +706,16 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   switched to tracking at 1440×900, script): the table keeps its upstream
   layout, an Assigned edit saves, and renaming a category through the row
   menu saves, with no console errors. Impeccable detector on the changed
-  files: clean. **Not checked:** WIDE and Linux VRT (nothing visual changed,
-  so no snapshot should move); category and group drag reordering and
-  "apply templates to group" by hand (both now call the same stable
-  `mutate`).
+  files: clean. **Reorder and templates** (script, demo at 1440×900, run
+  the same way on this branch's 3018 build and on the v26.9.0 base at 3019,
+  9/9 on both): a category dragged within its group, then across groups,
+  then within the first group again (checking that a third drag uses the
+  updated order), then a group dragged above another. Each order is read
+  back from `get-categories`, is unchanged after a reload, and the table
+  shows the same order. Then "Overwrite with templates" on Usual Expenses
+  with `#template` notes on Food and General, run from the month after the
+  first one shown: the amounts land in that month and the first month is
+  unchanged. No console errors. Playwright's one-step `dragTo` drops before
+  the table works out above or below and fails the same way on both builds,
+  so the script uses a slow mouse drag with pauses. **Not checked:** WIDE
+  and Linux VRT (nothing visual changed, so no snapshot should move).
