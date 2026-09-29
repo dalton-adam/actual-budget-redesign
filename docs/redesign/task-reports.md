@@ -1005,8 +1005,8 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   **Known limits:** template sentences appear only with the automations UI
   flag on, like the automation button's tooltip (checked by hand on the dev
   server: "Budget 50.00 every 1 months" under the sentence).
-- ELEC-01: **in review September 29, 2026** (branch `redesign/elec-01`, not
-  merged). Desktop isolation review written into
+- ELEC-01: **done September 29, 2026**, merged into `redesign/main` with
+  owner approval (`0a8582cea`, branch `redesign/elec-01`). Desktop isolation review written into
   [stage-0.md](stage-0.md#desktop-isolation-review-elec-01) first, then the
   smoke test in [verification.md](verification.md#elec-01-september-29-2026).
   **Findings:** a development build launched the upstream way keeps its

@@ -35,7 +35,7 @@ Budget header are reference material, not tasks to build.
 | TOUR-FIX           | verified    | `485a7fbe3`              | —                                                                                                                          |
 | THEME-02           | verified    | `f9f4e1892`              | Linux VRT baselines regenerated in QA-00; WIDE not run.                                                                    |
 | QA-00              | verified    | `1e94b0559`              | VRT: 23 of 204 changed snapshots reviewed by eye, the rest by script. QA-01 thresholds decided (D-6).                      |
-| ELEC-01            | review      | —                        | Dev builds isolated by `scripts/redesign-electron.mjs`; packaged builds are not (stage-0.md). Title bar wrap → TOPBAR-FIX. |
+| ELEC-01            | verified    | `0a8582cea`              | Dev builds isolated by `scripts/redesign-electron.mjs`; packaged builds are not (stage-0.md). Title bar wrap → TOPBAR-FIX. |
 | BUD-04             | verified    | `c0527171d`              | Adds theme role `navListActive`. Linux VRT regenerated in DETAIL-03.                                                       |
 | PERF-01            | verified    | `8f88c6841`              | Edits now 57–59% faster than the base. Adds `C/budget/index.tsx` (owner-approved; may touch SYNC-01).                      |
 | PERF-02            | verified    | docs only                | PERF-01 fixed it; no source change. 1000×700 hit 33.3 ms in 5 of 7 runs (a pass; QA-01 watches).                           |
@@ -66,7 +66,7 @@ does not claim Claude's prototype is production-ready.
    measured.~~ Both closed September 29, 2026.
    After BUD-04, which edits some of the same files.
 6. ~~**DETAIL-03**, **DETAIL-04**~~ Both merged September 29, 2026.
-7. **ELEC-01**: in review (September 29, 2026); results in
+7. ~~**ELEC-01**~~ Merged September 29, 2026; results in
    [verification.md](verification.md). Then **TOPBAR-FIX**.
 8. **SYNC-01** once, before RELEASE-01 (decision D-1).
 9. **APP-01** onward, then QA-01 and RELEASE-01.
