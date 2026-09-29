@@ -36,7 +36,7 @@ Budget header are reference material, not tasks to build.
 | THEME-02             | verified    | `f9f4e1892`              | Linux VRT baselines regenerated in QA-00; WIDE not run.                                               |
 | QA-00                | verified    | `1e94b0559`              | VRT: 23 of 204 changed snapshots reviewed by eye, the rest by script. QA-01 thresholds decided (D-6). |
 | ELEC-01              | not started | —                        | Needs an isolation review first (stage-0.md "Electron").                                              |
-| BUD-04               | ready       | —                        | Scope now includes the light open-account fill (QA-00).                                               |
+| BUD-04               | review      | —                        | Branch `redesign/bud-04`; adds theme role `navListActive` (owner review). Linux VRT not rerun.        |
 | PERF-01, PERF-02     | ready       | —                        | Opened by QA-00; the thresholds they must meet are in verification.md.                                |
 | DETAIL-03, DETAIL-04 | not started | —                        | —                                                                                                     |
 | SYNC-01              | blocked     | —                        | Waiting on owner decision D-1.                                                                        |

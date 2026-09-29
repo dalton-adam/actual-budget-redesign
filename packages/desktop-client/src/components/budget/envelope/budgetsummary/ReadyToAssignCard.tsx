@@ -9,7 +9,7 @@ import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import * as monthUtils from '@actual-app/core/shared/months';
-import { css } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 
 import {
   EnvelopeCellValue,
@@ -89,6 +89,20 @@ export function ReadyToAssignCard({
         <Trans>All assigned</Trans>
       </StatusPill>
     ) : null;
+  // When the card is too narrow for the badge beside the label, the badge
+  // takes the subline's place under the amount instead of wrapping; for
+  // these two states the subline repeats the badge. The widths fit the
+  // English label and badge with a few pixels to spare.
+  const narrowCard = `@container (width < ${kind === 'negative' ? 243 : 223}px)`;
+  const badgeBeside = css({
+    display: 'flex',
+    [narrowCard]: { display: 'none' },
+  });
+  const badgeBelow = css({
+    display: 'none',
+    [narrowCard]: { display: 'flex' },
+  });
+  const sublineBeside = css({ [narrowCard]: { display: 'none' } });
 
   const amount = (
     <PrivacyFilter>
@@ -157,7 +171,7 @@ export function ReadyToAssignCard({
               </span>
               <span className={css(labelRowStyle)}>
                 <Trans>Ready to Assign</Trans>
-                {badge}
+                {badge && <span className={badgeBeside}>{badge}</span>}
               </span>
               <span
                 className={css(amountStyle)}
@@ -165,7 +179,12 @@ export function ReadyToAssignCard({
               >
                 {amount}
               </span>
-              <span className={css(sublineStyle)}>
+              {badge && (
+                <span className={cx(css(sublineStyle), badgeBelow)}>
+                  {badge}
+                </span>
+              )}
+              <span className={cx(css(sublineStyle), badge && sublineBeside)}>
                 {kind === 'positive' ? (
                   <Trans
                     i18nKey="<availableFunds /> available funds"
@@ -217,6 +236,7 @@ function getCardButtonStyle(hasGlow: boolean) {
     width: '100%',
     height: '100%',
     padding: '16px 20px',
+    containerType: 'inline-size' as const,
     margin: 0,
     textAlign: 'left' as const,
     font: 'inherit',

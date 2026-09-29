@@ -9,6 +9,7 @@ import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import type { CategoryEntity } from '@actual-app/core/types/models';
+import { css } from '@emotion/css';
 
 import {
   getCategoryAccentIndex,
@@ -49,8 +50,10 @@ export function CategoryActivityContent({
       ? t('{{percent}}%', { percent: progress.percent })
       : '';
 
+  // Only the amount line takes part in layout, so the cell centres it on the
+  // same line as Assigned and Available; the bar hangs below it.
   return (
-    <View style={{ gap: 5 }}>
+    <View style={{ position: 'relative' }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
         {showPercent && percentLabel !== '' && (
           <Text
@@ -69,6 +72,13 @@ export function CategoryActivityContent({
         <View style={{ flex: 1, minWidth: 0 }}>{children}</View>
       </View>
       <ProgressBar
+        className={css({
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          right: 0,
+          marginTop: 3,
+        })}
         value={progress.fill}
         color={
           progress.isOverspent

@@ -235,6 +235,7 @@ export const theme = {
   navTrack: 'var(--color-navTrack)',
   navActive: 'var(--color-navActive)',
   navActiveShadow: 'var(--color-navActiveShadow)',
+  navListActive: 'var(--color-navListActive)',
   selectionBackground: 'var(--color-selectionBackground)',
   selectionBorder: 'var(--color-selectionBorder)',
   tableRowHover: 'var(--color-tableRowHover)',
