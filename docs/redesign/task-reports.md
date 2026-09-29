@@ -545,7 +545,8 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   the gray base instead of navy). **Not yet run:** WIDE, and Linux VRT
   regeneration: dark and midnight screenshots change across most VRT tests
   (→ QA-00).
-- QA-00: **in review September 28, 2026** (branch `redesign/qa-00`; the
+- QA-00: **done September 29, 2026**, merged into `redesign/main` with
+  owner approval (`1e94b0559`, branch `redesign/qa-00`; the
   owner moved it ahead of THEME-02 and asked that the Linux VRT run wait
   for THEME-02 to merge, which happened during QA-00). Full record in
   [verification.md](verification.md). No application file changed. New
@@ -588,5 +589,8 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   showed only THEME-02's surface retune. The rerun without updating passed
   141/141. **For the owner (backlog D-5):** THEME-02 also recoloured the
   mobile screens in dark and midnight, where plan §19.4 keeps the upstream
-  look. Checks: typecheck pass (10 tasks); lint pass. No UI file changed, so
+  look. Checks: typecheck pass (10 tasks); lint pass. **Review gap accepted
+  at merge:** 23 of the 204 changed snapshots were compared by eye (the
+  most-changed per test file plus two of the smallest); the other 181 were
+  checked by script only (no light change, no size change, rerun passes). No UI file changed, so
   the Impeccable detector does not apply.
