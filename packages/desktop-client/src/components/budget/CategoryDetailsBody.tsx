@@ -6,6 +6,7 @@ import { SheetNameProvider } from '#hooks/useSheetName';
 
 import { useCategoryDetails } from './CategoryDetailsContext';
 import { CategoryDetailsNotes } from './CategoryDetailsNotes';
+import { CategoryDetailsOutlook } from './CategoryDetailsOutlook';
 import { CategoryDetailsSummary } from './CategoryDetailsSummary';
 import { CategoryDetailsTransactions } from './CategoryDetailsTransactions';
 
@@ -14,7 +15,7 @@ type CategoryDetailsBodyProps = {
 };
 
 /**
- * The panel's read-only details below the header (DETAIL-02). Keyed by
+ * The panel's details below the header (DETAIL-02, DETAIL-04). Keyed by
  * category and month so a new selection starts from its own loading state
  * and never shows the previous one's notes or transactions.
  */
@@ -32,6 +33,7 @@ export function CategoryDetailsBody({ month }: CategoryDetailsBodyProps) {
       name={monthUtils.sheetForMonth(month)}
     >
       <CategoryDetailsSummary category={category} month={month} />
+      <CategoryDetailsOutlook category={category} month={month} />
       <CategoryDetailsNotes categoryId={category.id} />
       <CategoryDetailsTransactions category={category} month={month} />
     </SheetNameProvider>

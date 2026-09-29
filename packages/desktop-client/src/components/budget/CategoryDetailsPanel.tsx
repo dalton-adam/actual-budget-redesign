@@ -28,6 +28,9 @@ const panelCardStyle: CSSProperties = {
   gap: 16,
   overflowY: 'auto',
   ...styles.lightScrollbar,
+  // `View` sets `min-height: 0`; without this, sections squash and overlap
+  // instead of the card scrolling when the content is taller than the card.
+  '& > *': { flexShrink: 0 },
 };
 
 type CategoryDetailsPanelProps = {

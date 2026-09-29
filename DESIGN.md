@@ -310,6 +310,8 @@ Calm and tactile: redesign variants are opt-in, so existing variants and screens
 
 - **Surface card:** Surface White, hairline border, 18px radius, Card elevation, 16px 20px padding.
 - **Stat tile:** Card Inset fill, 10px radius, 8px 10px padding, no shadow. Used in the details panel.
+- **Goal box:** Card Inset fill, 12px radius, 11px 12px padding. A target icon and a 13px/600 status line ("Template $280 · $30 short", "Goal $10,000 · 49% saved") in Pill Warning Text until the target is met, then Pill Positive Text; a 5px bar in the same colour; the Available pill's full sentence in Secondary text; and, when the automations UI is on, the category's template sentences. Shown only when goal templates are on and the month has a goal.
+- **Pace chart:** 110px Recharts chart in the details panel with no axes. Cumulative spending by day is a stepped 2.5px line in the category accent (Pill Negative Text when Available is negative) over an 18% fill of the same colour; even pace is a dashed 1.5px Page Text Faint line; the current month adds a dotted Faint "today" line. A future month shows the pace line and a "No activity yet" chip on Card Inset. Legend and a 600-weight Secondary summary sit below; the text equivalent is the chart's accessible name. Privacy mode replaces the chart with a sentence. Long-term savings goals show the goal box instead.
 
 ### Inputs / Fields
 
@@ -357,6 +359,5 @@ The page's hero card, with three states. Positive shows positive text and a hero
 These are not rules yet. Until they are decided, follow the current behavior and do not record them as rules in this file.
 
 - **Goal caption (D-3):** the caption under the category name for goal and template categories is left out. The target icon in the Available pill stays.
-- **Pace chart for past and future months** (design-decisions §11 item 2, DETAIL-04).
 - **Account hero and register treatment** (design-decisions §10 and §11 item 5, APP-01 and APP-02).
 - **Mobile** is deferred. Mobile screens keep the upstream look apart from the TERM-01 wording.

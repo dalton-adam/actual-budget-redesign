@@ -29,7 +29,7 @@ import { useDispatch } from '#redux';
 import type { AutomationEntry } from './automationExamples';
 import { TemplateSentence } from './TemplateSentence';
 
-function getAutomationEntries(
+export function getAutomationEntries(
   goalDef: string | null | undefined,
 ): AutomationEntry[] {
   if (!goalDef) {
