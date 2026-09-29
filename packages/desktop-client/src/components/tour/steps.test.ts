@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
+import * as monthUtils from '@actual-app/core/shared/months';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { getTourSteps } from './steps';
 import type { TourStepDeps } from './steps';
@@ -39,4 +40,128 @@ describe('getTourSteps', () => {
       expect(summaryStep?.target).toBeTruthy();
     },
   );
+});
+
+describe('budget summary step target', () => {
+  afterEach(() => {
+    document.body.replaceChildren();
+  });
+
+  function findSummaryTarget(budgetType: TourStepDeps['budgetType']) {
+    const target = getTourSteps('budget-tour', { ...deps, budgetType }).find(
+      step => step.id === 'budget-summary',
+    )?.target;
+    if (typeof target !== 'function') {
+      throw new Error('Expected the summary step to look up its target');
+    }
+    return target();
+  }
+
+  // jsdom has no layout, so every element reports no boxes unless it is
+  // marked as shown here.
+  function addElement(
+    attributes: Record<string, string>,
+    { isShown }: { isShown: boolean },
+  ) {
+    const element = document.createElement('div');
+    for (const [name, value] of Object.entries(attributes)) {
+      element.setAttribute(name, value);
+    }
+    if (isShown) {
+      Object.defineProperty(element, 'getClientRects', {
+        value: () => [element.getBoundingClientRect()],
+      });
+    }
+    document.body.append(element);
+    return element;
+  }
+
+  it('points envelope budgets at the Ready to Assign card', () => {
+    const card = addElement(
+      { 'data-testid': 'ready-to-assign' },
+      { isShown: true },
+    );
+    addElement({ 'data-testid': 'ready-to-assign' }, { isShown: false });
+
+    expect(findSummaryTarget('envelope')).toBe(card);
+  });
+
+  it('uses the compact strip when the envelope cards are hidden', () => {
+    addElement({ 'data-testid': 'ready-to-assign' }, { isShown: false });
+    const strip = addElement(
+      { 'data-testid': 'ready-to-assign' },
+      { isShown: true },
+    );
+
+    expect(findSummaryTarget('envelope')).toBe(strip);
+  });
+
+  it('finds no envelope target when Ready to Assign is not shown', () => {
+    addElement({ 'data-testid': 'ready-to-assign' }, { isShown: false });
+
+    expect(findSummaryTarget('envelope')).toBeNull();
+  });
+
+  it("keeps tracking budgets on the current month's summary", () => {
+    addElement(
+      {
+        'data-testid': 'budget-summary',
+        'data-month': monthUtils.prevMonth(monthUtils.currentMonth()),
+      },
+      { isShown: true },
+    );
+    const currentSummary = addElement(
+      {
+        'data-testid': 'budget-summary',
+        'data-month': monthUtils.currentMonth(),
+      },
+      { isShown: true },
+    );
+
+    expect(findSummaryTarget('tracking')).toBe(currentSummary);
+  });
+
+  it('points tracking budgets at the summary of the month shown', () => {
+    const currentMonth = monthUtils.currentMonth();
+    const shownMonth = monthUtils.addMonths(currentMonth, 2);
+    addElement(
+      { 'data-testid': 'selected-budget-month', 'data-month': shownMonth },
+      { isShown: true },
+    );
+    // Clipped neighbours rendered for the slide animation.
+    for (const month of [
+      monthUtils.prevMonth(shownMonth),
+      monthUtils.nextMonth(shownMonth),
+    ]) {
+      addElement(
+        { 'data-testid': 'budget-summary', 'data-month': month },
+        { isShown: true },
+      );
+    }
+    const shownSummary = addElement(
+      { 'data-testid': 'budget-summary', 'data-month': shownMonth },
+      { isShown: true },
+    );
+
+    expect(findSummaryTarget('tracking')).toBe(shownSummary);
+  });
+
+  it('finds no tracking target when the shown month has no summary', () => {
+    addElement(
+      {
+        'data-testid': 'selected-budget-month',
+        'data-month': monthUtils.nextMonth(monthUtils.currentMonth()),
+      },
+      { isShown: true },
+    );
+    addElement(
+      {
+        'data-testid': 'budget-summary',
+        'data-month': monthUtils.currentMonth(),
+      },
+      { isShown: true },
+    );
+
+    expect(findSummaryTarget('tracking')).toBeNull();
+  });
 });

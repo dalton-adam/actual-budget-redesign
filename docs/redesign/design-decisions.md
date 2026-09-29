@@ -401,6 +401,15 @@ effect on screen readers today (unchanged upstream behavior). Generated
 locale files (`packages/desktop-client/locale/`) are gitignored, so
 `generate:i18n` produces nothing to stage.
 
+**Tour (TOUR-FIX, September 28, 2026).** TERM-01 missed the in-app tour.
+Its envelope text now uses the same words; tracking budgets keep "Saved
+This Month", Budgeted and Balance, with unchanged translation keys:
+
+| Current                                                        | New                                                              | Where                                           |
+| -------------------------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------- |
+| To Budget (summary step title); "The To Budget amount shows…"  | Ready to Assign; "The Ready to Assign amount shows…"             | `C/tour/steps.tsx` summary step, envelope only  |
+| "Click the Budgeted amount… keep an eye on the Balance column" | "Click the Assigned amount… keep an eye on the Available column" | `C/tour/steps.tsx` category step, envelope only |
+
 ## 10. Accounts screens (APP-01/APP-02 inputs)
 
 - Account hero card (type eyebrow, editable name, notes, balance, chips for

@@ -472,3 +472,40 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   account in the accounts pane is only faintly highlighted (NAV-02).
   **Not yet checked:** the overlay in a custom theme; performance with the
   panel's queries (→ QA-00).
+- TOUR-FIX (bug fix, no task card): **in review September 28, 2026** on
+  `redesign/tour-fix`, based on `28fe2ec08`; not merged, waiting for owner
+  approval. **Problem:** on envelope budgets the in-app tour skipped its
+  third step ("budget summary"): BUD-01 hid the per-month summary row it
+  targeted (`[data-testid="budget-summary"]`), so react-joyride found no
+  target and moved on. `e2e/tour.test.ts` failed with "Expected 3 of 8,
+  Received 4 of 8" (reproduced on unmodified `redesign/main` at
+  `1e6b570ed`: tour 1 failed, 1 passed; budget 8/8). TERM-01 also missed the
+  tour's text ("To Budget", "Budgeted", "Balance"). **Changes, all in
+  `C/tour/steps.tsx` and `steps.test.ts`:** the envelope summary step
+  targets the Ready to Assign card (its existing `data-testid`), or the
+  compact strip's copy when a short window's table has scrolled and the
+  strip has replaced the cards; the envelope wording follows
+  design-decisions §9. Two problems found while verifying and fixed with
+  owner approval: the tracking summary step preferred the current month's
+  summary, which `BudgetSummaries` renders clipped beside the shown month
+  for its slide animation, so on any other month it spotlighted a blank
+  area; it now matches the month the picker shows. The month step no longer
+  mentions the calendar icons for choosing how many months are shown, which
+  BUD-03 removed (both budget types). No budget component, handler,
+  preference or saved value changed. Checks (after rebasing on
+  `28fe2ec08`): typecheck pass; lint pass; UNIT `src/components/tour` 12/12
+  (6 new: envelope picks the shown card, the strip when the cards are
+  hidden, nothing when neither is shown; tracking picks the current month,
+  the shown month beside its clipped neighbours, nothing when the shown
+  month has no summary; the envelope and shown-month cases fail on the old
+  code); `generate:i18n` ran, and the only keys that changed are the three
+  tour sentences plus "To Budget", which no longer has a use; tracking's
+  category sentence keeps its key, so its translations still apply;
+  E2E(tour, budget) 10/10, the tour walking every step to "8 of 8". A
+  scratch Playwright script (not committed) against the 3018 preview on the
+  demo budget passed 4/4, each walking all 8 steps: envelope at 1440×900
+  (step 3 anchored under the card; steps 4 and 5 show the new text);
+  envelope at 1000×700 with the table scrolled (step 3 anchored under the
+  strip); tracking at 1440×900 (step 3 under the January summary, category
+  text unchanged); tracking moved to February (step 3 under the February
+  summary). No VRT: the tour test takes no screenshots.
