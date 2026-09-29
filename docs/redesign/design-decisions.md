@@ -67,7 +67,7 @@ figures and "never color alone" stay in force.
     with the panel open, or "Overassigned" at 1440×900), the badge takes the
     subline's place under the amount instead of wrapping under the label; for
     these two states the subline repeats the badge. The widths are set for
-    the English label and badges (BUD-04, pending owner review).
+    the English label and badges (BUD-04, approved at merge).
 - Clicking the card (or Enter/Space) opens **one popover** containing the full
   existing breakdown (Available funds, Overspent in _previous month_,
   Assigned, For next month, = Ready to Assign) followed by the existing To
@@ -344,7 +344,7 @@ should stay legible).
   in light. **Owner accepted them as they are (September 27, 2026):** the
   letter is decorative, since the category name appears alongside it.
 
-Rail initials (BUD-04, pending owner review): an account keeps its first
+Rail initials (BUD-04, approved at merge): an account keeps its first
 letter unless another account in the rail shares it. Those take the first
 letters of their first two words, or their first two letters ("HSBC" → HS,
 "House Asset" → HA in the demo); any that still collide take the letter and
@@ -399,7 +399,7 @@ well as the table roles.
   or a modal (dark 1.73/1.58 → 1.34/1.22; midnight modal 2.04 → 1.22), rule
   chips on a table (1.27 → 1.10) and the dark modal border (2.98 → 1.89).
 
-### Added in BUD-04 (September 29, 2026; pending owner review)
+### Added in BUD-04 (September 29, 2026; approved at merge)
 
 - **`navListActive`**: the open account in the accounts pane and its rail
   chip. The pane used `navActive`, which is white in light (it is the top

@@ -594,8 +594,8 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   most-changed per test file plus two of the smallest); the other 181 were
   checked by script only (no light change, no size change, rerun passes). No UI file changed, so
   the Impeccable detector does not apply.
-- BUD-04: **in review September 29, 2026** on branch `redesign/bud-04`
-  (not merged). Four Budget-page fixes from the mid-project review and
+- BUD-04: **done September 29, 2026**, merged into `redesign/main` with
+  owner approval (`c0527171d`, branch `redesign/bud-04`). Four Budget-page fixes from the mid-project review and
   QA-00; no handler, binding, value or query change. **Files:**
   `C/budget/envelope/CategoryActivityContent.tsx` (the bar is positioned
   under the amount instead of stacked with it, so only the amount line is
