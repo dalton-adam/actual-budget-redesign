@@ -914,8 +914,8 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   **Known limits:** the empty-notes button keeps the row's
   30% placeholder opacity, which is faint; notes text is not redacted in
   privacy mode (unchanged from DETAIL-02 and the row's tooltip).
-- DETAIL-04: **in review September 29, 2026** (branch `redesign/detail-04`
-  from `225c5bfc3`). Goal box and pace chart in the details panel
+- DETAIL-04: **done September 29, 2026**, merged into `redesign/main` with
+  owner approval (`9059b8491`; branch `redesign/detail-04` from `225c5bfc3`). Goal box and pace chart in the details panel
   (design-decisions §5 items 4 and 5, §7.2; plan §10 Part A). **Owner
   decisions (September 29, 2026):** past and future months follow §7.2 as
   shown (§11 item 2, now Approved); the goal box shows the goal values and
