@@ -545,3 +545,48 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   the gray base instead of navy). **Not yet run:** WIDE, and Linux VRT
   regeneration: dark and midnight screenshots change across most VRT tests
   (→ QA-00).
+- QA-00: **in review September 28, 2026** (branch `redesign/qa-00`; the
+  owner moved it ahead of THEME-02 and asked that the Linux VRT run wait
+  for THEME-02 to merge, which happened during QA-00). Full record in
+  [verification.md](verification.md). No application file changed. New
+  files: `docs/redesign/verification.md`, five evidence screenshots in
+  `docs/redesign/verification/qa-00/`, and `scripts/redesign-perf.mjs`
+  (outside the app, so QA-01 can rerun the same method; its `summary` mode
+  prints the tables). **Performance:** v26.9.0 (`59fe126f6`, own worktree, 3019) against `redesign/main` (3018), the demo plus 100 added categories,
+  7 rounds at 1440×900 and 1000×700, a third variant with the details panel
+  closed; 42 runs, none failed. Assigned edits are 36% (1440) and 47%
+  (1000) slower, with or without the panel; the table drops 2–3 frames
+  (49–85 ms) whenever it leaves or returns to the top, traced to the
+  `isScrolled` flip in `DynamicBudgetTable`; the large budget settles
+  17–19% later after load (part of it the panel's queries). Month switching
+  and opening a register are not slower. Opened **PERF-01** (edits and
+  settle) and **PERF-02** (scroll flip); proposed QA-01 thresholds (within
+  10% of the base medians, no frame over 33 ms while scrolling). Another
+  session rebuilt the shared browser build with THEME-02 at 21:17, partway
+  through the timing run; THEME-02 changes only dark and midnight values,
+  the runs used light, and rounds before and after the rebuild agree.
+  **Custom theme:** two installed custom themes (dark and light bases) that
+  set every pre-redesign role, hue-rotated, and no redesign role; every
+  redesigned surface at 1440, 1000, the 820 overlay and mobile checked by
+  script (every computed colour comes from a theme role; outside the custom
+  CSS and `fallback.css` only the category accents, as design-decisions §8
+  intends) and by eye. Pass; clears BUD-01, BUD-02, BUD-03 and DETAIL-01's
+  gap. **Reduced motion:** every redesign transition stops; only the
+  upstream Reports loading animation remains. Pass. **Carried forward:**
+  the open account in light has no visible fill (white on white, 1.00:1;
+  added to BUD-04); TERM-01 wording correct in light and midnight,
+  including the mobile Budget Summary modal, the only place the
+  multi-month "Ready to Assign:" label still shows. **Linux VRT:**
+  after THEME-02 merged (`5b6df214b`), Playwright v1.61.1 Docker image,
+  one worker. The full run had 56 passed, 92 failed (all screenshot
+  mismatches) and 15 did not run. Three light failures ("1 associated
+  rules", "1 uncategorized transactions") came from the new worktree
+  missing the gitignored `locale/` files; with them copied in, the
+  baselines' singular text returned. Updating the 21 failing files changed
+  204 snapshots (141 dark, 63 midnight, no light, no new files, no size
+  changes). A before/after review of the most-changed snapshot per file
+  showed only THEME-02's surface retune. The rerun without updating passed
+  141/141. **For the owner (backlog D-5):** THEME-02 also recoloured the
+  mobile screens in dark and midnight, where plan §19.4 keeps the upstream
+  look. Checks: typecheck pass (10 tasks); lint pass. No UI file changed, so
+  the Impeccable detector does not apply.
