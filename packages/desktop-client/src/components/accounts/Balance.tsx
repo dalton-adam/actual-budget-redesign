@@ -4,9 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import { Button } from '@actual-app/components/button';
 import { SvgArrowButtonRight1 } from '@actual-app/components/icons/v2';
-import { Text } from '@actual-app/components/text';
+import { StatusPill } from '@actual-app/components/status-pill';
 import { theme } from '@actual-app/components/theme';
-import { View } from '@actual-app/components/view';
 import { q } from '@actual-app/core/shared/query';
 import type { Query } from '@actual-app/core/shared/query';
 import { getScheduledAmount } from '@actual-app/core/shared/schedules';
@@ -36,22 +35,15 @@ function DetailedBalance({
 }: DetailedBalanceProps) {
   const format = useFormat();
   return (
-    <Text
-      style={{
-        borderRadius: 4,
-        padding: '4px 6px',
-        color: theme.pillText,
-        backgroundColor: theme.pillBackground,
-      }}
-    >
-      {name}{' '}
+    <StatusPill tone="neutral">
+      <span style={{ fontWeight: 500 }}>{name}</span>
       <PrivacyFilter>
-        <FinancialText style={{ fontWeight: 600 }}>
+        <FinancialText>
           {!isExactBalance && '~ '}
           {format(balance, 'financial')}
         </FinancialText>
       </PrivacyFilter>
-    </Text>
+    </StatusPill>
   );
 }
 
@@ -175,95 +167,109 @@ function MoreBalances({ balanceQuery }: MoreBalancesProps) {
   );
 }
 
-type BalancesProps = {
+type BalanceAmountProps = {
   balanceQuery: { name: `balance-query-${string}`; query: Query };
   showExtraBalances: boolean;
   onToggleExtraBalances: () => void;
-  account?: AccountEntity;
-  isFiltered: boolean;
-  filteredAmount?: number | null;
+  isCompact: boolean;
 };
 
-export function Balances({
+/** The account's hero amount; pressing it shows the cleared breakdown. */
+export function BalanceAmount({
   balanceQuery,
   showExtraBalances,
   onToggleExtraBalances,
-  account,
-  isFiltered,
-  filteredAmount,
-}: BalancesProps) {
+  isCompact,
+}: BalanceAmountProps) {
   const selectedItems = useSelectedItems();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const isButtonHovered = useHover(buttonRef as RefObject<HTMLButtonElement>);
 
   return (
-    <View
+    <Button
+      ref={buttonRef}
+      data-testid="account-balance"
+      variant="bare"
+      onPress={onToggleExtraBalances}
       style={{
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        marginTop: -5,
-        marginLeft: -5,
-        gap: 10,
+        alignSelf: isCompact ? 'center' : 'flex-start',
+        flexShrink: 0,
+        marginLeft: isCompact ? 0 : -5,
+        paddingTop: 1,
+        paddingBottom: 1,
       }}
     >
-      <Button
-        ref={buttonRef}
-        data-testid="account-balance"
-        variant="bare"
-        onPress={onToggleExtraBalances}
-        style={{
-          paddingTop: 1,
-          paddingBottom: 1,
-        }}
+      <CellValue
+        binding={
+          { ...balanceQuery, value: 0 } as Binding<
+            'balance',
+            `balance-query-${string}`
+          >
+        }
+        type="financial"
       >
-        <CellValue
-          binding={
-            { ...balanceQuery, value: 0 } as Binding<
-              'balance',
-              `balance-query-${string}`
-            >
-          }
-          type="financial"
-        >
-          {props => (
-            <CellValueText
-              {...props}
-              style={{
-                fontSize: 22,
-                fontWeight: 400,
-                color:
-                  props.value < 0
-                    ? theme.numberNegative
-                    : props.value > 0
-                      ? theme.numberPositive
-                      : theme.pageTextSubdued,
-              }}
-            />
-          )}
-        </CellValue>
+        {props => (
+          <CellValueText
+            {...props}
+            style={{
+              fontSize: isCompact ? 28 : 34,
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: isCompact ? -0.4 : -0.8,
+              color:
+                props.value < 0
+                  ? theme.numberNegative
+                  : props.value > 0
+                    ? theme.numberPositive
+                    : theme.pageTextSubdued,
+            }}
+          />
+        )}
+      </CellValue>
 
-        <SvgArrowButtonRight1
-          style={{
-            width: 10,
-            height: 10,
-            marginLeft: 10,
-            color: theme.pillText,
-            transform: showExtraBalances ? 'rotateZ(180deg)' : 'rotateZ(0)',
-            opacity:
-              isButtonHovered || selectedItems.size > 0 || showExtraBalances
-                ? 1
-                : 0,
-          }}
-        />
-      </Button>
+      <SvgArrowButtonRight1
+        style={{
+          width: 10,
+          height: 10,
+          marginLeft: 10,
+          color: theme.pageTextSecondary,
+          transform: showExtraBalances ? 'rotateZ(180deg)' : 'rotateZ(0)',
+          opacity:
+            isButtonHovered || selectedItems.size > 0 || showExtraBalances
+              ? 1
+              : 0,
+        }}
+      />
+    </Button>
+  );
+}
 
+type BalanceChipsProps = {
+  balanceQuery: { name: `balance-query-${string}`; query: Query };
+  showExtraBalances: boolean;
+  account?: AccountEntity;
+  isFiltered: boolean;
+  filteredAmount?: number | null;
+};
+
+/** Cleared, uncleared, selected and filtered balances, as hero chips. */
+export function BalanceChips({
+  balanceQuery,
+  showExtraBalances,
+  account,
+  isFiltered,
+  filteredAmount,
+}: BalanceChipsProps) {
+  const selectedItems = useSelectedItems();
+
+  return (
+    <>
       {showExtraBalances && <MoreBalances balanceQuery={balanceQuery} />}
 
       {selectedItems.size > 0 && (
         <SelectedBalance selectedItems={selectedItems} account={account} />
       )}
       {isFiltered && <FilteredBalance filteredAmount={filteredAmount} />}
-    </View>
+    </>
   );
 }

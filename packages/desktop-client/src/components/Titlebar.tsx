@@ -32,7 +32,6 @@ import { useSyncedPref } from '#hooks/useSyncedPref';
 import { useDispatch } from '#redux';
 import * as bindings from '#spreadsheet/bindings';
 
-import { AccountSyncCheck } from './accounts/AccountSyncCheck';
 import { AnimatedRefresh } from './AnimatedRefresh';
 import { Link } from './common/Link';
 import { HelpMenu } from './HelpMenu';
@@ -346,7 +345,7 @@ export function Titlebar({ style }: TitlebarProps) {
           }
         />
 
-        <Route path="/accounts/:id" element={<AccountSyncCheck />} />
+        {/* An account's bank-sync error sits in its hero card (APP-01). */}
 
         {/* The budget shows one month, so the months-shown control is not
             offered (design-decisions §6). */}
