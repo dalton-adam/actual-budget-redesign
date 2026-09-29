@@ -37,7 +37,8 @@ Budget header are reference material, not tasks to build.
 | QA-00                | verified    | `1e94b0559`              | VRT: 23 of 204 changed snapshots reviewed by eye, the rest by script. QA-01 thresholds decided (D-6). |
 | ELEC-01              | not started | —                        | Needs an isolation review first (stage-0.md "Electron").                                              |
 | BUD-04               | verified    | `c0527171d`              | Adds theme role `navListActive`. Linux VRT not rerun (light Budget and pane snapshots change).        |
-| PERF-01, PERF-02     | ready       | —                        | Opened by QA-00; the thresholds they must meet are in verification.md.                                |
+| PERF-01              | review      | —                        | Edits now 57–59% faster than the base. Adds `C/budget/index.tsx` (owner-approved; may touch SYNC-01). |
+| PERF-02              | ready       | —                        | Opened by QA-00. PERF-01's run saw no scroll frame over 33 ms; confirm and close.                     |
 | DETAIL-03, DETAIL-04 | not started | —                        | —                                                                                                     |
 | SYNC-01              | blocked     | —                        | Waiting on owner decision D-1.                                                                        |
 | APP-01 – APP-06      | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                           |

@@ -15,12 +15,52 @@ type CategoryTileProps = {
   className?: string;
 };
 
+// Budget rows re-render on every edit, so the segmenter and each tile's
+// class are created once and reused.
+let graphemeSegmenter: Intl.Segmenter | null = null;
+
 export function getTileLetter(name: string) {
   const trimmed = name.trim();
-  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-  const first = segmenter.segment(trimmed)[Symbol.iterator]().next();
+  graphemeSegmenter ??= new Intl.Segmenter(undefined, {
+    granularity: 'grapheme',
+  });
+  const first = graphemeSegmenter.segment(trimmed)[Symbol.iterator]().next();
   return first.done ? '' : first.value.segment.toLocaleUpperCase();
 }
+
+const tileClassNames = new Map<string, string>();
+
+function getTileClassName(size: number, accentIndex: number | undefined) {
+  const key = `${size}:${accentIndex}`;
+  let className = tileClassNames.get(key);
+  if (!className) {
+    className = css({
+      position: 'relative',
+      display: 'inline-grid',
+      placeItems: 'center',
+      flexShrink: 0,
+      width: size,
+      height: size,
+      borderRadius: Math.round(size * 0.3),
+      overflow: 'hidden',
+      fontSize: Math.round(size * 0.46),
+      fontWeight: 700,
+      lineHeight: 1,
+      color: getAccentColor(accentIndex),
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        inset: 0,
+        backgroundColor: 'currentColor',
+        opacity: theme.tileAlpha,
+      },
+    });
+    tileClassNames.set(key, className);
+  }
+  return className;
+}
+
+const letterClassName = css({ position: 'relative' });
 
 export function getAccentColor(accentIndex: number | undefined) {
   if (
@@ -48,34 +88,9 @@ export function CategoryTile({
   return (
     <span
       aria-hidden
-      className={cx(
-        css({
-          position: 'relative',
-          display: 'inline-grid',
-          placeItems: 'center',
-          flexShrink: 0,
-          width: size,
-          height: size,
-          borderRadius: Math.round(size * 0.3),
-          overflow: 'hidden',
-          fontSize: Math.round(size * 0.46),
-          fontWeight: 700,
-          lineHeight: 1,
-          color: getAccentColor(accentIndex),
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: 'currentColor',
-            opacity: theme.tileAlpha,
-          },
-        }),
-        className,
-      )}
+      className={cx(getTileClassName(size, accentIndex), className)}
     >
-      <span className={css({ position: 'relative' })}>
-        {getTileLetter(name)}
-      </span>
+      <span className={letterClassName}>{getTileLetter(name)}</span>
     </span>
   );
 }

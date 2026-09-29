@@ -25,6 +25,7 @@ import {
 } from './CategoryDetailsContext';
 import { CategoryDetailsPanel } from './CategoryDetailsPanel';
 import {
+  EnvelopeTableLayoutProvider,
   getEnvelopeColumnWidths,
   getEnvelopeMonthWidth,
 } from './envelopeTable';
@@ -61,7 +62,7 @@ const DynamicBudgetTable = ({
   height,
   prewarmStartMonth,
   startMonth,
-  maxMonths = 3,
+  maxMonths,
   monthBounds,
   onMonthSelect,
   onBudgetAction,
@@ -87,8 +88,10 @@ const DynamicBudgetTable = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const { width: windowWidth } = useResponsive();
   const { expanded: accountsPaneExpanded } = useSidebar();
-  const { data: { grouped: categoryGroups } = { grouped: [] } } =
-    useCategories();
+  // No default inside the destructure, so the React Compiler can compile
+  // this component (PERF-01).
+  const { data: categoryData } = useCategories();
+  const categoryGroups = categoryData === undefined ? [] : categoryData.grouped;
   const hasDetailsPanel = type === 'envelope';
   const detailsPanelWidth = getDetailsPanelWidth(windowWidth);
   const pushedColumnWidths = getEnvelopeColumnWidths(windowWidth, {
@@ -236,7 +239,7 @@ const DynamicBudgetTable = ({
   );
 
   if (!hasDetailsPanel) {
-    return page;
+    return <EnvelopeTableLayoutProvider>{page}</EnvelopeTableLayoutProvider>;
   }
 
   // The details panel is on the envelope Budget page only
@@ -247,7 +250,7 @@ const DynamicBudgetTable = ({
       categoryGroups={categoryGroups}
       containerRef={containerRef}
     >
-      {page}
+      <EnvelopeTableLayoutProvider>{page}</EnvelopeTableLayoutProvider>
     </CategoryDetailsProvider>
   );
 };
@@ -265,8 +268,8 @@ type AutoSizingBudgetTableProps = Omit<
 export const AutoSizingBudgetTable = (props: AutoSizingBudgetTableProps) => {
   return (
     <AutoSizer
-      renderProp={({ width = 0, height = 0 }) => {
-        if (width === 0 || height === 0) {
+      renderProp={({ width, height }) => {
+        if (!width || !height) {
           return null;
         }
 

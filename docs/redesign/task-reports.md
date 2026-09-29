@@ -645,3 +645,77 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   34px hero amount at 1000×700; that is the BUD-01 amount style, not
   this change. The badge thresholds are English; a longer translation of
   the label or badge can still wrap.
+- PERF-01: **ready for review September 29, 2026** (branch
+  `redesign/perf-01` from `6eb4efc7a`; not merged). **Cause, found by
+  profiling:** each Assigned edit re-rendered every category row three
+  times, in the base too: once when the edit moved to the next row, and
+  once each when the save mutation went pending and settled. The React
+  Compiler skipped `Budget`, `BudgetTable` and `DynamicBudgetTable`
+  (a default inside an object destructure, reported by the compiler as
+  `Expected object property value to be an LVal, got: AssignmentPattern`),
+  so every handler they passed was new on each render and no row's `memo`
+  held. The redesign's rows cost more to render (tile, Available pill,
+  details opener, progress bar, per-row preference reads), and that cost
+  was paid three times per edit. **Files:** `C/budget/index.tsx`,
+  `C/budget/BudgetTable.tsx`, `C/budget/DynamicBudgetTable.tsx` (the
+  destructure defaults rewritten to give the same values, so all three
+  compile; `index.tsx` also passes each mutation's stable `mutate`, since
+  TanStack's mutation result object is new on every render, and declares
+  `onApplyBudgetTemplatesInGroup` after the mutation it calls so the
+  compiler can memoize it; `DynamicBudgetTable` drops a `maxMonths = 3`
+  default that never applied, the prop being required, and `AutoSizer`'s
+  `width = 0, height = 0` became a falsy check);
+  `C/budget/envelopeTable.ts` (new `EnvelopeTableLayoutProvider`: budget
+  type, column widths and the category column style worked out once per
+  page and shared through a memoized context; `useIsEnvelopeTable`,
+  `useEnvelopeColumnWidths` and `useCategoryColumnStyle` keep their names
+  and read it, and throw outside the provider; every caller is under
+  `DynamicBudgetTable`); `L/CategoryTile.tsx` (one shared
+  `Intl.Segmenter`; tile classes cached per size and accent). Handlers call
+  the same mutations with the same arguments; no binding, saved value or
+  query changed, and the panel still opens by default. **Scope beyond the
+  card:** `C/budget/index.tsx`, approved by the owner on September 29, 2026;
+  it is upstream code and may conflict at SYNC-01, though the rewrite is
+  small. **Renders per edit** (demo, dev server, React DevTools' did-render
+  rule): the two mutation commits went from about 1,000 components each
+  (every row) to 2 (`Budget` and one child); the commit that moves the
+  edit to the next row still re-renders the table, as in the base.
+  **Measured** (`scripts/redesign-perf.mjs run 7`, v26.9.0 `59fe126f6` on
+  3019 and this branch on 3018 in the same session, 42 runs, none failed):
+
+  | Measure                       | 1440 base | 1440 redesign | 1000 base | 1000 redesign |
+  | ----------------------------- | --------: | ------------: | --------: | ------------: |
+  | Assigned edit: median         |       124 |     52 (−58%) |       125 |     51 (−59%) |
+  | Assigned edit: p90            |       163 |     69 (−58%) |       160 |     69 (−57%) |
+  | First paint, large: first row |      1519 |    1512 (−0%) |      1530 |    1486 (−3%) |
+  | First paint, large: settled   |      1632 |    1744 (+7%) |      1635 |    1718 (+5%) |
+
+  The panel-closed variant matches (52 ms at both sizes). Assigned edits
+  pass D-6 at both sizes, and are now faster than the base. Large
+  first-paint settled (reported, not blocking) went from +17–19% in QA-00
+  to +5–7%. Before the compiler fix, the layout context and tile caching
+  alone reached 159 ms against a 167 ms start. **Seen for PERF-02:** in this
+  run no scroll frame went over 33 ms (longest 17.7 ms at 1440, 33.3 ms at
+  1000; QA-00 had 49–85 ms), probably because `DynamicBudgetTable` now
+  compiles and its `isScrolled` re-render no longer reaches the rows.
+  PERF-02 still has to confirm it. **Checks:** typecheck pass; `oxlint
+--type-aware --quiet` and `oxfmt --check` pass on the changed files. UNIT
+  `src/components/budget` 74/74 (including `envelopeTable.test.ts`);
+  `@actual-app/components` 42/42. E2E(budget, detail-01, detail-02) 20/20
+  against the rebuilt 3018 preview. Tracking-budget smoke test (demo
+  switched to tracking at 1440×900, script): the table keeps its upstream
+  layout, an Assigned edit saves, and renaming a category through the row
+  menu saves, with no console errors. Impeccable detector on the changed
+  files: clean. **Reorder and templates** (script, demo at 1440×900, run
+  the same way on this branch's 3018 build and on the v26.9.0 base at 3019,
+  9/9 on both): a category dragged within its group, then across groups,
+  then within the first group again (checking that a third drag uses the
+  updated order), then a group dragged above another. Each order is read
+  back from `get-categories`, is unchanged after a reload, and the table
+  shows the same order. Then "Overwrite with templates" on Usual Expenses
+  with `#template` notes on Food and General, run from the month after the
+  first one shown: the amounts land in that month and the first month is
+  unchanged. No console errors. Playwright's one-step `dragTo` drops before
+  the table works out above or below and fails the same way on both builds,
+  so the script uses a slow mouse drag with pauses. **Not checked:** WIDE
+  and Linux VRT (nothing visual changed, so no snapshot should move).

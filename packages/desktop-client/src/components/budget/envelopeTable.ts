@@ -1,6 +1,9 @@
 // Presentation constants for the redesigned envelope table
 // (design-decisions §4.1). Tracking budgets keep the shared table's
 // ROW_HEIGHT; the shared constant itself is not changed.
+import { createContext, createElement, useContext, useMemo } from 'react';
+import type { ReactNode } from 'react';
+
 import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import type { CSSProperties } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
@@ -15,12 +18,6 @@ import { useCategoryDetails } from './CategoryDetailsContext';
 
 export const ENVELOPE_CATEGORY_ROW_HEIGHT = 44;
 export const ENVELOPE_GROUP_ROW_HEIGHT = 40;
-
-/** The redesigned table applies to envelope budgets only. */
-export function useIsEnvelopeTable() {
-  const [budgetType = 'envelope'] = useSyncedPref('budgetType');
-  return budgetType === 'envelope';
-}
 
 export type EnvelopeColumnWidths = {
   /** Minimum width of the flexible Category column. */
@@ -107,14 +104,75 @@ export function getEnvelopeMonthWidth({
   return assigned + activity + available;
 }
 
-export function useEnvelopeColumnWidths() {
+type EnvelopeTableLayout = {
+  isEnvelopeTable: boolean;
+  columnWidths: EnvelopeColumnWidths;
+  categoryColumnStyle: CSSProperties;
+};
+
+const EnvelopeTableLayoutContext = createContext<EnvelopeTableLayout | null>(
+  null,
+);
+
+/**
+ * Works out the table layout once for the whole Budget page. Every row
+ * re-renders on each Assigned edit, and reading the budget type, window
+ * size and preferences in each row made edits slower (PERF-01).
+ */
+export function EnvelopeTableLayoutProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const [budgetType = 'envelope'] = useSyncedPref('budgetType');
   const { width } = useResponsive();
   const details = useCategoryDetails();
   const { expanded } = useSidebar();
-  return getEnvelopeColumnWidths(width, {
-    detailsPushed: !!details && details.mode === 'push' && details.isShown,
-    accountsPaneExpanded: expanded,
-  });
+  const [categoryExpandedStatePref] = useGlobalPref('categoryExpandedState');
+
+  const isEnvelopeTable = budgetType === 'envelope';
+  const detailsPushed = !!details && details.mode === 'push' && details.isShown;
+  const categoryExpandedState = categoryExpandedStatePref ?? 0;
+
+  // Rows only re-render for the context when the layout itself changes.
+  const layout = useMemo(() => {
+    const columnWidths = getEnvelopeColumnWidths(width, {
+      detailsPushed,
+      accountsPaneExpanded: expanded,
+    });
+    return {
+      isEnvelopeTable,
+      columnWidths,
+      categoryColumnStyle: isEnvelopeTable
+        ? { flex: 1, minWidth: columnWidths.categoryMin }
+        : { width: 200 + 100 * categoryExpandedState },
+    };
+  }, [isEnvelopeTable, width, detailsPushed, expanded, categoryExpandedState]);
+
+  return createElement(
+    EnvelopeTableLayoutContext.Provider,
+    { value: layout },
+    children,
+  );
+}
+
+function useEnvelopeTableLayout() {
+  const layout = useContext(EnvelopeTableLayoutContext);
+  if (!layout) {
+    throw new Error(
+      'The budget table must be inside an EnvelopeTableLayoutProvider.',
+    );
+  }
+  return layout;
+}
+
+/** The redesigned table applies to envelope budgets only. */
+export function useIsEnvelopeTable() {
+  return useEnvelopeTableLayout().isEnvelopeTable;
+}
+
+export function useEnvelopeColumnWidths() {
+  return useEnvelopeTableLayout().columnWidths;
 }
 
 /**
@@ -122,14 +180,7 @@ export function useEnvelopeColumnWidths() {
  * spare width; tracking budgets keep the adjustable fixed width.
  */
 export function useCategoryColumnStyle(): CSSProperties {
-  const isEnvelopeTable = useIsEnvelopeTable();
-  const { categoryMin } = useEnvelopeColumnWidths();
-  const [categoryExpandedStatePref] = useGlobalPref('categoryExpandedState');
-  const categoryExpandedState = categoryExpandedStatePref ?? 0;
-
-  return isEnvelopeTable
-    ? { flex: 1, minWidth: categoryMin }
-    : { width: 200 + 100 * categoryExpandedState };
+  return useEnvelopeTableLayout().categoryColumnStyle;
 }
 
 /** Reads an existing envelope spreadsheet cell for the current month. */

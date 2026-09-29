@@ -297,11 +297,11 @@ predates THEME-02; mobile stays deferred.
 
 ### Regressions opened as tasks
 
-| Task    | Regression                                                                     | Card                             |
-| ------- | ------------------------------------------------------------------------------ | -------------------------------- |
-| PERF-01 | Assigned edits 36–47% slower; large budget settles 17–19% later after load     | [backlog](backlog.md#task-cards) |
-| PERF-02 | 2–3 dropped frames (49–85 ms) each time the table leaves or returns to the top | [backlog](backlog.md#task-cards) |
-| BUD-04  | (added) The open account in the accounts pane has no visible fill in light     | [backlog](backlog.md#task-cards) |
+| Task    | Regression                                                                                                                                                                           | Card                             |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------- |
+| PERF-01 | Assigned edits 36–47% slower; large budget settles 17–19% later after load. Fixed on `redesign/perf-01`: edits 57–59% faster than the base, settle +5–7% ([report](task-reports.md)) | [backlog](backlog.md#task-cards) |
+| PERF-02 | 2–3 dropped frames (49–85 ms) each time the table leaves or returns to the top                                                                                                       | [backlog](backlog.md#task-cards) |
+| BUD-04  | (added) The open account in the accounts pane has no visible fill in light                                                                                                           | [backlog](backlog.md#task-cards) |
 
 ### Not checked in QA-00
 
