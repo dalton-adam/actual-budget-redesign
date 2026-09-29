@@ -22,6 +22,20 @@ function findBudgetSummary(): HTMLElement | null {
   );
 }
 
+// Envelope budgets summarize the month in the page header's cards. On short
+// windows a one-line strip replaces them once the table scrolls, so use
+// whichever Ready to Assign is on screen.
+function findReadyToAssign(): HTMLElement | null {
+  const candidates = document.querySelectorAll<HTMLElement>(
+    '[data-testid="ready-to-assign"]',
+  );
+  return (
+    Array.from(candidates).find(
+      element => element.getClientRects().length > 0,
+    ) ?? null
+  );
+}
+
 // Must resolve within joyride's 5s beforeTimeout
 function waitForElement(selector: string, timeoutMs = 4000): Promise<void> {
   return new Promise(resolve => {
@@ -111,6 +125,7 @@ function getBudgetTourSteps({ navigate, budgetType }: TourStepDeps): Step[] {
     {
       ...(budgetType === 'tracking'
         ? {
+            target: findBudgetSummary,
             title: <Trans>Saved This Month</Trans>,
             content: (
               <Trans>
@@ -121,17 +136,17 @@ function getBudgetTourSteps({ navigate, budgetType }: TourStepDeps): Step[] {
             ),
           }
         : {
-            title: <Trans>To Budget</Trans>,
+            target: findReadyToAssign,
+            title: <Trans>Ready to Assign</Trans>,
             content: (
               <Trans>
-                The <strong>To Budget</strong> amount shows the money you have
-                not assigned to a category yet. Aim to bring it to zero, so that
-                all of your money has a job.
+                The <strong>Ready to Assign</strong> amount shows the money you
+                have not assigned to a category yet. Aim to bring it to zero, so
+                that all of your money has a job.
               </Trans>
             ),
           }),
       id: 'budget-summary',
-      target: findBudgetSummary,
       placement: 'bottom',
     },
     {
@@ -139,14 +154,22 @@ function getBudgetTourSteps({ navigate, budgetType }: TourStepDeps): Step[] {
       target: '[data-testid="category-name"]',
       placement: 'bottom',
       title: <Trans>Categories</Trans>,
-      content: (
-        <Trans>
-          Each row in the budget is a category. Click the{' '}
-          <strong>Budgeted</strong> amount to assign money to a category, and
-          keep an eye on the <strong>Balance</strong> column to see how much is
-          left to spend.
-        </Trans>
-      ),
+      content:
+        budgetType === 'tracking' ? (
+          <Trans>
+            Each row in the budget is a category. Click the{' '}
+            <strong>Budgeted</strong> amount to assign money to a category, and
+            keep an eye on the <strong>Balance</strong> column to see how much
+            is left to spend.
+          </Trans>
+        ) : (
+          <Trans>
+            Each row in the budget is a category. Click the{' '}
+            <strong>Assigned</strong> amount to assign money to a category, and
+            keep an eye on the <strong>Available</strong> column to see how much
+            is left to spend.
+          </Trans>
+        ),
     },
     {
       id: 'month-picker',
