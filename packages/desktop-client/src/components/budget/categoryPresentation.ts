@@ -196,6 +196,40 @@ export function getCategoryPace({
   return { kind, days, upto, start, series, spent, hasPaceLine, summary };
 }
 
+export type GoalStatus = {
+  /** The goal or template target. */
+  target: IntegerAmount;
+  /** Available for a long-term goal, Assigned for a template. */
+  value: IntegerAmount;
+  /** Still needed to reach the target; 0 once it is met. */
+  remaining: IntegerAmount;
+  isMet: boolean;
+  /** Progress toward the target, between 0 and 1. */
+  fill: number;
+};
+
+/**
+ * Goal box status (design-decisions §5, item 4). Compares the same values as
+ * the Available pill: a long-term goal compares Available, a template
+ * compares Assigned.
+ */
+export function getGoalStatus({
+  goal,
+  isLongGoal,
+  available,
+  assigned,
+}: {
+  goal: IntegerAmount;
+  isLongGoal: boolean;
+  available: IntegerAmount;
+  assigned: IntegerAmount;
+}): GoalStatus {
+  const value = isLongGoal ? available : assigned;
+  const remaining = Math.max(0, goal - value);
+  const fill = goal > 0 ? Math.min(1, Math.max(0, value / goal)) : 1;
+  return { target: goal, value, remaining, isMet: remaining === 0, fill };
+}
+
 export type SpendingBarSegment =
   | { type: 'category'; categoryId: string; value: IntegerAmount }
   | { type: 'other'; value: IntegerAmount }

@@ -6,6 +6,7 @@ import {
   getCategoryPace,
   getCategoryProgress,
   getEvenPace,
+  getGoalStatus,
   getSpendingBarSegments,
   stableHash,
 } from './categoryPresentation';
@@ -350,6 +351,66 @@ describe('getCategoryPace', () => {
     expect(pace.hasPaceLine).toBe(false);
     expect(pace.series[30]).toBe(4000);
     expect(pace.summary).toEqual({ type: 'finished-overspent', amount: 4000 });
+  });
+});
+
+describe('getGoalStatus', () => {
+  it('measures a long-term goal against Available', () => {
+    // $10,000 goal, $4,900 available (the prototype's Emergency fund).
+    expect(
+      getGoalStatus({
+        goal: 1000000,
+        isLongGoal: true,
+        available: 490000,
+        assigned: 70000,
+      }),
+    ).toEqual({
+      target: 1000000,
+      value: 490000,
+      remaining: 510000,
+      isMet: false,
+      fill: 0.49,
+    });
+  });
+
+  it('measures a template against Assigned, not Available', () => {
+    // $280 template, $250 assigned, $110 available after carry-in.
+    expect(
+      getGoalStatus({
+        goal: 28000,
+        isLongGoal: false,
+        available: 11000,
+        assigned: 25000,
+      }),
+    ).toMatchObject({ value: 25000, remaining: 3000, isMet: false });
+  });
+
+  it('is met at or above the target and caps the fill', () => {
+    expect(
+      getGoalStatus({
+        goal: 28000,
+        isLongGoal: false,
+        available: 0,
+        assigned: 30000,
+      }),
+    ).toMatchObject({ remaining: 0, isMet: true, fill: 1 });
+  });
+
+  it('shows an empty bar when the goal is overspent', () => {
+    expect(
+      getGoalStatus({
+        goal: 50000,
+        isLongGoal: true,
+        available: -2000,
+        assigned: 0,
+      }),
+    ).toMatchObject({ remaining: 52000, isMet: false, fill: 0 });
+  });
+
+  it('treats a zero target as met', () => {
+    expect(
+      getGoalStatus({ goal: 0, isLongGoal: false, available: 0, assigned: 0 }),
+    ).toMatchObject({ remaining: 0, isMet: true, fill: 1 });
   });
 });
 
