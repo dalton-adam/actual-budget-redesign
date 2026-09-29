@@ -681,7 +681,9 @@ RELEASE-01.
 ### 19.4 Scope recorded
 
 - **Mobile is deferred.** Only the TERM-01 wording applies to the mobile
-  envelope screens; they keep the upstream look. Mobile E2E must keep passing.
+  envelope screens; they keep the upstream layout. Their colours follow the
+  shared theme roles, so THEME-02's dark and midnight retune applies to
+  them too (backlog decision D-5). Mobile E2E must keep passing.
   This satisfies §11's requirement to list deferred screens.
 - **Goal captions are an open decision** (backlog D-3): BUD-02 left out the
   goal/template caption because no approved formula exists.
