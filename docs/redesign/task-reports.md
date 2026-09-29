@@ -1038,3 +1038,24 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   `better-sqlite3` was reverted from a backup and loads under Node again.
   **Not checked:** themes and privacy mode in the desktop shell, the packaged
   `app://` bundle.
+- TOPBAR-FIX: **in review September 29, 2026**, branch
+  `redesign/topbar-fix` (`b13404ca8`), not merged. Results in
+  [verification.md](verification.md#topbar-fix-september-29-2026).
+  **Cause:** the title bar's right-hand group wrapped, and nothing responded
+  to the width the expanded pane takes; ELEC-01's run also had the
+  development theme switcher. **Change:** the title bar is a size container;
+  the group never wraps; below an 800px title bar the tabs and gaps tighten
+  and Help shows its icon only (accessible name kept); the budget name and
+  uncategorized count ellipsize last. **Scope added (not in the card):**
+  `C/HelpMenu.tsx` (the Help label needed its own element to hide) and
+  `C/sidebar/BudgetName.tsx` (the switcher shrinks). No handler or route
+  changed. **Checks:** typecheck and lint pass; web unit tests 1052 passed,
+  1 skipped; E2E budget, accounts, help-menu, nav-02 26/26 (dev server);
+  12 width × pane cases in the browser and 8 in the isolated desktop build
+  all fit; light, dark and midnight screenshots at 1000, 1100 and 1440.
+  **Environment note:** `better-sqlite3` was rebuilt for Electron for the
+  desktop check and restored from a backup; it loads under Node again.
+  **Not checked:** Linux VRT, a `build:browser` preview, custom theme,
+  server-online/offline labels, long translations. **Owner decision:** the
+  icon-only Help at narrow widths is a new "Shown" row (design-decisions §2,
+  §11 item 6).

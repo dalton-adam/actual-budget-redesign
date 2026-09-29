@@ -40,6 +40,7 @@ figures and "never color alone" stay in force.
 | Decision                                                                                                                                                                                                                                                                                         | Status   |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
 | Top bar: segmented pill tabs **Budget, Accounts ▾, Reports, Schedules, More ▾**; right side: uncategorized chip, sync, privacy, help, budget switcher                                                                                                                                            | Approved |
+| Narrow title bar (under 800px, i.e. the pane expanded in a window under about 1036px): tabs and gaps tighten and Help shows its icon only; the budget name, then the uncategorized count, ellipsize. The bar never wraps and no control is removed (TOPBAR-FIX)                                  | Shown    |
 | Every destination in the [destination map](prototype/README.md#destination-map) stays reachable at every width                                                                                                                                                                                   | Approved |
 | **Accounts pane**: on the left of every page, **collapsible**. Open: the full list (All accounts, On/Off budget with totals, each account with sync-status dot and balance, Closed accounts, Add account). Collapsed: 56px rail with initials and status dots, Add account, and an expand button | Approved |
 | Pane open/collapsed state is **device-local** front-end storage (like the details panel); no new stored or synced preference                                                                                                                                                                     | Approved |
@@ -519,6 +520,8 @@ Confirm or change these before the named task starts; until then the
 4. ~~Accounts pane default open at ≥1280px, collapsed below (NAV-02).~~
    **Confirmed by the owner September 27, 2026**; now Approved in §2.
 5. Account hero and register treatment in §10 (APP-01, APP-02).
+6. Narrow title bar behaviour in §2, including Help shown as an icon only
+   (TOPBAR-FIX).
 
 ## 12. Evidence
 

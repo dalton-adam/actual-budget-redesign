@@ -376,3 +376,95 @@ is the browser's; only the shell differs); the packaged `app://` bundle
 through macOS menus while the window is in another Space (the test harness
 could not deliver them reliably; the same menu items were triggered directly
 instead).
+
+## TOPBAR-FIX (September 29, 2026)
+
+Branch `redesign/topbar-fix`. Fixes the title bar wrap found in ELEC-01.
+
+### Cause
+
+The right-hand group (`SpaceBetween` in `Titlebar.tsx`) wrapped by default,
+and the layout had no response to the width the expanded accounts pane
+(236px) takes. ELEC-01's 1000px run also showed the development-only theme
+switcher, which pushed the group over; without it the demo fits at 1000px
+but not at 900px, and the uncategorized-transactions button (about 195px)
+overflows much wider windows.
+
+### Change
+
+The title bar is a named size container (`titlebar`), so its controls
+respond to the width left after the pane, not the window. The right-hand
+group never wraps. Below an 800px title bar (pane expanded under about
+1036px; never with the rail collapsed) the tabs' side padding drops from 12
+to 8px, the group's gaps from 10 to 6px, and Help shows only its icon; its
+accessible name stays "Help". If that is still not enough, the budget name
+and the uncategorized count ellipsize; every other control keeps its size.
+
+### Measurements
+
+Every control's box inside the 36px bar, the right-hand group starting after
+the tabs and ending inside the bar's padding ("fits"). Demo budget, no
+server, with the development theme switcher present (the ELEC-01 worst
+case).
+
+| Window | Pane      | Title bar | Result | Notes                                          |
+| ------ | --------- | --------- | ------ | ---------------------------------------------- |
+| 900    | expanded  | 664       | fits   | Tight; budget name ellipsized to 94px ("Tes…") |
+| 950    | expanded  | 714       | fits   | Tight; name in full                            |
+| 1000   | expanded  | 764       | fits   | Tight; name in full (ELEC-01's failing case)   |
+| 1035   | expanded  | 799       | fits   | Tight (last width below the threshold)         |
+| 1036   | expanded  | 800       | fits   | Full labels                                    |
+| 1100   | expanded  | 864       | fits   | Full labels                                    |
+| 1280   | expanded  | 1044      | fits   |                                                |
+| 1440   | expanded  | 1204      | fits   |                                                |
+| 900    | collapsed | 844       | fits   | Full labels                                    |
+| 1000   | collapsed | 944       | fits   |                                                |
+| 1100   | collapsed | 1044      | fits   |                                                |
+| 1440   | collapsed | 1384      | fits   |                                                |
+
+With 12 uncategorized transactions forced on locally (a temporary edit,
+reverted before commit): 900 expanded fits with the count at "12 un…" and
+the budget switcher at its initial; 1100 expanded fits with both shortened;
+1280 expanded and 1440 collapsed show both in full
+([900 worst case](verification/topbar-fix/light-900-pane-open-worst-case.jpg);
+the pane balances read 0.00 because the capture was taken while the demo was
+still loading).
+
+### Checks
+
+| Check                                                                     | Result                                                                                           |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `yarn typecheck`                                                          | pass                                                                                             |
+| `yarn lint`                                                               | pass                                                                                             |
+| `yarn workspace @actual-app/web run test`                                 | 74 files, 1052 passed, 1 skipped                                                                 |
+| E2E budget, accounts, help-menu, nav-02 (dev server on 3028)              | 26 passed                                                                                        |
+| VISUAL light, dark, midnight at 1000, 1100, 1440 (pane expanded)          | all fit; screenshots below                                                                       |
+| Desktop build (isolated, Playwright Electron, 900–1440, both pane states) | 8/8 fit; `userData` in `data/redesign-electron/`; 0 files changed in the installed app's folders |
+
+Screenshots: light
+[1000](verification/topbar-fix/light-1000-pane-open.jpg),
+[1100](verification/topbar-fix/light-1100-pane-open.jpg),
+[1440](verification/topbar-fix/light-1440-pane-open.jpg),
+[1000 collapsed](verification/topbar-fix/light-1000-rail-collapsed.jpg),
+[900](verification/topbar-fix/light-900-pane-open.jpg); dark
+[1000](verification/topbar-fix/dark-1000-pane-open.jpg),
+[1100](verification/topbar-fix/dark-1100-pane-open.jpg),
+[1440](verification/topbar-fix/dark-1440-pane-open.jpg); midnight
+[1000](verification/topbar-fix/midnight-1000-pane-open.jpg),
+[1100](verification/topbar-fix/midnight-1100-pane-open.jpg),
+[1440](verification/topbar-fix/midnight-1440-pane-open.jpg); desktop
+[1000 expanded](verification/topbar-fix/desktop-1000-pane-open.png) (compare
+ELEC-01's [wrapped bar](verification/elec-01/titlebar-pane-open-1000.png)),
+[1000 collapsed](verification/topbar-fix/desktop-1000-pane-collapsed.png).
+
+### Not checked
+
+- E2E ran against a Vite dev server, not a `build:browser` preview: the
+  shared preview on 3018 belonged to another session.
+- Linux VRT not regenerated. Snapshots at title bar widths of 800px or more
+  should be unchanged (only the Help label gained a wrapping `span`); none was
+  compared.
+- The desktop check drove the window with Playwright; the manual launcher
+  run started and passed its isolation check, but its window was on another
+  Space and could not be inspected. Custom theme, "Server online"/"Server
+  offline" labels and long translations were not measured.
