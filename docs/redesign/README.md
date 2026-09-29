@@ -33,6 +33,8 @@ node scripts/redesign.mjs preview
 
 The preview listens only at http://127.0.0.1:3018. Its data is separate from port 3017 and the installed desktop app. Close the terminal process with Ctrl+C to stop it. A built preview must be rebuilt to show source changes.
 
+For the desktop (Electron) app, use only `node scripts/redesign-electron.mjs` after the one-time preparation in [Stage 0](stage-0.md#desktop-isolation-review-elec-01). Never run upstream's desktop scripts or a packaged build: they use the installed app's folders.
+
 ## Baseline verification commands
 
 ```sh
