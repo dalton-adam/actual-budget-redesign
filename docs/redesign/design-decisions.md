@@ -191,7 +191,13 @@ Contents, top to bottom (`18`, `20`–`24`):
 7. The month's transactions, newest first, up to five, then "View in
    Accounts" (the existing filtered view). Posted transactions only:
    scheduled previews are left out so the list matches Activity (owner
-   decision, September 28, 2026).
+   decision, September 28, 2026). The five rows stay read-only; "View in
+   Accounts" opens the panel's month (owner decision, September 29, 2026).
+
+Notes are edited from the panel with the row's own notes button, saving
+the same way (owner decision, September 29, 2026). The month stepper stays
+within the budget's months and follows the budget month again whenever it
+changes (DETAIL-03).
 
 Privacy mode hides the chart and uses the redacted font for amounts (`50`).
 

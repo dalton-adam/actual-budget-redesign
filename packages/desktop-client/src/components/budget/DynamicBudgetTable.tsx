@@ -232,7 +232,7 @@ const DynamicBudgetTable = ({
       </View>
       {hasDetailsPanel && (
         <ErrorBoundary FallbackComponent={FeatureErrorFallback}>
-          <CategoryDetailsPanel month={startMonth} width={detailsPanelWidth} />
+          <CategoryDetailsPanel width={detailsPanelWidth} />
         </ErrorBoundary>
       )}
     </View>
@@ -248,6 +248,9 @@ const DynamicBudgetTable = ({
     <CategoryDetailsProvider
       mode={detailsPanelMode}
       categoryGroups={categoryGroups}
+      budgetMonth={startMonth}
+      monthBounds={monthBounds}
+      onShowActivity={props.onShowActivity}
       containerRef={containerRef}
     >
       <EnvelopeTableLayoutProvider>{page}</EnvelopeTableLayoutProvider>

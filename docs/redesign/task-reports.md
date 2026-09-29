@@ -821,3 +821,94 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   7-character amounts; the Linux VRT shows the exact `-755.00` case). At
   window widths where the Category column is at its minimum, the gutter
   leaves 48px less for the name.
+- DETAIL-03: **in review September 29, 2026**, not yet merged (branch
+  `redesign/detail-03` from `c53871325`). Panel actions (design-decisions §5
+  items 1, 6 and 7; plan §10 Part B). **Owner decisions (September 29,
+  2026):** the five transaction rows stay read-only (the desktop app has no
+  view for a single transaction), and "View in Accounts" under the list is
+  the only link; notes are edited with the row's own `NotesButton`, placed
+  beside the Notes heading, so there is no second save path. **Month
+  stepper:** ‹ month › in the header, labelled "Details: month before" and
+  "Details: month after" (a first draft's "Next month in details" matched the
+  Budget page model's `Next month` locator and would have broken every E2E
+  test that changes month). The panel follows the budget month until the
+  stepper is used, and again whenever the budget month changes
+  (`resolveDetailsMonth`); it stops at the budget's month bounds
+  (`stepDetailsMonth`). The Budget page's month does not move. **View in
+  Accounts:** shown when the list has transactions; calls the page's
+  existing `onShowActivity` (the handler behind the row's Activity amount)
+  with the panel's month, after saving the table scroll position under the
+  same `budget-scroll-position` key `BudgetTable` restores. **Notes:** the
+  popover editor saves when it closes and only if the text changed, as in the
+  row. Escape closes the editor first, not the panel (react-aria stops the
+  event); the editor takes the first click outside it, so switching category
+  or closing the panel while editing always saves first. **Scope grew beyond
+  the card:** the chosen category and panel month are kept in
+  `sessionStorage` (`actual-budget-details-category`,
+  `actual-budget-details-month`), because going to Accounts and back
+  otherwise reset the panel to the first category. This is browser-session
+  storage, not a synced or core preference. Changed files:
+  `C/budget/CategoryDetails{Context,Context.test,Header,Notes,Panel,Transactions,TransactionRow}.ts(x)`,
+  `C/budget/DynamicBudgetTable.tsx` (passes the budget month, month bounds and
+  `onShowActivity` to the provider); new `e2e/detail-03.test.ts`.
+  `NotesButton.tsx` and `NotesModal.tsx` unchanged. No handler, query,
+  preference or saved value changed. Checks: typecheck pass; lint pass; UNIT
+  `src/components/budget` 81/81 (7 new: month follow/reset, step bounds,
+  provider stepping and reset, bounds at the last month, category and month
+  kept across remount, scroll saved and handler called); `generate:i18n`
+  ran; E2E(detail-03) 6/6 (stepper moves the panel only, and values in the
+  stepped month match the table on that month; keyboard stepping; View in
+  Accounts gives the same register rows as Activity and back keeps the
+  category; the link uses the panel month and back keeps it; a note edited
+  in the panel saves on Escape and shows in the row; clicking away saves to
+  the right category); E2E(detail-01, detail-02, detail-03, budget, bud-01,
+  transactions, accounts, settings) 55/55 and E2E(nav-02, tour, help-menu)
+  8/8, with `--ignore-snapshots`; after the header's last change,
+  E2E(detail-01, detail-02, detail-03, budget) 26/26. Impeccable detector:
+  no findings. VISUAL (Playwright against its own dev server, demo budget;
+  [screenshots](verification/detail-03/)): dark 1440×900, with focus rings
+  on the stepper and the link, the notes editor open, and privacy mode (every
+  panel amount redacted; the link shows no amount); light 1000×700 and
+  stepped back to an empty month (found and fixed: at 320px the stepper wraps
+  and left a dangling "·" after the group name, so the separator was
+  removed); midnight 820×700 overlay, with a note saved by Escape and the
+  overlay still open, then Escape closing it. **Custom theme** (the QA-00
+  method rebuilt: every v26.9.0 `--color-*` role resolved through the
+  palette and hue-rotated 150°, none of the redesign roles; "custom dark" 224
+  roles on base `dark`, "custom light" 226 on base `light`; installed through
+  `installedCustomLightTheme` and reloaded): panel pushed at 1440×900 and
+  1000×700, with and without the notes editor open, and the 820×700 overlay.
+  Every computed text, background, border and outline colour in the panel and
+  the notes popover matched an active theme role. The only roles not set by
+  the custom CSS are `categoryAccent1`–`10` (kept from the base by design,
+  design-decisions §8) and `cardInset` and `progressTrack` (derived by the
+  fallback layer from the custom colours). One colour matched no role: the
+  browser-default fill of react-aria's visually hidden dismiss button inside
+  the popover (also seen in QA-00). No console errors. Screenshots:
+  `custom-dark-1440.png`, `custom-light-1440-notes.png`,
+  `custom-dark-820-overlay.png`, `custom-light-1000.png`. **Linux VRT**
+  (Playwright v1.61.1 image against the HTTPS dev server): the first full
+  run had 123 passed, 31 failed, 15 did not run; all 31 were screenshot
+  mismatches. A script compared each regenerated snapshot with the committed
+  one: 156 of the 177 changed snapshots differ only inside the accounts pane
+  (BUD-04's pane changes, which were never regenerated), and 21 are over the
+  Budget page (Budget ×6, command bar ×3, help menu and keyboard shortcuts
+  ×12), combining BUD-04's shorter summary cards with this task's panel
+  controls. Reviewed by eye: the Budget, command bar and shortcuts shots in
+  dark and midnight, and a pane-only Payees shot. Regenerated with
+  `--update-snapshots=changed` on those 11 files (the long schedules test
+  needed `--timeout=240000`). Verification run without updating: 168 passed,
+  1 flaky (`budget.mobile.test.ts` "set budget to 3 month average", passed
+  on retry; it passed in the first run and this task doesn't touch mobile), 0
+  failed. Found in review, not caused by this task: the Food row in
+  `Budget-transfer-funds-to-another-category-2` shows its Assigned amount
+  cut to "-755...." beside the row's hover tools; the committed snapshot
+  already had it (split into its own task).
+  **WIDE** (the recipe's config, pointed at this branch's own production
+  build served on 3028 from a scratch folder, so the other session's 3018
+  preview and `build/` were left alone): 58 passed, 1 failed (the known
+  Reports baseline at 1440: more widgets fit than the test expects), 15 did
+  not run, matching the recorded baseline.
+  **Known limits:** the empty-notes button keeps the row's
+  30% placeholder opacity, which is faint; notes text is not redacted in
+  privacy mode (unchanged from DETAIL-02 and the row's tooltip).
