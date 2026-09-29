@@ -348,6 +348,44 @@ should stay legible).
   custom-theme fallback is `pageTextSubdued`. `pageTextSubdued` keeps its
   value and meaning everywhere else.
 
+### Retuned in THEME-02 (owner decision D-4, September 28, 2026)
+
+Existing dark and midnight roles changed value so every page shares the
+Budget page's surfaces (plan §19.1). Role meanings are unchanged; light and
+`fallback.css` are untouched. Scope approved by the owner beyond the task
+card: the Settings (`pill*`), input, menu, tooltip and normal-button roles as
+well as the table roles.
+
+- **Dark:** navy surfaces become the neutral gray ramp. Solid surfaces use
+  palette grays: `tableBackground`, `tableHeaderBackground`, `menuBackground`,
+  `menuItemBackground`, `formInputBackground`, `buttonNormalBackground`,
+  `buttonNormalDisabledBackground` and `tooltipBackground` are `gray800` (the
+  Budget card); `pillBackground` is `gray700`, one step lighter so a pill
+  still shows on a modal or card (the rule editor's condition rows);
+  `pillBackgroundLight`, `menuBorder` and `menuAutoCompleteBackground` are
+  `gray900`; `tableBorderSeparator` is `gray400`; `buttonNormalBorder` is
+  `gray300`; `menuAutoCompleteBackgroundHover` is `gray500`. Hover fills,
+  borders and menu hover use three literal grays, each the smallest step on
+  the ramp that stays as distinct from `gray800` as the navy value was:
+  `#2a2e3b` (`tableRowBackgroundHover`, `tableRowHeaderBackground`,
+  `formInputBackgroundSelected`, `pillBorder`, `tooltipBorder`), `#3f4554`
+  (`tableBorder`, `formInputBorder`, `modalBorder`,
+  `buttonNormalBackgroundHover`) and `#535d6d` (`menuItemBackgroundHover`,
+  `buttonMenuBorder`, `buttonNormalDisabledBorder`).
+- **Midnight:** `tableHeaderBackground`, `pillBackground`, `menuBackground`,
+  `buttonNormalBackground` and `buttonNormalDisabledBackground` are `gray800`;
+  `buttonNormalBackgroundHover` is `#525b6c` (keeps today's 2.65:1 against the
+  button).
+- **Left as they were:** all text roles, calendar and date-picker roles,
+  sidebar hover, `reportsInnerLabel`, the multi-month budget roles, mobile
+  roles and `cardShadow`.
+- **Contrast:** text on every changed surface is higher than before, and
+  hover and selection surfaces are at least as distinct, except the midnight
+  table header text (11.44 → 10.41:1, because the header now matches the
+  card). Owner accepted these lower edge distinctions: pills against the page
+  or a modal (dark 1.73/1.58 → 1.34/1.22; midnight modal 2.04 → 1.22), rule
+  chips on a table (1.27 → 1.10) and the dark modal border (2.98 → 1.89).
+
 ## 9. Wording (TERM-01)
 
 Visible text only; no identifier, binding, preference or API renames.

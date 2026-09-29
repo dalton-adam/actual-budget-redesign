@@ -208,7 +208,7 @@ Ten accents — **Indigo, Emerald, Amber, Blue, Pink, Orange, Cyan, Violet, Lime
 - **Faint Text** (`pageTextFaint`): column headers and captions only, never body copy.
 - **Surface White**: cards, table and controls. **Card Inset** fills stat tiles, and **Group Row** tints group rows.
 - **Hairline**, **Row Hover**, **Nav Track** and **Progress Track**: low-alpha ink washes that give structure without borders shouting.
-- **Navy Ink / Navy Mist**: upstream sidebar and page colors, still in use on unmigrated screens.
+- **Navy Ink / Navy Mist**: upstream light-theme sidebar and page colors, still in use on unmigrated screens. In dark and midnight, unmigrated tables, Settings, inputs, menus, tooltips and buttons use the same neutral grays as the Budget cards (THEME-02, design-decisions §8).
 
 ### Named Rules
 
@@ -354,7 +354,6 @@ The page's hero card, with three states. Positive shows positive text and a hero
 
 These are not rules yet. Until they are decided, follow the current behavior and do not record them as rules in this file.
 
-- **THEME-02 (decision D-4):** retuned dark and midnight surface values. The dark and midnight values in the theme files today are the ones in force.
 - **Goal caption (D-3):** the caption under the category name for goal and template categories is left out. The target icon in the Available pill stays.
 - **Pace chart for past and future months** (design-decisions §11 item 2, DETAIL-04).
 - **Account hero and register treatment** (design-decisions §10 and §11 item 5, APP-01 and APP-02).

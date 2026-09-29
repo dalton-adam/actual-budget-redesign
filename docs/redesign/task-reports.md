@@ -509,3 +509,39 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   strip); tracking at 1440×900 (step 3 under the January summary, category
   text unchanged); tracking moved to February (step 3 under the February
   summary). No VRT: the tour test takes no screenshots.
+- THEME-02: **done September 28, 2026**, merged into `redesign/main` with
+  owner approval (branch `redesign/theme-02`; decision D-4). Dark and
+  midnight values of existing roles retuned so unmigrated pages share the
+  Budget page's surfaces; values and contrast are recorded in
+  design-decisions §8 "Retuned in THEME-02". **Scope grew beyond the card,
+  with owner approval:** the card covered only the table and card roles, but
+  in dark Settings sections (`pill*`), search and rule inputs
+  (`formInput*`), menus, tooltips and normal buttons had navy roles of their
+  own, so they were included. Only `L/themes/{dark,midnight}.css` changed; no
+  component, handler, preference or saved value changed, and light and
+  `fallback.css` are untouched. **Found and fixed during review:** matching
+  `pillBackground` to the card made the rule editor's condition rows (which
+  use `styles.editorPill`) disappear into the modal, so dark's pill is one
+  step lighter (`gray700`); the first gray-ramp mapping made row hover,
+  table and input borders, menu hover, autocomplete hover and midnight
+  button hover less distinct than today, so those use calibrated grays that
+  keep today's ratios. Checks: typecheck pass; lint: oxlint pass and the
+  changed files are formatted (the root `lint` format check fails only on
+  the gitignored local `.impeccable/design.json`); UNIT `src/style` 215/215
+  and `@actual-app/components` 42/42; `build:browser`; E2E(budget, accounts,
+  reports, schedules, settings) 45/45 against the 3018 preview; Impeccable
+  detector on both theme files: no findings. A scratch contrast audit
+  (not committed) resolved every changed role before and after: all text
+  pairs rise except the midnight table header (11.44 → 10.41:1); hover and
+  selection pairs are equal or higher; lower edge distinctions for pills,
+  rule chips and the dark modal border were accepted by the owner. VISUAL
+  (scratch Playwright script against the 3017 dev server, one demo budget
+  kept across runs so accents match): Budget, All accounts, an account
+  register with a hovered row, Reports, Schedules, Payees, Rules, Tags,
+  Settings, the rule editor modal and the account menu, in dark and midnight
+  at 1440×900 and 1000×700, before and after (88 images, reviewed by the
+  owner); a custom theme on the dark base that sets only four pre-redesign
+  roles, at both sizes (loads and stays readable; unset table roles now take
+  the gray base instead of navy). **Not yet run:** WIDE, and Linux VRT
+  regeneration: dark and midnight screenshots change across most VRT tests
+  (→ QA-00).
