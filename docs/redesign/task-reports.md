@@ -754,8 +754,8 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   [1440](verification/perf-02/light-budget-1440-scrolled.png)). No
   typecheck, lint or UNIT: no source changed.
 
-- ASSIGN-FIX (bug fix, no task card): **in review September 29, 2026**,
-  not merged; waiting on owner approval (branch
+- ASSIGN-FIX (bug fix, no task card): **done September 29, 2026**, merged
+  into `redesign/main` with owner approval (`cc078bd06`, branch
   `redesign/bud-assigned-hover` from `c53871325`). **Problem:** the Linux
   VRT `Budget-transfer-funds-to-another-category-2` (1280×720, dark, panel
   open) showed Food's Assigned as "-755...." beside the month notes icon
