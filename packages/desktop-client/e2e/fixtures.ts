@@ -50,6 +50,12 @@ export const test = process.env.VRT
       ],
     });
 
+// `:root:root` outranks the theme's `:root` rules whatever their order.
+const PINNED_ACCENTS_CSS = `:root:root {${Array.from(
+  { length: 9 },
+  (_, i) => `--color-categoryAccent${i + 2}: var(--color-categoryAccent1);`,
+).join(' ')}}`;
+
 export const expect = baseExpect.extend({
   async toMatchThemeScreenshots(target: Locator | Page) {
     // Disable screenshot assertions in regular e2e tests;
@@ -67,6 +73,18 @@ export const expect = baseExpect.extend({
 
     const page: Page = 'page' in target ? target.page() : target;
     const dataThemeLocator = page.locator('[data-theme]');
+
+    // Category accents come from category IDs, which the demo budget
+    // generates afresh for every test; give every accent the theme's first
+    // accent so screenshots are stable. The unit tests cover accent choice.
+    await page.evaluate(css => {
+      if (!document.getElementById('vrt-pinned-accents')) {
+        const style = document.createElement('style');
+        style.id = 'vrt-pinned-accents';
+        style.textContent = css;
+        document.head.appendChild(style);
+      }
+    }, PINNED_ACCENTS_CSS);
 
     // Check lightmode
     await page.evaluate(() => window.Actual.setTheme('auto'));

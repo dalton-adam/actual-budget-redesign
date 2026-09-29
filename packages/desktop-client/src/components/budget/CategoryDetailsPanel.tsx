@@ -9,6 +9,7 @@ import { SurfaceCard } from '@actual-app/components/surface-card';
 import { theme } from '@actual-app/components/theme';
 import { css } from '@emotion/css';
 
+import { CategoryDetailsBody } from './CategoryDetailsBody';
 import {
   CATEGORY_DETAILS_PANEL_ID,
   DETAILS_PANEL_GAP,
@@ -37,8 +38,7 @@ type CategoryDetailsPanelProps = {
 /**
  * The Budget page's category details panel frame (design-decisions §5):
  * beside the table from 900px, an overlay with a scrim below that or when
- * the table would not fit beside it. The details themselves arrive with
- * DETAIL-02.
+ * the table would not fit beside it.
  */
 export function CategoryDetailsPanel({
   month,
@@ -86,6 +86,7 @@ export function CategoryDetailsPanel({
           >
             <SurfaceCard style={panelCardStyle}>
               <CategoryDetailsHeader month={month} />
+              <CategoryDetailsBody month={month} />
             </SurfaceCard>
           </Dialog>
         </Modal>
@@ -119,6 +120,7 @@ export function CategoryDetailsPanel({
     >
       <SurfaceCard style={panelCardStyle}>
         <CategoryDetailsHeader month={month} />
+        <CategoryDetailsBody month={month} />
       </SurfaceCard>
     </aside>
   );

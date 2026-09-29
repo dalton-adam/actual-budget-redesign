@@ -65,6 +65,25 @@ export function getCategoryProgress({
   };
 }
 
+/**
+ * The details panel's "From _previous month_" tile (design-decisions §5,
+ * §11 item 1): what the envelope carried into the month. The existing
+ * envelope sheet builds Available as carried in + assigned + activity, so
+ * the carried-in amount is read back from the three values the sheet
+ * already provides instead of repeating its rollover rule.
+ */
+export function getCarriedIn({
+  available,
+  assigned,
+  activity,
+}: {
+  available: IntegerAmount;
+  assigned: IntegerAmount;
+  activity: IntegerAmount;
+}): IntegerAmount {
+  return available - assigned - activity;
+}
+
 export type PaceMonthKind = 'past' | 'current' | 'future';
 
 export type PaceSummary =
