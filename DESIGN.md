@@ -252,7 +252,7 @@ The desktop shell has a pill-tab top bar, a collapsible accounts pane on the lef
 
 - **Breakpoints (redesign):** at 1280px and wider the accounts pane defaults open and the table uses full column widths. From 900 to 1279px the pane defaults collapsed to a 56px rail and the panel narrows to 320px. Below 900px navigation moves into a drawer, the details panel becomes an overlay with a scrim, and the Activity column hides. Actual's own mobile screens take over below its mobile breakpoint.
 - **Budget table density:** category rows are 44px, group rows 40px, and the sticky header is Eyebrow text. Column widths follow design-decisions §4.1 per breakpoint and panel state.
-- **Details panel:** 360px (320px at 900–1279px). It pushes the table rather than covering it at desktop widths.
+- **Details panel:** 360px (320px at 900–1279px). It pushes the table rather than covering it at desktop widths. Its header carries its own month stepper; its one link, "View in Accounts", uses Page Text Link.
 - **Compact strip:** on windows shorter than 900px, a 46px one-line summary replaces the cards once the table scrolls past 40px.
 - **Spacing rhythm:** 4 and 8px inside controls, 14px between cards, 16–20px card padding.
 

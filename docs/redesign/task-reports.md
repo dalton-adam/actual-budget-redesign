@@ -753,3 +753,62 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   ([1000](verification/perf-02/light-budget-1000-scrolled.png),
   [1440](verification/perf-02/light-budget-1440-scrolled.png)). No
   typecheck, lint or UNIT: no source changed.
+
+- DETAIL-03: **in review September 29, 2026**, not yet merged (branch
+  `redesign/detail-03` from `c53871325`). Panel actions (design-decisions §5
+  items 1, 6 and 7; plan §10 Part B). **Owner decisions (September 29,
+  2026):** the five transaction rows stay read-only (the desktop app has no
+  view for a single transaction), and "View in Accounts" under the list is
+  the only link; notes are edited with the row's own `NotesButton`, placed
+  beside the Notes heading, so there is no second save path. **Month
+  stepper:** ‹ month › in the header, labelled "Details: month before" and
+  "Details: month after" (a first draft's "Next month in details" matched the
+  Budget page model's `Next month` locator and would have broken every E2E
+  test that changes month). The panel follows the budget month until the
+  stepper is used, and again whenever the budget month changes
+  (`resolveDetailsMonth`); it stops at the budget's month bounds
+  (`stepDetailsMonth`). The Budget page's month does not move. **View in
+  Accounts:** shown when the list has transactions; calls the page's
+  existing `onShowActivity` (the handler behind the row's Activity amount)
+  with the panel's month, after saving the table scroll position under the
+  same `budget-scroll-position` key `BudgetTable` restores. **Notes:** the
+  popover editor saves when it closes and only if the text changed, as in the
+  row. Escape closes the editor first, not the panel (react-aria stops the
+  event); the editor takes the first click outside it, so switching category
+  or closing the panel while editing always saves first. **Scope grew beyond
+  the card:** the chosen category and panel month are kept in
+  `sessionStorage` (`actual-budget-details-category`,
+  `actual-budget-details-month`), because going to Accounts and back
+  otherwise reset the panel to the first category. This is browser-session
+  storage, not a synced or core preference. Changed files:
+  `C/budget/CategoryDetails{Context,Context.test,Header,Notes,Panel,Transactions,TransactionRow}.ts(x)`,
+  `C/budget/DynamicBudgetTable.tsx` (passes the budget month, month bounds and
+  `onShowActivity` to the provider); new `e2e/detail-03.test.ts`.
+  `NotesButton.tsx` and `NotesModal.tsx` unchanged. No handler, query,
+  preference or saved value changed. Checks: typecheck pass; lint pass; UNIT
+  `src/components/budget` 81/81 (7 new: month follow/reset, step bounds,
+  provider stepping and reset, bounds at the last month, category and month
+  kept across remount, scroll saved and handler called); `generate:i18n`
+  ran; E2E(detail-03) 6/6 (stepper moves the panel only, and values in the
+  stepped month match the table on that month; keyboard stepping; View in
+  Accounts gives the same register rows as Activity and back keeps the
+  category; the link uses the panel month and back keeps it; a note edited
+  in the panel saves on Escape and shows in the row; clicking away saves to
+  the right category); E2E(detail-01, detail-02, detail-03, budget, bud-01,
+  transactions, accounts, settings) 55/55 and E2E(nav-02, tour, help-menu)
+  8/8, with `--ignore-snapshots`; after the header's last change,
+  E2E(detail-01, detail-02, detail-03, budget) 26/26. Impeccable detector:
+  no findings. VISUAL (Playwright against its own dev server, demo budget;
+  [screenshots](verification/detail-03/)): dark 1440×900, with focus rings
+  on the stepper and the link, the notes editor open, and privacy mode (every
+  panel amount redacted; the link shows no amount); light 1000×700 and
+  stepped back to an empty month (found and fixed: at 320px the stepper wraps
+  and left a dangling "·" after the group name, so the separator was
+  removed); midnight 820×700 overlay, with a note saved by Escape and the
+  overlay still open, then Escape closing it. **Not yet checked:** a custom
+  theme (the new controls use existing roles `pageTextSecondary`,
+  `pageText` and `pageTextLink`); Linux VRT (the panel header changed, so
+  Budget-page snapshots at the default viewport will need regenerating in
+  Docker); WIDE. **Known limits:** the empty-notes button keeps the row's
+  30% placeholder opacity, which is faint; notes text is not redacted in
+  privacy mode (unchanged from DETAIL-02 and the row's tooltip).
