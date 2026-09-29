@@ -8,12 +8,14 @@ import { SvgHelp } from '@actual-app/components/icons/v2';
 import { Menu } from '@actual-app/components/menu';
 import { Popover } from '@actual-app/components/popover';
 import { SpaceBetween } from '@actual-app/components/space-between';
+import { css } from '@emotion/css';
 import { useToggle } from 'usehooks-ts';
 
 import { useFeatureFlag } from '#hooks/useFeatureFlag';
 import { pushModal } from '#modals/modalsSlice';
 import { useDispatch } from '#redux';
 
+import { TITLEBAR_TIGHT } from './navigation/constants';
 import { useTour } from './tour/TourProvider';
 
 const getPageDocs = (page: string) => {
@@ -53,6 +55,7 @@ type HelpButtonProps = {
 
 const HelpButton = forwardRef<HTMLButtonElement, HelpButtonProps>(
   ({ onPress }, ref) => {
+    const { t } = useTranslation();
     const size = 15;
     return (
       <Button
@@ -60,6 +63,7 @@ const HelpButton = forwardRef<HTMLButtonElement, HelpButtonProps>(
         ref={ref}
         onPress={onPress}
         data-testid="help-menu-button"
+        aria-label={t('Help')}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -67,7 +71,10 @@ const HelpButton = forwardRef<HTMLButtonElement, HelpButtonProps>(
         }}
       >
         <SvgHelp width={size} height={size} />
-        <Trans>Help</Trans>
+        {/* A narrow title bar shows the icon only. */}
+        <span className={css({ [TITLEBAR_TIGHT]: { display: 'none' } })}>
+          <Trans>Help</Trans>
+        </span>
       </Button>
     );
   },

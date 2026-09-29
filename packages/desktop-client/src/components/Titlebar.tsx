@@ -37,7 +37,11 @@ import { AnimatedRefresh } from './AnimatedRefresh';
 import { Link } from './common/Link';
 import { HelpMenu } from './HelpMenu';
 import { LoggedInUser } from './LoggedInUser';
-import { COMPACT_NAV_WIDTH } from './navigation/constants';
+import {
+  COMPACT_NAV_WIDTH,
+  TITLEBAR_CONTAINER,
+  TITLEBAR_TIGHT,
+} from './navigation/constants';
 import { TopNav } from './navigation/TopNav';
 import { useServerURL } from './ServerContext';
 import { BudgetName } from './sidebar/BudgetName';
@@ -56,9 +60,21 @@ function UncategorizedButton() {
       to="/categories/uncategorized"
       style={{
         color: theme.errorText,
+        minWidth: 0,
+        flexShrink: 1,
       }}
     >
-      <Trans count={count}>{{ count }} uncategorized transactions</Trans>
+      {/* Shortens with an ellipsis rather than pushing the title bar onto a
+          second line; the full text stays in the accessibility tree. */}
+      <Text
+        style={{
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        <Trans count={count}>{{ count }} uncategorized transactions</Trans>
+      </Text>
     </Link>
   );
 }
@@ -300,6 +316,8 @@ export function Titlebar({ style }: TitlebarProps) {
         alignItems: 'center',
         padding: '0 10px 0 15px',
         height: 36,
+        containerType: 'inline-size',
+        containerName: TITLEBAR_CONTAINER,
         pointerEvents: 'none',
         '& *': {
           pointerEvents: 'auto',
@@ -307,7 +325,7 @@ export function Titlebar({ style }: TitlebarProps) {
         ...style,
       }}
     >
-      <View style={{ marginRight: 12 }}>
+      <View style={{ marginRight: 12, flexShrink: 0 }}>
         <TopNav />
       </View>
 
@@ -334,7 +352,19 @@ export function Titlebar({ style }: TitlebarProps) {
             offered (design-decisions §6). */}
       </Routes>
       <View style={{ flex: 1 }} />
-      <SpaceBetween gap={10}>
+      {/* One line at every width: narrow title bars tighten the gaps, and
+          only the budget name and the uncategorized count (which set their
+          own flexShrink) give up width; nothing wraps. */}
+      <SpaceBetween
+        gap={10}
+        wrap={false}
+        style={{
+          minWidth: 0,
+          flexShrink: 1,
+          '& > *': { flexShrink: 0 },
+          [TITLEBAR_TIGHT]: { gap: 6 },
+        }}
+      >
         <UncategorizedButton />
         {isDevelopmentEnvironment() && !isTestEnv && <ThemeSelector />}
         <PrivacyButton />

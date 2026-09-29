@@ -92,6 +92,9 @@ function EditableBudgetName() {
         color: theme.pageText,
         height: 30,
         maxWidth: 180,
+        // Gives up width before the title bar would wrap; the name ellipsizes.
+        minWidth: 0,
+        flexShrink: 1,
         padding: '0 8px 0 5px',
         gap: 7,
         ...styles.smallText,
