@@ -384,3 +384,91 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   snapshots (not regenerated — `budget.test.ts` screenshots at the default
   viewport now include the open panel, so they will need regenerating in
   Docker).
+- DETAIL-02: **done September 28, 2026**, merged into `redesign/main` with
+  owner approval (branch `redesign/detail-02`). Read-only panel contents
+  below the DETAIL-01 header (design-decisions §5 items 2, 3, 6 and 7).
+  **Owner decisions (September 28, 2026):** the third stat tile is "From
+  _previous month_" (§11 item 1, now Approved); the scope is the core
+  read-only content, with the goal box and pace chart left to DETAIL-04 and
+  the panel's own month stepper, transaction links and notes editing to
+  DETAIL-03 (until then the panel follows the budget month); the list shows
+  posted transactions only, not scheduled previews, so it matches Activity.
+  **Hero:** Available (`catBalance`), labelled "Available" or "Overspent";
+  when negative, the rollover sentence if `catCarryover` is set, otherwise
+  "If it isn't covered, this comes out of _next month_'s Ready to Assign";
+  then the row's §7.1 progress bar (`getCategoryProgress`). **Tiles:** From
+  _previous month_, Assigned (`catBudgeted`), Activity (`catSumAmount`). The
+  carried-in amount is read back as Available − Assigned − Activity (new
+  `getCarriedIn` in `categoryPresentation.ts`) because the envelope sheet
+  builds Available from exactly those three; the rollover rule is not
+  repeated. **Notes:** the `useNotes` query read directly (to tell loading
+  from empty) and shown with the existing `Notes` markdown view; "No
+  notes." when empty; editing stays with the row's notes button.
+  **Transactions:** the category balance bindings' filter (category and
+  month, `splits: 'inline'`), newest first (`date`, then `sort_order`),
+  five rows through `useTransactions`; payee names from
+  `DisplayPayeeProvider` (the registers' transfer and split naming), date ·
+  account, amount. Split parts appear under their own category; refunds
+  and transfers keep their sign. The heading shows the month's total from a
+  live `$count` query cell (the `balance-query-*` binding pattern in
+  `accounts/Balance.tsx`). **Stale data:** the body is keyed by category and
+  month, and `useTransactions` placeholder rows (it keeps the previous
+  query's data while loading) count as loading, so switching never shows
+  another category's notes or transactions. Loading, empty and error states
+  in both sections. **Privacy:** every amount uses `PrivacyFilter`, sized to
+  the amount so it doesn't push the label or clip account names. **Scope
+  grew beyond the card, with owner approval:** `getCarriedIn` and its tests
+  in `C/budget/categoryPresentation{,.test}.ts`; `e2e/fixtures.ts` pins
+  category accents in VRT screenshots (accents come from category IDs, which
+  the demo budget regenerates for every test, so Budget-page screenshots
+  could never match twice; each theme keeps its own `categoryAccent1`); 245
+  regenerated Linux VRT baselines. New files:
+  `C/budget/CategoryDetails{Body,Summary,StatTile,Notes,Section,Transactions,TransactionRow}.tsx`
+  and `e2e/detail-02.test.ts`; `CategoryDetailsPanel.tsx` renders the body.
+  No handler, binding, query engine, preference or saved value changed.
+  Checks: typecheck pass; lint pass; UNIT `src/components/budget` 74/74 (5
+  new for `getCarriedIn`: empty, carried in, rolled-over negative, refund,
+  overspent); `generate:i18n` ran; E2E(detail-02) 6/6 (panel amounts match
+  the row for three categories, with the carried-in identity; up to five
+  transactions and the count; a note added from the row appears read-only;
+  next month refreshes to the row's values and "No transactions this
+  month."; fast switching ends on the last choice; privacy hides the hero);
+  E2E(detail-02, detail-01, budget, bud-01, accounts, transactions,
+  settings) 49/49 before the count was added and E2E(detail-02, detail-01,
+  budget, bud-01) 24/24 after; WIDE 58 passed, 1 failed (known Reports
+  baseline at 1440), 15 did not run. **Fixture comparison** (hand-calculated,
+  on a disposable demo budget seeded through `window.$send`): a category
+  with 100.00 assigned and 30.00 spent in August, 50.00 assigned in
+  September and six September transactions (−20.00; a −45.00 split with
+  −25.00 in the category; a +12.00 refund; a −15.00 transfer to off-budget
+  Vanguard 401k; −8.00; −4.00) showed From Aug 70.00, Assigned 50.00,
+  Activity −60.00, Available 60.00, a count of 6 and the five newest (the
+  September 3 row left out, the transfer named "Vanguard 401k", the split
+  shown as its −25.00 part). A rollover category (40.00 overspent in August;
+  10.00 assigned and 5.00 spent in September) showed From Aug −40.00,
+  Overspent −35.00 and the rollover sentence. All matched the calculation
+  and the table row. VISUAL (Playwright against the 3018 preview): dark
+  1440×900 with a markdown note, overspent and in privacy mode (found and
+  fixed: the redaction overlay pushed "Overspent" aside and clipped account
+  names); light 1000×700 overspent and the next, empty month; midnight
+  820×700 overlay; a custom theme that sets only pre-redesign roles at
+  1440×900 and 1000×700 (tiles and notes use the fallback `cardInset`);
+  reduced motion: no animations or transitions in the panel. **Linux VRT**
+  (Playwright v1.61.1 image against the HTTPS dev server): the first full
+  run had 95 passed, 53 failed, 15 did not run. The 52 screenshot failures
+  across 15 files were all reviewed as intended changes (NAV-01/02
+  navigation and the Budget page with the panel on desktop; TERM-01 wording
+  on mobile; two plural fixes, "1 associated rule" and "1 uncategorized
+  transaction", that no redesign commit touched). 245 baselines regenerated
+  (`9d3472cd8`); every updated test then passed a run without
+  `--update-snapshots`. Run VRT with one worker: two containers in parallel
+  caused timeouts, not mismatches, and a loaded run can capture a
+  tracking-budget screenshot before the budget type switch renders (the
+  mobile one was restored to its original; the Reports tracking forecast was
+  recaptured and checked in all three themes). **Found, not DETAIL-02:** the
+  tour skips its "budget summary" step on envelope budgets because BUD-01
+  hid the element it targets, and its text still says "To Budget",
+  "Budgeted" and "Balance" (fix on `redesign/tour-fix`); in light, the open
+  account in the accounts pane is only faintly highlighted (NAV-02).
+  **Not yet checked:** the overlay in a custom theme; performance with the
+  panel's queries (→ QA-00).

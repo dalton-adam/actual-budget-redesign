@@ -174,14 +174,18 @@ Contents, top to bottom (`18`, `20`–`24`):
    covered, this comes out of _next month_'s Ready to Assign". Then the row's
    progress bar.
 3. Three stat tiles: **From _previous month_** (carried in), **Assigned**,
-   **Activity**. (Shown; plan §3 had "last month's Activity", see §11.)
+   **Activity**. (Approved September 28, 2026, replacing plan §3's "last
+   month's Activity"; the carried-in amount is read back as Available −
+   Assigned − Activity, see §11.)
 4. Goal/template box when the category has one: status line with icon,
    progress toward the target, and the full sentence.
 5. Pace chart (§7.2) with legend and text summary. Omitted for long-term
    savings goals, where the goal box replaces it.
 6. Notes (read-only first).
 7. The month's transactions, newest first, up to five, then "View in
-   Accounts" (the existing filtered view).
+   Accounts" (the existing filtered view). Posted transactions only:
+   scheduled previews are left out so the list matches Activity (owner
+   decision, September 28, 2026).
 
 Privacy mode hides the chart and uses the redacted font for amounts (`50`).
 
@@ -422,8 +426,9 @@ locale files (`packages/desktop-client/locale/`) are gitignored, so
 Confirm or change these before the named task starts; until then the
 "Shown" behavior above is the default.
 
-1. Details panel third stat tile: **From previous month** (carried in)
-   instead of the plan's "last month's Activity" (DETAIL-02).
+1. ~~Details panel third stat tile: **From previous month** (carried in)
+   instead of the plan's "last month's Activity" (DETAIL-02).~~
+   **Confirmed by the owner September 28, 2026**; now Approved in §5.
 2. Pace chart for past and future months as in §7.2 (the plan said past
    months without a label and future months without a chart) (DETAIL-04).
 3. ~~The "Shown" wording rows in §9 (TERM-01).~~
@@ -440,3 +445,4 @@ Confirm or change these before the named task starts; until then the
 | Sep 27, 2026 | DESIGN-01 review: layout A, summary cards, all three themes, panel on Budget only                                                                        | [prototype README](prototype/README.md#owner-decisions-september-27-2026), commit `78f444a86`                                    |
 | Sep 27, 2026 | DESIGN-02 walkthrough: 44px rows, collapsible accounts pane, one month at a time, empty bar for negative Available without spending, reconciliation band | [prototype README](prototype/README.md#owner-decisions-september-27-2026-walkthrough), commit `aa422ef87`, screenshots `18`–`50` |
 | Sep 27, 2026 | After NAV-01: accounts pane default confirmed (open at 1280px and wider, collapsed below; §2, §11 item 4)                                                | Owner confirmation in the NAV-01 session                                                                                         |
+| Sep 28, 2026 | DETAIL-02: third stat tile "From previous month" confirmed (§5, §11 item 1); the panel lists posted transactions only                                    | Owner confirmation in the DETAIL-02 session                                                                                      |

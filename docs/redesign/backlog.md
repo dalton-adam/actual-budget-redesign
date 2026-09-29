@@ -17,29 +17,29 @@ Budget header are reference material, not tasks to build.
 
 ### Status ledger
 
-| ID                   | State       | Merged                   | Open gaps carried forward                                                                                      |
-| -------------------- | ----------- | ------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| DISC-01, DISC-02     | verified    | Stage 0 docs             | Reports baseline: 58 passed, 1 failed, 15 skipped. No performance baseline (→ QA-00).                          |
-| DESIGN-01 – 03       | verified    | docs                     | design-decisions §11 items 1, 2, 5 still "Shown".                                                              |
-| UI-01                | verified    | `4b7b82ea6`              | Accepted light contrast shortfalls (design-decisions §8).                                                      |
-| UI-02                | verified    | `3dd3144a3`              | Storybook needs a local case-sensitivity workaround on macOS.                                                  |
-| UI-03                | verified    | `0e57f083c`, `0129f2c00` | —                                                                                                              |
-| NAV-01               | verified    | `7eea259f3`              | —                                                                                                              |
-| NAV-02 (+ e2e fix)   | verified    | `f02e5ff5e`, `ed654319e` | Collapsed-rail initials are ambiguous (→ BUD-04).                                                              |
-| BUD-01               | verified    | `03e9150c3`              | Custom theme (→ QA-00).                                                                                        |
-| TERM-01              | verified    | `f771c251d`              | Light/midnight wording pass; Linux VRT (→ QA-00).                                                              |
-| BUD-02               | verified    | `b732f170f`              | Goal caption left out (→ decision D-3); scroll performance, custom theme, Linux VRT (→ QA-00).                 |
-| BUD-03               | verified    | `6b53968b8`              | Custom theme, Linux VRT (→ QA-00).                                                                             |
-| DETAIL-01            | verified    | `5f238b120`              | Panel is open by default but shows only its header until DETAIL-02 (→ D-2). Custom theme, Linux VRT (→ QA-00). |
-| **DETAIL-02**        | **next**    | —                        | —                                                                                                              |
-| THEME-02             | ready       | —                        | Needs owner approval of the retuned values (D-4).                                                              |
-| QA-00                | ready       | —                        | —                                                                                                              |
-| ELEC-01              | not started | —                        | Needs an isolation review first (stage-0.md "Electron").                                                       |
-| BUD-04               | ready       | —                        | —                                                                                                              |
-| DETAIL-03, DETAIL-04 | not started | —                        | —                                                                                                              |
-| SYNC-01              | blocked     | —                        | Waiting on owner decision D-1.                                                                                 |
-| APP-01 – APP-06      | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                    |
-| QA-01, RELEASE-01    | not started | —                        | —                                                                                                              |
+| ID                   | State       | Merged                   | Open gaps carried forward                                                                                    |
+| -------------------- | ----------- | ------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| DISC-01, DISC-02     | verified    | Stage 0 docs             | Reports baseline: 58 passed, 1 failed, 15 skipped. No performance baseline (→ QA-00).                        |
+| DESIGN-01 – 03       | verified    | docs                     | design-decisions §11 items 2, 5 still "Shown".                                                               |
+| UI-01                | verified    | `4b7b82ea6`              | Accepted light contrast shortfalls (design-decisions §8).                                                    |
+| UI-02                | verified    | `3dd3144a3`              | Storybook needs a local case-sensitivity workaround on macOS.                                                |
+| UI-03                | verified    | `0e57f083c`, `0129f2c00` | —                                                                                                            |
+| NAV-01               | verified    | `7eea259f3`              | —                                                                                                            |
+| NAV-02 (+ e2e fix)   | verified    | `f02e5ff5e`, `ed654319e` | Collapsed-rail initials are ambiguous (→ BUD-04). The open account is barely highlighted in light (→ QA-00). |
+| BUD-01               | verified    | `03e9150c3`              | Custom theme (→ QA-00). The tour skips its summary step since BUD-01 (fix on `redesign/tour-fix`).           |
+| TERM-01              | verified    | `f771c251d`              | Light/midnight wording pass (→ QA-00).                                                                       |
+| BUD-02               | verified    | `b732f170f`              | Goal caption left out (→ decision D-3); scroll performance, custom theme (→ QA-00).                          |
+| BUD-03               | verified    | `6b53968b8`              | Custom theme (→ QA-00).                                                                                      |
+| DETAIL-01            | verified    | `5f238b120`              | The overlay (below 900px) not yet checked in a custom theme (→ QA-00).                                       |
+| DETAIL-02            | verified    | `d90250dff`              | Goal box and pace chart (→ DETAIL-04); month stepper, links and notes editing (→ DETAIL-03).                 |
+| **THEME-02**         | **next**    | —                        | Needs owner approval of the retuned values (D-4).                                                            |
+| QA-00                | ready       | —                        | Linux VRT baselines were regenerated with DETAIL-02 (`9d3472cd8`); run VRT with one worker.                  |
+| ELEC-01              | not started | —                        | Needs an isolation review first (stage-0.md "Electron").                                                     |
+| BUD-04               | ready       | —                        | —                                                                                                            |
+| DETAIL-03, DETAIL-04 | not started | —                        | —                                                                                                            |
+| SYNC-01              | blocked     | —                        | Waiting on owner decision D-1.                                                                               |
+| APP-01 – APP-06      | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                  |
+| QA-01, RELEASE-01    | not started | —                        | —                                                                                                            |
 
 States follow plan §16: not started, ready, in progress, review, verified,
 blocked. All application work not marked verified is pending; this document
@@ -47,8 +47,8 @@ does not claim Claude's prototype is production-ready.
 
 ### Order from here (mid-project review, September 28, 2026)
 
-1. **DETAIL-02**: the panel is open by default, so it should show content
-   before anything else lands.
+1. ~~**DETAIL-02**: the panel is open by default, so it should show content
+   before anything else lands.~~ Merged September 28, 2026.
 2. **THEME-02**: dark and midnight surfaces match across every page.
 3. **QA-00**: clear the checks carried forward above and record a
    performance baseline.
@@ -66,13 +66,12 @@ The review's reasoning is in plan §19.
 | ID  | Question                                                                                                                                      | Default until decided                                                                                                                                                   |
 | --- | --------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | D-1 | How closely should this fork follow upstream Actual releases? (plan §19.2)                                                                    | Stay on v26.9.0; merge upstream once, deliberately, before RELEASE-01; review each upstream release's notes for security, data or bank-sync fixes worth taking earlier. |
-| D-2 | If DETAIL-02 is not merged soon, should the panel start closed until it has content?                                                          | Keep open by default; do DETAIL-02 next.                                                                                                                                |
+| D-2 | ~~If DETAIL-02 is not merged soon, should the panel start closed until it has content?~~                                                      | **Resolved September 28, 2026:** DETAIL-02 merged, so the panel opens with content; it stays open by default.                                                           |
 | D-3 | Goal/template caption under the category name (design-decisions §4.2): build it from goal values Actual already exposes, or drop it for good? | Left out, as BUD-02 shipped. The target icon in the Available pill stays.                                                                                               |
 | D-4 | THEME-02 changes the values of existing dark and midnight roles (plan §2 requires a reviewed decision).                                       | Proceed to a proposal with before/after screenshots; merge only after owner approval.                                                                                   |
 
 Mobile is **deferred** (plan §19.4): only the TERM-01 wording applies to the
 mobile envelope screens. Keep mobile E2E passing; don't restyle it.
-claim Claude's prototype is production-ready.
 
 ## Rules for every task
 
