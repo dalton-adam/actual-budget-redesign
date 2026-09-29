@@ -120,4 +120,48 @@ describe('budget summary step target', () => {
 
     expect(findSummaryTarget('tracking')).toBe(currentSummary);
   });
+
+  it('points tracking budgets at the summary of the month shown', () => {
+    const currentMonth = monthUtils.currentMonth();
+    const shownMonth = monthUtils.addMonths(currentMonth, 2);
+    addElement(
+      { 'data-testid': 'selected-budget-month', 'data-month': shownMonth },
+      { isShown: true },
+    );
+    // Clipped neighbours rendered for the slide animation.
+    for (const month of [
+      monthUtils.prevMonth(shownMonth),
+      monthUtils.nextMonth(shownMonth),
+    ]) {
+      addElement(
+        { 'data-testid': 'budget-summary', 'data-month': month },
+        { isShown: true },
+      );
+    }
+    const shownSummary = addElement(
+      { 'data-testid': 'budget-summary', 'data-month': shownMonth },
+      { isShown: true },
+    );
+
+    expect(findSummaryTarget('tracking')).toBe(shownSummary);
+  });
+
+  it('finds no tracking target when the shown month has no summary', () => {
+    addElement(
+      {
+        'data-testid': 'selected-budget-month',
+        'data-month': monthUtils.nextMonth(monthUtils.currentMonth()),
+      },
+      { isShown: true },
+    );
+    addElement(
+      {
+        'data-testid': 'budget-summary',
+        'data-month': monthUtils.currentMonth(),
+      },
+      { isShown: true },
+    );
+
+    expect(findSummaryTarget('tracking')).toBeNull();
+  });
 });

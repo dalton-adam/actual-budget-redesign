@@ -14,11 +14,14 @@ export type TourStepDeps = {
   budgetType: 'envelope' | 'tracking';
 };
 
+// The summary row also renders a clipped month on each side for its slide
+// animation, so match the month the picker shows.
 function findBudgetSummary(): HTMLElement | null {
-  return (
-    document.querySelector<HTMLElement>(
-      `[data-testid="budget-summary"][data-month="${monthUtils.currentMonth()}"]`,
-    ) ?? document.querySelector<HTMLElement>('[data-testid="budget-summary"]')
+  const shownMonth =
+    document.querySelector<HTMLElement>('[data-testid="selected-budget-month"]')
+      ?.dataset.month ?? monthUtils.currentMonth();
+  return document.querySelector<HTMLElement>(
+    `[data-testid="budget-summary"][data-month="${shownMonth}"]`,
   );
 }
 
@@ -179,8 +182,7 @@ function getBudgetTourSteps({ navigate, budgetType }: TourStepDeps): Step[] {
       content: (
         <Trans>
           Every month gets its own budget. Use the month picker to move between
-          months, and the calendar icons on the left to choose how many months
-          are shown side by side.
+          months.
         </Trans>
       ),
     },
