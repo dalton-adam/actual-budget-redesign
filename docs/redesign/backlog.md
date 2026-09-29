@@ -42,7 +42,7 @@ Budget header are reference material, not tasks to build.
 | ASSIGN-FIX         | verified    | `cc078bd06`              | Snapshots stale since BUD-04 regenerated in DETAIL-03.                                                                     |
 | DETAIL-03          | verified    | `658a38c90`              | Linux VRT regenerated (177, incl. BUD-04's pane); custom theme and WIDE passed. Session-only category and month memory.    |
 | DETAIL-04          | verified    | `9059b8491`              | E2E and WIDE ran against a dev server, not a `build:browser` preview. Linux VRT regenerated (21).                          |
-| TOPBAR-FIX         | not started | —                        | Found in ELEC-01.                                                                                                          |
+| TOPBAR-FIX         | review      | —                        | Branch `redesign/topbar-fix`. Icon-only Help when narrow awaits owner confirmation (design-decisions §11 item 6).          |
 | SYNC-01            | not started | —                        | Scheduled once, before RELEASE-01 (D-1). Upstream master has a new database migration (see D-1).                           |
 | APP-01 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                          |

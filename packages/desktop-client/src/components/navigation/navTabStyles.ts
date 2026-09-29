@@ -2,6 +2,8 @@ import { styles } from '@actual-app/components/styles';
 import type { CSSProperties } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 
+import { TITLEBAR_TIGHT } from './constants';
+
 export const TAB_HEIGHT = 26;
 
 export const tabBaseStyle: CSSProperties = {
@@ -11,6 +13,7 @@ export const tabBaseStyle: CSSProperties = {
   gap: 4,
   height: TAB_HEIGHT,
   padding: '0 12px',
+  [TITLEBAR_TIGHT]: { padding: '0 8px' },
   borderRadius: 10,
   whiteSpace: 'nowrap',
   textDecoration: 'none',
