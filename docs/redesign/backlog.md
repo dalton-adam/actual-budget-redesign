@@ -105,6 +105,20 @@ counts, fixture, screenshots when relevant, and remaining gaps. Never mark a tas
 done just because code exists or a screenshot looks right. A mismatch requiring
 protected changes is a blocker to report, not permission to expand scope.
 
+Tasks that change UI follow root `DESIGN.md` (the design system as shipped;
+design-decisions.md wins where they differ). Before review, run the Impeccable
+detector over the changed UI files and include its result in the completion
+report:
+
+```sh
+.claude/skills/impeccable/scripts/impeccable detect --json <changed UI files>
+```
+
+Fix real findings or explain why a finding does not apply (for example an
+approved exception in design-decisions.md). If the skill is not installed,
+install it with `npx impeccable install` first. When a task ships a new
+approved token, component or rule, update `DESIGN.md` in the same task.
+
 ## Verification recipes
 
 Run all commands from the repository root. These are future task requirements,

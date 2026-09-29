@@ -1,8 +1,12 @@
 # Product
 
-## Register
+<!-- impeccable:product-schema 1 -->
 
-product
+## Platform
+
+web
+
+One responsive web design language serves the browser build, the Electron desktop app, and the Capacitor mobile wrapper (`packages/mobile-client`).
 
 ## Users
 
@@ -11,6 +15,22 @@ People managing their own household finances: privacy-minded budgeters, self-hos
 ## Product Purpose
 
 Actual Budget is a local-first personal finance tool built around envelope budgeting. It exists so people can track and plan their money without handing data to a third party — everything runs on their own device or server, with optional sync. Success looks like users trusting the numbers, completing routine money tasks quickly, and sticking with their budget over months and years.
+
+## Positioning
+
+This repository is a redesign fork of Actual v26.9.0. It offers YNAB-style envelope budgeting (every dollar assigned to an envelope, Ready to Assign as the central figure) on Actual's existing local-first engine. The redesign changes how the product looks and flows, not what it calculates or where data lives.
+
+## Capabilities and Constraints
+
+- Preserve the envelope budgeting workflow, all existing financial calculations, and all back-end behavior. The redesign is front-end only.
+- Preserve custom themes. The built-in light, dark, and midnight themes are all first-class.
+- Every existing destination must stay reachable. New UI state (such as panel open/collapsed) is device-local, never a new stored or synced preference.
+- Owner-approved decisions live in `docs/redesign/design-decisions.md`, and task status lives in `docs/redesign/backlog.md`. Where they differ from this file on visual matters, the decisions record wins.
+
+## Evidence on Hand
+
+- The built-in demo budget (**Try the demo**) and synthetic test fixtures are the only data sources for screenshots, prototypes, and tests.
+- The repository is public. Never commit real budget exports, personal screenshots, or real financial data, and never invent customer testimonials or usage claims.
 
 ## Brand Personality
 
