@@ -26,13 +26,13 @@ Budget header are reference material, not tasks to build.
 | UI-03                | verified    | `0e57f083c`, `0129f2c00` | —                                                                                                            |
 | NAV-01               | verified    | `7eea259f3`              | —                                                                                                            |
 | NAV-02 (+ e2e fix)   | verified    | `f02e5ff5e`, `ed654319e` | Collapsed-rail initials are ambiguous (→ BUD-04). The open account is barely highlighted in light (→ QA-00). |
-| BUD-01               | verified    | `03e9150c3`              | Custom theme (→ QA-00). The tour skipped its summary step since BUD-01 (→ TOUR-FIX).                         |
+| BUD-01               | verified    | `03e9150c3`              | Custom theme (→ QA-00). Tour summary step fixed in TOUR-FIX.                                                 |
 | TERM-01              | verified    | `f771c251d`              | Light/midnight wording pass (→ QA-00).                                                                       |
 | BUD-02               | verified    | `b732f170f`              | Goal caption left out (→ decision D-3); scroll performance, custom theme (→ QA-00).                          |
 | BUD-03               | verified    | `6b53968b8`              | Custom theme (→ QA-00).                                                                                      |
 | DETAIL-01            | verified    | `5f238b120`              | The overlay (below 900px) not yet checked in a custom theme (→ QA-00).                                       |
 | DETAIL-02            | verified    | `d90250dff`              | Goal box and pace chart (→ DETAIL-04); month stepper, links and notes editing (→ DETAIL-03).                 |
-| TOUR-FIX             | review      | — (`redesign/tour-fix`)  | Waiting for owner approval to merge.                                                                         |
+| TOUR-FIX             | verified    | `485a7fbe3`              | —                                                                                                            |
 | **THEME-02**         | **next**    | —                        | Needs owner approval of the retuned values (D-4).                                                            |
 | QA-00                | ready       | —                        | Linux VRT baselines were regenerated with DETAIL-02 (`9d3472cd8`); run VRT with one worker.                  |
 | ELEC-01              | not started | —                        | Needs an isolation review first (stage-0.md "Electron").                                                     |

@@ -472,12 +472,12 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   account in the accounts pane is only faintly highlighted (NAV-02).
   **Not yet checked:** the overlay in a custom theme; performance with the
   panel's queries (→ QA-00).
-- TOUR-FIX (bug fix, no task card): **in review September 28, 2026** on
-  `redesign/tour-fix`, based on `28fe2ec08`; not merged, waiting for owner
-  approval. **Problem:** on envelope budgets the in-app tour skipped its
-  third step ("budget summary"): BUD-01 hid the per-month summary row it
-  targeted (`[data-testid="budget-summary"]`), so react-joyride found no
-  target and moved on. `e2e/tour.test.ts` failed with "Expected 3 of 8,
+- TOUR-FIX (bug fix, no task card): **done September 28, 2026**, merged
+  into `redesign/main` with owner approval (`485a7fbe3`). **Problem:** on
+  envelope budgets the in-app tour skipped its third step ("budget
+  summary"): BUD-01 hid the per-month summary row it targeted
+  (`[data-testid="budget-summary"]`), so react-joyride found no target and
+  moved on. `e2e/tour.test.ts` failed with "Expected 3 of 8,
   Received 4 of 8" (reproduced on unmodified `redesign/main` at
   `1e6b570ed`: tour 1 failed, 1 passed; budget 8/8). TERM-01 also missed the
   tour's text ("To Budget", "Budgeted", "Balance"). **Changes, all in
