@@ -17,6 +17,7 @@ import { useSelector } from '#redux';
 import * as bindings from '#spreadsheet/bindings';
 
 import { Account } from './Account';
+import { getRailInitials } from './railInitials';
 import { SecondaryItem } from './SecondaryItem';
 import { useSidebar } from './SidebarProvider';
 
@@ -79,6 +80,8 @@ export function Accounts({ collapsed = false }: AccountsProps) {
   };
 
   if (collapsed) {
+    const railAccounts = [...onBudgetAccounts, ...offbudgetAccounts];
+    const railInitials = getRailInitials(railAccounts.map(a => a.name));
     return (
       <View
         style={{
@@ -87,7 +90,7 @@ export function Accounts({ collapsed = false }: AccountsProps) {
           padding: '4px 8px 10px',
         }}
       >
-        {[...onBudgetAccounts, ...offbudgetAccounts].map(account => (
+        {railAccounts.map((account, index) => (
           <Account
             key={account.id}
             name={account.name}
@@ -99,6 +102,7 @@ export function Accounts({ collapsed = false }: AccountsProps) {
             to={getAccountPath(account)}
             query={bindings.accountBalance(account.id)}
             compact
+            initials={railInitials[index]}
             onRequestEdit={() => {
               setAccountToEdit(account.id);
               setExpanded(true);

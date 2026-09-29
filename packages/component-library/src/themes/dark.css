@@ -275,6 +275,7 @@
   --color-navTrack: #141419;
   --color-navActive: rgba(255, 255, 255, 0.1);
   --color-navActiveShadow: none;
+  --color-navListActive: var(--color-navActive);
   --color-selectionBackground: rgba(129, 140, 248, 0.11);
   --color-selectionBorder: #818cf8;
   --color-tableRowHover: rgba(255, 255, 255, 0.025);

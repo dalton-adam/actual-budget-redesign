@@ -20,6 +20,7 @@
   --color-navTrack: var(--color-cardBackground);
   --color-navActive: color-mix(in srgb, var(--color-pageText) 12%, transparent);
   --color-navActiveShadow: none;
+  --color-navListActive: var(--color-navActive);
   --color-selectionBackground: color-mix(
     in srgb,
     var(--color-buttonPrimaryBackground) 16%,

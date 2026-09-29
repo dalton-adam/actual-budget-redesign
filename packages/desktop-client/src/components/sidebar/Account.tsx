@@ -36,6 +36,8 @@ import { openAccountCloseModal } from '#modals/modalsSlice';
 import { useDispatch, useSelector } from '#redux';
 import type { Binding, SheetFields } from '#spreadsheet';
 
+import { firstGrapheme } from './railInitials';
+
 export const accountNameStyle: CSSProperties = {
   minHeight: 32,
   margin: '1px 6px',
@@ -64,17 +66,12 @@ type AccountProps<FieldName extends SheetFields<'account'>> = {
   isExactPathMatch?: boolean;
   balanceTestId?: string;
   compact?: boolean;
+  /** Rail initials; defaults to the name's first letter. */
+  initials?: string;
   startEditing?: boolean;
   onEditComplete?: () => void;
   onRequestEdit?: () => void;
 };
-
-function firstGrapheme(value: string) {
-  const trimmed = value.trim();
-  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-  const first = segmenter.segment(trimmed)[Symbol.iterator]().next();
-  return first.done ? '?' : first.value.segment.toLocaleUpperCase();
-}
 
 export function Account<FieldName extends SheetFields<'account'>>({
   name,
@@ -93,6 +90,7 @@ export function Account<FieldName extends SheetFields<'account'>>({
   isExactPathMatch,
   balanceTestId,
   compact = false,
+  initials,
   startEditing = false,
   onEditComplete,
   onRequestEdit,
@@ -209,8 +207,7 @@ export function Account<FieldName extends SheetFields<'account'>>({
             }}
             activeStyle={{
               color: theme.pageText,
-              backgroundColor: theme.navActive,
-              boxShadow: theme.navActiveShadow,
+              backgroundColor: theme.navListActive,
             }}
           >
             <span
@@ -228,7 +225,7 @@ export function Account<FieldName extends SheetFields<'account'>>({
             >
               {name}
             </span>
-            <span aria-hidden>{firstGrapheme(name)}</span>
+            <span aria-hidden>{initials ?? firstGrapheme(name)}</span>
             {connected && (
               <span
                 aria-hidden
@@ -266,15 +263,18 @@ export function Account<FieldName extends SheetFields<'account'>>({
               ...accountNameStyle,
               ...style,
               position: 'relative',
+              // Centre the name in the row's 32px fill.
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
               ...(updated && {
                 fontWeight: 700,
                 color: theme.pageText,
               }),
             }}
             activeStyle={{
-              backgroundColor: theme.navActive,
+              backgroundColor: theme.navListActive,
               color: theme.pageText,
-              boxShadow: theme.navActiveShadow,
               // This is kind of a hack, but we don't ever want the account
               // that the user is looking at to be "bolded" which means it
               // has unread transactions. The system does mark is read and
