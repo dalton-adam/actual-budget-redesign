@@ -13,7 +13,9 @@ import {
   getDetailsPanelMode,
   getDetailsPanelWidth,
   resolveDetailsCategory,
+  resolveDetailsMonth,
   resolveDetailsPanelOpen,
+  stepDetailsMonth,
   useCategoryDetails,
 } from './CategoryDetailsContext';
 import type { DetailsPanelMode } from './CategoryDetailsContext';
@@ -109,22 +111,71 @@ describe('resolveDetailsCategory', () => {
   });
 });
 
-function setup(mode: DetailsPanelMode) {
+describe('details month', () => {
+  const bounds = { start: '2026-01', end: '2026-12' };
+
+  it('follows the budget month until the stepper picks one', () => {
+    expect(resolveDetailsMonth('2026-09', null)).toBe('2026-09');
+    expect(
+      resolveDetailsMonth('2026-09', {
+        budgetMonth: '2026-09',
+        month: '2026-07',
+      }),
+    ).toBe('2026-07');
+  });
+
+  it('follows the budget month again once it changes', () => {
+    expect(
+      resolveDetailsMonth('2026-10', {
+        budgetMonth: '2026-09',
+        month: '2026-07',
+      }),
+    ).toBe('2026-10');
+  });
+
+  it('steps within the budget months only', () => {
+    expect(stepDetailsMonth('2026-09', -1, bounds)).toBe('2026-08');
+    expect(stepDetailsMonth('2026-09', 1, bounds)).toBe('2026-10');
+    expect(stepDetailsMonth('2026-01', -1, bounds)).toBeNull();
+    expect(stepDetailsMonth('2026-12', 1, bounds)).toBeNull();
+    expect(stepDetailsMonth('2026-12', -1, bounds)).toBe('2026-11');
+  });
+});
+
+type SetupOptions = {
+  budgetMonth?: string;
+  onShowActivity?: (id: string, month: string) => void;
+};
+
+function setup(
+  mode: DetailsPanelMode,
+  { budgetMonth = '2026-09', onShowActivity = vi.fn() }: SetupOptions = {},
+) {
   const container = document.createElement('div');
   const opener = document.createElement('button');
   opener.dataset.detailsOpener = 'groceries';
-  container.append(opener);
+  const scroller = document.createElement('div');
+  scroller.dataset.testid = 'budget-table-scroll-container';
+  container.append(opener, scroller);
   document.body.append(container);
 
+  let month = budgetMonth;
   const hook = renderHook(() => useCategoryDetails(), {
     wrapper: ({ children }: { children: ReactNode }) =>
       createElement(CategoryDetailsProvider, {
         mode,
         categoryGroups: groups,
+        budgetMonth: month,
+        monthBounds: { start: '2026-01', end: '2026-12' },
+        onShowActivity,
         containerRef: { current: container },
         children,
       }),
   });
+  const setBudgetMonth = (next: string) => {
+    month = next;
+    hook.rerender();
+  };
   const details = () => {
     const value = hook.result.current;
     if (!value) {
@@ -132,12 +183,13 @@ function setup(mode: DetailsPanelMode) {
     }
     return value;
   };
-  return { ...hook, details, opener };
+  return { ...hook, details, opener, scroller, setBudgetMonth };
 }
 
 describe('CategoryDetailsProvider', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    window.sessionStorage.clear();
     document.body.innerHTML = '';
   });
 
@@ -192,5 +244,47 @@ describe('CategoryDetailsProvider', () => {
     act(() => details().close());
     expect(details().isShown).toBe(false);
     expect(window.localStorage.getItem(DETAILS_PANEL_STORAGE_KEY)).toBeNull();
+  });
+
+  it('steps its own month and follows a new budget month', () => {
+    const { details, setBudgetMonth } = setup('push');
+    expect(details().month).toBe('2026-09');
+
+    act(() => details().stepMonth(-1));
+    act(() => details().stepMonth(-1));
+    expect(details().month).toBe('2026-07');
+
+    setBudgetMonth('2026-10');
+    expect(details().month).toBe('2026-10');
+  });
+
+  it('does not step past the budget months', () => {
+    const { details } = setup('push', { budgetMonth: '2026-12' });
+    expect(details().canStepMonth(1)).toBe(false);
+    expect(details().canStepMonth(-1)).toBe(true);
+
+    act(() => details().stepMonth(1));
+    expect(details().month).toBe('2026-12');
+  });
+
+  it('keeps the category and month for the way back from Accounts', () => {
+    const first = setup('push');
+    act(() => first.details().openCategory('groceries'));
+    act(() => first.details().stepMonth(-1));
+    first.unmount();
+
+    const second = setup('push');
+    expect(second.details().selectedCategoryId).toBe('groceries');
+    expect(second.details().month).toBe('2026-08');
+  });
+
+  it('opens the Accounts view and remembers the table scroll position', () => {
+    const onShowActivity = vi.fn();
+    const { details, scroller } = setup('push', { onShowActivity });
+    scroller.scrollTop = 240;
+
+    act(() => details().showActivity('groceries', '2026-08'));
+    expect(onShowActivity).toHaveBeenCalledWith('groceries', '2026-08');
+    expect(window.sessionStorage.getItem('budget-scroll-position')).toBe('240');
   });
 });

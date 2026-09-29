@@ -31,7 +31,6 @@ const panelCardStyle: CSSProperties = {
 };
 
 type CategoryDetailsPanelProps = {
-  month: string;
   width: number;
 };
 
@@ -40,16 +39,14 @@ type CategoryDetailsPanelProps = {
  * beside the table from 900px, an overlay with a scrim below that or when
  * the table would not fit beside it.
  */
-export function CategoryDetailsPanel({
-  month,
-  width,
-}: CategoryDetailsPanelProps) {
+export function CategoryDetailsPanel({ width }: CategoryDetailsPanelProps) {
   const { t } = useTranslation();
   const details = useCategoryDetails();
 
   if (!details) {
     return null;
   }
+  const { month } = details;
 
   if (details.mode === 'overlay') {
     return (

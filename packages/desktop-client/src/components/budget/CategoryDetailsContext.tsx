@@ -7,11 +7,12 @@ import React, {
 } from 'react';
 import type { ReactNode, RefObject } from 'react';
 
+import * as monthUtils from '@actual-app/core/shared/months';
 import type {
   CategoryEntity,
   CategoryGroupEntity,
 } from '@actual-app/core/types/models';
-import { useLocalStorage } from 'usehooks-ts';
+import { useLocalStorage, useSessionStorage } from 'usehooks-ts';
 
 /**
  * Device-local open state of the details panel (design-decisions §5). Kept
@@ -20,6 +21,16 @@ import { useLocalStorage } from 'usehooks-ts';
 export const CATEGORY_DETAILS_PANEL_ID = 'category-details-panel';
 
 export const DETAILS_PANEL_STORAGE_KEY = 'actual-budget-details-panel-open';
+
+/**
+ * The chosen category and panel month last only for the browser session, so
+ * "View in Accounts" and back returns to the same details.
+ */
+export const DETAILS_CATEGORY_SESSION_KEY = 'actual-budget-details-category';
+export const DETAILS_MONTH_SESSION_KEY = 'actual-budget-details-month';
+
+// Kept in step with BudgetTable, which restores it when the page mounts.
+const BUDGET_SCROLL_POSITION_KEY = 'budget-scroll-position';
 
 /** Below this window width the panel is an overlay with a scrim. */
 export const DETAILS_PANEL_OVERLAY_BELOW = 900;
@@ -87,13 +98,49 @@ export function resolveDetailsCategory(
   return fallback;
 }
 
+/**
+ * A month picked with the panel's own stepper, and the budget month it was
+ * picked from.
+ */
+export type DetailsMonthChoice = { budgetMonth: string; month: string };
+
+/**
+ * The panel follows the budget month until its own stepper is used, and
+ * again whenever the budget month changes (design-decisions §5, item 1).
+ */
+export function resolveDetailsMonth(
+  budgetMonth: string,
+  choice: DetailsMonthChoice | null,
+) {
+  return choice && choice.budgetMonth === budgetMonth
+    ? choice.month
+    : budgetMonth;
+}
+
+/** The month one step away, or null outside the budget's months. */
+export function stepDetailsMonth(
+  month: string,
+  delta: -1 | 1,
+  bounds: { start: string; end: string },
+) {
+  const next = monthUtils.addMonths(month, delta);
+  return next < bounds.start || next > bounds.end ? null : next;
+}
+
 type CategoryDetailsContextValue = {
   mode: DetailsPanelMode;
   /** Whether the panel is on screen. */
   isShown: boolean;
   selectedCategoryId: CategoryEntity['id'] | null;
   selected: { category: CategoryEntity; group: CategoryGroupEntity } | null;
+  /** The month the panel describes. */
+  month: string;
+  /** Whether the stepper can move one month back or forward. */
+  canStepMonth: (delta: -1 | 1) => boolean;
+  stepMonth: (delta: -1 | 1) => void;
   openCategory: (id: CategoryEntity['id']) => void;
+  /** Opens the existing Accounts view filtered to the category and month. */
+  showActivity: (id: CategoryEntity['id'], month: string) => void;
   toggle: () => void;
   /** Closes the panel and returns focus to the selected category's opener. */
   close: () => void;
@@ -105,6 +152,11 @@ const CategoryDetailsContext =
 type CategoryDetailsProviderProps = {
   mode: DetailsPanelMode;
   categoryGroups: CategoryGroupEntity[];
+  /** The month the Budget page shows. */
+  budgetMonth: string;
+  monthBounds: { start: string; end: string };
+  /** The Budget page's handler behind the row's Activity amount. */
+  onShowActivity: (id: CategoryEntity['id'], month: string) => void;
   /** Holds the openers and the table's scroll container. */
   containerRef: RefObject<HTMLElement | null>;
   children: ReactNode;
@@ -113,6 +165,9 @@ type CategoryDetailsProviderProps = {
 export function CategoryDetailsProvider({
   mode,
   categoryGroups,
+  budgetMonth,
+  monthBounds,
+  onShowActivity,
   containerRef,
   children,
 }: CategoryDetailsProviderProps) {
@@ -123,12 +178,43 @@ export function CategoryDetailsProvider({
   // The overlay covers the budget, so below the push layout it only opens
   // when asked to in this session and never changes the stored choice.
   const [overlayOpen, setOverlayOpen] = useState(false);
-  const [chosenId, setChosenId] = useState<CategoryEntity['id'] | null>(null);
+  const [chosenId, setChosenId] = useSessionStorage<
+    CategoryEntity['id'] | null
+  >(DETAILS_CATEGORY_SESSION_KEY, null);
+  const [monthChoice, setMonthChoice] =
+    useSessionStorage<DetailsMonthChoice | null>(
+      DETAILS_MONTH_SESSION_KEY,
+      null,
+    );
   const pendingFocus = useRef<{ scrollTop: number } | null>(null);
 
   const isShown =
     mode === 'push' ? resolveDetailsPanelOpen(storedOpen) : overlayOpen;
   const selected = resolveDetailsCategory(categoryGroups, chosenId);
+  const month = resolveDetailsMonth(budgetMonth, monthChoice);
+
+  const canStepMonth = (delta: -1 | 1) =>
+    stepDetailsMonth(month, delta, monthBounds) != null;
+
+  const stepMonth = (delta: -1 | 1) => {
+    const next = stepDetailsMonth(month, delta, monthBounds);
+    if (next) {
+      setMonthChoice({ budgetMonth, month: next });
+    }
+  };
+
+  // Same as the row's Activity amount: remember the table's scroll position
+  // for the way back, then use the page's handler.
+  const showActivity = (id: CategoryEntity['id'], activityMonth: string) => {
+    const scroller = getScrollContainer(containerRef.current);
+    if (scroller) {
+      sessionStorage.setItem(
+        BUDGET_SCROLL_POSITION_KEY,
+        String(scroller.scrollTop),
+      );
+    }
+    onShowActivity(id, activityMonth);
+  };
 
   const setShown = (shown: boolean) => {
     if (mode === 'push') {
@@ -180,7 +266,11 @@ export function CategoryDetailsProvider({
         isShown,
         selectedCategoryId: selected?.category.id ?? null,
         selected,
+        month,
+        canStepMonth,
+        stepMonth,
         openCategory,
+        showActivity,
         toggle,
         close,
       }}

@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
+import { Button } from '@actual-app/components/button';
+import { SvgCheveronRight } from '@actual-app/components/icons/v1';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import { q } from '@actual-app/core/shared/query';
@@ -10,6 +12,7 @@ import { DisplayPayeeProvider } from '#hooks/useDisplayPayee';
 import { useSheetValue } from '#hooks/useSheetValue';
 import { useTransactions } from '#hooks/useTransactions';
 
+import { useCategoryDetails } from './CategoryDetailsContext';
 import { CategoryDetailsSection } from './CategoryDetailsSection';
 import { CategoryDetailsTransactionRow } from './CategoryDetailsTransactionRow';
 
@@ -35,6 +38,7 @@ export function CategoryDetailsTransactions({
   month,
 }: CategoryDetailsTransactionsProps) {
   const { t } = useTranslation();
+  const details = useCategoryDetails();
   const monthQuery = useMemo(
     () =>
       q('transactions')
@@ -100,6 +104,25 @@ export function CategoryDetailsTransactions({
             />
           ))}
         </ul>
+        {details && (
+          <Button
+            variant="bare"
+            onPress={() => details.showActivity(category.id, month)}
+            style={{
+              alignSelf: 'flex-start',
+              marginTop: 8,
+              padding: '4px 6px',
+              marginLeft: -6,
+              gap: 4,
+              fontSize: 13,
+              fontWeight: 600,
+              color: theme.pageTextLink,
+            }}
+          >
+            <Trans>View in Accounts</Trans>
+            <SvgCheveronRight width={10} height={10} />
+          </Button>
+        )}
       </DisplayPayeeProvider>
     );
   }

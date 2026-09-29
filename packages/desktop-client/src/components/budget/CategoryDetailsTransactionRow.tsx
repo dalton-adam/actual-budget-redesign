@@ -28,7 +28,8 @@ type CategoryDetailsTransactionRowProps = {
 /**
  * One read-only transaction in the details panel: payee (the same display
  * name the registers use, including transfers and splits), date, account
- * and amount. Opening it arrives with DETAIL-03.
+ * and amount. Rows stay read-only; "View in Accounts" below the list opens
+ * the full filtered view (owner decision, DETAIL-03).
  */
 export function CategoryDetailsTransactionRow({
   transaction,
