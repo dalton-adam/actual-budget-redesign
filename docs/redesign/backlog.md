@@ -33,7 +33,7 @@ Budget header are reference material, not tasks to build.
 | DETAIL-01            | verified    | `5f238b120`              | The overlay (below 900px) not yet checked in a custom theme (→ QA-00).                                       |
 | DETAIL-02            | verified    | `d90250dff`              | Goal box and pace chart (→ DETAIL-04); month stepper, links and notes editing (→ DETAIL-03).                 |
 | TOUR-FIX             | verified    | `485a7fbe3`              | —                                                                                                            |
-| **THEME-02**         | **next**    | —                        | Needs owner approval of the retuned values (D-4).                                                            |
+| THEME-02             | verified    | `f9f4e1892`              | Linux VRT baselines for dark and midnight (→ QA-00); WIDE not run.                                           |
 | QA-00                | ready       | —                        | Linux VRT baselines were regenerated with DETAIL-02 (`9d3472cd8`); run VRT with one worker.                  |
 | ELEC-01              | not started | —                        | Needs an isolation review first (stage-0.md "Electron").                                                     |
 | BUD-04               | ready       | —                        | —                                                                                                            |
@@ -50,7 +50,8 @@ does not claim Claude's prototype is production-ready.
 
 1. ~~**DETAIL-02**: the panel is open by default, so it should show content
    before anything else lands.~~ Merged September 28, 2026.
-2. **THEME-02**: dark and midnight surfaces match across every page.
+2. ~~**THEME-02**: dark and midnight surfaces match across every page.~~
+   Merged September 28, 2026.
 3. **QA-00**: clear the checks carried forward above and record a
    performance baseline.
 4. **BUD-04**: small Budget-page polish found in the review.
@@ -69,7 +70,7 @@ The review's reasoning is in plan §19.
 | D-1 | How closely should this fork follow upstream Actual releases? (plan §19.2)                                                                    | Stay on v26.9.0; merge upstream once, deliberately, before RELEASE-01; review each upstream release's notes for security, data or bank-sync fixes worth taking earlier. |
 | D-2 | ~~If DETAIL-02 is not merged soon, should the panel start closed until it has content?~~                                                      | **Resolved September 28, 2026:** DETAIL-02 merged, so the panel opens with content; it stays open by default.                                                           |
 | D-3 | Goal/template caption under the category name (design-decisions §4.2): build it from goal values Actual already exposes, or drop it for good? | Left out, as BUD-02 shipped. The target icon in the Available pill stays.                                                                                               |
-| D-4 | THEME-02 changes the values of existing dark and midnight roles (plan §2 requires a reviewed decision).                                       | Proceed to a proposal with before/after screenshots; merge only after owner approval.                                                                                   |
+| D-4 | ~~THEME-02 changes the values of existing dark and midnight roles (plan §2 requires a reviewed decision).~~                                   | **Resolved September 28, 2026:** owner approved the before/after screenshots; values in design-decisions §8.                                                            |
 
 Mobile is **deferred** (plan §19.4): only the TERM-01 wording applies to the
 mobile envelope screens. Keep mobile E2E passing; don't restyle it.

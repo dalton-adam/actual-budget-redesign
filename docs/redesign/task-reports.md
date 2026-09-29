@@ -510,9 +510,9 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   text unchanged); tracking moved to February (step 3 under the February
   summary). No VRT: the tour test takes no screenshots.
 - THEME-02: **done September 28, 2026**, merged into `redesign/main` with
-  owner approval (branch `redesign/theme-02`; decision D-4). Dark and
-  midnight values of existing roles retuned so unmigrated pages share the
-  Budget page's surfaces; values and contrast are recorded in
+  owner approval (`f9f4e1892`, branch `redesign/theme-02`; decision D-4).
+  Dark and midnight values of existing roles retuned so unmigrated pages
+  share the Budget page's surfaces; values and contrast are recorded in
   design-decisions §8 "Retuned in THEME-02". **Scope grew beyond the card,
   with owner approval:** the card covered only the table and card roles, but
   in dark Settings sections (`pill*`), search and rule inputs
