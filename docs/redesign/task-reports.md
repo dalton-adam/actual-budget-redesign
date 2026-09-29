@@ -1038,8 +1038,8 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   `better-sqlite3` was reverted from a backup and loads under Node again.
   **Not checked:** themes and privacy mode in the desktop shell, the packaged
   `app://` bundle.
-- TOPBAR-FIX: **in review September 29, 2026**, branch
-  `redesign/topbar-fix` (`b13404ca8`), not merged. Results in
+- TOPBAR-FIX: **done September 29, 2026**, merged into `redesign/main` with
+  owner approval (`107560a51`, branch `redesign/topbar-fix`). Results in
   [verification.md](verification.md#topbar-fix-september-29-2026).
   **Cause:** the title bar's right-hand group wrapped, and nothing responded
   to the width the expanded pane takes; ELEC-01's run also had the
