@@ -38,7 +38,7 @@ Budget header are reference material, not tasks to build.
 | ELEC-01              | not started | —                        | Needs an isolation review first (stage-0.md "Electron").                                              |
 | BUD-04               | verified    | `c0527171d`              | Adds theme role `navListActive`. Linux VRT not rerun (light Budget and pane snapshots change).        |
 | PERF-01              | verified    | `8f88c6841`              | Edits now 57–59% faster than the base. Adds `C/budget/index.tsx` (owner-approved; may touch SYNC-01). |
-| PERF-02              | ready       | —                        | Opened by QA-00. PERF-01's run saw no scroll frame over 33 ms; confirm and close.                     |
+| PERF-02              | verified    | docs only                | PERF-01 fixed it; no source change. 1000×700 hit 33.3 ms in 5 of 7 runs (a pass; QA-01 watches).      |
 | DETAIL-03, DETAIL-04 | not started | —                        | —                                                                                                     |
 | SYNC-01              | blocked     | —                        | Waiting on owner decision D-1.                                                                        |
 | APP-01 – APP-06      | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                           |
@@ -59,8 +59,8 @@ does not claim Claude's prototype is production-ready.
    [verification.md](verification.md).
 4. ~~**BUD-04**: small Budget-page polish found in the review.~~
    Merged September 29, 2026.
-5. ~~**PERF-01**~~ (merged September 29, 2026), **PERF-02**: the Budget
-   table regressions QA-00 measured.
+5. ~~**PERF-01**, **PERF-02**: the Budget table regressions QA-00
+   measured.~~ Both closed September 29, 2026.
    After BUD-04, which edits some of the same files.
 6. **DETAIL-03**, then **DETAIL-04**.
 7. **ELEC-01** once its isolation review is written; before RELEASE-01 at the

@@ -719,3 +719,37 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   the table works out above or below and fails the same way on both builds,
   so the script uses a slow mouse drag with pauses. **Not checked:** WIDE
   and Linux VRT (nothing visual changed, so no snapshot should move).
+
+- PERF-02: **closed September 29, 2026 with no source change**, by owner
+  decision (branch `redesign/perf-02` from `320071bc7`; documentation
+  only). PERF-01's compiler fix already removed the long frames: with
+  `DynamicBudgetTable` compiled, flipping `isScrolled` no longer re-renders
+  the rows. **Measured** (`scripts/redesign-perf.mjs run 7`, v26.9.0
+  `59fe126f6` on 3019 and a fresh `build:browser` of `320071bc7` on 3018 in
+  the same session, 42 runs, none failed):
+
+  | Measure                            | 1440 base | 1440 redesign | 1000 base | 1000 redesign |
+  | ---------------------------------- | --------: | ------------: | --------: | ------------: |
+  | Scroll: frames over 33 ms (of 359) |         0 |             0 |         0 |             0 |
+  | Scroll: longest frame              |      18.7 |          18.6 |      18.5 |          33.3 |
+  | Scroll: p95 frame                  |      17.9 |          17.7 |      17.8 |          18.0 |
+
+  QA-00 had 2–3 frames of 49–85 ms per run. The other blocking measures
+  also pass D-6 in this run (Assigned edit median 51 ms against the base's
+  124 ms at both sizes). **Near miss, accepted by the owner:** at 1000×700
+  the redesign dropped one frame (33.3 ms, two refreshes at 60 fps) in 5 of
+  7 runs, and the panel-closed variant in 2 of 7; never at 1440×900, and
+  the base's longest at 1000×700 was 25.5 ms. The script counts frames over
+  33.4 ms, so these pass. It is probably the layout change when the cards
+  give way to the strip, which only happens below 900 px tall; not
+  profiled. QA-01 should watch it. A scratch profile with Long Animation
+  Frame entries (3 runs a size, without the reload the script does first)
+  saw no frame over 18.7 ms and ~16.7 ms frames on either side of every
+  swap. The flip still re-renders `DynamicBudgetTable` at 1440×900, where
+  nothing visible changes; cheap now, left as is. **Checks:** E2E(budget,
+  bud-01, tour) 14/14 against 3018. VISUAL (script, demo, light): at
+  1000×700 the strip replaces the cards after scrolling and the cards
+  return at the top; at 1440×900 the cards stay
+  ([1000](verification/perf-02/light-budget-1000-scrolled.png),
+  [1440](verification/perf-02/light-budget-1440-scrolled.png)). No
+  typecheck, lint or UNIT: no source changed.

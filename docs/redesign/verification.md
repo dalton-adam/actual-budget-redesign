@@ -164,7 +164,9 @@ today's gap, not fixed targets.
 10% is about the run-to-run noise: the base's own per-round edit medians
 ranged from 116 to 165 ms. As of QA-00 the redesign fails Assigned edits and
 scrolling at both sizes (PERF-01, PERF-02) and passes the other blocking
-measures; large first-paint settled (+17–19%) is reported.
+measures; large first-paint settled (+17–19%) is reported. PERF-01 and
+PERF-02 (September 29, 2026) since measured both as passing; see
+[task-reports.md](task-reports.md).
 
 ### Custom theme
 
