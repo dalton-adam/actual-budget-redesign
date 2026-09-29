@@ -312,3 +312,67 @@ CSS override on its own; privacy mode and keyboard paths beyond what earlier
 tasks recorded; 200% zoom; the desktop (Electron) build (ELEC-01); tracking
 budgets (the redesign leaves them unchanged). Performance was measured in a
 browser only, headless, on one machine.
+
+## ELEC-01 (September 29, 2026)
+
+Branch `redesign/elec-01` from `redesign/main` at `cb9cefab0`. The isolation
+review and procedure are in [stage-0.md](stage-0.md#desktop-isolation-review-elec-01).
+No application file changed. Screenshots are in
+[verification/elec-01/](verification/elec-01/).
+
+### Environment
+
+| Item      | Value                                                                                                                                                 |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Machine   | Apple M1, macOS (Darwin 27.0.0), 1440×900 display                                                                                                     |
+| Build     | Development desktop build: Electron 43.4.0, `@actual-app/core build:node`, `desktop-electron build:dist`, renderer from Vite on 127.0.0.1:3001        |
+| Launcher  | `node scripts/redesign-electron.mjs` (three manual runs); the same paths through Playwright's Electron driver for the zoom, size and title bar checks |
+| Fixture   | Don't use a server → Try the demo, in `data/redesign-electron/`                                                                                       |
+| Installed | Actual 26.9.0 was not running; its folders were only read (to find `document-dir`), never opened by the test build                                    |
+
+### Isolation evidence
+
+| Check                                                                               | Result                                                                                                                                                        |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Folder naming probe (throwaway `productName`, exits before any window)              | Unpackaged `userData` = `~/Library/Application Support/<productName>`; `--user-data-dir` moves `userData`, session data and crash dumps; `HOME` moves nothing |
+| Files open in the running Electron processes (`lsof`, run 1, after the demo loaded) | Every file under the user folder was inside `data/redesign-electron/`; none in `~/Library/Application Support/Actual` or `~/Documents/Actual`                 |
+| Welcome screen on first launch                                                      | "Welcome to Actual" with no budget list, although `~/Documents/Actual` holds a budget ([screenshot](verification/elec-01/run1-welcome-no-budgets.jpg))        |
+| Budget path in the app's own log (runs 2 and 3)                                     | `Loading budget …/data/redesign-electron/documents/Actual/_test-budget`                                                                                       |
+| Playwright runs, `app.getPath('userData')` and the two variables                    | All three under `data/redesign-electron/`                                                                                                                     |
+| Launcher change check after each manual run                                         | Runs 1, 2 and 3: "nothing changed in ~/Library/Application Support/Actual, ~/Documents/Actual"                                                                |
+| `find … -newer` over both folders after the Playwright runs                         | 0 files                                                                                                                                                       |
+| `~/Library/Logs/Actual`                                                             | Not created (the probe's empty `ActualIsolationProbe` log folder was removed)                                                                                 |
+
+### Smoke test
+
+| Area                                  | Observation                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| First paint                           | Redesign renders as in the browser: tabs, accounts rail, summary cards, details panel with pace chart ([screenshot](verification/elec-01/run1-budget-1000x700.jpg))                                                                                                                                                                                                                                                                            |
+| Title bar and dragging                | The window keeps macOS's native title bar (upstream sets no `frame`/`titleBarStyle`), with the in-app tab bar below it. Dragging the native title bar moves the window. Dragging empty space in the tab bar selects text instead: the `WebkitAppRegion: 'drag'` that `FinancesApp.tsx` gives the title bar is unchanged from v26.9.0 but has no effect in a framed window, so upstream behaves the same. Traffic lights never overlap the tabs |
+| Budget flows                          | Assigned edit (Food 400 → 425: Ready to Assign 0.00 → −25.00, panel updated), restored to 400; month switch to October and back; Reports dashboard; Schedules; account register from the rail, with the rail tooltip                                                                                                                                                                                                                           |
+| Native menus                          | App menu (Hide, Quit Actual), File, View (Reload, Toggle Developer Tools, Actual Size, Zoom In/Out, Toggle Full Screen), Edit, Window all present. Edit → Undo/Redo are always disabled (`enabled: false` in upstream `menu.ts`); ⌘Z works in the page. View lists "Toggle Full Screen" twice (the `togglefullscreen` role plus the item macOS adds); both upstream                                                                            |
+| Zoom                                  | Menu Zoom In ×2 → zoom level 1 (page width 833 CSS px, compact navigation, nothing wider than the window); Zoom Out → 0.5; Actual Size → 0. Level 2 (694 CSS px) also fits ([level 1](verification/elec-01/zoom-level-1-window-1000.png), [level 2](verification/elec-01/zoom-level-2-window-1000.png))                                                                                                                                        |
+| Minimum window size                   | None is set (`getMinimumSize()` = 0×0, as upstream). At 360×300 the app switches to the upstream mobile layout, as in a narrow browser ([screenshot](verification/elec-01/smallest-window.png)); 800×600 shows the compact navigation with the budget intact                                                                                                                                                                                   |
+| Accounts pane and details panel state | Run 1: pane expanded, panel closed in the overlay → quit → run 2: pane expanded (kept); panel open in push mode (correct: closing the overlay never changes the stored choice, DETAIL-01). Run 2: pane collapsed, panel closed in push mode → quit → run 3: both kept ([screenshot](verification/elec-01/run3-state-restored.jpg)). Window position also kept (`window.json`)                                                                  |
+
+### Defect found
+
+**The title bar wraps at 1000px with the accounts pane expanded.** Measured
+with the pane open: at 1000px the right-hand group (display, privacy, "No
+server", Help) sits 15px above the top of the page, so its upper half is cut
+off under the native title bar, and the budget switcher drops to a second line
+([measured](verification/elec-01/titlebar-pane-open-1000.png),
+[desktop](verification/elec-01/run1-titlebar-wrap-pane-open.jpg)). At 1100,
+1200, 1280 and 1440px everything sits on one line
+([1280](verification/elec-01/titlebar-pane-open-1280.png)). The layout depends
+only on the window width, so the browser at the same width should show the same
+thing. Opened as task TOPBAR-FIX; not fixed here.
+
+### Not checked
+
+Custom theme, dark/midnight and privacy mode in the desktop build (the UI code
+is the browser's; only the shell differs); the packaged `app://` bundle
+(blocked: packaged builds are not isolated); keyboard shortcuts delivered
+through macOS menus while the window is in another Space (the test harness
+could not deliver them reliably; the same menu items were triggered directly
+instead).

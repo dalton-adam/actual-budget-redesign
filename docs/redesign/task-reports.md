@@ -1005,3 +1005,36 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   **Known limits:** template sentences appear only with the automations UI
   flag on, like the automation button's tooltip (checked by hand on the dev
   server: "Budget 50.00 every 1 months" under the sentence).
+- ELEC-01: **in review September 29, 2026** (branch `redesign/elec-01`, not
+  merged). Desktop isolation review written into
+  [stage-0.md](stage-0.md#desktop-isolation-review-elec-01) first, then the
+  smoke test in [verification.md](verification.md#elec-01-september-29-2026).
+  **Findings:** a development build launched the upstream way keeps its
+  budgets in `data/` but writes Chromium's storage (localStorage, IndexedDB,
+  caches) into the installed app's `~/Library/Application Support/Actual`,
+  because an unpackaged build is named after `productName` and
+  `ACTUAL_DATA_DIR` does not move Chromium's folder. `--user-data-dir` does;
+  `HOME` does not. Packaged builds overwrite both directory variables and
+  share the installed app's bundle ID, so they stay unsafe to launch until a
+  separately scoped source change. **Scope added (not in the card):**
+  `scripts/redesign-electron.mjs`, a launcher that applies the isolation,
+  refuses overlapping paths, binds the renderer to loopback and checks the
+  installed app's folders for changes on exit, so the procedure is enforced
+  rather than only written down. No application or `desktop-electron` file
+  changed. **Checks:** typecheck pass; lint pass (after replacing the
+  launcher's `require('electron')` with the package's own `path.txt`
+  lookup). No UNIT or E2E: no application code changed. Three manual desktop
+  runs plus two Playwright Electron runs, all isolated: `lsof`, the
+  launcher's change check (3/3 clean) and `find -newer` (0 files) show
+  nothing touched in the installed app's folders. **Smoke test:** first
+  paint, Assigned edit and restore, month switch, Reports, Schedules,
+  register, native menus, zoom in/out/reset, smallest window (mobile layout,
+  no minimum size, as upstream), accounts pane and details panel state across
+  two restarts, window position. Dragging works from the native title bar
+  only; the in-page drag region is upstream's and has no effect in a framed
+  window. **Defect found:** the title bar wraps at 1000px with the accounts
+  pane expanded (Help and the privacy/server controls cut off at the top);
+  opened as TOPBAR-FIX. **Environment note:** the Electron rebuild of
+  `better-sqlite3` was reverted from a backup and loads under Node again.
+  **Not checked:** themes and privacy mode in the desktop shell, the packaged
+  `app://` bundle.
