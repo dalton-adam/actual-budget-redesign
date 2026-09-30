@@ -46,8 +46,14 @@ export const ReportCardName = ({
         display: 'block',
         margin: 0,
         padding: 0,
-        ...styles.mediumText,
-        marginBottom: 5,
+        // Widget title (APP-03): Title size, one line.
+        fontSize: 13.5,
+        fontWeight: 600,
+        lineHeight: 1.3,
+        marginBottom: 2,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
       }}
     >
       {name}

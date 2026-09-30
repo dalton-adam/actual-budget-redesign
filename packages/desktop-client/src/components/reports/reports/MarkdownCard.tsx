@@ -107,7 +107,7 @@ export function MarkdownCard({
       <View
         style={{
           flex: 1,
-          paddingTop: 5,
+          paddingTop: 12,
           paddingLeft: 20,
           overflowY: 'auto',
           height: '100%',

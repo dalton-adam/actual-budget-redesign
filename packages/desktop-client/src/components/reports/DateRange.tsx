@@ -16,6 +16,8 @@ type DateRangeProps = {
   end: string;
   type?: string;
   comparisonLabel?: string;
+  /** Dashboard widget subline (APP-03): 12px Secondary text. */
+  isWidget?: boolean;
 };
 
 function checkDate(date: string) {
@@ -32,6 +34,7 @@ export function DateRange({
   end,
   type,
   comparisonLabel,
+  isWidget = false,
 }: DateRangeProps): ReactElement {
   const { t } = useTranslation();
   const locale = useLocale();
@@ -92,5 +95,21 @@ export function DateRange({
     content = d.format(endDate, 'MMMM yyyy', { locale });
   }
 
-  return <Block style={{ color: theme.pageTextSubdued }}>{content}</Block>;
+  return (
+    <Block
+      style={
+        isWidget
+          ? {
+              color: theme.pageTextSecondary,
+              fontSize: 12,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }
+          : { color: theme.pageTextSubdued }
+      }
+    >
+      {content}
+    </Block>
+  );
 }

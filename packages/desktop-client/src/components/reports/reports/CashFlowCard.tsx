@@ -11,7 +11,7 @@ import { Bar, BarChart, LabelList } from 'recharts';
 
 import { FinancialText } from '#components/FinancialText';
 import { PrivacyFilter } from '#components/PrivacyFilter';
-import { Change } from '#components/reports/Change';
+import { ChangePill } from '#components/reports/ChangePill';
 import { useRechartsAnimation } from '#components/reports/chart-theme';
 import { Container } from '#components/reports/Container';
 import { DateRange } from '#components/reports/DateRange';
@@ -152,7 +152,7 @@ export function CashFlowCard({
         onPointerEnter={onCardHover}
         onPointerLeave={onCardHoverEnd}
       >
-        <View style={{ flexDirection: 'row', padding: 20 }}>
+        <View style={{ flexDirection: 'row', padding: '16px 20px' }}>
           <View style={{ flex: 1 }}>
             <ReportCardName
               name={meta?.name || t('Cash Flow')}
@@ -166,12 +166,12 @@ export function CashFlowCard({
               }}
               onClose={() => setNameMenuOpen(false)}
             />
-            <DateRange start={start} end={end} />
+            <DateRange isWidget start={start} end={end} />
           </View>
           {data && (
             <View style={{ textAlign: 'right' }}>
               <PrivacyFilter activationFilters={[!isCardHovered]}>
-                <Change amount={income - expenses} />
+                <ChangePill amount={income - expenses} />
               </PrivacyFilter>
             </View>
           )}

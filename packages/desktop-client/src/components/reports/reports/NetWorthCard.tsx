@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import { Block } from '@actual-app/components/block';
 import { useResponsive } from '@actual-app/components/hooks/useResponsive';
-import { styles } from '@actual-app/components/styles';
 import { View } from '@actual-app/components/view';
 import { send } from '@actual-app/core/platform/client/connection';
 import * as monthUtils from '@actual-app/core/shared/months';
@@ -14,7 +13,8 @@ import type {
 
 import { FinancialText } from '#components/FinancialText';
 import { PrivacyFilter } from '#components/PrivacyFilter';
-import { Change } from '#components/reports/Change';
+import { ChangePill } from '#components/reports/ChangePill';
+import { WIDGET_VALUE_STYLE } from '#components/reports/constants';
 import { DateRange } from '#components/reports/DateRange';
 import { NetWorthGraph } from '#components/reports/graphs/NetWorthGraph';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
@@ -111,7 +111,7 @@ export function NetWorthCard({
         onPointerEnter={onCardHover}
         onPointerLeave={onCardHoverEnd}
       >
-        <View style={{ flexDirection: 'row', padding: 20 }}>
+        <View style={{ flexDirection: 'row', padding: '16px 20px' }}>
           <View style={{ flex: 1 }}>
             <ReportCardName
               name={meta?.name || t('Net Worth')}
@@ -125,15 +125,13 @@ export function NetWorthCard({
               }}
               onClose={() => setNameMenuOpen(false)}
             />
-            <DateRange start={start} end={end} />
+            <DateRange isWidget start={start} end={end} />
           </View>
           {data && (
             <View style={{ textAlign: 'right' }}>
               <Block
                 style={{
-                  ...styles.mediumText,
-                  fontWeight: 500,
-                  marginBottom: 5,
+                  ...WIDGET_VALUE_STYLE,
                 }}
               >
                 <PrivacyFilter activationFilters={[!isCardHovered]}>
@@ -143,7 +141,7 @@ export function NetWorthCard({
                 </PrivacyFilter>
               </Block>
               <PrivacyFilter activationFilters={[!isCardHovered]}>
-                <Change amount={data.totalChange} />
+                <ChangePill amount={data.totalChange} />
               </PrivacyFilter>
             </View>
           )}

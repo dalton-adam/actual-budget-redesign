@@ -96,7 +96,7 @@ export function SummaryCard({
       onRename={() => setNameMenuOpen(true)}
     >
       <View style={{ flex: 1, overflow: 'hidden' }}>
-        <View style={{ flexGrow: 0, flexShrink: 0, padding: 20 }}>
+        <View style={{ flexGrow: 0, flexShrink: 0, padding: '16px 20px' }}>
           <ReportCardName
             name={meta?.name || t('Summary')}
             isEditing={nameMenuOpen}
@@ -110,14 +110,15 @@ export function SummaryCard({
             }}
             onClose={() => setNameMenuOpen(false)}
           />
-          <DateRange start={start} end={end} />
+          <DateRange isWidget start={start} end={end} />
         </View>
         <View
           style={{
-            justifyContent: 'center',
-            alignItems: 'center',
+            justifyContent: 'flex-end',
+            alignItems: 'flex-start',
             flexGrow: 1,
             flexShrink: 1,
+            padding: '0 20px 8px',
           }}
         >
           {data ? (
@@ -128,6 +129,7 @@ export function SummaryCard({
               loading={!data}
               initialFontSize={content.fontSize}
               animate={isEditing ?? false}
+              maxFontSize={28}
             />
           ) : (
             <ReportCardValueSkeleton />

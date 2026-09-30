@@ -3,7 +3,6 @@ import { Trans, useTranslation } from 'react-i18next';
 
 import { Block } from '@actual-app/components/block';
 import { useResponsive } from '@actual-app/components/hooks/useResponsive';
-import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import { send } from '@actual-app/core/platform/client/connection';
@@ -11,6 +10,7 @@ import * as monthUtils from '@actual-app/core/shared/months';
 import type { AgeOfMoneyWidget } from '@actual-app/core/types/models';
 
 import { PrivacyFilter } from '#components/PrivacyFilter';
+import { WIDGET_VALUE_STYLE } from '#components/reports/constants';
 import { DateRange } from '#components/reports/DateRange';
 import { AgeOfMoneyGraph } from '#components/reports/graphs/AgeOfMoneyGraph';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
@@ -105,7 +105,7 @@ export function AgeOfMoneyCard({
         onPointerEnter={onCardHover}
         onPointerLeave={onCardHoverEnd}
       >
-        <View style={{ flexDirection: 'row', padding: 20 }}>
+        <View style={{ flexDirection: 'row', padding: '16px 20px' }}>
           <View style={{ flex: 1 }}>
             <ReportCardName
               name={meta?.name || t('Age of Money')}
@@ -119,15 +119,13 @@ export function AgeOfMoneyCard({
               }}
               onClose={() => setNameMenuOpen(false)}
             />
-            <DateRange start={start} end={end} />
+            <DateRange isWidget start={start} end={end} />
           </View>
           {data && (
             <View style={{ textAlign: 'right' }}>
               <Block
                 style={{
-                  ...styles.largeText,
-                  fontWeight: 500,
-                  marginBottom: 5,
+                  ...WIDGET_VALUE_STYLE,
                   color: getAgeColor(data.currentAge),
                 }}
               >

@@ -44,6 +44,7 @@ export function DashboardSelector({
     <DialogTrigger>
       <Button
         ref={triggerRef}
+        variant="control"
         onPress={() => setMenuOpen(true)}
         style={{
           flexGrow: 1,

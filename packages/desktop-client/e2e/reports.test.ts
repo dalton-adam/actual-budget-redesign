@@ -31,6 +31,21 @@ test.describe('Reports', () => {
   });
 
   test('loads net worth and cash flow reports', async () => {
+    // Widgets render their content only once scrolled into view, so how
+    // many titles exist depends on the window size. Bring every widget into
+    // view first, so the whole default dashboard is checked at any size
+    // (APP-03).
+    const gridItems = reportsPage.pageContent.locator('.react-grid-item');
+    const count = await gridItems.count();
+    for (let i = 0; i < count; i++) {
+      await gridItems.nth(i).scrollIntoViewIfNeeded();
+    }
+    await expect(
+      reportsPage.pageContent.getByRole('heading', {
+        name: 'Recent Net Worth Change',
+      }),
+    ).toBeVisible();
+
     const reports = await reportsPage.getAvailableReportList();
 
     expect(reports).toEqual([
@@ -43,12 +58,17 @@ test.describe('Reports', () => {
       'This Month',
       'Budget Overview',
       '3-Month Average',
+      'Transaction Calendar',
+      'Recent Net Worth Change',
     ]);
+
+    await gridItems.first().scrollIntoViewIfNeeded();
     await expect(page).toMatchThemeScreenshots();
   });
 
   test('right clicking a report card opens context menu', async () => {
-    await reportsPage.rightClickReportCard('Net Worth');
+    // Anchored: at wider windows "Recent Net Worth Change" is on screen too.
+    await reportsPage.rightClickReportCard(/^Net Worth/);
     const menu = page.getByRole('menu');
     await expect(menu).toBeVisible();
     await expect(menu.getByRole('button', { name: 'Rename' })).toBeVisible();

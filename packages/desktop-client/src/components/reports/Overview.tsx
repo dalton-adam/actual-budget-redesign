@@ -518,8 +518,8 @@ export function Overview({ dashboard }: OverviewProps) {
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
-                gap: 5,
-                alignItems: 'stretch',
+                gap: 8,
+                alignItems: 'center',
               }}
             >
               {currentBreakpoint === 'desktop' && (
@@ -530,15 +530,24 @@ export function Overview({ dashboard }: OverviewProps) {
                     currentDashboard={dashboard}
                   />
 
-                  <View
-                    style={{
-                      height: 'auto',
-                      borderLeft: `1.5px solid ${theme.pillBorderDark}`,
-                      borderRadius: 0.75,
-                      marginLeft: 7,
-                      marginRight: 7,
-                    }}
-                  />
+                  {/* The Editing Button */}
+                  {isEditing ? (
+                    <Button
+                      variant="control"
+                      isDisabled={isImporting}
+                      onPress={() => setIsEditing(false)}
+                    >
+                      <Trans>Finish editing dashboard</Trans>
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="control"
+                      isDisabled={isImporting}
+                      onPress={() => setIsEditing(true)}
+                    >
+                      <Trans>Edit dashboard</Trans>
+                    </Button>
+                  )}
 
                   <DialogTrigger>
                     <Button variant="primary" isDisabled={isImporting}>
@@ -667,31 +676,10 @@ export function Overview({ dashboard }: OverviewProps) {
                     </Popover>
                   </DialogTrigger>
 
-                  {/* The Editing Button */}
-                  {isEditing ? (
-                    <Button
-                      isDisabled={isImporting}
-                      onPress={() => setIsEditing(false)}
-                    >
-                      <Trans>Finish editing dashboard</Trans>
-                    </Button>
-                  ) : (
-                    <Button
-                      isDisabled={isImporting}
-                      onPress={() => setIsEditing(true)}
-                    >
-                      <Trans>Edit dashboard</Trans>
-                    </Button>
-                  )}
-
                   {/* The Menu */}
                   <DialogTrigger>
-                    <Button variant="bare" aria-label={t('Menu')}>
-                      <SvgDotsHorizontalTriple
-                        width={15}
-                        height={15}
-                        style={{ transform: 'rotateZ(90deg)' }}
-                      />
+                    <Button variant="control" aria-label={t('Menu')}>
+                      <SvgDotsHorizontalTriple width={14} height={14} />
                     </Button>
                     <Popover>
                       <Dialog>
@@ -770,6 +758,8 @@ export function Overview({ dashboard }: OverviewProps) {
                 gridConfig={{
                   cols: currentBreakpoint === 'desktop' ? 12 : 1,
                   rowHeight: 100,
+                  // 14px between widget cards (APP-03).
+                  margin: [14, 14],
                 }}
                 dragConfig={{
                   enabled: currentBreakpoint === 'desktop' && isEditing,
