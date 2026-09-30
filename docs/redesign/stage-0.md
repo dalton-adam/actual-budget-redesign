@@ -24,6 +24,8 @@ Electron's `index.ts` has separate development and packaged-data handling. Its `
 
 Written September 29, 2026 against `redesign/main` at `cb9cefab0` and Electron 43.4.0 on macOS. Evidence and smoke-test results are in the [verification record](verification.md#elec-01-september-29-2026).
 
+Windows and CDP-driving notes added September 30, 2026, after the by-hand Windows run in the [verification record](verification.md#app-02-desktop-window-september-30-2026).
+
 ### What the installed app uses
 
 The installed app (`/Applications/Actual.app`, 26.9.0, `com.actualbudget.actual`) keeps its data in two places:
@@ -50,7 +52,7 @@ Traced through `packages/desktop-electron/index.ts`, `window-state.ts`, `package
 
 Only this procedure is approved for running the redesign as a desktop app. Use it for every desktop check until a packaging task changes the answer for packaged builds.
 
-1. **Never** run upstream's `yarn start:desktop`, `yarn workspace desktop-electron watch`, `yarn build:desktop` or the resulting `.app`/`.dmg` for this fork. Never open the fork's build with `open` or from Finder: it shares the installed app's bundle ID.
+1. **Never** run upstream's `yarn start:desktop`, `yarn workspace desktop-electron watch`, `yarn build:desktop` or the resulting `.app`/`.dmg`/`.exe`/`.appx` for this fork. Never open the fork's build with `open`, from Finder or from Explorer: it shares the installed app's bundle ID and app name.
 2. One-time preparation, from the repository root:
 
    ```sh
@@ -63,19 +65,31 @@ Only this procedure is approved for running the redesign as a desktop app. Use i
 
    The rebuild replaces the Node build of `better-sqlite3` in the shared `node_modules` with an Electron build, which breaks Node tests. Back up `node_modules/better-sqlite3/build` first and put it back afterwards (or run `npm rebuild better-sqlite3`), then check that `node -e "new (require('better-sqlite3'))(':memory:')"` succeeds.
 
+   **On Windows** the rebuild compiles from source and needs Visual Studio Build Tools (the "Desktop development with C++" workload) and Python. Run the commands from Git Bash or PowerShell, with `.\node_modules\.bin\electron-rebuild.cmd` in PowerShell. Copy the whole `node_modules\better-sqlite3\build` folder aside before the rebuild and copy it back when the desktop checks are done; restoring the backup is quicker than a second source build.
+
 3. Launch with `node scripts/redesign-electron.mjs`. The script:
    - puts `ACTUAL_DATA_DIR`, `ACTUAL_DOCUMENT_DIR` and `--user-data-dir` under `data/redesign-electron/` (git-ignored by `/data/*`);
-   - refuses to start if any of them resolves inside `~/Library/Application Support/Actual`, `~/Documents/Actual` or the installed app's `document-dir`;
+   - refuses to start if any of them resolves inside the installed app's folders or its `document-dir`. It picks those per platform, following Electron's `userData` and `documents` paths for an app named "Actual":
+     - macOS: `~/Library/Application Support/Actual` and `~/Documents/Actual`;
+     - Windows: `%APPDATA%\Actual`, and `Actual` inside the Documents known folder (read from the registry, so a OneDrive-redirected `~/OneDrive/Documents` is found) as well as `~/Documents/Actual`;
+     - Linux: `$XDG_CONFIG_HOME/Actual` (default `~/.config/Actual`) and `~/Documents/Actual`;
    - serves the renderer on 127.0.0.1:3001 only (upstream's `yarn start` listens on every interface);
-   - when the app quits, lists any file in those folders that changed during the run and exits non-zero if there is one. Quit the installed app first, or its own writes will show up.
+   - when the app quits, stops Vite (on Windows the whole process tree, so port 3001 is freed), lists any file in those folders that changed during the run and exits non-zero if there is one. Quit the installed app first, or its own writes will show up.
+
+   To drive checks with Playwright over CDP instead of screen control, add either or both switches; the script passes them to Electron and rejects anything else. Both listen on 127.0.0.1 only.
+   - `--remote-debugging-port=<port>`: the renderer. Connect with `chromium.connectOverCDP('http://127.0.0.1:<port>')`; the app window is the page at `http://localhost:3001/` (the development build also opens a docked DevTools target, which can be ignored or closed).
+   - `--inspect[=<port>]`: the main process, for example to set the window's content size or to call `app.quit()` through `Runtime.evaluate`. loot-core's server process inherits the switch and logs that the port is already in use; that is harmless.
+
+   With `--inspect`, `app.quit()` stops at "Waiting for the debugger to disconnect" / "Debugger ending" until the inspector client detaches. Close the inspector connection after quitting, or the script never reaches its isolation check.
+
 4. In the app: **Don't use a server**, then **Try the demo**. The welcome screen must show no existing budgets; if it lists one, quit and stop. Do not connect a server, import a file, change the budget folder (Settings → Files), or open files from native dialogs.
-5. Close with Electron → Quit Actual and check the script's last line reads "Isolation check: nothing changed". Delete `data/redesign-electron/` to start fresh.
+5. Close with Electron → Quit Actual (macOS) or by closing the window (Windows, where closing the last window quits), or `app.quit()` over the inspector, and check the script's last line reads "Isolation check: nothing changed". Delete `data/redesign-electron/` to start fresh. On Windows, restore the `better-sqlite3` backup afterwards (step 2).
 
 ### Remaining risks
 
 - **Packaged builds are not isolated** (point 3 above). Running one needs a separately scoped source change first, for example a distinct `productName`/`appId` for fork builds and honouring the directory variables when packaged. RELEASE-01 must not build or install a desktop package until that exists.
 - The development build loads the renderer from Vite (`http://localhost:3001`) rather than the packaged `app://actual` bundle, so desktop-only issues in the production bundle are not covered.
-- The script's change check compares modification times. It cannot see reads, and it would miss a change made and reverted within one run. `lsof` on the running processes (recorded in the verification record) is the check for open files.
+- The script's change check compares modification times. It cannot see reads, and it would miss a change made and reverted within one run. `lsof` on the running processes (recorded in the verification record) is the check for open files; on Windows, Resource Monitor or Sysinternals Handle serves the same purpose.
 
 ## Code map
 

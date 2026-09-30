@@ -2,7 +2,7 @@
 // every data path inside data/redesign-electron/, and checks afterwards that
 // nothing in the installed Actual app's folders changed.
 // Procedure and reasoning: docs/redesign/stage-0.md, "Desktop isolation review".
-import { spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import {
   existsSync,
   mkdirSync,
@@ -17,7 +17,6 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const home = os.homedir();
-const installedDataDir = path.join(home, 'Library/Application Support/Actual');
 
 const sandbox = path.join(root, 'data/redesign-electron');
 const dirs = {
@@ -26,13 +25,92 @@ const dirs = {
   chromium: path.join(sandbox, 'chromium'),
 };
 
+// Debugging switches passed through to Electron, so checks can be driven over
+// CDP (Playwright's connectOverCDP) instead of by screen control. Both listen
+// on 127.0.0.1 only.
+//   --remote-debugging-port=<port>  the renderer (Chromium DevTools protocol)
+//   --inspect[=<port>]              the main process (Node inspector)
+const debugArgs = [];
+for (const arg of process.argv.slice(2)) {
+  if (
+    /^--remote-debugging-port=\d+$/.test(arg) ||
+    /^--inspect(=\d+)?$/.test(arg)
+  ) {
+    debugArgs.push(arg);
+  } else {
+    console.error(
+      `Unknown argument ${arg}. Accepted: --remote-debugging-port=<port>, --inspect[=<port>].`,
+    );
+    process.exit(1);
+  }
+}
+
+// Electron's app.getPath('documents'). On Windows that is the Documents known
+// folder, which OneDrive (or a policy) may have moved away from ~/Documents.
+function documentsDir() {
+  if (process.platform === 'win32') {
+    try {
+      const output = execFileSync(
+        'reg',
+        [
+          'query',
+          path.win32.join(
+            'HKCU',
+            'Software',
+            'Microsoft',
+            'Windows',
+            'CurrentVersion',
+            'Explorer',
+            'User Shell Folders',
+          ),
+          '/v',
+          'Personal',
+        ],
+        { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
+      );
+      const match = output.match(/Personal\s+REG_(?:EXPAND_)?SZ\s+(.+)/);
+      if (match) {
+        return match[1]
+          .trim()
+          .replace(/%([^%]+)%/g, (whole, name) => process.env[name] ?? whole);
+      }
+    } catch {
+      // Fall back to the default location below.
+    }
+  }
+  return path.join(home, 'Documents');
+}
+
+// Electron's app.getPath('userData') for an app named "Actual".
+function installedDataDir() {
+  switch (process.platform) {
+    case 'darwin':
+      return path.join(home, 'Library/Application Support/Actual');
+    case 'win32':
+      return path.join(
+        process.env.APPDATA ?? path.join(home, 'AppData/Roaming'),
+        'Actual',
+      );
+    default:
+      return path.join(
+        process.env.XDG_CONFIG_HOME ?? path.join(home, '.config'),
+        'Actual',
+      );
+  }
+}
+
 // The installed app's settings folder, its default budget folder, and any
-// budget folder it has been pointed at (Settings → Files).
+// budget folder it has been pointed at (Settings → Files). On Windows the
+// un-redirected ~/Documents/Actual is guarded too when Documents has moved.
 function protectedDirs() {
-  const found = [installedDataDir, path.join(home, 'Documents/Actual')];
+  const dataDir = installedDataDir();
+  const found = [dataDir, path.join(documentsDir(), 'Actual')];
+  if (process.platform === 'win32') {
+    found.push(path.join(home, 'Documents/Actual'));
+  }
   try {
     const store = JSON.parse(
-      readFileSync(path.join(installedDataDir, 'global-store.json'), 'utf8'),
+      readFileSync(path.join(dataDir, 'global-store.json'), 'utf8'),
     );
     if (typeof store['document-dir'] === 'string') {
       found.push(store['document-dir']);
@@ -40,7 +118,10 @@ function protectedDirs() {
   } catch {
     // No installed app settings; the defaults above still apply.
   }
-  return found.map(dir => (existsSync(dir) ? realpathSync(dir) : dir));
+  const resolved = found.map(dir =>
+    existsSync(dir) ? realpathSync(dir) : path.resolve(dir),
+  );
+  return [...new Set(resolved)];
 }
 
 function overlaps(a, b) {
@@ -155,24 +236,49 @@ const electronEnv = {
 // Playwright mode changes the user agent and requires its own setup.
 delete electronEnv.EXECUTION_CONTEXT;
 
+if (debugArgs.some(arg => arg.startsWith('--inspect'))) {
+  console.log(
+    'With --inspect, quitting can stop at "Debugger ending" until the ' +
+      'inspector client disconnects; disconnect it after app.quit().',
+  );
+}
+
 // --user-data-dir moves Chromium's own storage (localStorage, IndexedDB,
 // cookies, caches, crash dumps). Without it an unpackaged build named
-// "Actual" uses the installed app's ~/Library/Application Support/Actual.
+// "Actual" uses the installed app's userData folder
+// (~/Library/Application Support/Actual, %APPDATA%\Actual).
 const electron = spawn(
   electronBinary,
   [
+    ...debugArgs,
     path.join(root, 'packages/desktop-electron'),
     `--user-data-dir=${dirs.chromium}`,
   ],
   { cwd: root, env: electronEnv, stdio: 'inherit' },
 );
 
+// On Windows, kill() only ends the yarn process and leaves Vite holding port
+// 3001; taskkill /T ends the whole tree.
+function stop(child, signal) {
+  if (process.platform === 'win32' && child.exitCode === null) {
+    try {
+      execFileSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], {
+        stdio: 'ignore',
+      });
+      return;
+    } catch {
+      // Already gone, or taskkill unavailable; fall through.
+    }
+  }
+  child.kill(signal);
+}
+
 for (const signal of ['SIGINT', 'SIGTERM']) {
-  process.on(signal, () => electron.kill(signal));
+  process.on(signal, () => stop(electron, signal));
 }
 
 electron.on('exit', code => {
-  vite.kill('SIGTERM');
+  stop(vite, 'SIGTERM');
   const changed = guarded.flatMap(dir => changedSince(dir, startedAt));
   if (changed.length > 0) {
     console.error(
