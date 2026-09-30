@@ -1120,3 +1120,72 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   The launcher reported no change in the real Actual folders.
   `better-sqlite3` was rebuilt for Electron and restored from a backup
   afterwards; it loads under Node again.
+- APP-02: **in progress September 30, 2026** on branch
+  `redesign/app-02-register`; not merged. Screenshots in
+  [verification/app-02](verification/app-02/). **Owner decisions before
+  starting:** design-decisions §11 item 5 (the register) confirmed as drawn;
+  hairline dividers instead of stripes; the payee initial takes the row's
+  category accent; square-ish tags in the register only. **Change:**
+  `C/transactions/TransactionsTable.tsx` takes an opt-in `isRegister` (and
+  `isReconciling`) prop, shared with its rows through a context in the new
+  `C/transactions/registerAppearance.ts`; with it the table sits in one card,
+  rows, header and new-transaction rows are 36px through the shared table's
+  `rowHeight` prop (`ROW_HEIGHT` unchanged), headers are Eyebrow text, rows
+  have hairline dividers, selected rows the Selection Tint and 3px bar, the
+  row being edited the tint, the cleared icons are 15px with a muted lock,
+  schedule status pills are upright, and the cleared header turns purple
+  while reconciling. New `C/transactions/CategoryAccentDot.tsx` and
+  `C/transactions/PayeeInitialTile.tsx` (the letter is drawn with CSS so the
+  payee cell's text is unchanged). `useTagCSS` gains a `square` option,
+  passed through `NotesTagFormatter` and `DesktopTaggedNotes`.
+  `C/transactions/TransactionList.tsx` passes the props through and
+  `C/accounts/Account.tsx` sets them; the Calendar report keeps upstream's
+  look (APP-03). **Scope added (not in the card):** `hooks/useTagCSS.ts`,
+  `notes/NotesTagFormatter.tsx`, `notes/DesktopTaggedNotes.tsx`,
+  `C/accounts/Account.tsx`. No handler, binding, pref, route or string
+  changed. **Checks:** typecheck and lint pass; web unit tests 1052 passed,
+  1 skipped (transactions and notes 75 passed, 1 skipped); E2E on a dev
+  server (port 3031) accounts, transactions, bank-sync, budget, nav-02,
+  help-menu, detail-03: first run 41 passed, 3 failed (the payee initial's
+  letter was in the payee cell's text; fixed by drawing it with CSS); rerun
+  of accounts and transactions 22 passed, 1 failed: `transactions.test.ts`
+  "by payee" asserts 19 rendered rows after a filter and 36px rows render 18
+  at 1280×720 (13 visible plus 5 overscan). Impeccable detector: two
+  advisory radius findings, both in the untouched upstream Imported Payee
+  tooltip. Light 1000×700 (selected and editing, adding), dark 1000×700
+  reconciling, midnight 1440×900. **Observed once, not reproduced:** after a
+  theme switch, reconcile exit and a 1000→1440 resize in quick succession,
+  the header kept a stale 440px scrollbar padding (the shared table
+  re-measures 200ms after a render); repeated resizes on this branch and on
+  the September 29 `redesign/main` build stayed aligned. **Not checked:**
+  custom theme, keyboard-only pass, privacy mode, split transactions by
+  eye (unit and E2E cover splits), built preview, WIDE, Linux VRT, desktop
+  build.
+  **E2E fix (owner's choice, same day):** "by payee" now checks every
+  rendered row after the "does not contain" filter (at least 15) instead of
+  a fixed 19; `e2e/transactions.test.ts` is an upstream file, so expect a
+  possible conflict at SYNC-01. Accounts and transactions E2E 23/23.
+  **Follow-up checks (same day):** _Custom theme_ (QA-00 method and themes:
+  every v26.9.0 role hue-rotated 150°, no redesign roles, installed as
+  `installedCustomLightTheme`, bases dark and light), register with a split
+  transaction, a selected row and a cell being edited, at 1440×900 and
+  1000×700: every colour in the card is a theme role except the tag
+  backgrounds (the tags' own user colours, kept by design); muted header
+  text, the selection tint and the accents come from the fallback layer or
+  base (design-decisions §8); no console errors. _Keyboard:_ the same
+  scripted sequence (click a date, Tab ×4, Shift+Tab, Enter, Shift+Enter,
+  Escape, split toggle, Tab to the cleared cell) gives a focus path
+  identical to the September 29 `redesign/main` build; every step shows
+  the purple edit border and the row tint. _Privacy:_ every payment and
+  deposit cell is masked on the branch build, split children included.
+  _Splits by eye:_ the parent is italic with the split icon and a neutral
+  payee initial; children are plain with accent dots; the date and account
+  placeholders are transparent. _Built preview_ (`vite build --mode=browser`
+  into a scratch folder, port 3032): E2E for the seven files 44/44; WIDE
+  58 passed, 1 failed, 15 did not run, the recorded baseline (the known
+  Reports case, APP-03). _Desktop build:_ prepared and launched through
+  `scripts/redesign-electron.mjs` ("Isolation check: nothing changed"), but
+  the owner declined screen control, so the register was not exercised in
+  the desktop window. `better-sqlite3` was rebuilt for Electron and
+  restored from a backup; it loads under Node again. **Still not checked:**
+  Linux VRT (owner, on Windows); the register inside the desktop window.

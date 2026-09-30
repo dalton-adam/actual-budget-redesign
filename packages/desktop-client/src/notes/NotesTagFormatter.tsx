@@ -11,11 +11,14 @@ import { MobileTaggedNotes } from './MobileTaggedNotes';
 type NotesTagFormatterProps = {
   notes: string;
   onNotesTagClick?: (tag: string) => void;
+  /** Square-ish desktop tags, used by the account register (APP-02). */
+  squareTags?: boolean;
 };
 
 export function NotesTagFormatter({
   notes,
   onNotesTagClick,
+  squareTags,
 }: NotesTagFormatterProps) {
   const { isNarrowWidth } = useResponsive();
 
@@ -55,6 +58,7 @@ export function NotesTagFormatter({
                 content={segment.content}
                 tag={segment.tag}
                 separator={separator}
+                square={squareTags}
               />
             );
 

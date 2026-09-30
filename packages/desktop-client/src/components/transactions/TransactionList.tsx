@@ -94,6 +94,8 @@ type TransactionListProps = Pick<
   | 'isAdding'
   | 'isMatched'
   | 'isNew'
+  | 'isReconciling'
+  | 'isRegister'
   | 'loadMoreTransactions'
   | 'onBatchDelete'
   | 'onBatchDuplicate'
@@ -175,6 +177,8 @@ export function TransactionList({
   onCreateRule,
   onScheduleAction,
   onMakeAsNonSplitTransactions,
+  isRegister,
+  isReconciling,
 }: TransactionListProps) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -562,6 +566,8 @@ export function TransactionList({
         onMakeAsNonSplitTransactions={onMakeAsNonSplitTransactions}
         showSelection={showSelection}
         allowSplitTransaction={allowSplitTransaction}
+        isRegister={isRegister}
+        isReconciling={isReconciling}
       />
     </ErrorBoundary>
   );
