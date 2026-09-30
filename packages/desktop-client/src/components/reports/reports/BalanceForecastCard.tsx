@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { Block } from '@actual-app/components/block';
-import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import * as monthUtils from '@actual-app/core/shared/months';
@@ -20,6 +19,7 @@ import {
 } from 'recharts';
 
 import { PrivacyFilter } from '#components/PrivacyFilter';
+import { WIDGET_VALUE_STYLE } from '#components/reports/constants';
 import { Container } from '#components/reports/Container';
 import { DateRange } from '#components/reports/DateRange';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
@@ -160,7 +160,7 @@ export function BalanceForecastCard({
         onPointerEnter={onCardHover}
         onPointerLeave={onCardHoverEnd}
       >
-        <View style={{ flexDirection: 'row', padding: 20 }}>
+        <View style={{ flexDirection: 'row', padding: '16px 20px' }}>
           <View style={{ flex: 1 }}>
             <ReportCardName
               name={meta?.name || t('Balance Forecast')}
@@ -174,15 +174,13 @@ export function BalanceForecastCard({
               }}
               onClose={() => setNameMenuOpen(false)}
             />
-            <DateRange start={start} end={end} />
+            <DateRange isWidget start={start} end={end} />
           </View>
           {endingPoint && (
             <View style={{ textAlign: 'right' }}>
               <Block
                 style={{
-                  ...styles.mediumText,
-                  fontWeight: 500,
-                  marginBottom: 5,
+                  ...WIDGET_VALUE_STYLE,
                   color: hasNegativeEndingBalance
                     ? theme.errorText
                     : theme.pageText,

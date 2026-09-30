@@ -171,7 +171,7 @@ Actual is a tool people open every week for years to give each dollar a job, so 
 
 The look borrows Copilot Money's calm card language, applied on top of Actual's existing envelope engine and theme system. It stays restrained. Depth appears only where it was approved, and the category accent colors show identity, never status. The system must look equally correct in light, dark and midnight, and in any custom theme through derived fallbacks.
 
-The redesign is being rolled out page by page. The Budget page, top navigation, accounts pane, the account page header and the account register use this vocabulary now. Reports (including the Calendar report's transaction list), Schedules and settings still use the upstream vocabulary until their APP tasks land. New work always uses the redesign vocabulary, and existing variants stay untouched so unmigrated screens look the same.
+The redesign is being rolled out page by page. The Budget page, top navigation, accounts pane, the account page header, the account register and the Reports dashboard use this vocabulary now. The report pages, the custom report editor and the Calendar report's transaction list (APP-03b, APP-03c), Schedules and settings still use the upstream vocabulary until their APP tasks land. New work always uses the redesign vocabulary, and existing variants stay untouched so unmigrated screens look the same.
 
 **Key Characteristics:**
 
@@ -332,6 +332,10 @@ One continuous table with Eyebrow column headers (Category | Assigned | Activity
 ### Account Register
 
 The account page's transaction table (APP-02), in one Surface card under the toolbar with the page's 20px side margins. Eyebrow column headers on the card, Card Hairline dividers and no stripes. Each row: a 22px payee initial circle tinted with the row's category accent (neutral for income, split, transfer, off-budget and uncategorized rows; the letter is drawn with CSS so the cell's text stays the payee name); tags keep their user colours with 4px corners; an 8px accent dot before the category name; cleared as a positive check, uncleared as a faint ring and reconciled as a faint lock, at 15px. Selected rows take Selection Tint and the 3px Actual Purple bar; the row being edited takes the tint. Schedule previews stay italic, with their upstream status colours in a small upright 6px-corner pill. While reconciling, the cleared column header turns Actual Purple. Columns are the user's; none are hidden at small widths. The look is opt-in (`isRegister`) so the Calendar report keeps upstream's until APP-03.
+
+### Reports Dashboard
+
+The Reports dashboard (APP-03a). The header is a "Reports" line in Secondary text over the dashboard name at Display size, with its rename pencil on hover or keyboard focus; the dashboard selector, Edit dashboard and ⋯ are Control buttons and Add new widget stays primary. Widgets sit on the user's saved grid with a 14px gap. Each widget is a Surface card **without** Card elevation (owner decision): hairline border, 18px radius, the border turning Page Text Faint on hover, and the focus ring on keyboard focus. Headers are 16px 20px: the title at 13.5px/600 on one line, the date range at 12px in Secondary text, and a headline value at 18px/700 where the widget has one. Change amounts are small status pills with their sign; the tone follows the colour the amount had before (for spending, an increase is negative). Summary widgets show their amount bottom-left at Display size, shrinking only to fit. Chart colours are the existing `reports*` roles, unchanged. Edit mode keeps colours: a dashed Page Text Faint border and an always-visible ⋯ Control button, with header room reserved for it.
 
 ### Account Hero
 

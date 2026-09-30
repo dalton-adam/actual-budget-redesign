@@ -174,7 +174,7 @@ export function CalendarCard({
         ref={el => (el ? cardRef(el) : undefined)}
         style={{ flex: 1, margin: 2, overflow: 'hidden', width: '100%' }}
       >
-        <View style={{ flexDirection: 'row', padding: 20, paddingBottom: 0 }}>
+        <View style={{ flexDirection: 'row', padding: '16px 20px 0' }}>
           <View style={{ flex: 1, marginBottom: -5 }}>
             <ReportCardName
               name={meta?.name || t('Calendar')}
@@ -256,7 +256,7 @@ export function CalendarCard({
                   </View>
                 }
               >
-                <DateRange start={start} end={end} />
+                <DateRange isWidget start={start} end={end} />
               </Tooltip>
             </Block>
           </View>

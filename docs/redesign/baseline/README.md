@@ -89,6 +89,9 @@ stopped after the first failure in that block, not because they failed. Their be
   APP-03, then rerun all Reports cases at both widths and record the results.
   Do not remove actual widgets to satisfy the old expectation or count the
   default-viewport single-test rerun as coverage of the skipped cases.
+  **Resolved in APP-03a (September 30, 2026):** the test now scrolls every
+  widget into view and expects all 11; all 34 Reports cases pass at both
+  widths with none skipped (task-reports.md).
 
 ## Not covered here
 

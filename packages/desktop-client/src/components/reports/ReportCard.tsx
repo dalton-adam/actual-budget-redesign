@@ -5,8 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@actual-app/components/button';
 import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { SvgDotsHorizontalTriple } from '@actual-app/components/icons/v1';
+import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
+import { css } from '@emotion/css';
 
 import { useContextMenu } from '#hooks/useContextMenu';
 import { useIsInViewport } from '#hooks/useIsInViewport';
@@ -69,21 +71,31 @@ export function ReportCard({
     <View
       ref={ref}
       style={{
-        backgroundColor: theme.tableBackground,
-        borderBottomLeftRadius: 2,
-        borderBottomRightRadius: 2,
+        // A hairline Surface card with no shadow (APP-03, owner decision
+        // September 30, 2026; docs/redesign/prototype/README.md).
+        backgroundColor: theme.cardBackground,
+        border: `1px ${isEditing ? 'dashed' : 'solid'} ${
+          isEditing ? theme.pageTextFaint : theme.cardHairline
+        }`,
+        borderRadius: 18,
+        overflow: 'hidden',
+        color: theme.pageText,
         width: '100%',
         height: '100%',
-        boxShadow: '0 2px 6px rgba(0, 0, 0, .15)',
-        transition: 'box-shadow .25s',
+        '@media (prefers-reduced-motion: no-preference)': {
+          transition: 'border-color .15s',
+        },
         ...(isEditing
           ? {
+              // Room for the always-visible widget menu in edit mode, so it
+              // never covers the header's value or change pill. Each card's
+              // header is the first child of its root view.
+              '& > div > div:first-child': { paddingRight: 48 },
               '& .recharts-surface:hover': {
                 cursor: 'move',
                 ':active': { cursor: 'grabbing' },
               },
               ':active': { cursor: 'grabbing' },
-              filter: 'grayscale(1)',
             }
           : {
               '& .recharts-surface:hover': {
@@ -91,8 +103,8 @@ export function ReportCard({
               },
             }),
         ':hover': {
-          ...(to ? { boxShadow: '0 4px 6px rgba(0, 0, 0, .15)' } : null),
-          ...(isEditing ? { cursor: 'move', filter: 'grayscale(0)' } : null),
+          ...(to ? { borderColor: theme.pageTextFaint } : null),
+          ...(isEditing ? { cursor: 'move' } : null),
         },
         ...(to ? null : containerProps),
         ...style,
@@ -111,6 +123,12 @@ export function ReportCard({
         <Button
           variant="bare"
           onPress={() => navigate(to, { state: { goBack: true } })}
+          className={css({
+            // Keyboard focus: the redesign focus ring plus the stronger card
+            // border that hover shows.
+            '&[data-focus-visible]': styles.focusRing,
+            '&[data-focus-visible] > div': { borderColor: theme.pageTextFaint },
+          })}
           style={{
             height: '100%',
             width: '100%',
@@ -118,6 +136,7 @@ export function ReportCard({
             padding: 0,
             textAlign: 'left',
             overflow: 'visible',
+            borderRadius: 18,
           }}
         >
           {content}
@@ -210,18 +229,19 @@ function Layout({
     >
       {isEditing && (
         <View
-          className={['hover-visible', NON_DRAGGABLE_AREA_CLASS_NAME].join(' ')}
+          className={NON_DRAGGABLE_AREA_CLASS_NAME}
           style={{
             position: 'absolute',
-            top: 7,
-            right: 3,
+            top: 10,
+            right: 10,
             zIndex: 1,
           }}
         >
           <Button
             ref={triggerRef}
-            variant="bare"
+            variant="control"
             aria-label={t('Menu')}
+            style={{ width: 28, height: 28, minWidth: 28, minHeight: 28 }}
             onPress={() => {
               if (viewRef.current) {
                 const rect = triggerRef.current?.getBoundingClientRect();
@@ -237,11 +257,7 @@ function Layout({
               }
             }}
           >
-            <SvgDotsHorizontalTriple
-              width={15}
-              height={15}
-              style={{ transform: 'rotateZ(90deg)' }}
-            />
+            <SvgDotsHorizontalTriple width={13} height={13} />
           </Button>
         </View>
       )}

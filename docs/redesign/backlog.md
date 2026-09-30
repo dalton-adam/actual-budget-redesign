@@ -46,7 +46,8 @@ Budget header are reference material, not tasks to build.
 | SYNC-01            | blocked     | —                        | No upstream release after v26.9.0 (checked September 29, 2026). Start when v26.10.0 ships; before RELEASE-01 (D-1).        |
 | APP-01             | verified    | `875ddad48`              | Linux VRT regenerated (69) on Windows. Custom theme, keyboard, privacy and desktop passed.                                 |
 | APP-02             | verified    | `f8fcc70d8`              | Linux VRT regenerated (66) and desktop window checked on Windows. E2E test "by payee" changed (SYNC-01 conflict risk).     |
-| APP-03 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
+| APP-03a – c        | in progress | —                        | Split in three (a, b, c). Drawing approved Sep 30 (prototype README, shots 51–58). APP-03a in review.                      |
+| APP-04 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                          |
 
 States follow plan §16: not started, ready, in progress, review, verified,

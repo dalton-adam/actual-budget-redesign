@@ -25,6 +25,11 @@ type SummaryNumberProps = {
   loading?: boolean;
   initialFontSize?: number;
   fontSizeChanged?: (fontSize: number) => void;
+  /**
+   * Dashboard widget (APP-03): cap the size at Display (28px), shrinking
+   * only to fit, and sit bottom-left instead of filling the card.
+   */
+  maxFontSize?: number;
 };
 
 export function SummaryNumber({
@@ -35,6 +40,7 @@ export function SummaryNumber({
   loading = true,
   initialFontSize = 14,
   fontSizeChanged,
+  maxFontSize,
 }: SummaryNumberProps) {
   const { t } = useTranslation();
   const [fontSize, setFontSize] = useState<number>(initialFontSize);
@@ -60,6 +66,7 @@ export function SummaryNumber({
     const calculatedFontSize = Math.min(
       (width * FONT_SIZE_SCALE_FACTOR) / displayAmount.toString().length,
       height, // Ensure the text fits vertically by using the height as the limiting factor
+      maxFontSize ?? Infinity,
     );
 
     if (calculatedFontSize > 0) {
@@ -91,7 +98,7 @@ export function SummaryNumber({
                   : t('Positive amount: {{amount}}', { amount: displayAmount })
           }
           style={{
-            alignItems: 'center',
+            alignItems: maxFontSize ? 'flex-start' : 'center',
             flexGrow: 1,
             flexShrink: 1,
             width: '100%',
@@ -100,7 +107,8 @@ export function SummaryNumber({
             fontSize,
             lineHeight: 1,
             margin: `${CONTAINER_MARGIN}px 0`,
-            justifyContent: 'center',
+            justifyContent: maxFontSize ? 'flex-end' : 'center',
+            ...(maxFontSize && { fontWeight: 700, letterSpacing: -0.4 }),
             transition: animate ? 'font-size 0.3s ease' : '',
             color: !isNumericValue
               ? theme.reportsNumberNeutral

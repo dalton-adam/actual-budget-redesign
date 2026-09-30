@@ -137,7 +137,7 @@ function CustomReportListCardsInner({
       to={`/reports/custom/${report.id}`}
       onRename={() => setNameMenuOpen(true)}
     >
-      <View style={{ flex: 1, padding: 10 }}>
+      <View style={{ flex: 1, padding: '16px 20px' }}>
         <View
           style={{
             flexShrink: 0,
@@ -152,7 +152,11 @@ function CustomReportListCardsInner({
               onClose={() => setNameMenuOpen(false)}
             />
             {report.isDateStatic ? (
-              <DateRange start={report.startDate} end={report.endDate} />
+              <DateRange
+                isWidget
+                start={report.startDate}
+                end={report.endDate}
+              />
             ) : (
               <Text style={{ color: theme.pageTextSubdued }}>
                 {t(report.dateRange)}

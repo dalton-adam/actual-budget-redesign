@@ -525,6 +525,31 @@ This Month", Budgeted and Balance, with unchanged translation keys:
 - Bank-sync error for the account: warning chip in the hero with the
   existing actions (from the accounts review).
 
+## 10a. Reports (APP-03)
+
+Drawn September 30, 2026 in the prototype (Page → Reports, shots `51`–`58`)
+and **approved as drawn the same day**, with these owner answers:
+
+- Split into APP-03a (dashboard, widget cards, the E2E viewport fix),
+  APP-03b (report page header and controls) and APP-03c (custom report
+  editor and the Calendar report's transaction list).
+- Widget cards: hairline border, **no shadow**. Card elevation stays on its
+  approved list only.
+- Chart and amount colours stay on the existing `reports*` and number roles.
+- Summary widget amounts at Display size (28px), shrinking only to fit, in
+  place of filling the card. The saved font size and the Summary report page
+  are unchanged.
+- Edit mode keeps colours (no greyscale): dashed border, visible ⋯ menu.
+- Change amounts become status pills with their sign kept.
+
+**As implemented (APP-03a):** the ⋯ widget menu shows in edit mode only, as
+upstream does (the hovered card in `51` is drawn wrongly); the dashboard
+selector shows the dashboard's name only, without the drawn "Dashboard:"
+prefix (no new string); the grip before each title is left out (no suitable
+icon; the dashed border, menu and resize handle mark edit mode); Finish
+editing dashboard stays a Control button so Add new widget remains the one
+primary.
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the

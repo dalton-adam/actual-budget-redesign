@@ -179,7 +179,7 @@ export function SankeyCard({
       onRename={() => setNameMenuOpen(true)}
     >
       <View style={{ flex: 1 }}>
-        <View style={{ flexDirection: 'row', padding: 20 }}>
+        <View style={{ flexDirection: 'row', padding: '16px 20px' }}>
           <View style={{ flex: 1 }}>
             <ReportCardName
               name={meta?.name || t('Sankey')}

@@ -153,3 +153,61 @@ Interactions work in the browser: click a name to open details (right-click for 
 10. **Wording used in this prototype** for DESIGN-03's old → new list: To Budget → Ready to Assign, Overbudgeted → Overassigned, Budgeted → Assigned, Spent → Activity, Balance → Available (budget only; the register's Balance stays), plus the unchanged menu item texts from the source.
 
 Next: DESIGN-03 writes `docs/redesign/design-decisions.md` from these decisions.
+
+## APP-03: Reports proposal (September 30, 2026)
+
+**Status: approved as drawn September 30, 2026**, with the owner's answers to
+the three questions: summary amounts at Display size (they shrink only to
+fit), edit mode keeps colours, and change amounts become pills.
+Choose **Page → Reports** in the bar at the bottom, then **View** (Dashboard or
+the Net Worth report page) and **Edit** (dashboard edit mode). URL parameters:
+`page=reports`, `rview=dash|networth`, `redit=0|1`, `whover=<widget id>`.
+
+Owner decisions before drawing (September 30, 2026):
+
+1. Draw first, then build (as for APP-01 and APP-02).
+2. Widget cards get a **hairline border and no shadow** (the Approved-Depth-Only
+   rule stands; Card elevation is not extended to Reports).
+3. **Chart and amount colours stay as they are**: Actual's existing `reports*`
+   and number roles. Only cards, controls, spacing and text change.
+4. **Split in three**: APP-03a dashboard, widget cards and the E2E viewport fix;
+   APP-03b the report page header and controls; APP-03c the custom report
+   sidebar and the Calendar report's transaction list.
+
+What the drawing proposes (each item is presentation only):
+
+| Surface            | Today                                                                         | Proposed                                                                                                                                                                                  |
+| ------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dashboard title    | "Reports: Main", 25px/500, pencil on hover                                    | "Reports" eyebrow over the dashboard name at Display (28px/700); the same rename pencil on hover or focus                                                                                 |
+| Dashboard controls | Dashboard selector, divider, Add new widget (primary), Edit dashboard, ⋯ menu | Same controls and order of importance as Control buttons: "Dashboard: Main ▾", Edit dashboard, Add new widget (primary), ⋯; Finish editing dashboard becomes the primary                  |
+| Widget card        | `tableBackground`, 2px bottom radius, drop shadow that deepens on hover       | Surface card fill, hairline border, 18px radius, 16px 20px padding, **no shadow**; hover and keyboard focus strengthen the border; 14px grid gap                                          |
+| Widget header      | Title 15px, subline subdued                                                   | Title 13.5px/600, subline 12px in Secondary text; the widget's ⋯ menu (edit mode only, as today; the hovered card in `51` is drawn wrongly) has reserved space so it never covers a value |
+| Summary widgets    | Amount auto-sized to fill the card (up to ~60px)                              | Amount at Display (28px/700) in tabular figures, bottom-left, same colour meaning as today. **Question for the owner:** this drops the fill-the-card sizing.                              |
+| Change amounts     | Coloured text ("+19,511.15")                                                  | Status pills with the sign kept (positive or negative tone), so colour is never the only signal                                                                                           |
+| Charts             | Recharts, existing colours                                                    | Unchanged series colours; charts run to the card's edges; axis text Faint 11px; dashed hairline grid                                                                                      |
+| Edit mode          | Cards turn greyscale; move cursor                                             | Cards keep their colours; dashed border, a grip before each title, the ⋯ menu always visible and a resize corner                                                                          |
+| Report page header | Title, then a row of upstream buttons (Live/Static, date range, Filter, …)    | "Reports · Main" eyebrow, title at Display; Live/Static as a segmented tab control; date range, Filter, Monthly and Trend as Control buttons; Save widget stays primary (APP-03b)         |
+| Report page body   | Chart on the page background; explanation text below                          | The chart in a Surface card with the total and change pill; the explanation in its own card (APP-03b)                                                                                     |
+
+Unchanged by design: which widgets exist and where (the user's saved layout),
+widget sizes and drag/resize, every menu item, report calculations, filters,
+privacy mode (amounts use the privacy font; charts stay visible, as today), and
+mobile (deferred, plan §19.4). Not drawn: the custom report editor and the
+Calendar report's transaction list (APP-03c), the widget menu contents, the
+Add new widget menu, and the other eight report pages, which would follow the
+Net Worth page's header and card pattern.
+
+| File                                  | Shows                                                  |
+| ------------------------------------- | ------------------------------------------------------ |
+| `shots/51-reports-dark-wide.png`      | Dashboard, dark, 1440×900, Net Worth widget hovered    |
+| `shots/52-reports-light-wide.png`     | Dashboard, light, 1440×900                             |
+| `shots/53-reports-midnight-1000.png`  | Dashboard, midnight, 1000×700, accounts pane collapsed |
+| `shots/54-reports-light-1000-editing` | Edit mode, light, 1000×700                             |
+| `shots/55-networth-dark-wide.png`     | Net Worth report page, dark, 1440×900                  |
+| `shots/56-networth-light-1000.png`    | Net Worth report page, light, 1000×700                 |
+| `shots/57-reports-custom-wide.png`    | Custom theme through the fallback layer                |
+| `shots/58-reports-privacy-dark-wide`  | Privacy mode                                           |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-03`
+(`PW_CHANNEL=msedge` uses the installed Edge when Playwright's Chromium is not
+installed).

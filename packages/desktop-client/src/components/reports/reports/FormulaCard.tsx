@@ -100,7 +100,7 @@ export function FormulaCard({
     >
       <View style={{ flex: 1, overflow: 'hidden' }}>
         {showTitle && (
-          <View style={{ flexGrow: 0, flexShrink: 0, padding: 20 }}>
+          <View style={{ flexGrow: 0, flexShrink: 0, padding: '16px 20px' }}>
             <ReportCardName
               name={meta?.name || t('Formula')}
               isEditing={nameMenuOpen}
