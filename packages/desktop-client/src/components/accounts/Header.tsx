@@ -715,7 +715,7 @@ function AccountNameField({
               opacity: 0,
               transition: 'opacity .25s',
             },
-            '&:hover .hover-visible': {
+            '&:hover .hover-visible, &:focus-within .hover-visible': {
               opacity: 1,
             },
           }}

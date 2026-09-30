@@ -86,27 +86,29 @@ export function ReconcilingMessage({
               </span>
               <PrivacyFilter>{difference}</PrivacyFilter>
             </StatusPill>
-            <Text
-              style={{
-                flex: 1,
-                minWidth: 240,
-                color: theme.pageTextSecondary,
-                // The sentence keeps its translated line break for other
-                // layouts; the band has room for one line.
-                '& br': { display: 'none' },
-              }}
-            >
-              <Trans>
-                Your cleared balance{' '}
-                <strong>{{ clearedBalance } as TransObjectLiteral}</strong>{' '}
-                needs <strong>{{ difference } as TransObjectLiteral}</strong> to
-                match
-                <br /> your bank&apos;s balance of{' '}
-                <Text style={{ fontWeight: 700 }}>
-                  {{ bankBalance } as TransObjectLiteral}
-                </Text>
-              </Trans>
-            </Text>
+            <PrivacyFilter style={{ flex: 1, minWidth: 240 }}>
+              <Text
+                style={{
+                  flex: 1,
+                  minWidth: 240,
+                  color: theme.pageTextSecondary,
+                  // The sentence keeps its translated line break for other
+                  // layouts; the band has room for one line.
+                  '& br': { display: 'none' },
+                }}
+              >
+                <Trans>
+                  Your cleared balance{' '}
+                  <strong>{{ clearedBalance } as TransObjectLiteral}</strong>{' '}
+                  needs <strong>{{ difference } as TransObjectLiteral}</strong>{' '}
+                  to match
+                  <br /> your bank&apos;s balance of{' '}
+                  <Text style={{ fontWeight: 700 }}>
+                    {{ bankBalance } as TransObjectLiteral}
+                  </Text>
+                </Trans>
+              </Text>
+            </PrivacyFilter>
           </>
         )}
       </View>
