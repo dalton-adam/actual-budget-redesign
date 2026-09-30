@@ -45,7 +45,8 @@ Budget header are reference material, not tasks to build.
 | TOPBAR-FIX         | verified    | `107560a51`              | Icon-only Help when narrow is still "Shown" (design-decisions §11 item 6). Linux VRT not regenerated.                      |
 | SYNC-01            | blocked     | —                        | No upstream release after v26.9.0 (checked September 29, 2026). Start when v26.10.0 ships; before RELEASE-01 (D-1).        |
 | APP-01             | verified    | `875ddad48`              | Linux VRT not regenerated (owner runs it on Windows). Custom theme, keyboard, privacy and desktop passed.                  |
-| APP-02 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
+| APP-02             | in progress | —                        | Branch `redesign/app-02-register`. E2E 1 failure: "by payee" needs 19 rendered rows (36px rows render 18). Owner choice.   |
+| APP-03 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                          |
 
 States follow plan §16: not started, ready, in progress, review, verified,

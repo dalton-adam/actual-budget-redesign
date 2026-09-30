@@ -1901,6 +1901,8 @@ class AccountInternal extends PureComponent<
 
               <View style={{ flex: 1 }}>
                 <TransactionList
+                  isRegister
+                  isReconciling={reconcileAmount != null}
                   headerContent={undefined}
                   // @ts-expect-error - fix me
                   tableRef={this.table}

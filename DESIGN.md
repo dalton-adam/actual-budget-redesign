@@ -171,7 +171,7 @@ Actual is a tool people open every week for years to give each dollar a job, so 
 
 The look borrows Copilot Money's calm card language, applied on top of Actual's existing envelope engine and theme system. It stays restrained. Depth appears only where it was approved, and the category accent colors show identity, never status. The system must look equally correct in light, dark and midnight, and in any custom theme through derived fallbacks.
 
-The redesign is being rolled out page by page. The Budget page, top navigation, accounts pane and the account page header use this vocabulary now. The account register, Reports, Schedules and settings still use the upstream vocabulary until their APP tasks land. New work always uses the redesign vocabulary, and existing variants stay untouched so unmigrated screens look the same.
+The redesign is being rolled out page by page. The Budget page, top navigation, accounts pane, the account page header and the account register use this vocabulary now. Reports (including the Calendar report's transaction list), Schedules and settings still use the upstream vocabulary until their APP tasks land. New work always uses the redesign vocabulary, and existing variants stay untouched so unmigrated screens look the same.
 
 **Key Characteristics:**
 
@@ -252,6 +252,7 @@ The desktop shell has a pill-tab top bar, a collapsible accounts pane on the lef
 
 - **Breakpoints (redesign):** at 1280px and wider the accounts pane defaults open and the table uses full column widths. From 900 to 1279px the pane defaults collapsed to a 56px rail and the panel narrows to 320px. Below 900px navigation moves into a drawer, the details panel becomes an overlay with a scrim, and the Activity column hides. Actual's own mobile screens take over below its mobile breakpoint.
 - **Budget table density:** category rows are 44px, group rows 40px, and the sticky header is Eyebrow text. Column widths follow design-decisions §4.1 per breakpoint and panel state.
+- **Register density:** account register rows are 36px, passed through the shared table's `rowHeight` prop; the shared 32px default is unchanged for every other table.
 - **Details panel:** 360px (320px at 900–1279px). It pushes the table rather than covering it at desktop widths. Its header carries its own month stepper; its one link, "View in Accounts", uses Page Text Link.
 - **Compact strip:** on windows shorter than 900px, a 46px one-line summary replaces the cards once the table scrolls past 40px.
 - **Spacing rhythm:** 4 and 8px inside controls, 14px between cards, 16–20px card padding.
@@ -328,6 +329,10 @@ Calm and tactile: redesign variants are opt-in, so existing variants and screens
 
 One continuous table with Eyebrow column headers (Category | Assigned | Activity | Available). Group rows are tinted with Group Row and collapsible. Each category row holds the tile and name (the name is a button that opens the details panel), the editable Assigned amount, and the Activity amount with a percentage and progress bar. The Activity amount sits on the same line as Assigned and Available; the bar hangs 3px below it. It ends with an Available status pill. Row tools (notes, menu, drag handle) take no width and appear only on hover or keyboard focus. The Assigned cell's month notes and budget menu sit just left of the Assigned column, in a 48px gutter the Category cell keeps free, so the amount always has the whole column.
 
+### Account Register
+
+The account page's transaction table (APP-02), in one Surface card under the toolbar with the page's 20px side margins. Eyebrow column headers on the card, Card Hairline dividers and no stripes. Each row: a 22px payee initial circle tinted with the row's category accent (neutral for income, split, transfer, off-budget and uncategorized rows; the letter is drawn with CSS so the cell's text stays the payee name); tags keep their user colours with 4px corners; an 8px accent dot before the category name; cleared as a positive check, uncleared as a faint ring and reconciled as a faint lock, at 15px. Selected rows take Selection Tint and the 3px Actual Purple bar; the row being edited takes the tint. Schedule previews stay italic, with their upstream status colours in a small upright 6px-corner pill. While reconciling, the cleared column header turns Actual Purple. Columns are the user's; none are hidden at small widths. The look is opt-in (`isRegister`) so the Calendar report keeps upstream's until APP-03.
+
 ### Account Hero
 
 The account page's header (APP-01), a Surface card. From 1280px wide and 900px tall: an On budget / Off budget line in Secondary text, the account name at 28px/700 with its notes and rename buttons, Bank Sync and Reconcile as Control buttons at the top right, the balance as the Hero Amount, then a chip row. Smaller windows get one band: name and chips on the left, icon-only Bank Sync and Reconcile (accessible names kept) and the balance at Display size on the right. Chips are neutral pills for Cleared, Uncleared (after pressing the balance), Selected and Filtered totals; a lock chip for reconciliation status (positive once reconciled); and the bank-sync error as a negative pill that opens its existing popover. While reconciling, the card takes a 1px Actual Purple outline and holds a Card Inset band: a Difference pill (negative) or "All reconciled!" (positive), the existing sentence, and the existing buttons. The optional balance chart is a second Surface card beside the hero, or a short full-width card under the band when compact. Multi-account views show the name, balance and chips only.
@@ -363,5 +368,4 @@ The page's hero card, with three states. Positive shows positive text and a hero
 These are not rules yet. Until they are decided, follow the current behavior and do not record them as rules in this file.
 
 - **Goal caption (D-3):** the caption under the category name for goal and template categories is left out. The target icon in the Available pill stays.
-- **Account register treatment** (design-decisions §10, APP-02).
 - **Mobile** is deferred. Mobile screens keep the upstream look apart from the TERM-01 wording.

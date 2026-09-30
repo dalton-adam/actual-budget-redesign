@@ -147,6 +147,14 @@ import {
   isFutureTransaction,
 } from '#util/schedule-actions';
 
+import { CategoryAccentDot } from './CategoryAccentDot';
+import { PayeeInitialTile } from './PayeeInitialTile';
+import {
+  getRegisterAccentIndex,
+  REGISTER_ROW_HEIGHT,
+  RegisterAppearanceProvider,
+  useIsRegister,
+} from './registerAppearance';
 import {
   isTransactionTableColumnAvailableInChildRows,
   isTransactionTableColumnDisplayOnly,
@@ -229,6 +237,7 @@ type TransactionHeaderProps = {
   ascDesc: 'asc' | 'desc';
   field: string;
   amountColumnWidths: AmountColumnWidths;
+  isReconciling?: boolean;
 };
 
 const TransactionHeader = memo(
@@ -241,8 +250,10 @@ const TransactionHeader = memo(
     field,
     showSelection,
     amountColumnWidths,
+    isReconciling,
   }: TransactionHeaderProps) => {
     const dispatchSelected = useSelectedDispatch();
+    const isRegister = useIsRegister();
     const { t } = useTranslation();
     const columnLabels = useTransactionTableColumnLabels();
 
@@ -336,6 +347,7 @@ const TransactionHeader = memo(
 
     return (
       <Row
+        height={isRegister ? REGISTER_ROW_HEIGHT : undefined}
         style={{
           fontWeight: 300,
           zIndex: 200,
@@ -345,6 +357,14 @@ const TransactionHeader = memo(
           borderTopWidth: 1,
           borderBottomWidth: 1,
           borderColor: theme.tableBorder,
+          // Eyebrow headers on the card, as the budget table's
+          // (design-decisions §10).
+          ...(isRegister && {
+            color: theme.pageTextFaint,
+            backgroundColor: theme.cardBackground,
+            borderTopWidth: 0,
+            borderColor: theme.cardHairline,
+          }),
         }}
         data-testid="transaction-table-header"
       >
@@ -382,6 +402,10 @@ const TransactionHeader = memo(
               key={columnId}
               id={columnId}
               {...cellProps}
+              isEyebrow={isRegister}
+              // The cleared column is accented while reconciling
+              // (design-decisions §10).
+              isAccented={isReconciling && columnId === 'cleared'}
               icon={
                 sortDirection
                   ? field === columnId
@@ -409,6 +433,7 @@ const TransactionHeader = memo(
 TransactionHeader.displayName = 'TransactionHeader';
 
 function ClearedColumnLegend() {
+  const isRegister = useIsRegister();
   const legendItems = [
     {
       Icon: SvgCheckCircleHollow,
@@ -422,7 +447,7 @@ function ClearedColumnLegend() {
     },
     {
       Icon: SvgLockClosed,
-      color: theme.noticeTextLight,
+      color: isRegister ? theme.pageTextSubdued : theme.noticeTextLight,
       label: <Trans>Reconciled: locked after reconciliation</Trans>,
     },
     {
@@ -486,15 +511,20 @@ function StatusCell({
   onEdit,
   onUpdate,
 }: StatusCellProps) {
+  const isRegister = useIsRegister();
   const isClearedField =
     status === 'cleared' || status === 'reconciled' || status == null;
   const statusProps = getStatusProps(status);
 
+  // The register draws cleared as a check, uncleared as a ring and
+  // reconciled as a muted lock (design-decisions §10).
   const statusColor =
     status === 'cleared'
       ? theme.noticeTextLight
       : status === 'reconciled'
-        ? theme.noticeTextLight
+        ? isRegister
+          ? theme.pageTextSubdued
+          : theme.noticeTextLight
         : status === 'missed'
           ? theme.errorText
           : status === 'due'
@@ -543,8 +573,8 @@ function StatusCell({
       >
         {createElement(statusProps.Icon, {
           style: {
-            width: 13,
-            height: 13,
+            width: isRegister ? 15 : 13,
+            height: isRegister ? 15 : 13,
             color: statusColor,
             marginTop: status === 'due' ? -1 : 0,
           },
@@ -560,6 +590,8 @@ type HeaderCellProps = {
   icon?: 'asc' | 'desc' | 'clickable';
   tooltip?: ReactNode;
   onClick?: () => void;
+  isEyebrow?: boolean;
+  isAccented?: boolean;
 } & Pick<CSSProperties, 'width' | 'alignItems' | 'marginLeft' | 'marginRight'>;
 
 function HeaderCell({
@@ -572,6 +604,8 @@ function HeaderCell({
   icon,
   tooltip,
   onClick,
+  isEyebrow,
+  isAccented,
 }: HeaderCellProps) {
   const style = {
     whiteSpace: 'nowrap' as CSSProperties['whiteSpace'],
@@ -581,6 +615,17 @@ function HeaderCell({
     fontWeight: 300,
     marginLeft,
     marginRight,
+    ...(isEyebrow && {
+      color: theme.pageTextFaint,
+      fontSize: 11,
+      fontWeight: 650,
+      textTransform: 'uppercase' as CSSProperties['textTransform'],
+      letterSpacing: '0.07em',
+    }),
+    ...(isAccented && {
+      color: theme.selectionBorder,
+      fontWeight: 700,
+    }),
   };
 
   return (
@@ -639,6 +684,8 @@ type PayeeCellProps = {
   onManagePayees: (id: PayeeEntity['id'] | undefined) => void;
   onNavigateToTransferAccount: (id: AccountEntity['id']) => void;
   onNavigateToSchedule: (id: ScheduleEntity['id']) => void;
+  /** The register's payee initial tint; undefined is neutral. */
+  accentIndex?: number;
 };
 
 function PayeeCell({
@@ -658,9 +705,11 @@ function PayeeCell({
   onManagePayees,
   onNavigateToTransferAccount,
   onNavigateToSchedule,
+  accentIndex,
 }: PayeeCellProps) {
   const isCreatingPayee = useRef(false);
   const { t } = useTranslation();
+  const isRegister = useIsRegister();
 
   const dispatch = useDispatch();
 
@@ -715,6 +764,9 @@ function PayeeCell({
             color: theme.pageTextSubdued,
           }}
         >
+          {isRegister && (
+            <PayeeInitialTile name={displayPayee} accentIndex={undefined} />
+          )}
           <PayeeIcons
             transaction={transaction}
             transferAccount={transferAccount}
@@ -811,6 +863,9 @@ function PayeeCell({
 
         return (
           <>
+            {isRegister && (
+              <PayeeInitialTile name={displayPayee} accentIndex={accentIndex} />
+            )}
             <PayeeIcons
               transaction={transaction}
               transferAccount={transferAccount}
@@ -1101,6 +1156,7 @@ const Transaction = memo(function Transaction({
   amountColumnWidths,
 }: TransactionProps) {
   const { t } = useTranslation();
+  const isRegister = useIsRegister();
 
   const dispatch = useDispatch();
   const dispatchSelected = useSelectedDispatch();
@@ -1367,6 +1423,13 @@ const Transaction = memo(function Transaction({
   const isBudgetTransfer = transferAcct && transferAcct.offbudget === 0;
   const isOffBudget = account && account.offbudget === 1;
 
+  // Register accent for the payee initial and category dot: neutral for
+  // split parents, transfers and off-budget rows (design-decisions §10).
+  const accentIndex =
+    isRegister && !isParent && !transferAcct && !isOffBudget && categoryId
+      ? getRegisterAccentIndex(getCategoriesById(categoryGroups)[categoryId])
+      : undefined;
+
   const valueStyle = added
     ? { fontWeight: 600, color: theme.tableTextItemAdded }
     : null;
@@ -1600,7 +1663,9 @@ const Transaction = memo(function Transaction({
             width={110}
             style={{
               width: 110,
-              backgroundColor: theme.tableRowBackgroundHover,
+              backgroundColor: isRegister
+                ? 'transparent'
+                : theme.tableRowBackgroundHover,
               border: 0, // known z-order issue, bottom border for parent transaction hidden
             }}
           />
@@ -1660,7 +1725,9 @@ const Transaction = memo(function Transaction({
             /* Account blank placeholder for Child transaction */
             style={{
               flex: 1,
-              backgroundColor: theme.tableRowBackgroundHover,
+              backgroundColor: isRegister
+                ? 'transparent'
+                : theme.tableRowBackgroundHover,
               border: 0,
             }}
           />
@@ -1735,12 +1802,14 @@ const Transaction = memo(function Transaction({
             onManagePayees={onManagePayees}
             onNavigateToTransferAccount={onNavigateToTransferAccount}
             onNavigateToSchedule={onNavigateToSchedule}
+            accentIndex={accentIndex}
           />
         );
       case 'notes':
         return (
           <NotesCell
             key={columnId}
+            squareTags={isRegister}
             note={notes ?? ''}
             scheduleNote={isPreview ? schedule?.name : null}
             focused={focusedField === 'notes'}
@@ -1813,6 +1882,16 @@ const Transaction = memo(function Transaction({
                   textOverflow: 'ellipsis',
                   display: 'inline-block',
                   whiteSpace: 'nowrap',
+                  // Schedule status as a small upright pill in the
+                  // register, still distinct from budget pills by its
+                  // corners and upstream colours (accounts review item 10).
+                  ...(isRegister && {
+                    padding: '2px 8px',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    fontStyle: 'normal',
+                  }),
                 }}
               >
                 {titleFirst(getStatusLabel(previewStatus ?? ''))}
@@ -1914,6 +1993,16 @@ const Transaction = memo(function Transaction({
             }
             exposed={focusedField === 'category'}
             onExpose={name => !isPreview && onEdit(id, name)}
+            unexposedContent={
+              accentIndex !== undefined
+                ? props => (
+                    <>
+                      <CategoryAccentDot accentIndex={accentIndex} />
+                      <UnexposedCellContent {...props} />
+                    </>
+                  )
+                : undefined
+            }
             valueStyle={
               !categoryId
                 ? {
@@ -2095,6 +2184,7 @@ const Transaction = memo(function Transaction({
       <Row
         ref={rowRef}
         {...dragProps}
+        height={isRegister ? REGISTER_ROW_HEIGHT : undefined}
         style={{
           backgroundColor: selected
             ? theme.tableRowBackgroundHighlight
@@ -2115,6 +2205,26 @@ const Transaction = memo(function Transaction({
           ...(highlighted || selected
             ? { color: theme.tableRowBackgroundHighlightText }
             : { color: theme.tableText }),
+          // The register (design-decisions §10): hairline dividers instead
+          // of stripes; selected rows take the Selection Tint and the 3px
+          // purple bar, and the row being edited takes the tint, as the
+          // budget table's do (DESIGN.md, Shapes and Inputs).
+          ...(isRegister && {
+            backgroundColor:
+              selected || editing
+                ? theme.selectionBackground
+                : backgroundFocus
+                  ? theme.tableRowHover
+                  : theme.cardBackground,
+            ':hover': !(backgroundFocus || selected || editing) && {
+              backgroundColor: theme.tableRowHover,
+            },
+            color: theme.tableText,
+            ...(selected && {
+              boxShadow: `inset 3px 0 0 ${theme.selectionBorder}`,
+            }),
+            '& > div': { borderColor: theme.cardHairline },
+          }),
           ...style,
           ...(isPreview && {
             color: theme.tableTextInactive,
@@ -2226,6 +2336,7 @@ type NotesCellProps = {
   onUpdate: (value: string) => void;
   onClickTag: (tag: string) => void;
   onExpose: (name: string) => void;
+  squareTags?: boolean;
 };
 
 function NotesCell({
@@ -2236,6 +2347,7 @@ function NotesCell({
   onUpdate,
   onClickTag,
   onExpose,
+  squareTags,
 }: NotesCellProps) {
   const [inputValue, setInputValue] = useState(note);
   useEffect(() => {
@@ -2278,7 +2390,11 @@ function NotesCell({
       value={displayedNote}
       valueStyle={valueStyle}
       formatter={value =>
-        NotesTagFormatter({ notes: value, onNotesTagClick: onClickTag })
+        NotesTagFormatter({
+          notes: value,
+          onNotesTagClick: onClickTag,
+          squareTags,
+        })
       }
       focused={focused}
       exposed={focused}
@@ -2294,6 +2410,7 @@ function NotesCell({
                 <NotesTagFormatter
                   notes={displayedNote}
                   onNotesTagClick={onClickTag}
+                  squareTags={squareTags}
                 />
               </Text>
             </View>
@@ -2458,6 +2575,7 @@ function NewTransaction({
     t => t.parent_id === transactions[0].id,
   );
 
+  const isRegister = useIsRegister();
   const addButtonRef = useRef(null);
   useProperFocus(addButtonRef, focusedField === 'add');
   const scheduleButtonRef = useRef(null);
@@ -2479,6 +2597,10 @@ function NewTransaction({
         borderBottom: '1px solid ' + theme.tableBorderHover,
         paddingBottom: 6,
         backgroundColor: theme.tableBackground,
+        ...(isRegister && {
+          borderBottomColor: theme.cardHairline,
+          backgroundColor: theme.cardBackground,
+        }),
       }}
       data-testid="new-transaction"
       onKeyDown={e => {
@@ -2649,6 +2771,8 @@ type TransactionTableInnerProps = {
 
   onSort: (field: string, ascDesc: 'asc' | 'desc') => void;
   showHiddenCategories?: boolean;
+  isRegister?: boolean;
+  isReconciling?: boolean;
   // Drag and drop props
   canDrag?: boolean;
   draggedId?: TransactionEntity['id'] | null;
@@ -2884,103 +3008,120 @@ function TransactionTableInner({
   };
 
   return (
-    <View
-      innerRef={containerRef}
-      style={{
-        flex: 1,
-        cursor: 'default',
-        ...props.style,
-      }}
-    >
-      <View>
-        <TransactionHeader
-          hasSelected={props.selectedItems.size > 0}
-          columns={props.columns}
-          scrollWidth={scrollWidth}
-          onSort={props.onSort}
-          ascDesc={props.ascDesc}
-          field={props.sortField}
-          showSelection={props.showSelection}
-          amountColumnWidths={amountColumnWidths}
-        />
+    <RegisterAppearanceProvider value={!!props.isRegister}>
+      <View
+        innerRef={containerRef}
+        style={{
+          flex: 1,
+          cursor: 'default',
+          ...props.style,
+          // The register in one card (design-decisions §10), aligned with
+          // the hero and toolbar above it.
+          ...(props.isRegister && {
+            margin: '0 20px 20px',
+            backgroundColor: theme.cardBackground,
+            border: '1px solid ' + theme.cardHairline,
+            borderRadius: 18,
+            boxShadow: theme.cardElevation,
+            overflow: 'hidden',
+          }),
+        }}
+      >
+        <View>
+          <TransactionHeader
+            isReconciling={props.isReconciling}
+            hasSelected={props.selectedItems.size > 0}
+            columns={props.columns}
+            scrollWidth={scrollWidth}
+            onSort={props.onSort}
+            ascDesc={props.ascDesc}
+            field={props.sortField}
+            showSelection={props.showSelection}
+            amountColumnWidths={amountColumnWidths}
+          />
 
-        {props.isAdding && (
-          <View
-            {...newNavigator.getNavigatorProps({
-              onKeyDown: (e: KeyboardEvent) => props.onCheckNewEnter(e),
-            })}
-          >
-            <NewTransaction
-              transactions={props.newTransactions}
-              amountColumnWidths={amountColumnWidths}
-              transferAccountsByTransaction={
-                props.transferAccountsByTransaction
-              }
-              editingTransaction={newNavigator.editingId}
-              focusedField={newNavigator.focusedField}
-              accounts={props.accounts}
-              categoryGroups={props.categoryGroups}
-              payees={props.payees || []}
-              columns={props.columns}
-              dateFormat={dateFormat}
-              hideFraction={props.hideFraction}
-              onClose={props.onCloseAddTransaction}
-              onSchedule={props.onScheduleTemporary}
-              onAdd={props.onAddTemporary}
-              onAddAndClose={props.onAddAndCloseTemporary}
-              onAddSplit={props.onAddSplit}
-              onToggleSplit={props.onToggleSplit}
-              onSplit={props.onSplit}
-              onEdit={newNavigator.onEdit}
-              onSave={props.onSave}
-              onDelete={props.onDelete}
-              onManagePayees={props.onManagePayees}
-              onCreatePayee={props.onCreatePayee}
-              onNavigateToTransferAccount={onNavigateToTransferAccount}
-              onNavigateToSchedule={onNavigateToSchedule}
-              onNotesTagClick={onNotesTagClick}
-              onDistributeRemainder={props.onDistributeRemainder}
-              showHiddenCategories={showHiddenCategories}
-            />
-          </View>
-        )}
-      </View>
-      {/*// * On Windows, makes the scrollbar always appear
+          {props.isAdding && (
+            <View
+              {...newNavigator.getNavigatorProps({
+                onKeyDown: (e: KeyboardEvent) => props.onCheckNewEnter(e),
+              })}
+            >
+              <NewTransaction
+                transactions={props.newTransactions}
+                amountColumnWidths={amountColumnWidths}
+                transferAccountsByTransaction={
+                  props.transferAccountsByTransaction
+                }
+                editingTransaction={newNavigator.editingId}
+                focusedField={newNavigator.focusedField}
+                accounts={props.accounts}
+                categoryGroups={props.categoryGroups}
+                payees={props.payees || []}
+                columns={props.columns}
+                dateFormat={dateFormat}
+                hideFraction={props.hideFraction}
+                onClose={props.onCloseAddTransaction}
+                onSchedule={props.onScheduleTemporary}
+                onAdd={props.onAddTemporary}
+                onAddAndClose={props.onAddAndCloseTemporary}
+                onAddSplit={props.onAddSplit}
+                onToggleSplit={props.onToggleSplit}
+                onSplit={props.onSplit}
+                onEdit={newNavigator.onEdit}
+                onSave={props.onSave}
+                onDelete={props.onDelete}
+                onManagePayees={props.onManagePayees}
+                onCreatePayee={props.onCreatePayee}
+                onNavigateToTransferAccount={onNavigateToTransferAccount}
+                onNavigateToSchedule={onNavigateToSchedule}
+                onNotesTagClick={onNotesTagClick}
+                onDistributeRemainder={props.onDistributeRemainder}
+                showHiddenCategories={showHiddenCategories}
+              />
+            </View>
+          )}
+        </View>
+        {/*// * On Windows, makes the scrollbar always appear
          //   the full height of the container ??? */}
 
-      <View
-        style={{ flex: 1, overflow: 'hidden' }}
-        data-testid="transaction-table"
-      >
-        <Table
-          navigator={tableNavigator}
-          ref={tableRef}
-          listContainerRef={listContainerRef}
-          items={transactionsToRender}
-          renderItem={renderRow}
-          renderEmpty={renderEmpty}
-          loadMore={props.loadMoreTransactions}
-          isSelected={id => props.selectedItems.has(id)}
-          onKeyDown={e => props.onCheckEnter(e)}
-          saveScrollWidth={saveScrollWidth}
-        />
-
-        {props.isAdding && (
-          <div
-            key="shadow"
-            style={{
-              position: 'absolute',
-              top: -20,
-              left: 0,
-              right: 0,
-              height: 20,
-              backgroundColor: theme.errorText,
-              boxShadow: '0 0 6px rgba(0, 0, 0, .20)',
-            }}
+        <View
+          style={{ flex: 1, overflow: 'hidden' }}
+          data-testid="transaction-table"
+        >
+          <Table
+            navigator={tableNavigator}
+            ref={tableRef}
+            listContainerRef={listContainerRef}
+            items={transactionsToRender}
+            renderItem={renderRow}
+            renderEmpty={renderEmpty}
+            loadMore={props.loadMoreTransactions}
+            isSelected={id => props.selectedItems.has(id)}
+            onKeyDown={e => props.onCheckEnter(e)}
+            saveScrollWidth={saveScrollWidth}
+            rowHeight={props.isRegister ? REGISTER_ROW_HEIGHT : undefined}
+            backgroundColor={
+              props.isRegister ? theme.cardBackground : undefined
+            }
           />
-        )}
+
+          {props.isAdding && (
+            <div
+              key="shadow"
+              style={{
+                position: 'absolute',
+                top: -20,
+                left: 0,
+                right: 0,
+                height: 20,
+                backgroundColor: theme.errorText,
+                boxShadow: '0 0 6px rgba(0, 0, 0, .20)',
+              }}
+            />
+          )}
+        </View>
       </View>
-    </View>
+    </RegisterAppearanceProvider>
   );
 }
 
@@ -3053,6 +3194,13 @@ export type TransactionTableProps = {
   showSelection: boolean;
   allowSplitTransaction?: boolean;
   onManagePayees: (id?: PayeeEntity['id']) => void;
+  /**
+   * The account register's look (design-decisions §10, APP-02): 36px rows
+   * in one card. Other users of this table keep upstream's.
+   */
+  isRegister?: boolean;
+  /** Accents the cleared column header while reconciling. */
+  isReconciling?: boolean;
 };
 
 export const TransactionTable = forwardRef(

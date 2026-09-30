@@ -15,7 +15,12 @@ export function useTagCSS(opts?: { ellipsis?: boolean }) {
   return useCallback(
     (
       tag: string,
-      options: { color?: string | null; compact?: boolean } = {},
+      options: {
+        color?: string | null;
+        compact?: boolean;
+        /** Square-ish corners for the account register (APP-02). */
+        square?: boolean;
+      } = {},
     ) => {
       const tagObj = tags.find(t => t.tag === tag);
       const [color, backgroundColor, backgroundColorHovered] = getTagCSSColors(
@@ -36,7 +41,7 @@ export function useTagCSS(opts?: { ellipsis?: boolean }) {
           : { display: 'inline-flex' }),
         opacity: tagObj?.hidden ? 0.5 : undefined,
         padding: options.compact ? '0px 7px' : '3px 7px',
-        borderRadius: 16,
+        borderRadius: options.square ? 4 : 16,
         userSelect: 'none',
         backgroundColor,
         color,

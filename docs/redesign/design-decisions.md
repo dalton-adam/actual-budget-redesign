@@ -503,7 +503,18 @@ This Month", Budgeted and Balance, with unchanged translation keys:
 - Register: 36px rows **passed through the existing `rowHeight` prop for the
   register only**; category accent dot; payee initial; cleared as check /
   ring / lock; tags keep user colors and a square-ish shape. User-configured
-  columns are never auto-hidden.
+  columns are never auto-hidden. **Approved as drawn September 30, 2026**
+  (§11 item 5), with three owner answers: hairline dividers replace the
+  alternating row shading; the payee initial takes the row's category
+  accent (neutral for income, split, transfer and uncategorized rows); the
+  square-ish tag shape applies in the register only (the Tags page,
+  autocompletes and mobile keep round tags).
+  **As implemented (APP-02):** the register sits in one card; the look is
+  opt-in from the account page, so the Calendar report's transaction list
+  (the only other user of the table) keeps upstream's until APP-03;
+  selected rows use the budget table's Selection Tint and 3px bar, and the
+  row being edited takes the tint; the reconciled lock is muted rather
+  than green, as drawn; schedule status pills keep upstream colours.
 - **Reconciliation mode, approved as drawn** (`44`–`46`): the existing
   reconcile popover (statement balance, last bank balance, Use last synced
   total, Reconcile); then a band in the hero with a "Difference" chip, the
@@ -530,8 +541,8 @@ Confirm or change these before the named task starts; until then the
 4. ~~Accounts pane default open at ≥1280px, collapsed below (NAV-02).~~
    **Confirmed by the owner September 27, 2026**; now Approved in §2.
 5. ~~Account hero and register treatment in §10 (APP-01, APP-02).~~
-   **Hero confirmed by the owner September 29, 2026** (APP-01); the register
-   treatment is still "Shown" until APP-02.
+   **Hero confirmed by the owner September 29, 2026** (APP-01); **register
+   confirmed September 30, 2026** (APP-02); both now Approved in §10.
 6. Narrow title bar behaviour in §2, including Help shown as an icon only
    (TOPBAR-FIX).
 
@@ -546,3 +557,4 @@ Confirm or change these before the named task starts; until then the
 | Sep 28, 2026 | DETAIL-02: third stat tile "From previous month" confirmed (§5, §11 item 1); the panel lists posted transactions only                                    | Owner confirmation in the DETAIL-02 session                                                                                      |
 | Sep 29, 2026 | DETAIL-04: pace chart for past and future months as §7.2 (§11 item 2); goal box contents (§5 item 4)                                                     | Owner confirmation in the DETAIL-04 session                                                                                      |
 | Sep 29, 2026 | APP-01: account hero as drawn (§10, §11 item 5); balance toggle kept; bank-sync error moves into the hero                                                | Owner answers in the APP-01 session                                                                                              |
+| Sep 30, 2026 | APP-02: register as drawn (§10, §11 item 5); dividers instead of stripes; payee initial in the category accent; square tags in the register only         | Owner answers in the APP-02 session                                                                                              |

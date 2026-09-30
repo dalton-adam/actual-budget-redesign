@@ -1120,3 +1120,44 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   The launcher reported no change in the real Actual folders.
   `better-sqlite3` was rebuilt for Electron and restored from a backup
   afterwards; it loads under Node again.
+- APP-02: **in progress September 30, 2026** on branch
+  `redesign/app-02-register`; not merged. Screenshots in
+  [verification/app-02](verification/app-02/). **Owner decisions before
+  starting:** design-decisions §11 item 5 (the register) confirmed as drawn;
+  hairline dividers instead of stripes; the payee initial takes the row's
+  category accent; square-ish tags in the register only. **Change:**
+  `C/transactions/TransactionsTable.tsx` takes an opt-in `isRegister` (and
+  `isReconciling`) prop, shared with its rows through a context in the new
+  `C/transactions/registerAppearance.ts`; with it the table sits in one card,
+  rows, header and new-transaction rows are 36px through the shared table's
+  `rowHeight` prop (`ROW_HEIGHT` unchanged), headers are Eyebrow text, rows
+  have hairline dividers, selected rows the Selection Tint and 3px bar, the
+  row being edited the tint, the cleared icons are 15px with a muted lock,
+  schedule status pills are upright, and the cleared header turns purple
+  while reconciling. New `C/transactions/CategoryAccentDot.tsx` and
+  `C/transactions/PayeeInitialTile.tsx` (the letter is drawn with CSS so the
+  payee cell's text is unchanged). `useTagCSS` gains a `square` option,
+  passed through `NotesTagFormatter` and `DesktopTaggedNotes`.
+  `C/transactions/TransactionList.tsx` passes the props through and
+  `C/accounts/Account.tsx` sets them; the Calendar report keeps upstream's
+  look (APP-03). **Scope added (not in the card):** `hooks/useTagCSS.ts`,
+  `notes/NotesTagFormatter.tsx`, `notes/DesktopTaggedNotes.tsx`,
+  `C/accounts/Account.tsx`. No handler, binding, pref, route or string
+  changed. **Checks:** typecheck and lint pass; web unit tests 1052 passed,
+  1 skipped (transactions and notes 75 passed, 1 skipped); E2E on a dev
+  server (port 3031) accounts, transactions, bank-sync, budget, nav-02,
+  help-menu, detail-03: first run 41 passed, 3 failed (the payee initial's
+  letter was in the payee cell's text; fixed by drawing it with CSS); rerun
+  of accounts and transactions 22 passed, 1 failed: `transactions.test.ts`
+  "by payee" asserts 19 rendered rows after a filter and 36px rows render 18
+  at 1280×720 (13 visible plus 5 overscan). Impeccable detector: two
+  advisory radius findings, both in the untouched upstream Imported Payee
+  tooltip. Light 1000×700 (selected and editing, adding), dark 1000×700
+  reconciling, midnight 1440×900. **Observed once, not reproduced:** after a
+  theme switch, reconcile exit and a 1000→1440 resize in quick succession,
+  the header kept a stale 440px scrollbar padding (the shared table
+  re-measures 200ms after a render); repeated resizes on this branch and on
+  the September 29 `redesign/main` build stayed aligned. **Not checked:**
+  custom theme, keyboard-only pass, privacy mode, split transactions by
+  eye (unit and E2E cover splits), built preview, WIDE, Linux VRT, desktop
+  build.
