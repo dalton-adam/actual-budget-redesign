@@ -577,3 +577,43 @@ OneDrive redirection included) and added `--remote-debugging-port` /
 `--inspect` pass-through. A run with both switches on this machine ended
 with "Isolation check: nothing changed" for all three Windows folders.
 The register checks above were not repeated through the launcher.
+
+## APP-03a follow-up checks (September 30, 2026)
+
+Against `redesign/app-03-reports` at `f1a6b0cd8` (APP-03a merged) plus the
+reduced-motion fix below, on Windows 11. Screenshots in
+[verification/app-03a](verification/app-03a/).
+
+| Check               | Result                                                                                                                                                                                                                                                                                                                                                               |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Custom theme        | QA-00 method: every v26.9.0 `--color-*` role (225 from light, 222 from dark) hue-rotated 150°, no redesign roles, installed as `installedCustomLightTheme` with base light or dark. Dashboard at 1440×900 and 1000×700, normal and edit mode, one widget hovered: every text, background and border colour in the page equals a theme role (**0 misses in 4 runs**). |
+| Reduced motion      | Hovering six widgets and the header buttons, entering and leaving edit mode, hovering a widget in edit mode, the rename pencil by keyboard. `no-preference`: 78 transitions and animations. `reduce`: **0**, after gating the summary amount's font-size transition in edit mode (upstream code in `SummaryNumber.tsx`; it ignored the setting).                     |
+| Built preview       | `build:browser`, `scripts/redesign.mjs preview` (port 3018), installed Edge: reports, budget and accounts E2E at 1000×700 and 1440×900, **74/74**, none skipped.                                                                                                                                                                                                     |
+| Linux VRT           | The APP-02 setup (Docker Playwright v1.61.1, HTTPS dev server on 3021 over the LAN address, checkout at `/mnt/host/c/...`). Full run: 158 passed, 2 failed, 15 did not run (the serial Reports block after its first failure). Update scoped to `reports` and `command-bar`: **12 snapshots changed**; rerun without updating 19/19.                                 |
+| Impeccable detector | Installed with `npx impeccable install` (its rewrite of three committed hook files was reverted). Over every changed Reports file: two advisory font-size findings (10px), both on `CalendarCard.tsx` calendar-cell lines APP-03a did not change.                                                                                                                    |
+| Desktop build       | `scripts/redesign-electron.mjs` with `--remote-debugging-port` and `--inspect`, Electron build of `better-sqlite3` (Node build backed up and restored; it loads under Node again). See below.                                                                                                                                                                        |
+
+**VRT review.** `Reports › loads net worth and cash flow reports` (light,
+dark, midnight): the restyled dashboard. `Command bar › search works
+correctly` (three): the same dashboard behind the open command bar.
+`loads net worth graph` and `loads cash flow graph` (three each): the report
+pages are unchanged except the chart tooltip's position; the test opens the
+page by clicking its dashboard card, which now sits a few pixels elsewhere,
+so the pointer rests over a different point of the chart.
+
+**Desktop.** The welcome screen listed no budget; **Don't use a server**,
+**Try the demo**. The window first loaded from a leftover browser-mode Vite
+server of mine on port 3001 (the "Version" component failed without
+Electron's globals); after stopping it and reloading, from the launcher's
+own server on 127.0.0.1:3001:
+
+- Light 1000×700: 18px hairline cards, no shadow (measured); edit mode with
+  dashed borders and the menu clear of every value.
+- Dark 1440×900: Tab from Add new widget reaches the first widget with the
+  focus ring; Enter opens its summary report.
+- Midnight 1440×900 with privacy on: every amount and pill masked.
+- Console: only the Transaction Calendar's nested-button warning (upstream
+  structure, noted in the task report).
+- Quit with `app.quit()` over the inspector: "Isolation check: nothing
+  changed" for `%APPDATA%\Actual`, `OneDrive\Documents\Actual` and
+  `Documents\Actual`.

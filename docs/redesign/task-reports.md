@@ -1249,7 +1249,11 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   Enter opens the report. Privacy: every widget amount and pill is masked.
   Console: one warning, a button inside a button in the Transaction
   Calendar widget (its day buttons inside the card's button; the same
-  structure on `redesign/main`). **Not checked:** custom theme, reduced
-  motion, a `build:browser` preview, Linux VRT (the Reports dashboard
-  snapshot will differ), the desktop build, the Impeccable detector (not
-  installed in this checkout).
+  structure on `redesign/main`). **Follow-up checks (same day):** custom
+  theme 0 misses in 4 runs; reduced motion 0 transitions with `reduce`
+  after gating the summary amount's font-size transition
+  (`SummaryNumber.tsx`); built preview 74/74; Linux VRT 12 snapshots
+  regenerated (reports and command bar), rerun 19/19; Impeccable detector
+  two advisories on untouched calendar lines; desktop build checked, with
+  "Isolation check: nothing changed" (verification.md). Every APP-03a
+  check is now done.
