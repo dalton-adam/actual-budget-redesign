@@ -1202,3 +1202,54 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   at 1440. No console error from the register. Nothing written outside
   `data/redesign-electron/` (verification.md). Screenshots `desktop-*.jpg`.
   Every APP-02 check is now done.
+- APP-03a: **in review September 30, 2026** on branch
+  `redesign/app-03-reports`; not merged. Screenshots in
+  [verification/app-03a](verification/app-03a/). **Owner decisions before
+  starting:** the Reports drawing (prototype shots `51`–`58`) approved as
+  drawn, split into APP-03a/b/c, hairline cards with no shadow, chart
+  colours unchanged, summary amounts at Display size, edit mode keeps
+  colours, change amounts as pills (design-decisions §10a). **Change:**
+  `ReportCard.tsx` is a hairline Surface card without elevation (hover and
+  keyboard focus turn the border Page Text Faint; the focus ring on the
+  card's button); edit mode drops the greyscale for a dashed border, an
+  always-visible ⋯ Control button and header room reserved for it;
+  `ReportCardName.tsx` titles are 13.5px/600 on one line; `DateRange.tsx`
+  gains an `isWidget` subline (12px Secondary); new `ChangePill.tsx` shows
+  change amounts as small status pills with the sign kept (Net Worth, Cash
+  Flow and the spending cards; an increase in spending is negative, as its
+  colour was); `SummaryNumber.tsx` gains `maxFontSize`, used only by
+  `SummaryCard.tsx` (28px, bottom-left; the saved font size and the Summary
+  report page are unchanged); headline values in five cards share
+  `WIDGET_VALUE_STYLE` (`constants.ts`); card headers are 16px 20px in every
+  widget; `DashboardHeader.tsx` is a "Reports" line over the name at
+  Display size; `Overview.tsx` makes the selector, Edit dashboard and ⋯
+  Control buttons, drops the divider, puts Edit dashboard before Add new
+  widget, and sets a 14px grid gap; `DashboardSelector.tsx` is a Control
+  button. No handler, query, saved layout, pref, route or string changed.
+  **E2E fix (in scope):** `e2e/reports.test.ts` "loads net worth and cash
+  flow reports" now scrolls every widget into view and expects all 11
+  default widgets, so it passes at any window size; "right clicking a
+  report card" anchors its name (`/^Net Worth/`), because at 1440 wide
+  "Recent Net Worth Change" matched too (one of the 15 cases that never ran
+  at 1440 in the baseline). **Deviations from the drawing:** the ⋯ menu
+  stays edit-mode only (as upstream); the selector shows the name without
+  "Dashboard:"; no title grip; Finish editing stays a Control button.
+  **Checks:** typecheck passes; `oxlint --type-aware` reports two errors,
+  both in `budget/{envelope,tracking}/*BudgetComponents.tsx` (untouched,
+  same on `redesign/main`); the format check passes for every changed file
+  (the repo-wide check lists 472 files with CRLF line endings in this
+  Windows checkout, unrelated); web unit tests 1052 passed, 1 skipped
+  (reports 271/271). E2E against the dev server (port 3001) with the
+  installed Edge (Playwright's Chromium is not installed here), at
+  1000×700 and 1440×900: reports 34/34 with **zero skipped** (the recorded
+  baseline was 58 passed, 1 failed, 15 skipped across WIDE); budget and
+  accounts 40/40, so WIDE is 74/74. Screenshots: dark 1440, light 1440,
+  midnight 1000, light 1000 editing, keyboard focus, privacy. Keyboard: Tab
+  reaches the header controls then each widget with a visible 2px ring;
+  Enter opens the report. Privacy: every widget amount and pill is masked.
+  Console: one warning, a button inside a button in the Transaction
+  Calendar widget (its day buttons inside the card's button; the same
+  structure on `redesign/main`). **Not checked:** custom theme, reduced
+  motion, a `build:browser` preview, Linux VRT (the Reports dashboard
+  snapshot will differ), the desktop build, the Impeccable detector (not
+  installed in this checkout).
