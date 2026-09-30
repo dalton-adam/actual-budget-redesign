@@ -1191,4 +1191,7 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   the owner declined screen control, so the register was not exercised in
   the desktop window. `better-sqlite3` was rebuilt for Electron and
   restored from a backup; it loads under Node again. **Still not checked:**
-  Linux VRT (owner, on Windows); the register inside the desktop window.
+  the register inside the desktop window.
+  _Linux VRT (September 30, 2026):_ 66 snapshots regenerated in the
+  accounts, rules, schedules and transactions tests, each showing the
+  restyled register; nothing else changed (verification.md).

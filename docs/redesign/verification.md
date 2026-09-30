@@ -502,3 +502,32 @@ dependencies (`Cannot find module 'date-fns'`). Mounting the checkout at
    unblurred in dark; the previous snapshot shows the same, so it predates
    APP-01.
 5. **Rerun without updating:** the same four files: 33 passed.
+
+## Linux VRT for APP-02 (September 30, 2026)
+
+Against `redesign/main` at `60e349ce4` (APP-02 merged) plus the unpushed
+APP-01 snapshot commit, on Windows 11 with the same setup as the
+[APP-01 run](#linux-vrt-for-topbar-fix-and-app-01-september-30-2026): Docker
+Desktop 29.8.1, Playwright v1.61.1 image, HTTPS Vite development server on
+port 3021 over the LAN address, checkout mounted at
+`/mnt/host/c/dev/actual-budget-redesign`, one worker, no retries.
+
+1. **Full run, no updates:** 157 passed, 18 failed (175 tests, 26 minutes).
+   Every failure was a screenshot mismatch, all in the four files that show
+   an account register: `accounts` (5), `rules` (2), `schedules` (2),
+   `transactions` (9, including the edited "by payee" test, whose row check
+   passed). Budget, reports and notes tests, which use the tag style that
+   `useTagCSS` shares, all passed.
+2. **Update, scoped to the four files** (`--update-snapshots=changed`): 33
+   passed; **66 snapshots changed** (the 18 tests in light, dark and
+   midnight; four tests take two screenshots). No new file, nothing outside
+   those tests.
+3. **Review:** each change is APP-02's register: one card, Eyebrow headers,
+   36px rows with hairline dividers, payee initial tiles, category accent
+   dots and square tags. Checked by eye: page visuals in light, dark and
+   midnight; the split transaction (italic parent, plain children with
+   accent dots); the empty date-filter result; the closed account in dark;
+   the schedules register with its hover state. Tag colours are unchanged
+   (background and text pixels match the previous snapshot); only the
+   corners and size differ.
+4. **Rerun without updating:** the same four files: 33 passed.
