@@ -1087,7 +1087,29 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   detail-03 44/44 (dev server on port 3029); Impeccable detector: no
   findings; light, dark and midnight at 1440×900 and 1000×700 for a single
   account, extra balances, reconciling, balance chart and All accounts.
-  **Not checked:** custom theme, Linux VRT (the accounts and transactions
-  screenshot tests will differ), a `build:browser` preview, the desktop
-  build, privacy mode, bank-sync error chip with a real failed account (no
-  server), keyboard-only pass.
+  **Follow-up checks (same day):** _Custom theme_ (QA-00 method: every
+  v26.9.0 role, 226, hue-rotated 150°, no redesign roles, installed as
+  `installedCustomLightTheme` with base light or dark): the hero, chart card
+  and toolbar with extra balances, a selection, the chart and reconciling
+  on, at 1440×900 and 1000×700 — every text, background and border colour
+  equals a theme role (0 misses in 4 runs). _Keyboard:_ every header control
+  is reachable by Tab; Enter toggles the balance chips, opens Reconcile with
+  its input focused (Escape returns focus to Reconcile), starts and exits
+  reconciling and opens the account menu. **Fixed:** the notes and rename
+  buttons took focus while invisible (upstream shows them on hover only);
+  they now also show on focus. _Privacy:_ the balance, chips, Difference pill
+  and chart value are masked. **Fixed:** the reconciliation sentence
+  (upstream never masked it) is now masked too; its translation key is
+  unchanged. _Bank-sync error:_ with the demo account marked failed in the
+  page's query cache only (no saved data changed), the hero shows the
+  negative chip, the title bar shows none, and Enter opens the existing
+  popover with Unlink and Reauthorize (light 1440, dark 1000). _Built
+  preview:_ a `vite build --mode=browser` into a scratch folder, served on
+  port 3030: E2E for the same seven files 44/44; WIDE 58 passed, 1 failed,
+  15 skipped, the recorded baseline (the known Reports case, APP-03).
+  Typecheck, lint and accounts unit tests pass after the fixes.
+  **Not checked:** Linux VRT (the accounts and transactions screenshot tests
+  will differ); the desktop build — it launched through
+  `scripts/redesign-electron.mjs` and reopened the sandboxed demo, but its
+  window was on another macOS Space and could not be driven in the
+  background.
