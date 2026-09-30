@@ -1202,8 +1202,8 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   at 1440. No console error from the register. Nothing written outside
   `data/redesign-electron/` (verification.md). Screenshots `desktop-*.jpg`.
   Every APP-02 check is now done.
-- APP-03a: **in review September 30, 2026** on branch
-  `redesign/app-03-reports`; not merged. Screenshots in
+- APP-03a: **done September 30, 2026**, merged into `redesign/main` with
+  owner approval (`d63b275d0`, branch `redesign/app-03-reports`). Screenshots in
   [verification/app-03a](verification/app-03a/). **Owner decisions before
   starting:** the Reports drawing (prototype shots `51`–`58`) approved as
   drawn, split into APP-03a/b/c, hairline cards with no shadow, chart
