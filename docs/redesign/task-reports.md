@@ -1165,3 +1165,27 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   rendered row after the "does not contain" filter (at least 15) instead of
   a fixed 19; `e2e/transactions.test.ts` is an upstream file, so expect a
   possible conflict at SYNC-01. Accounts and transactions E2E 23/23.
+  **Follow-up checks (same day):** _Custom theme_ (QA-00 method and themes:
+  every v26.9.0 role hue-rotated 150°, no redesign roles, installed as
+  `installedCustomLightTheme`, bases dark and light), register with a split
+  transaction, a selected row and a cell being edited, at 1440×900 and
+  1000×700: every colour in the card is a theme role except the tag
+  backgrounds (the tags' own user colours, kept by design); muted header
+  text, the selection tint and the accents come from the fallback layer or
+  base (design-decisions §8); no console errors. _Keyboard:_ the same
+  scripted sequence (click a date, Tab ×4, Shift+Tab, Enter, Shift+Enter,
+  Escape, split toggle, Tab to the cleared cell) gives a focus path
+  identical to the September 29 `redesign/main` build; every step shows
+  the purple edit border and the row tint. _Privacy:_ every payment and
+  deposit cell is masked on the branch build, split children included.
+  _Splits by eye:_ the parent is italic with the split icon and a neutral
+  payee initial; children are plain with accent dots; the date and account
+  placeholders are transparent. _Built preview_ (`vite build --mode=browser`
+  into a scratch folder, port 3032): E2E for the seven files 44/44; WIDE
+  58 passed, 1 failed, 15 did not run, the recorded baseline (the known
+  Reports case, APP-03). _Desktop build:_ prepared and launched through
+  `scripts/redesign-electron.mjs` ("Isolation check: nothing changed"), but
+  the owner declined screen control, so the register was not exercised in
+  the desktop window. `better-sqlite3` was rebuilt for Electron and
+  restored from a backup; it loads under Node again. **Still not checked:**
+  Linux VRT (owner, on Windows); the register inside the desktop window.
