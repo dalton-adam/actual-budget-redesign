@@ -44,7 +44,7 @@ Budget header are reference material, not tasks to build.
 | DETAIL-04          | verified    | `9059b8491`              | E2E and WIDE ran against a dev server, not a `build:browser` preview. Linux VRT regenerated (21).                          |
 | TOPBAR-FIX         | verified    | `107560a51`              | Icon-only Help when narrow is still "Shown" (design-decisions §11 item 6). Linux VRT not regenerated.                      |
 | SYNC-01            | blocked     | —                        | No upstream release after v26.9.0 (checked September 29, 2026). Start when v26.10.0 ships; before RELEASE-01 (D-1).        |
-| APP-01             | review      | branch only              | Custom theme, keyboard, privacy, sync chip, built preview and desktop build pass. Linux VRT still open.                    |
+| APP-01             | verified    | `875ddad48`              | Linux VRT not regenerated (owner runs it on Windows). Custom theme, keyboard, privacy and desktop passed.                  |
 | APP-02 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                          |
 
@@ -72,7 +72,8 @@ does not claim Claude's prototype is production-ready.
    September 29, 2026.
 8. **SYNC-01** once, before RELEASE-01 (decision D-1). Blocked September 29,
    2026: no upstream release after v26.9.0 yet, so APP-01 goes first.
-9. **APP-01** onward, then QA-01 and RELEASE-01.
+9. ~~**APP-01**~~ Merged September 29, 2026 (Linux VRT still to run).
+   Then **APP-02** onward, then QA-01 and RELEASE-01.
 
 The review's reasoning is in plan §19.
 
