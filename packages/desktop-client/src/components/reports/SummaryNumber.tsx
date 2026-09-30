@@ -109,7 +109,10 @@ export function SummaryNumber({
             margin: `${CONTAINER_MARGIN}px 0`,
             justifyContent: maxFontSize ? 'flex-end' : 'center',
             ...(maxFontSize && { fontWeight: 700, letterSpacing: -0.4 }),
-            transition: animate ? 'font-size 0.3s ease' : '',
+            // Only when reduced motion is not requested (APP-03a).
+            '@media (prefers-reduced-motion: no-preference)': {
+              transition: animate ? 'font-size 0.3s ease' : '',
+            },
             color: !isNumericValue
               ? theme.reportsNumberNeutral
               : value === 0
