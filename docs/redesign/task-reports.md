@@ -1109,7 +1109,14 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   15 skipped, the recorded baseline (the known Reports case, APP-03).
   Typecheck, lint and accounts unit tests pass after the fixes.
   **Not checked:** Linux VRT (the accounts and transactions screenshot tests
-  will differ); the desktop build — it launched through
-  `scripts/redesign-electron.mjs` and reopened the sandboxed demo, but its
-  window was on another macOS Space and could not be driven in the
-  background.
+  will differ); the wide hero in the desktop build (the window could not be
+  resized from the background; the same layout passes in the browser).
+  _Desktop build (same day):_ through `scripts/redesign-electron.mjs` with
+  the sandboxed demo, window 1000×732: the compact hero renders; the balance
+  toggles the extra chips; Reconcile opens its popover, and entering 100.00
+  shows the band with the Difference pill, sentence and both buttons and
+  the selection border; Exit reconciliation turns the chip positive
+  (screenshots `desktop-compact-1000.jpg`, `desktop-reconciling-1000.jpg`).
+  The launcher reported no change in the real Actual folders.
+  `better-sqlite3` was rebuilt for Electron and restored from a backup
+  afterwards; it loads under Node again.
