@@ -570,3 +570,10 @@ was restored from the backup; it loads under Node again. Screenshots in
 
 **Not covered:** the packaged `app://actual` bundle (stage-0.md); the
 launcher's own isolation check, which only knows macOS paths.
+
+_Later, September 30, 2026:_ `086171905` taught the launcher the Windows
+folders (`%APPDATA%\Actual` and `Actual` in the Documents known folder,
+OneDrive redirection included) and added `--remote-debugging-port` /
+`--inspect` pass-through. A run with both switches on this machine ended
+with "Isolation check: nothing changed" for all three Windows folders.
+The register checks above were not repeated through the launcher.
