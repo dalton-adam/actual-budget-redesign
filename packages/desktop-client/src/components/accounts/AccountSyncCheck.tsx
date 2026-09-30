@@ -153,15 +153,18 @@ export function AccountSyncCheck() {
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-          color: theme.errorText,
-          backgroundColor: theme.errorBackground,
-          padding: '4px 8px',
-          borderRadius: 4,
+          color: theme.pillNegativeText,
+          backgroundColor: theme.pillNegativeBackground,
+          padding: '4px 10px',
+          borderRadius: 99,
+          fontSize: 12.5,
+          fontWeight: 600,
+          textAlign: 'left',
         }}
         onPress={() => setOpen(true)}
       >
         <SvgExclamationOutline
-          style={{ width: 14, height: 14, marginRight: 5 }}
+          style={{ width: 13, height: 13, marginRight: 5, flexShrink: 0 }}
         />{' '}
         <Trans>
           This account is experiencing connection problems. Let's fix it.

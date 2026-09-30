@@ -489,7 +489,17 @@ This Month", Budgeted and Balance, with unchanged translation keys:
 - Account hero card (type eyebrow, editable name, notes, balance, chips for
   Cleared, Uncleared, Selected, Filtered and reconciliation status; Bank Sync
   and Reconcile buttons) and optional balance chart card; compact one-band
-  hero below 1280px. Shown in DESIGN-01 (`14`–`17`); not separately approved.
+  hero below 1280px. Shown in DESIGN-01 (`14`–`17`). **Approved as drawn
+  September 29, 2026** (§11 item 5), with three owner answers: Cleared and
+  Uncleared keep today's toggle (press the balance; per-account synced
+  pref unchanged); the account's bank-sync error moves from the title bar to
+  a chip in the hero with the same popover and actions; the eyebrow is On
+  budget / Off budget (Actual stores no account type).
+  **As implemented (APP-01):** the compact band also applies to windows
+  under 900px tall, as the Budget page's cards do (§3), so a 1280×720
+  window keeps its register rows; the balance chart, when switched on,
+  stays visible below 1280px as a short full-width card under the band
+  instead of hiding, so the account menu's toggle always has an effect.
 - Register: 36px rows **passed through the existing `rowHeight` prop for the
   register only**; category accent dot; payee initial; cleared as check /
   ring / lock; tags keep user colors and a square-ish shape. User-configured
@@ -519,7 +529,9 @@ Confirm or change these before the named task starts; until then the
    **Confirmed by the owner September 28, 2026**; now Approved in §9.
 4. ~~Accounts pane default open at ≥1280px, collapsed below (NAV-02).~~
    **Confirmed by the owner September 27, 2026**; now Approved in §2.
-5. Account hero and register treatment in §10 (APP-01, APP-02).
+5. ~~Account hero and register treatment in §10 (APP-01, APP-02).~~
+   **Hero confirmed by the owner September 29, 2026** (APP-01); the register
+   treatment is still "Shown" until APP-02.
 6. Narrow title bar behaviour in §2, including Help shown as an icon only
    (TOPBAR-FIX).
 
@@ -533,3 +545,4 @@ Confirm or change these before the named task starts; until then the
 | Sep 27, 2026 | After NAV-01: accounts pane default confirmed (open at 1280px and wider, collapsed below; §2, §11 item 4)                                                | Owner confirmation in the NAV-01 session                                                                                         |
 | Sep 28, 2026 | DETAIL-02: third stat tile "From previous month" confirmed (§5, §11 item 1); the panel lists posted transactions only                                    | Owner confirmation in the DETAIL-02 session                                                                                      |
 | Sep 29, 2026 | DETAIL-04: pace chart for past and future months as §7.2 (§11 item 2); goal box contents (§5 item 4)                                                     | Owner confirmation in the DETAIL-04 session                                                                                      |
+| Sep 29, 2026 | APP-01: account hero as drawn (§10, §11 item 5); balance toggle kept; bank-sync error moves into the hero                                                | Owner answers in the APP-01 session                                                                                              |

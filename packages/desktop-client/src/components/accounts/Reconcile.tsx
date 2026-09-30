@@ -7,7 +7,7 @@ import { Button } from '@actual-app/components/button';
 import { SvgCheckCircle1 } from '@actual-app/components/icons/v2';
 import { InitialFocus } from '@actual-app/components/initial-focus';
 import { Input } from '@actual-app/components/input';
-import { styles } from '@actual-app/components/styles';
+import { StatusPill } from '@actual-app/components/status-pill';
 import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -18,6 +18,7 @@ import type { TransObjectLiteral } from '@actual-app/core/types/util';
 import { format as formatDate } from 'date-fns';
 import { t } from 'i18next';
 
+import { PrivacyFilter } from '#components/PrivacyFilter';
 import { useDateFormat } from '#hooks/useDateFormat';
 import { useFormat } from '#hooks/useFormat';
 import { useLocale } from '#hooks/useLocale';
@@ -54,68 +55,79 @@ export function ReconcilingMessage({
 
   return (
     <View
+      data-testid="reconcile-band"
       style={{
-        flexDirection: 'row',
-        alignSelf: 'center',
-        backgroundColor: theme.tableBackground,
-        ...styles.shadow,
-        borderRadius: 4,
-        marginTop: 5,
-        marginBottom: 15,
-        padding: 10,
+        backgroundColor: theme.cardInset,
+        borderRadius: 12,
+        padding: '12px 14px',
+        gap: 10,
       }}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: 10,
+        }}
+      >
         {targetDiff === 0 ? (
-          <View
-            style={{
-              color: theme.noticeTextLight,
-              flex: 1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
+          <StatusPill tone="positive">
             <SvgCheckCircle1
-              style={{
-                width: 13,
-                height: 13,
-                color: 'inherit',
-                marginRight: 3,
-              }}
+              style={{ width: 13, height: 13, color: 'inherit' }}
             />
             <Trans>All reconciled!</Trans>
-          </View>
+          </StatusPill>
         ) : (
-          <View style={{ color: theme.tableText }}>
-            <Text style={{ fontStyle: 'italic', textAlign: 'center' }}>
-              <Trans>
-                Your cleared balance{' '}
-                <strong>{{ clearedBalance } as TransObjectLiteral}</strong>{' '}
-                needs <strong>{{ difference } as TransObjectLiteral}</strong> to
-                match
-                <br /> your bank&apos;s balance of{' '}
-                <Text style={{ fontWeight: 700 }}>
-                  {{ bankBalance } as TransObjectLiteral}
-                </Text>
-              </Trans>
-            </Text>
-          </View>
+          <>
+            <StatusPill tone="negative">
+              <span style={{ fontWeight: 500 }}>
+                <Trans>Difference</Trans>
+              </span>
+              <PrivacyFilter>{difference}</PrivacyFilter>
+            </StatusPill>
+            <PrivacyFilter style={{ flex: 1, minWidth: 240 }}>
+              <Text
+                style={{
+                  flex: 1,
+                  minWidth: 240,
+                  color: theme.pageTextSecondary,
+                  // The sentence keeps its translated line break for other
+                  // layouts; the band has room for one line.
+                  '& br': { display: 'none' },
+                }}
+              >
+                <Trans>
+                  Your cleared balance{' '}
+                  <strong>{{ clearedBalance } as TransObjectLiteral}</strong>{' '}
+                  needs <strong>{{ difference } as TransObjectLiteral}</strong>{' '}
+                  to match
+                  <br /> your bank&apos;s balance of{' '}
+                  <Text style={{ fontWeight: 700 }}>
+                    {{ bankBalance } as TransObjectLiteral}
+                  </Text>
+                </Trans>
+              </Text>
+            </PrivacyFilter>
+          </>
         )}
-        <View style={{ marginLeft: 15 }}>
-          <Button variant="primary" onPress={onDone}>
-            {targetDiff === 0
-              ? t('Lock transactions')
-              : t('Exit reconciliation')}
-          </Button>
-        </View>
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          justifyContent: 'flex-end',
+          gap: 10,
+        }}
+      >
         {targetDiff !== 0 && (
-          <View style={{ marginLeft: 15 }}>
-            <Button onPress={() => onCreateTransaction(targetDiff)}>
-              <Trans>Create reconciliation transaction</Trans>
-            </Button>
-          </View>
+          <Button onPress={() => onCreateTransaction(targetDiff)}>
+            <Trans>Create reconciliation transaction</Trans>
+          </Button>
         )}
+        <Button variant="primary" onPress={onDone}>
+          {targetDiff === 0 ? t('Lock transactions') : t('Exit reconciliation')}
+        </Button>
       </View>
     </View>
   );

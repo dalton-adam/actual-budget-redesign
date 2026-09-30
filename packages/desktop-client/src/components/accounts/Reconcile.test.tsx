@@ -79,8 +79,9 @@ describe('ReconcilingMessage math & UI', () => {
     // Formatted amounts present
     expect(screen.getByText('30.00')).toBeInTheDocument();
     expect(screen.getByText('100.00')).toBeInTheDocument();
-    // Positive diff shows plus sign
-    expect(screen.getByText('+70.00')).toBeInTheDocument();
+    // Positive diff shows plus sign, in the Difference chip and the sentence
+    expect(screen.getAllByText('+70.00')).toHaveLength(2);
+    expect(screen.getByText('Difference')).toBeInTheDocument();
 
     await userEvent.click(
       screen.getByText('Create reconciliation transaction'),
@@ -106,7 +107,7 @@ describe('ReconcilingMessage math & UI', () => {
 
     expect(screen.getByText('120.00')).toBeInTheDocument();
     expect(screen.getByText('100.00')).toBeInTheDocument();
-    expect(screen.getByText('-20.00')).toBeInTheDocument();
+    expect(screen.getAllByText('-20.00')).toHaveLength(2);
 
     await userEvent.click(
       screen.getByText('Create reconciliation transaction'),

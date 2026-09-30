@@ -1059,3 +1059,64 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   server-online/offline labels, long translations. **Owner decision:** the
   icon-only Help at narrow widths is a new "Shown" row (design-decisions §2,
   §11 item 6).
+- APP-01: **in review September 29, 2026** on branch
+  `redesign/app-01-account-header`; not merged. Screenshots in
+  [verification/app-01](verification/app-01/). **Owner decisions before
+  starting:** design-decisions §11 item 5 (the hero) confirmed as drawn;
+  Cleared/Uncleared keep today's toggle; the bank-sync error moves from the
+  title bar into the hero. **Change:** new `C/accounts/AccountHero.tsx`
+  (hero card and compact band); `C/accounts/Header.tsx` builds the hero
+  (eyebrow On/Off budget, 28px name, Bank Sync and Reconcile as Control
+  buttons, reconciliation status chip, chart card) and moves Reconcile out
+  of the toolbar, whose buttons become Control buttons with Add New as
+  primary; `C/accounts/Balance.tsx` splits the balance into `BalanceAmount`
+  (hero amount, same `account-balance` button and toggle) and `BalanceChips`
+  (neutral pills, same labels); `C/accounts/Reconcile.tsx` turns the
+  reconciling message into the hero's band (Difference pill, same sentence
+  and buttons; its line break is hidden, so the translation key is
+  unchanged); `C/accounts/AccountSyncCheck.tsx` is restyled as a negative
+  pill; `C/Titlebar.tsx` no longer renders it. **Scope added (approved):**
+  `C/Titlebar.tsx`. **Test change:** `C/accounts/Reconcile.test.tsx` now
+  expects the difference twice (pill and sentence) and the "Difference"
+  label. **Deviations from the drawing:** the compact band also applies
+  under 900px tall (a 1280×720 window lost two register rows with the full
+  hero, failing `transactions.test.ts` "by payee"); the chart stays visible
+  when compact. No handler, binding, pref or route changed; one new string,
+  "Difference". **Checks:** typecheck and lint pass; accounts unit tests
+  12/12 and the full web suite 1052 passed, 1 skipped; E2E accounts, transactions, bank-sync, budget, nav-02, help-menu,
+  detail-03 44/44 (dev server on port 3029); Impeccable detector: no
+  findings; light, dark and midnight at 1440×900 and 1000×700 for a single
+  account, extra balances, reconciling, balance chart and All accounts.
+  **Follow-up checks (same day):** _Custom theme_ (QA-00 method: every
+  v26.9.0 role, 226, hue-rotated 150°, no redesign roles, installed as
+  `installedCustomLightTheme` with base light or dark): the hero, chart card
+  and toolbar with extra balances, a selection, the chart and reconciling
+  on, at 1440×900 and 1000×700 — every text, background and border colour
+  equals a theme role (0 misses in 4 runs). _Keyboard:_ every header control
+  is reachable by Tab; Enter toggles the balance chips, opens Reconcile with
+  its input focused (Escape returns focus to Reconcile), starts and exits
+  reconciling and opens the account menu. **Fixed:** the notes and rename
+  buttons took focus while invisible (upstream shows them on hover only);
+  they now also show on focus. _Privacy:_ the balance, chips, Difference pill
+  and chart value are masked. **Fixed:** the reconciliation sentence
+  (upstream never masked it) is now masked too; its translation key is
+  unchanged. _Bank-sync error:_ with the demo account marked failed in the
+  page's query cache only (no saved data changed), the hero shows the
+  negative chip, the title bar shows none, and Enter opens the existing
+  popover with Unlink and Reauthorize (light 1440, dark 1000). _Built
+  preview:_ a `vite build --mode=browser` into a scratch folder, served on
+  port 3030: E2E for the same seven files 44/44; WIDE 58 passed, 1 failed,
+  15 skipped, the recorded baseline (the known Reports case, APP-03).
+  Typecheck, lint and accounts unit tests pass after the fixes.
+  **Not checked:** Linux VRT (the accounts and transactions screenshot tests
+  will differ); the wide hero in the desktop build (the window could not be
+  resized from the background; the same layout passes in the browser).
+  _Desktop build (same day):_ through `scripts/redesign-electron.mjs` with
+  the sandboxed demo, window 1000×732: the compact hero renders; the balance
+  toggles the extra chips; Reconcile opens its popover, and entering 100.00
+  shows the band with the Difference pill, sentence and both buttons and
+  the selection border; Exit reconciliation turns the chip positive
+  (screenshots `desktop-compact-1000.jpg`, `desktop-reconciling-1000.jpg`).
+  The launcher reported no change in the real Actual folders.
+  `better-sqlite3` was rebuilt for Electron and restored from a backup
+  afterwards; it loads under Node again.
