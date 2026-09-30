@@ -177,8 +177,13 @@ test.describe('Transactions', () => {
 
       await textInput.fill('l');
       await filterTooltip.applyButton.click();
-      // Assert that all Payees DO NOT contain the letter 'l'
-      for (let i = 0; i < 19; i++) {
+      // Assert that all Payees DO NOT contain the letter 'l'. Check every
+      // rendered row rather than a fixed 19: the redesign's taller register
+      // rows render fewer at 1280×720 (APP-02).
+      await expect(accountPage.getNthTransaction(0).payee).not.toHaveText(/l/);
+      const renderedRows = await accountPage.transactionTableRow.count();
+      expect(renderedRows).toBeGreaterThanOrEqual(15);
+      for (let i = 0; i < renderedRows; i++) {
         await expect(accountPage.getNthTransaction(i).payee).not.toHaveText(
           /l/,
         );

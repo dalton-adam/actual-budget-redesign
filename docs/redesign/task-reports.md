@@ -1161,3 +1161,7 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   custom theme, keyboard-only pass, privacy mode, split transactions by
   eye (unit and E2E cover splits), built preview, WIDE, Linux VRT, desktop
   build.
+  **E2E fix (owner's choice, same day):** "by payee" now checks every
+  rendered row after the "does not contain" filter (at least 15) instead of
+  a fixed 19; `e2e/transactions.test.ts` is an upstream file, so expect a
+  possible conflict at SYNC-01. Accounts and transactions E2E 23/23.
