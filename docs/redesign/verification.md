@@ -461,10 +461,44 @@ ELEC-01's [wrapped bar](verification/elec-01/titlebar-pane-open-1000.png)),
 
 - E2E ran against a Vite dev server, not a `build:browser` preview: the
   shared preview on 3018 belonged to another session.
-- Linux VRT not regenerated. Snapshots at title bar widths of 800px or more
-  should be unchanged (only the Help label gained a wrapping `span`); none was
-  compared.
+- Linux VRT not regenerated at the time. Run September 30, 2026 with APP-01
+  ([below](#linux-vrt-for-topbar-fix-and-app-01-september-30-2026)): no
+  snapshot changed.
 - The desktop check drove the window with Playwright; the manual launcher
   run started and passed its isolation check, but its window was on another
   Space and could not be inspected. Custom theme, "Server online"/"Server
   offline" labels and long translations were not measured.
+
+## Linux VRT for TOPBAR-FIX and APP-01 (September 30, 2026)
+
+Against `redesign/main` at `bf9eb4a11` (both tasks merged), on Windows 11:
+Docker Desktop 29.8.1 with the WSL2 backend, the `running-vrts` recipe
+(Playwright v1.61.1 image, HTTPS Vite development server on port 3021 reached
+over the LAN address), one worker, no retries. Checkout at
+`C:\dev\actual-budget-redesign` (moved out of OneDrive), locale files cloned
+from `actualbudget/translations`.
+
+**Windows setup.** Yarn's workspace links in `node_modules` are Windows
+junctions; inside the container Docker Desktop shows them as links to
+`/mnt/host/c/dev/actual-budget-redesign/packages/...`, so a checkout mounted at
+`/work` resolves linked packages outside the tree and cannot find their
+dependencies (`Cannot find module 'date-fns'`). Mounting the checkout at
+`/mnt/host/c/dev/actual-budget-redesign` and running from there fixes it; all
+175 tests load.
+
+1. **Full run, no updates:** 156 passed, 19 failed (175 tests, 27 minutes).
+   Every failure was a screenshot mismatch, all in the four files that show an
+   account register: `accounts`, `rules`, `schedules`, `transactions`.
+2. **TOPBAR-FIX:** no snapshot changed. The title bar is pixel-identical in
+   the failing account screenshots, and every other test passed.
+3. **Update, scoped to the four files** (`--update-snapshots=changed`): 33
+   passed; **69 snapshots changed** (the 19 tests, light, dark and midnight;
+   four tests take two screenshots). No new file, nothing outside those tests.
+4. **Review:** each change is APP-01's account hero (type, name, "Not yet
+   reconciled" pill, lock and balance) replacing the plain header, with the
+   register moved down. Checked light, dark and midnight of the page visuals,
+   the Close Account modal, and the date-picker popover (only its corners,
+   over the moved page, differ). Rows below the Close Account modal render
+   unblurred in dark; the previous snapshot shows the same, so it predates
+   APP-01.
+5. **Rerun without updating:** the same four files: 33 passed.

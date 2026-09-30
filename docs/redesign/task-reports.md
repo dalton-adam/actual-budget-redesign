@@ -1120,6 +1120,9 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   The launcher reported no change in the real Actual folders.
   `better-sqlite3` was rebuilt for Electron and restored from a backup
   afterwards; it loads under Node again.
+  _Linux VRT (September 30, 2026):_ 69 snapshots regenerated in the
+  accounts, rules, schedules and transactions tests, each showing the hero;
+  TOPBAR-FIX changed none (verification.md).
 - APP-02: **done September 30, 2026**, merged into `redesign/main` with
   owner approval (`f8fcc70d8`, branch `redesign/app-02-register`). Screenshots in
   [verification/app-02](verification/app-02/). **Owner decisions before

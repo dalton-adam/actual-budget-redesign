@@ -42,9 +42,9 @@ Budget header are reference material, not tasks to build.
 | ASSIGN-FIX         | verified    | `cc078bd06`              | Snapshots stale since BUD-04 regenerated in DETAIL-03.                                                                                                   |
 | DETAIL-03          | verified    | `658a38c90`              | Linux VRT regenerated (177, incl. BUD-04's pane); custom theme and WIDE passed. Session-only category and month memory.                                  |
 | DETAIL-04          | verified    | `9059b8491`              | E2E and WIDE ran against a dev server, not a `build:browser` preview. Linux VRT regenerated (21).                                                        |
-| TOPBAR-FIX         | verified    | `107560a51`              | Icon-only Help when narrow is still "Shown" (design-decisions §11 item 6). Linux VRT not regenerated.                                                    |
+| TOPBAR-FIX         | verified    | `107560a51`              | Icon-only Help when narrow is still "Shown" (design-decisions §11 item 6). Linux VRT: no snapshot changed.                                               |
 | SYNC-01            | blocked     | —                        | No upstream release after v26.9.0 (checked September 29, 2026). Start when v26.10.0 ships; before RELEASE-01 (D-1).                                      |
-| APP-01             | verified    | `875ddad48`              | Linux VRT not regenerated (owner runs it on Windows). Custom theme, keyboard, privacy and desktop passed.                                                |
+| APP-01             | verified    | `875ddad48`              | Linux VRT regenerated (69) on Windows. Custom theme, keyboard, privacy and desktop passed.                                                               |
 | APP-02             | verified    | `f8fcc70d8`              | Linux VRT not regenerated (owner runs it on Windows). Register not exercised in the desktop window. E2E test "by payee" changed (SYNC-01 conflict risk). |
 | APP-03 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                                              |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                                                        |
@@ -73,7 +73,7 @@ does not claim Claude's prototype is production-ready.
    September 29, 2026.
 8. **SYNC-01** once, before RELEASE-01 (decision D-1). Blocked September 29,
    2026: no upstream release after v26.9.0 yet, so APP-01 goes first.
-9. ~~**APP-01**~~ Merged September 29, 2026 (Linux VRT still to run).
+9. ~~**APP-01**~~ Merged September 29, 2026; Linux VRT regenerated September 30.
    ~~Then **APP-02**~~ Merged September 30, 2026 (Linux VRT still to run).
    Then **APP-03** onward, then QA-01 and RELEASE-01.
 
