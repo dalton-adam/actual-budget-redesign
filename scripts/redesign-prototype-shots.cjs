@@ -1,7 +1,8 @@
 // Screenshots of the static redesign prototype (docs/redesign/prototype).
-// Usage: node scripts/redesign-prototype-shots.cjs [--design-01]
+// Usage: node scripts/redesign-prototype-shots.cjs [--design-01 | --app-03]
 // Default: the DESIGN-02 set (18+). --design-01 regenerates 01-17 from the
 // current prototype with the fixture and row height they were taken with.
+// --app-03 takes the Reports proposal (51+).
 const { chromium } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
@@ -156,12 +157,30 @@ const design02 = [
   ['50-privacy-dark-wide', W, H, 'theme=dark&privacy=1&cat=c-dine'],
 ];
 
+const app03 = [
+  ['51-reports-dark-wide', W, H, 'page=reports&theme=dark&whover=nw'],
+  ['52-reports-light-wide', W, H, 'page=reports&theme=light'],
+  ['53-reports-midnight-1000', w, h, 'page=reports&theme=midnight'],
+  ['54-reports-light-1000-editing', w, h, 'page=reports&theme=light&redit=1'],
+  ['55-networth-dark-wide', W, H, 'page=reports&rview=networth&theme=dark'],
+  ['56-networth-light-1000', w, h, 'page=reports&rview=networth&theme=light'],
+  ['57-reports-custom-wide', W, H, 'page=reports&theme=custom'],
+  ['58-reports-privacy-dark-wide', W, H, 'page=reports&theme=dark&privacy=1'],
+];
+
 (async () => {
   const dir = path.resolve('docs/redesign/prototype');
   const out = path.join(dir, 'shots');
   fs.mkdirSync(out, { recursive: true });
-  const shots = process.argv.includes('--design-01') ? design01 : design02;
-  const b = await chromium.launch();
+  const shots = process.argv.includes('--design-01')
+    ? design01
+    : process.argv.includes('--app-03')
+      ? app03
+      : design02;
+  // PW_CHANNEL=msedge uses an installed browser instead of Playwright's.
+  const b = await chromium.launch(
+    process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {},
+  );
   for (const [name, sw, sh, q] of shots) {
     const p = await b.newPage({
       viewport: { width: sw, height: sh },

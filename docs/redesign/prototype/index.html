@@ -8,7 +8,8 @@
   DESIGN-01/02 prototype: fictional data only, no connection to Actual's code.
   Open with a local file URL after `yarn install` (fonts load from node_modules).
   URL params: layout=a|b, header=cards|trend, theme=light|dark|midnight|custom,
-  panel=0|1, privacy=0|1, controls=0|1, page=budget|account
+  panel=0|1, privacy=0|1, controls=0|1, page=budget|account|reports
+  APP-03: rview=dash|networth, redit=0|1, whover=<widget id>
   DESIGN-02: data=basic|states|many, density=50|44|38, rta=pos|zero|neg,
   when=past|current|future, cat=<category id>, pm=<panel month>, hover=<id>, edit=<id>:<month>,
   compact=1, hidden=0, collapsed=<group ids>, pane=open|collapsed, recon=0|diff|done,
@@ -2584,6 +2585,354 @@
           transition: width 0.2s ease;
         }
       }
+
+      /*
+   * APP-03 proposal: Reports. Chart and amount colours are Actual's existing
+   * reports* and number roles, unchanged (owner decision, September 30, 2026).
+   * Widget cards are hairline only, with no shadow (same decision).
+   */
+      :root,
+      [data-theme='light'] {
+        --reportsPos: #147d64; /* reportsNumberPositive = numberPositive */
+        --reportsNeg: #e12d39; /* reportsNumberNegative = numberNegative */
+        --reportsGreen: #3ebd93;
+        --reportsRed: #f86a6a;
+        --reportsGray: #747c8b;
+      }
+      [data-theme='dark'],
+      [data-theme='midnight'] {
+        --reportsPos: #65d6ad;
+        --reportsNeg: #ff9b9b;
+      }
+      [data-theme='custom'] {
+        --reportsPos: var(--x-numberPositive);
+        --reportsNeg: var(--x-numberNegative);
+      }
+      .rmain {
+        overflow-y: auto;
+        padding-right: 2px;
+      }
+      .rgrid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        grid-auto-rows: 88px;
+        gap: 14px;
+        flex-shrink: 0;
+      }
+      .wcard,
+      .rcard {
+        background: var(--cardBackground);
+        border: 1px solid var(--cardBorder);
+        border-radius: 18px;
+        min-width: 0;
+        position: relative;
+      }
+      .wcard {
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        text-align: left;
+        cursor: pointer;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .wcard {
+          transition: border-color 0.15s;
+        }
+      }
+      .wcard:hover,
+      .wcard.hover {
+        border-color: color-mix(in srgb, var(--pageText) 16%, transparent);
+      }
+      .w-top {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        /* room for the widget menu, so it never covers a value */
+        padding-right: 26px;
+      }
+      .w-top > div:first-child {
+        min-width: 0;
+        flex: 1;
+      }
+      .w-title {
+        font-size: 13.5px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .w-sub {
+        font-size: 12px;
+        color: var(--pageTextSubdued);
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .w-amt {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.4px;
+        line-height: 1.2;
+        margin-top: auto;
+      }
+      .w-val {
+        text-align: right;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+      }
+      .w-val .chip {
+        margin-top: 4px;
+      }
+      .pos-t {
+        color: var(--reportsPos);
+      }
+      .neg-t {
+        color: var(--reportsNeg);
+      }
+      .chip.bad {
+        background: var(--pillNegativeBackground);
+        color: var(--pillNegativeText);
+      }
+      .chip.sm {
+        padding: 2px 8px;
+        font-size: 11.5px;
+      }
+      .w-menu {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 28px;
+        height: 28px;
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+        color: var(--pageTextSubdued);
+        background: var(--controlBackground);
+        border: 1px solid var(--cardBorder);
+        opacity: 0;
+      }
+      .wcard:hover .w-menu,
+      .wcard.hover .w-menu,
+      .wcard:focus-within .w-menu {
+        opacity: 1;
+      }
+      .w-chart {
+        flex: 1;
+        min-height: 0;
+        margin: 10px -20px -16px;
+      }
+      .w-chart svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .cf {
+        flex: 1;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 18px;
+        margin-top: 8px;
+      }
+      .cf-col {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--pageTextSubdued);
+      }
+      .cf-bar {
+        width: 26px;
+        border-radius: 6px 6px 2px 2px;
+      }
+      .cf-col b {
+        display: block;
+        color: var(--pageText);
+        font-weight: 650;
+      }
+      .cal {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 12px;
+      }
+      .cal-m {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+      }
+      .cal-h {
+        display: flex;
+        gap: 8px;
+        align-items: baseline;
+        font-size: 12px;
+        font-weight: 650;
+      }
+      .cal-h .num {
+        font-size: 11.5px;
+        font-weight: 600;
+      }
+      .cal-g {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 3px;
+      }
+      .cal-g .dow {
+        font-size: 10.5px;
+        font-weight: 650;
+        letter-spacing: 0.07em;
+        color: var(--pageTextFaint);
+        text-align: center;
+      }
+      .cal-d {
+        height: 26px;
+        border-radius: 6px;
+        background: var(--cardInset);
+        position: relative;
+        overflow: hidden;
+        font-size: 10.5px;
+        color: var(--pageTextSubdued);
+        padding: 2px 4px;
+      }
+      .cal-d i {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0.55;
+      }
+      .cal-d.blank {
+        background: none;
+      }
+      .md {
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--pageTextSubdued);
+        margin-top: 8px;
+      }
+      .rgrid.editing .wcard {
+        cursor: move;
+        border-style: dashed;
+        border-color: color-mix(in srgb, var(--pageText) 22%, transparent);
+      }
+      .rgrid.editing .w-menu {
+        opacity: 1;
+      }
+      .grip-h {
+        color: var(--pageTextFaint);
+        margin-right: 2px;
+        display: inline-flex;
+        vertical-align: -1px;
+      }
+      .rs {
+        position: absolute;
+        right: 6px;
+        bottom: 6px;
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid var(--pageTextFaint);
+        border-bottom: 2px solid var(--pageTextFaint);
+        border-radius: 0 0 4px 0;
+      }
+      .rp-tools {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        flex-shrink: 0;
+      }
+      .rp-tools .seg button.on {
+        background: var(--navActive);
+        color: var(--pageText);
+        box-shadow: var(--navActiveShadow);
+      }
+      [data-theme='light'] .rp-tools .seg {
+        background: var(--navTrack);
+        border-color: transparent;
+      }
+      .rp-tools .tbtn.on {
+        background: var(--cardInset);
+      }
+      .rcard {
+        padding: 16px 20px;
+      }
+      .rp-chart {
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        height: min(460px, calc(100vh - 290px));
+        min-height: 260px;
+      }
+      .rp-plot {
+        flex: 1;
+        min-height: 0;
+        display: grid;
+        grid-template-columns: 64px minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr) 22px;
+        margin-top: 12px;
+      }
+      .rp-y {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--pageTextFaint);
+        text-align: right;
+        padding-right: 10px;
+      }
+      .rp-area {
+        position: relative;
+        border-bottom: 1px solid var(--cardBorder);
+      }
+      .rp-area .gl {
+        position: absolute;
+        left: 0;
+        right: 0;
+        border-top: 1px dashed var(--cardBorder);
+      }
+      .rp-area svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .rp-x {
+        grid-column: 2;
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--pageTextFaint);
+        padding-top: 6px;
+      }
+      .rp-notes h2 {
+        font-size: 15px;
+        font-weight: 650;
+        letter-spacing: -0.2px;
+      }
+      .rp-notes p {
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--pageTextSubdued);
+        margin-top: 6px;
+        max-width: 760px;
+      }
+      .rp-title-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .rp-title-row .tool {
+        opacity: 0;
+      }
+      .rp-title-row:hover .tool,
+      .rp-title-row:focus-within .tool {
+        opacity: 1;
+      }
     </style>
   </head>
   <body>
@@ -2620,6 +2969,11 @@
         ),
         filter: params.get('filter') || '',
         recon: params.get('recon') || '0',
+        // APP-03: reports view (dashboard or the Net Worth report page),
+        // dashboard edit mode, and a hovered widget for screenshots.
+        rview: params.get('rview') || 'dash',
+        redit: params.get('redit') === '1',
+        whover: params.get('whover') || '',
         // Accounts pane: open or collapsed (device-local). Default: open at
         // 1280px and wider, collapsed below.
         pane:
@@ -2969,14 +3323,15 @@
       function topbar() {
         const navBtn = (label, key, opts = {}) =>
           `<button class="${
-            (state.page === 'account' ? 'accounts' : 'budget') === key
+            ({ account: 'accounts', reports: 'reports' }[state.page] ||
+              'budget') === key
               ? 'on'
               : ''
           } ${state.menu === key ? 'open' : ''}" ${
             opts.menu
               ? `data-menu="${key}"`
-              : key === 'budget'
-                ? 'data-set="page" data-val="budget"'
+              : key === 'budget' || key === 'reports'
+                ? `data-set="page" data-val="${key}"`
                 : ''
           }
         aria-haspopup="${opts.menu ? 'menu' : 'false'}" aria-expanded="${
@@ -4149,6 +4504,7 @@
           grp('Page', 'page', [
             ['budget', 'Budget'],
             ['account', 'Account'],
+            ['reports', 'Reports'],
           ]),
           grp('Theme', 'theme', [
             ['light', 'Light'],
@@ -4194,8 +4550,19 @@
           ['open', 'Open'],
           ['collapsed', 'Collapsed'],
         ]);
+        const reports = [
+          grp('View', 'rview', [
+            ['dash', 'Dashboard'],
+            ['networth', 'Net Worth'],
+          ]),
+          grp('Edit', 'redit', [
+            [false, 'Off'],
+            [true, 'On'],
+          ]),
+        ];
+        const pageGroups = { budget, account: acct, reports }[state.page];
         return `<div class="proto" aria-label="Prototype controls">
-      ${[...common, ...(state.page === 'budget' ? budget : acct), pin].join('')}
+      ${[...common, ...pageGroups, pin].join('')}
       <div class="grp"><button data-reload title="Reload with the fixture's original amounts">Reset</button></div>
     </div>`;
       }
@@ -4574,6 +4941,345 @@
         </main>`;
       }
 
+      // APP-03 proposal: Reports dashboard and one report page (fictional data).
+      // Widgets and their grid positions follow Actual's default dashboard
+      // (loot-core shared/dashboard.ts), compacted as react-grid-layout does.
+      const fmt2 = n =>
+        (n < 0 ? '−' : '') +
+        '$' +
+        Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      function areaChart(pts, opts = {}) {
+        const { color = 'var(--reportsPos)', fill = 0.16, cmp, pad = 0 } = opts;
+        const all = cmp ? pts.concat(cmp) : pts;
+        const min = opts.min ?? Math.min(...all),
+          max = opts.max ?? Math.max(...all);
+        const y = v =>
+          40 - pad - ((v - min) / (max - min || 1)) * (40 - 2 * pad);
+        const path = s =>
+          s
+            .map(
+              (v, i) =>
+                `${i ? 'L' : 'M'}${((i / (s.length - 1)) * 100).toFixed(2)},${y(
+                  v,
+                ).toFixed(2)}`,
+            )
+            .join(' ');
+        const d = path(pts);
+        return `<svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
+          ${
+            cmp
+              ? `<path d="${path(
+                  cmp,
+                )}" fill="none" stroke="var(--reportsGray)" stroke-width="1.5" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>`
+              : ''
+          }
+          <path d="${d} L100,40 L0,40 Z" fill="${color}" fill-opacity="${fill}"/>
+          <path d="${d}" fill="none" stroke="${color}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+      }
+      const cum = (arr, k = 1) => {
+        let t = 0;
+        return arr.map(v => (t += v * k));
+      };
+      // Deterministic daily spending for the spending cards and calendar.
+      const daily = (seed, n, base) =>
+        Array.from(
+          { length: n },
+          (_, i) =>
+            base *
+            (0.3 + (((seed * 9301 + i * 49297) % 233280) / 233280) * 1.4),
+        );
+
+      function widget({
+        id,
+        x,
+        y,
+        w,
+        h,
+        title,
+        sub,
+        body,
+        val,
+        to = true,
+        open,
+      }) {
+        const hov = state.whover === id ? ' hover' : '';
+        const grip = state.redit
+          ? `<span class="grip-h" aria-hidden="true">${I.grip}</span>`
+          : '';
+        return `<div class="wcard${hov}" role="${
+          to && !state.redit ? 'button' : 'group'
+        }" tabindex="0" aria-label="${esc(title)}" ${
+          open && !state.redit ? `data-set="rview" data-val="${open}"` : ''
+        } style="grid-column:${
+          x + 1
+        } / span ${w};grid-row:${y + 1} / span ${h}">
+          <div class="w-top"><div><div class="w-title">${grip}${esc(
+            title,
+          )}</div>${sub ? `<div class="w-sub">${sub}</div>` : ''}</div>${
+            val ? `<div class="w-val">${val}</div>` : ''
+          }</div>
+          ${body}
+          <button class="w-menu" aria-label="${esc(title)} menu">${
+            I.dots
+          }</button>
+          ${state.redit ? '<span class="rs" aria-hidden="true"></span>' : ''}
+        </div>`;
+      }
+      const summaryW = (id, x, title, amt, sub = 'Jan 2026 – Sep 2026') =>
+        widget({
+          id,
+          x,
+          y: 0,
+          w: 3,
+          h: 2,
+          title,
+          sub,
+          body: `<div class="w-amt num ${amt < 0 ? 'neg-t' : 'pos-t'}">${fmt2(
+            Math.abs(amt),
+          )}</div>`,
+        });
+      const spendW = (id, x, title, sub, diff, seed) => {
+        const cur = cum(daily(seed, 30, 38));
+        const cmp = cum(daily(seed + 7, 30, 36));
+        return widget({
+          id,
+          x,
+          y: 4,
+          w: 4,
+          h: 2,
+          title,
+          sub,
+          val: `<span class="chip sm ${diff > 0 ? 'bad' : 'ok'} num">${
+            diff > 0 ? '+' : '−'
+          }${fmt2(Math.abs(diff))}</span>`,
+          body: `<div class="w-chart">${areaChart(cur, {
+            cmp,
+            color: 'var(--reportsGreen)',
+            fill: 0.14,
+            pad: 2,
+          })}</div>`,
+        });
+      };
+      function calendarW() {
+        const months = [
+          ['Jul 2026', 3, 31, 5320.14, 4102.33],
+          ['Aug 2026', 6, 31, 5410.0, 4388.9],
+          ['Sep 2026', 2, 30, 5400.0, 4212.4],
+        ];
+        const cal = months
+          .map(([name, first, days, inc, exp], mi) => {
+            const cells = [];
+            for (let i = 0; i < first; i++)
+              cells.push('<div class="cal-d blank"></div>');
+            for (let d = 1; d <= days; d++) {
+              const r = ((d * 37 + mi * 11) % 17) / 17;
+              const kind = d % 14 === 1 ? 'in' : r > 0.35 ? 'out' : '';
+              const hgt = kind === 'in' ? 100 : Math.round(r * 70);
+              cells.push(
+                `<div class="cal-d">${d}${
+                  kind
+                    ? `<i style="height:${hgt}%;background:var(${
+                        kind === 'in' ? '--reportsGreen' : '--reportsRed'
+                      })"></i>`
+                    : ''
+                }</div>`,
+              );
+            }
+            return `<div class="cal-m"><div class="cal-h">${name}<span class="num pos-t">↑ ${fmt2(
+              inc,
+            )}</span><span class="num neg-t">↓ ${fmt2(exp)}</span></div>
+              <div class="cal-g">${['S', 'M', 'T', 'W', 'T', 'F', 'S']
+                .map(x => `<div class="dow">${x}</div>`)
+                .join('')}${cells.join('')}</div></div>`;
+          })
+          .join('');
+        return widget({
+          id: 'cal',
+          x: 0,
+          y: 6,
+          w: 8,
+          h: 4,
+          title: 'Transaction Calendar',
+          sub: 'Jul 2026 – Sep 2026',
+          body: `<div class="cal">${cal}</div>`,
+        });
+      }
+
+      function reportsDashboard() {
+        const nw = [
+          74110, 75220, 76080, 77950, 78400, 79860, 81020, 82400, 83150, 84900,
+          85300, 86420,
+        ];
+        const cards = [
+          summaryW('inc', 0, 'Total Income (YTD)', 48600.0),
+          summaryW('exp', 3, 'Total Expenses (YTD)', -38420.6),
+          summaryW('apm', 6, 'Avg Per Month', -4268.96),
+          summaryW('apt', 9, 'Avg Per Transaction', -61.47),
+          widget({
+            id: 'nw',
+            x: 0,
+            y: 2,
+            w: 6,
+            h: 2,
+            title: 'Net Worth',
+            sub: 'Apr 2026 – Sep 2026',
+            open: 'networth',
+            val: `<div class="num">${fmt2(
+              86420,
+            )}</div><span class="chip sm ok num">+${fmt2(12310)}</span>`,
+            body: `<div class="w-chart">${areaChart(nw, { pad: 3 })}</div>`,
+          }),
+          widget({
+            id: 'cf',
+            x: 6,
+            y: 2,
+            w: 6,
+            h: 2,
+            title: 'Cash Flow',
+            sub: 'September 2026',
+            val: `<span class="chip sm ok num">+${fmt2(1187.6)}</span>`,
+            body: `<div class="cf">
+              <div class="cf-col"><span style="text-align:right">Income<b class="num">${fmt2(
+                5400,
+              )}</b></span><div class="cf-bar" style="height:86px;background:var(--reportsGreen)"></div></div>
+              <div class="cf-col"><div class="cf-bar" style="height:67px;background:var(--reportsRed)"></div><span>Expenses<b class="num">${fmt2(
+                4212.4,
+              )}</b></span></div></div>`,
+          }),
+          spendW(
+            'sp1',
+            0,
+            'This Month',
+            'Sep 2026 compared with Aug 2026',
+            212.4,
+            3,
+          ),
+          spendW(
+            'sp2',
+            4,
+            'Budget Overview',
+            'Sep 2026 compared with budgeted',
+            118.75,
+            5,
+          ),
+          spendW(
+            'sp3',
+            8,
+            '3-Month Average',
+            'Sep 2026 compared with the last 3 months',
+            -96.2,
+            9,
+          ),
+          calendarW(),
+          widget({
+            id: 'rnw',
+            x: 8,
+            y: 6,
+            w: 4,
+            h: 2,
+            title: 'Recent Net Worth Change',
+            sub: 'Jul 2026 – Sep 2026',
+            body: `<div class="w-amt num pos-t">+${fmt2(2140)}</div>`,
+          }),
+          widget({
+            id: 'md',
+            x: 8,
+            y: 8,
+            w: 4,
+            h: 2,
+            title: 'Notes',
+            to: false,
+            body: `<div class="md">Text widgets keep their Markdown. Add notes, links or a reminder for the next review here.</div>`,
+          }),
+        ];
+        return `<main class="main rmain">
+          <div class="head">
+            <div class="rp-title-row" style="flex-direction:column;align-items:flex-start;gap:0">
+              <div class="eyebrow">Reports</div>
+              <div class="rp-title-row"><h1>Main</h1><button class="tool" aria-label="Rename dashboard">${
+                I.pencil
+              }</button></div>
+            </div>
+            <div class="head-controls">
+              <button class="tbtn" aria-haspopup="listbox">Dashboard: Main ${
+                I.chevD
+              }</button>
+              ${
+                state.redit
+                  ? `<button class="tbtn primary" data-set="redit" data-val="false">Finish editing dashboard</button>`
+                  : `<button class="tbtn" data-set="redit" data-val="true">Edit dashboard</button><button class="tbtn primary">${I.plus}<span class="txt">Add new widget</span></button>`
+              }
+              <button class="icon-btn" aria-label="Menu">${I.dots}</button>
+            </div>
+          </div>
+          <div class="rgrid${state.redit ? ' editing' : ''}">${cards.join(
+            '',
+          )}</div>
+        </main>`;
+      }
+
+      function netWorthPage() {
+        const nw = [
+          74110, 74900, 75220, 75700, 76080, 77100, 77950, 78100, 78400, 79200,
+          79860, 80500, 81020, 81900, 82400, 82800, 83150, 84100, 84900, 85100,
+          85300, 85900, 86100, 86420,
+        ];
+        const ticks = [88000, 84000, 80000, 76000, 72000];
+        return `<main class="main rmain">
+          <div class="head">
+            <div style="display:flex;flex-direction:column">
+              <div class="eyebrow">Reports · Main</div>
+              <div class="rp-title-row"><h1>Net Worth</h1><button class="tool" aria-label="Rename report">${
+                I.pencil
+              }</button></div>
+            </div>
+          </div>
+          <div class="rp-tools">
+            <div class="seg" role="group" aria-label="Date range mode"><button class="on" aria-pressed="true">Live</button><button aria-pressed="false">Static</button></div>
+            <button class="tbtn" aria-haspopup="dialog">${
+              I.calendar
+            }<span class="num">Apr 2026 – Sep 2026</span>${I.chevD}</button>
+            <button class="tbtn" aria-label="Filter">${I.rules}<span class="txt">Filter</span></button>
+            <button class="tbtn" aria-haspopup="listbox">Monthly ${
+              I.chevD
+            }</button>
+            <button class="tbtn" aria-pressed="false">Trend</button>
+            <button class="tbtn primary" style="margin-left:auto">Save widget</button>
+          </div>
+          <section class="rcard rp-chart" aria-label="Net worth chart">
+            <div class="w-top"><div><div class="w-title">Net worth</div><div class="w-sub">Apr 2026 – Sep 2026 · all accounts</div></div>
+              <div class="w-val" style="font-size:28px;letter-spacing:-0.4px"><div class="num">${fmt2(
+                86420,
+              )}</div><span class="chip sm ok num">+${fmt2(12310)}</span></div></div>
+            <div class="rp-plot">
+              <div class="rp-y num">${ticks
+                .map(t => `<span>${fmt(t)}</span>`)
+                .join('')}</div>
+              <div class="rp-area">${[0, 25, 50, 75]
+                .map(p => `<div class="gl" style="top:${p}%"></div>`)
+                .join('')}${areaChart(nw, { min: 72000, max: 88000 })}</div>
+              <div class="rp-x">${[
+                'Apr ’26',
+                'May ’26',
+                'Jun ’26',
+                'Jul ’26',
+                'Aug ’26',
+                'Sep ’26',
+              ]
+                .map(m => `<span>${m}</span>`)
+                .join('')}</div>
+            </div>
+          </section>
+          <section class="rcard rp-notes">
+            <h2>How is net worth calculated?</h2>
+            <p>Net worth shows the balance of all accounts over time, including all of your investments. It is what you would have if you sold everything you own and paid off as much debt as possible. Hover over the graph to see assets and debt separately.</p>
+          </section>
+        </main>`;
+      }
+
+      const reportsPage = () =>
+        state.rview === 'networth' ? netWorthPage() : reportsDashboard();
+
       let totB = 0,
         totS = 0;
       function render() {
@@ -4606,7 +5312,9 @@
           ${
             state.page === 'account'
               ? accountPage()
-              : `<main class="main">
+              : state.page === 'reports'
+                ? reportsPage()
+                : `<main class="main">
             ${header()}
             ${summary}
             ${ledger(offs)}
@@ -4657,6 +5365,8 @@
         u.searchParams.set('privacy', state.privacy ? '1' : '0');
         u.searchParams.set('pane', state.pane);
         u.searchParams.set('recon', state.recon);
+        u.searchParams.set('rview', state.rview);
+        u.searchParams.set('redit', state.redit ? '1' : '0');
         for (const k of [
           'menu',
           'for',
@@ -4666,6 +5376,7 @@
           'ov',
           'pm',
           'filter',
+          'whover',
         ]) {
           u.searchParams.delete(k);
         }
