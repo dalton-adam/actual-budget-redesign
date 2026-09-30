@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 import type { ChildProcess } from 'node:child_process';
 import { createReadStream } from 'node:fs';
 import { cp, mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -160,10 +161,19 @@ async function stagePublicData(): Promise<void> {
 const lootCoreBackend = (): Plugin => ({
   name: 'loot-core-backend',
   configureServer(server) {
+    // Run loot-core's vite CLI through node directly: spawning `yarn` fails on
+    // Windows, where it is a .cmd shim that spawn cannot launch without a shell.
+    const lootCoreRequire = createRequire(
+      path.join(lootCoreRoot, 'package.json'),
+    );
+    const viteBin = path.join(
+      path.dirname(lootCoreRequire.resolve('vite/package.json')),
+      'bin/vite.js',
+    );
     const child: ChildProcess = spawn(
-      'yarn',
+      process.execPath,
       [
-        'vite',
+        viteBin,
         'build',
         '--config',
         lootCoreConfig,
