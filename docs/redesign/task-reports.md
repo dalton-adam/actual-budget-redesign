@@ -1190,8 +1190,15 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   `scripts/redesign-electron.mjs` ("Isolation check: nothing changed"), but
   the owner declined screen control, so the register was not exercised in
   the desktop window. `better-sqlite3` was rebuilt for Electron and
-  restored from a backup; it loads under Node again. **Still not checked:**
-  the register inside the desktop window.
-  _Linux VRT (September 30, 2026):_ 66 snapshots regenerated in the
+  restored from a backup; it loads under Node again. _Linux VRT (September 30, 2026):_ 66 snapshots regenerated in the
   accounts, rules, schedules and transactions tests, each showing the
   restyled register; nothing else changed (verification.md).
+  _Desktop window (September 30, 2026, on Windows):_ the isolated
+  development build, driven through Playwright over CDP, sandboxed demo:
+  the register renders as in the browser at 1000×700 and 1440×900 (36px
+  rows, selection bar and tint, edit tint, adding row, splits, schedule
+  pills, a tag filter); the keyboard path matches the browser; reconciling
+  accents the cleared header in dark; privacy masks every amount; midnight
+  at 1440. No console error from the register. Nothing written outside
+  `data/redesign-electron/` (verification.md). Screenshots `desktop-*.jpg`.
+  Every APP-02 check is now done.

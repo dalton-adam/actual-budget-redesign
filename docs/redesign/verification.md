@@ -531,3 +531,42 @@ port 3021 over the LAN address, checkout mounted at
    (background and text pixels match the previous snapshot); only the
    corners and size differ.
 4. **Rerun without updating:** the same four files: 33 passed.
+
+## APP-02 desktop window (September 30, 2026)
+
+Against `redesign/main` at `68e384cc4`, on Windows 11, Electron 43.4.0.
+
+**Setup.** Prepared as in stage-0.md (Electron downloaded, `better-sqlite3`
+rebuilt for Electron after backing up its Node build, `@actual-app/core`
+`build:node` and `desktop-electron` `build:dist`). `scripts/redesign-electron.mjs`
+guards only the macOS folders, so the build was started by hand with the
+same isolation: `ACTUAL_DATA_DIR` and `ACTUAL_DOCUMENT_DIR` under
+`data/redesign-electron/`, `--user-data-dir=data/redesign-electron/chromium`,
+no `EXECUTION_CONTEXT`, `NODE_ENV=development`, the renderer from Vite on
+127.0.0.1:3001. Two extra switches let Playwright drive the window without
+screen control: `--remote-debugging-port` (the page, over CDP) and
+`--inspect` (the main process, to set the window's content size). The
+development build opens DevTools docked; it was closed before measuring.
+The welcome screen listed no budget; **Don't use a server**, then **Try the
+demo**. Actual is not installed on this machine.
+
+| Check                                      | Result                                                                                                                                                                                 |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Register, light 1000×700 (Bank of America) | Card, Eyebrow headers, 36px rows (measured), payee initials, accent dots, square tags, upright schedule pills, splits with plain children                                              |
+| Selection and editing                      | Selected row: tint `rgba(135, 25, 224, 0.06)` and a 3px inset bar; row being edited: the tint; a tag click applies its filter and the filtered register renders                        |
+| Adding                                     | Add New shows the 36px new row, date picker, Cancel and Add; Cancel closes it                                                                                                          |
+| Keyboard                                   | Date → payee → notes → category → payment with Tab, Shift+Tab back, Enter down a row, Shift+Enter up; the edit tint on every step                                                      |
+| Reconciling, dark 1000×700                 | Band with the Difference pill, the cleared header accented; Exit reconciliation removes the band                                                                                       |
+| Privacy, dark 1000×700                     | Every payment and deposit masked, split children included                                                                                                                              |
+| Midnight 1440×900                          | Renders as in the browser with the accounts pane open                                                                                                                                  |
+| Row weight after reconciling               | 400 before and after; rows only look heavier on dark backgrounds                                                                                                                       |
+| Console                                    | One React development warning (key spread into JSX) from `CategoryAutocomplete.tsx`'s `SplitTransactionButton`, which the redesign has not changed; nothing from the register          |
+| Isolation                                  | `%APPDATA%\Actual`, `%LOCALAPPDATA%\Actual`, `Documents\Actual` and `OneDrive\Documents\Actual` do not exist after the run; all app data is in `data/redesign-electron/` (git-ignored) |
+
+`app.quit()` left the main process waiting on the inspector ("Debugger
+ending"), so the sandbox processes were stopped afterwards. `better-sqlite3`
+was restored from the backup; it loads under Node again. Screenshots in
+[verification/app-02](verification/app-02/) (`desktop-*.jpg`).
+
+**Not covered:** the packaged `app://actual` bundle (stage-0.md); the
+launcher's own isolation check, which only knows macOS paths.

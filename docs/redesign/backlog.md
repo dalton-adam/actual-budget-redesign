@@ -17,37 +17,37 @@ Budget header are reference material, not tasks to build.
 
 ### Status ledger
 
-| ID                 | State       | Merged                   | Open gaps carried forward                                                                                                                 |
-| ------------------ | ----------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| DISC-01, DISC-02   | verified    | Stage 0 docs             | Reports baseline: 58 passed, 1 failed, 15 skipped. Performance baseline recorded in QA-00.                                                |
-| DESIGN-01 – 03     | verified    | docs                     | design-decisions §11 items 2, 5 still "Shown".                                                                                            |
-| UI-01              | verified    | `4b7b82ea6`              | Accepted light contrast shortfalls (design-decisions §8).                                                                                 |
-| UI-02              | verified    | `3dd3144a3`              | Storybook needs a local case-sensitivity workaround on macOS.                                                                             |
-| UI-03              | verified    | `0e57f083c`, `0129f2c00` | —                                                                                                                                         |
-| NAV-01             | verified    | `7eea259f3`              | —                                                                                                                                         |
-| NAV-02 (+ e2e fix) | verified    | `f02e5ff5e`, `ed654319e` | Collapsed-rail initials are ambiguous; the open account has no visible fill in light (both → BUD-04).                                     |
-| BUD-01             | verified    | `03e9150c3`              | Tour summary step fixed in TOUR-FIX. Custom theme passed in QA-00.                                                                        |
-| TERM-01            | verified    | `f771c251d`              | Light and midnight wording checked in QA-00.                                                                                              |
-| BUD-02             | verified    | `b732f170f`              | Goal caption left out (→ decision D-3). Edit and scroll regressions found in QA-00 (→ PERF-01, 02).                                       |
-| BUD-03             | verified    | `6b53968b8`              | Custom theme passed in QA-00.                                                                                                             |
-| DETAIL-01          | verified    | `5f238b120`              | The overlay passed in a custom theme in QA-00.                                                                                            |
-| DETAIL-02          | verified    | `d90250dff`              | Goal box and pace chart (→ DETAIL-04); month stepper, links and notes editing (→ DETAIL-03).                                              |
-| TOUR-FIX           | verified    | `485a7fbe3`              | —                                                                                                                                         |
-| THEME-02           | verified    | `f9f4e1892`              | Linux VRT baselines regenerated in QA-00; WIDE not run.                                                                                   |
-| QA-00              | verified    | `1e94b0559`              | VRT: 23 of 204 changed snapshots reviewed by eye, the rest by script. QA-01 thresholds decided (D-6).                                     |
-| ELEC-01            | verified    | `0a8582cea`              | Dev builds isolated by `scripts/redesign-electron.mjs`; packaged builds are not (stage-0.md). Title bar wrap → TOPBAR-FIX.                |
-| BUD-04             | verified    | `c0527171d`              | Adds theme role `navListActive`. Linux VRT regenerated in DETAIL-03.                                                                      |
-| PERF-01            | verified    | `8f88c6841`              | Edits now 57–59% faster than the base. Adds `C/budget/index.tsx` (owner-approved; may touch SYNC-01).                                     |
-| PERF-02            | verified    | docs only                | PERF-01 fixed it; no source change. 1000×700 hit 33.3 ms in 5 of 7 runs (a pass; QA-01 watches).                                          |
-| ASSIGN-FIX         | verified    | `cc078bd06`              | Snapshots stale since BUD-04 regenerated in DETAIL-03.                                                                                    |
-| DETAIL-03          | verified    | `658a38c90`              | Linux VRT regenerated (177, incl. BUD-04's pane); custom theme and WIDE passed. Session-only category and month memory.                   |
-| DETAIL-04          | verified    | `9059b8491`              | E2E and WIDE ran against a dev server, not a `build:browser` preview. Linux VRT regenerated (21).                                         |
-| TOPBAR-FIX         | verified    | `107560a51`              | Icon-only Help when narrow is still "Shown" (design-decisions §11 item 6). Linux VRT: no snapshot changed.                                |
-| SYNC-01            | blocked     | —                        | No upstream release after v26.9.0 (checked September 29, 2026). Start when v26.10.0 ships; before RELEASE-01 (D-1).                       |
-| APP-01             | verified    | `875ddad48`              | Linux VRT regenerated (69) on Windows. Custom theme, keyboard, privacy and desktop passed.                                                |
-| APP-02             | verified    | `f8fcc70d8`              | Linux VRT regenerated (66) on Windows. Register not exercised in the desktop window. E2E test "by payee" changed (SYNC-01 conflict risk). |
-| APP-03 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                               |
-| QA-01, RELEASE-01  | not started | —                        | —                                                                                                                                         |
+| ID                 | State       | Merged                   | Open gaps carried forward                                                                                                  |
+| ------------------ | ----------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| DISC-01, DISC-02   | verified    | Stage 0 docs             | Reports baseline: 58 passed, 1 failed, 15 skipped. Performance baseline recorded in QA-00.                                 |
+| DESIGN-01 – 03     | verified    | docs                     | design-decisions §11 items 2, 5 still "Shown".                                                                             |
+| UI-01              | verified    | `4b7b82ea6`              | Accepted light contrast shortfalls (design-decisions §8).                                                                  |
+| UI-02              | verified    | `3dd3144a3`              | Storybook needs a local case-sensitivity workaround on macOS.                                                              |
+| UI-03              | verified    | `0e57f083c`, `0129f2c00` | —                                                                                                                          |
+| NAV-01             | verified    | `7eea259f3`              | —                                                                                                                          |
+| NAV-02 (+ e2e fix) | verified    | `f02e5ff5e`, `ed654319e` | Collapsed-rail initials are ambiguous; the open account has no visible fill in light (both → BUD-04).                      |
+| BUD-01             | verified    | `03e9150c3`              | Tour summary step fixed in TOUR-FIX. Custom theme passed in QA-00.                                                         |
+| TERM-01            | verified    | `f771c251d`              | Light and midnight wording checked in QA-00.                                                                               |
+| BUD-02             | verified    | `b732f170f`              | Goal caption left out (→ decision D-3). Edit and scroll regressions found in QA-00 (→ PERF-01, 02).                        |
+| BUD-03             | verified    | `6b53968b8`              | Custom theme passed in QA-00.                                                                                              |
+| DETAIL-01          | verified    | `5f238b120`              | The overlay passed in a custom theme in QA-00.                                                                             |
+| DETAIL-02          | verified    | `d90250dff`              | Goal box and pace chart (→ DETAIL-04); month stepper, links and notes editing (→ DETAIL-03).                               |
+| TOUR-FIX           | verified    | `485a7fbe3`              | —                                                                                                                          |
+| THEME-02           | verified    | `f9f4e1892`              | Linux VRT baselines regenerated in QA-00; WIDE not run.                                                                    |
+| QA-00              | verified    | `1e94b0559`              | VRT: 23 of 204 changed snapshots reviewed by eye, the rest by script. QA-01 thresholds decided (D-6).                      |
+| ELEC-01            | verified    | `0a8582cea`              | Dev builds isolated by `scripts/redesign-electron.mjs`; packaged builds are not (stage-0.md). Title bar wrap → TOPBAR-FIX. |
+| BUD-04             | verified    | `c0527171d`              | Adds theme role `navListActive`. Linux VRT regenerated in DETAIL-03.                                                       |
+| PERF-01            | verified    | `8f88c6841`              | Edits now 57–59% faster than the base. Adds `C/budget/index.tsx` (owner-approved; may touch SYNC-01).                      |
+| PERF-02            | verified    | docs only                | PERF-01 fixed it; no source change. 1000×700 hit 33.3 ms in 5 of 7 runs (a pass; QA-01 watches).                           |
+| ASSIGN-FIX         | verified    | `cc078bd06`              | Snapshots stale since BUD-04 regenerated in DETAIL-03.                                                                     |
+| DETAIL-03          | verified    | `658a38c90`              | Linux VRT regenerated (177, incl. BUD-04's pane); custom theme and WIDE passed. Session-only category and month memory.    |
+| DETAIL-04          | verified    | `9059b8491`              | E2E and WIDE ran against a dev server, not a `build:browser` preview. Linux VRT regenerated (21).                          |
+| TOPBAR-FIX         | verified    | `107560a51`              | Icon-only Help when narrow is still "Shown" (design-decisions §11 item 6). Linux VRT: no snapshot changed.                 |
+| SYNC-01            | blocked     | —                        | No upstream release after v26.9.0 (checked September 29, 2026). Start when v26.10.0 ships; before RELEASE-01 (D-1).        |
+| APP-01             | verified    | `875ddad48`              | Linux VRT regenerated (69) on Windows. Custom theme, keyboard, privacy and desktop passed.                                 |
+| APP-02             | verified    | `f8fcc70d8`              | Linux VRT regenerated (66) and desktop window checked on Windows. E2E test "by payee" changed (SYNC-01 conflict risk).     |
+| APP-03 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
+| QA-01, RELEASE-01  | not started | —                        | —                                                                                                                          |
 
 States follow plan §16: not started, ready, in progress, review, verified,
 blocked. All application work not marked verified is pending; this document
