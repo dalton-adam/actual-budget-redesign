@@ -1424,7 +1424,7 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   APP-03c).
 
 - APP-04: **merged October 1, 2026** into `redesign/main` (branch
-  `redesign/app-04-schedules`, code `197c58b49`). Drawing approved the same
+  `redesign/app-04-schedules`, code `197c58b49`, merge `f0052659d`). Drawing approved the same
   day (prototype shots `73`–`79`; the owner left the four questions to the
   implementer: actions in a top toolbar, pills keep their icon, no new
   headings in the dialog, the two other dialogs wait for APP-06;
