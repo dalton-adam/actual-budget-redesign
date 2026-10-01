@@ -1,7 +1,8 @@
 import { spawn } from 'node:child_process';
 import type { ChildProcess } from 'node:child_process';
-import { createReadStream } from 'node:fs';
+import { createReadStream, readFileSync } from 'node:fs';
 import { cp, mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -88,6 +89,19 @@ const injectShims = (): Plugin[] => {
 const lootCoreRoot = path.resolve(__dirname, '../loot-core');
 const lootCoreOutDir = path.resolve(lootCoreRoot, 'lib-dist/browser');
 const lootCoreConfig = path.resolve(lootCoreRoot, 'vite.config.mts');
+
+// Resolve loot-core's vite CLI so the watcher can be launched with the
+// current Node binary. Spawning `yarn` directly fails on Windows (it is a
+// .cmd shim), and wrapping it in a shell would leave the watcher orphaned
+// when the shell is killed.
+function resolveLootCoreViteBin(): string {
+  const require = createRequire(path.join(lootCoreRoot, 'package.json'));
+  const pkgPath = require.resolve('vite/package.json');
+  const { bin } = JSON.parse(readFileSync(pkgPath, 'utf8')) as {
+    bin: { vite: string };
+  };
+  return path.resolve(path.dirname(pkgPath), bin.vite);
+}
 const publicDir = path.resolve(__dirname, 'public');
 const publicDataDir = path.resolve(publicDir, 'data');
 const publicKcabDir = path.resolve(publicDir, 'kcab');
@@ -161,9 +175,9 @@ const lootCoreBackend = (): Plugin => ({
   name: 'loot-core-backend',
   configureServer(server) {
     const child: ChildProcess = spawn(
-      'yarn',
+      process.execPath,
       [
-        'vite',
+        resolveLootCoreViteBin(),
         'build',
         '--config',
         lootCoreConfig,
