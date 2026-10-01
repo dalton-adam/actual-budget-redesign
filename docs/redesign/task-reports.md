@@ -1257,3 +1257,4 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   two advisories on untouched calendar lines; desktop build checked, with
   "Isolation check: nothing changed" (verification.md). Every APP-03a
   check is now done.
+- LINT budget-import: **done September 30, 2026.** `EnvelopeBudgetComponents.tsx` and `TrackingBudgetComponents.tsx` now import the month prop types from `#components/budget` instead of `'..'`, clearing the two `absolute-parent-import` oxlint errors; typecheck, oxlint 0 errors, budget tests 86/86.

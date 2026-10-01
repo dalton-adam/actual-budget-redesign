@@ -15,6 +15,10 @@ import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import { css } from '@emotion/css';
 
+import type {
+  CategoryGroupMonthProps,
+  CategoryMonthProps,
+} from '#components/budget';
 import { BalanceWithCarryover } from '#components/budget/BalanceWithCarryover';
 import {
   ENVELOPE_ASSIGNED_TOOLS_WIDTH,
@@ -34,7 +38,6 @@ import { useSheetValue } from '#hooks/useSheetValue';
 import { useUndo } from '#hooks/useUndo';
 import type { Binding, SheetFields } from '#spreadsheet';
 import { envelopeBudget } from '#spreadsheet/bindings';
-import type { CategoryGroupMonthProps, CategoryMonthProps } from '..';
 
 import { BalanceMovementMenu } from './BalanceMovementMenu';
 import { BudgetMenu } from './BudgetMenu';
