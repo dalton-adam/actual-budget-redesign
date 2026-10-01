@@ -645,6 +645,15 @@ questions to the implementer, who chose:
   the upstream look until APP-06 (the new look is opt-in from the page, as
   APP-02 did for the Calendar list).
 
+**As implemented (APP-04):** the toolbar buttons keep their labels at every
+desktop width, as the shipped account toolbar does (the drawing's icon-only
+toolbar below 1280px is dropped), and only Add new schedule carries an icon;
+the Recurring column is 96px on the card so its uppercase header fits; the
+dialog's inputs, pickers and the transactions table's header keep the
+upstream styling of their shared components, and its title stays centred as
+in every upstream modal; the Cancel / Save footer stays in view while the
+dialog scrolls.
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the
