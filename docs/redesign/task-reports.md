@@ -1314,7 +1314,9 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   Linux VRT: update scoped to `reports.test.ts`, **15 snapshots changed**
   (Net Worth, Cash Flow and the three forecast tests, three themes each);
   rerun with `command-bar.test.ts` 19/19 (verification.md).
-  **Open:** custom theme, desktop build.
+  **Follow-up checks (October 1, 2026):** custom theme on every report
+  page and desktop build passed (verification.md, "APP-03b and APP-03c
+  follow-up checks").
 - APP-03c: **merged October 1, 2026** into `redesign/main` (`0a7384ab1`,
   branch `redesign/app-03c-editors`).
   Drawing approved the same day (prototype shots `59`–`66`,
@@ -1362,4 +1364,14 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   the chart card now scrolls). Linux VRT: update scoped to `reports.test.ts`,
   **24 snapshots changed** (the eight custom report tests, three themes
   each); rerun with `command-bar.test.ts` 19/19 (verification.md).
-  **Open:** custom theme, desktop build (as APP-03b).
+  **Follow-up checks (same day):** _Custom theme_ (QA-00 method and themes,
+  bases dark and light, 1440×900 and 1000×700): the custom report, Calendar,
+  Formula and every other report page use only theme roles, except the
+  Calendar list's tag colours (by design) and CodeMirror's own editor
+  colours (upstream). _Desktop build_ (isolated development build over CDP):
+  Net Worth, the custom report (Line Graph in Time mode; "Unsaved changes"
+  after editing a saved report), Calendar with privacy on and Formula at
+  1440×900 and 1000×700 render as in the browser; "Isolation check: nothing
+  changed". Upstream's Formula Result box shows a classic scrollbar in
+  Electron at 1000×700 (3px overflow, not changed). Details in
+  verification.md.

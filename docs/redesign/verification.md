@@ -670,3 +670,46 @@ Not run: the full suite. `Select`'s `triggerVariant`, the table's
 `isFlatRegister` and `QueryManager`'s `isCard` are new optional props whose
 defaults are the old look. `CategorySelector` also changes Crossover's list,
 which has no screenshot test.
+
+## APP-03b and APP-03c follow-up checks (October 1, 2026)
+
+Against `redesign/main` at `2c1a2d09a` (APP-03c merged), on Windows 11.
+Screenshots in [verification/app-03c](verification/app-03c/) (`custom-*`
+and `desktop-*`).
+
+| Check         | Result                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Custom theme  | QA-00 method and themes (every v26.9.0 `--color-*` role hue-rotated 150°, no redesign roles, installed as `installedCustomLightTheme`, bases dark and light), dev server on 127.0.0.1:3001, installed Edge, 1440×900 and 1000×700. Pages: every widget on the demo dashboard (four Summary, Net Worth, Cash Flow, three Spending, Calendar), a second dashboard, Formula, the custom report with legend and summary on, Age of Money, Sankey, Forecast, and Crossover and Budget Analysis from new widgets (Sankey, Budget Analysis and Forecast flags on). Every text, background and border colour in the page is a theme role except the Calendar list's tags (each tag's own colour, as in the APP-02 register) and the Formula editor's CodeMirror defaults (gutter, active line, number colour; upstream `codeMirror-excelLanguage.tsx`, not changed). No page errors. |
+| Desktop build | `scripts/redesign-electron.mjs` with `--remote-debugging-port` and `--inspect`, fresh `data/redesign-electron/`, `better-sqlite3` rebuilt for Electron and restored from a backup afterwards (it loads under Node again). See below.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+
+**Desktop.** The welcome screen listed no budget; **Don't use a server**,
+**Try the demo**. As in APP-03a, the window first loaded from a leftover
+browser-mode Vite server of mine on the wildcard port 3001 (the page threw
+"Cannot assign to read only property 'Actual'"); after stopping it and
+reloading, from the launcher's own server on 127.0.0.1:3001:
+
+- Net Worth, dark 1440×900: the APP-03b header, segmented Live/Static (Enter
+  on Static by keyboard sets `aria-pressed`) and the chart card.
+- Custom report, dark 1440×900: Time mode, Line Graph segment pressed, the
+  settings card, the chart card with summary and legend beside it.
+- Custom report, light 1000×700: summary and legend under the chart; the
+  chart card has 18px corners, no shadow and scrolls (`overflowY: auto`).
+  Saved as a new report, then the graph type changed: "Unsaved changes"
+  shows beside **Report**.
+- Calendar, midnight 1440×900: the flat register card, month names above
+  their totals, the stat tiles; with privacy on, every amount in the tiles,
+  months and list is masked.
+- Formula (experimental flag on through Settings), midnight 1440×900 and
+  1000×700: Result, Formula and Appearance cards stack without overlap
+  (titles at 175, 380, 585 and 817px at 1000×700).
+- Console: only the Transaction Calendar's nested-button warning (upstream
+  structure, noted in APP-03a).
+- Quit with `app.quit()` over the inspector: "Isolation check: nothing
+  changed" for `%APPDATA%\Actual`, `OneDrive\Documents\Actual` and
+  `Documents\Actual`.
+
+**Observed, not changed:** in the Electron window the Formula Result box at
+1000×700 shows a classic vertical scrollbar. The box is upstream's (120px,
+`overflow: auto`), and the dynamically sized result is 3px taller than it
+(scroll height 123). Edge's headless screenshots draw no scrollbar for the
+same overflow.
