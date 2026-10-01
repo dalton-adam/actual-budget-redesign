@@ -4,7 +4,6 @@ import { Button } from '@actual-app/components/button';
 import { SvgDelete } from '@actual-app/components/icons/v0';
 import { SvgAdd } from '@actual-app/components/icons/v1';
 import { Select } from '@actual-app/components/select';
-import { styles } from '@actual-app/components/styles';
 import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -22,10 +21,8 @@ import type {
   MonteCarloConfig,
   MonteCarloTaxBand,
 } from '#components/reports/reports/monte-carlo/monteCarloSimulation';
-import {
-  FIELD_LABEL_ROW_STYLE,
-  FIELD_LABEL_STYLE,
-} from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useMonteCarloStyles } from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { Field, Row, TableHeader } from '#components/table';
 import { FinancialInput } from '#components/util/FinancialInput';
 
@@ -47,6 +44,16 @@ export function MonteCarloTaxConfiguration({
   onConfigChange,
 }: MonteCarloTaxConfigurationProps) {
   const { t } = useTranslation();
+  const {
+    fieldLabel,
+    tableContainer,
+    tableHeader,
+    rowBackground,
+    rowBorder,
+    mutedText,
+    fieldLabelRow,
+  } = useMonteCarloStyles();
+  const controlVariant = useReportControlVariant('normal');
 
   function updateBand(bandId: string, changes: Partial<MonteCarloTaxBand>) {
     onConfigChange({
@@ -80,8 +87,8 @@ export function MonteCarloTaxConfiguration({
   return (
     <View style={{ gap: 10 }}>
       <View style={{ width: 250 }}>
-        <View style={FIELD_LABEL_ROW_STYLE}>
-          <Text style={FIELD_LABEL_STYLE}>
+        <View style={fieldLabelRow}>
+          <Text style={fieldLabel}>
             <Trans>Tax model</Trans>
           </Text>
           <MonteCarloHelpTooltip>
@@ -109,11 +116,12 @@ export function MonteCarloTaxConfiguration({
             ['flat', t('Flat rate per pot')],
             ['bands', t('Tax bands (progressive)')],
           ]}
+          triggerVariant={controlVariant}
         />
       </View>
 
       {taxModel === 'flat' ? (
-        <Text style={{ color: theme.pageText }}>
+        <Text style={{ color: mutedText }}>
           <Trans>
             Set each pot&apos;s Tax (%) on the Investment pots tab. Leave it at
             0 for tax-free pots.
@@ -121,7 +129,7 @@ export function MonteCarloTaxConfiguration({
         </Text>
       ) : (
         <>
-          <Text style={{ color: theme.pageText }}>
+          <Text style={{ color: mutedText }}>
             <Trans>
               Amounts are yearly taxable income in today&apos;s money - the
               thresholds rise with inflation. Set each pot&apos;s Taxable
@@ -129,8 +137,8 @@ export function MonteCarloTaxConfiguration({
             </Trans>
           </Text>
 
-          <View style={{ ...styles.tableContainer, flex: 'unset' }}>
-            <TableHeader>
+          <View style={{ ...tableContainer, flex: 'unset' }}>
+            <TableHeader style={tableHeader}>
               <Field width="flex" style={{ minWidth: 160 }}>
                 <Trans>Income from</Trans>
               </Field>
@@ -146,7 +154,8 @@ export function MonteCarloTaxConfiguration({
                 collapsed
                 height={BAND_ROW_HEIGHT}
                 style={{
-                  backgroundColor: theme.tableBackground,
+                  backgroundColor: rowBackground,
+                  borderColor: rowBorder,
                   ':hover': { backgroundColor: theme.tableRowBackgroundHover },
                 }}
               >
@@ -205,7 +214,7 @@ export function MonteCarloTaxConfiguration({
           </View>
 
           <View style={{ flexDirection: 'row' }}>
-            <Button onPress={addBand}>
+            <Button variant={controlVariant} onPress={addBand}>
               <SvgAdd width={10} height={10} style={{ marginRight: 5 }} />
               <Trans>Add band</Trans>
             </Button>

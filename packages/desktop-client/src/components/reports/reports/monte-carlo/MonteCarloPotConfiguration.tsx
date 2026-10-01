@@ -20,7 +20,7 @@ import { css } from '@emotion/css';
 import { LabeledCheckbox } from '#components/forms/LabeledCheckbox';
 import { MonteCarloHelpTooltip } from '#components/reports/reports/monte-carlo/MonteCarloHelpTooltip';
 import { MonteCarloNumberInput } from '#components/reports/reports/monte-carlo/MonteCarloNumberInput';
-import { POT_COLUMNS } from '#components/reports/reports/monte-carlo/MonteCarloPotsTableHeader';
+import { usePotColumns } from '#components/reports/reports/monte-carlo/MonteCarloPotsTableHeader';
 import {
   ALLOCATION_PRESETS,
   MAX_AMOUNT,
@@ -28,17 +28,14 @@ import {
   MAX_WITHDRAWAL_TAX_RATE,
 } from '#components/reports/reports/monte-carlo/monteCarloSimulation';
 import type { MonteCarloPot } from '#components/reports/reports/monte-carlo/monteCarloSimulation';
-import {
-  FIELD_LABEL_ROW_STYLE,
-  FIELD_LABEL_STYLE,
-  FIELD_STYLE,
-  GROUP_HEADING_STYLE,
-} from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useMonteCarloStyles } from '#components/reports/reports/monte-carlo/monteCarloStyles';
 import { Field, Row } from '#components/table';
 import { FinancialInput } from '#components/util/FinancialInput';
 import { useAccounts } from '#hooks/useAccounts';
 
 const POT_ROW_HEIGHT = 43;
+// Taller rows on the card, as drawn (APP-03d)
+const POT_CARD_ROW_HEIGHT = 46;
 
 type MonteCarloPotConfigurationProps = ComponentPropsWithoutRef<
   typeof GridListItem<MonteCarloPot>
@@ -67,6 +64,9 @@ export function MonteCarloPotConfiguration({
   const { t } = useTranslation();
   const { data: accounts = [] } = useAccounts();
   const [isExpanded, setIsExpanded] = useState(false);
+  const columns = usePotColumns();
+  const { isCard, groupHeading, fieldLabel, field, fieldLabelRow } =
+    useMonteCarloStyles();
 
   // Historical models derive this pot's returns from its allocation mix;
   // the manual return/volatility only apply to Custom pots there
@@ -103,14 +103,17 @@ export function MonteCarloPotConfiguration({
     >
       <Row
         collapsed
-        height={POT_ROW_HEIGHT}
+        height={isCard ? POT_CARD_ROW_HEIGHT : POT_ROW_HEIGHT}
         style={{
-          backgroundColor: theme.tableBackground,
+          backgroundColor: isCard
+            ? theme.cardBackground
+            : theme.tableBackground,
+          ...(isCard && { borderColor: theme.cardHairline }),
           ':hover': { backgroundColor: theme.tableRowBackgroundHover },
         }}
       >
         <Field
-          width={POT_COLUMNS.expand}
+          width={columns.expand}
           truncate={false}
           style={{ alignItems: 'center' }}
         >
@@ -130,11 +133,7 @@ export function MonteCarloPotConfiguration({
           </Button>
         </Field>
 
-        <Field
-          width="flex"
-          style={{ minWidth: POT_COLUMNS.name }}
-          truncate={false}
-        >
+        <Field width="flex" style={{ minWidth: columns.name }} truncate={false}>
           <Input
             // Uncontrolled on purpose: committing on blur keeps typing
             // snappy since every config change re-runs the simulation
@@ -150,7 +149,7 @@ export function MonteCarloPotConfiguration({
 
         <Field
           width="flex"
-          style={{ minWidth: POT_COLUMNS.startingBalance }}
+          style={{ minWidth: columns.startingBalance }}
           truncate={false}
         >
           <FinancialInput
@@ -172,7 +171,7 @@ export function MonteCarloPotConfiguration({
 
         <Field
           width="flex"
-          style={{ minWidth: POT_COLUMNS.linkedAccount }}
+          style={{ minWidth: columns.linkedAccount }}
           truncate={false}
         >
           <Select
@@ -192,7 +191,7 @@ export function MonteCarloPotConfiguration({
 
         <Field
           width="flex"
-          style={{ minWidth: POT_COLUMNS.allocation }}
+          style={{ minWidth: columns.allocation }}
           truncate={false}
         >
           <Select
@@ -222,7 +221,7 @@ export function MonteCarloPotConfiguration({
 
         <Field
           width="flex"
-          style={{ minWidth: POT_COLUMNS.expectedReturn }}
+          style={{ minWidth: columns.expectedReturn }}
           truncate={false}
         >
           <MonteCarloNumberInput
@@ -243,7 +242,7 @@ export function MonteCarloPotConfiguration({
 
         <Field
           width="flex"
-          style={{ minWidth: POT_COLUMNS.volatility }}
+          style={{ minWidth: columns.volatility }}
           truncate={false}
         >
           <MonteCarloNumberInput
@@ -263,7 +262,7 @@ export function MonteCarloPotConfiguration({
         </Field>
 
         <Field
-          width={POT_COLUMNS.remove}
+          width={columns.remove}
           truncate={false}
           style={{ alignItems: 'center' }}
         >
@@ -283,9 +282,19 @@ export function MonteCarloPotConfiguration({
       {isExpanded && (
         <View
           style={{
-            backgroundColor: theme.tableBackground,
-            borderBottom: `1px solid ${theme.tableBorder}`,
-            padding: '12px 15px 16px',
+            // On the card the settings sit on a Card Inset well (APP-03d)
+            ...(isCard
+              ? {
+                  backgroundColor: theme.cardInset,
+                  borderRadius: 10,
+                  margin: '0 10px 10px 36px',
+                  padding: '12px 14px 14px',
+                }
+              : {
+                  backgroundColor: theme.tableBackground,
+                  borderBottom: `1px solid ${theme.tableBorder}`,
+                  padding: '12px 15px 16px',
+                }),
             flexDirection: 'row',
             flexWrap: 'wrap',
             alignItems: 'flex-start',
@@ -294,12 +303,12 @@ export function MonteCarloPotConfiguration({
           }}
         >
           <View style={{ gap: 10 }}>
-            <Text style={GROUP_HEADING_STYLE}>
+            <Text style={groupHeading}>
               <Trans>Access</Trans>
             </Text>
-            <View style={FIELD_STYLE}>
-              <View style={FIELD_LABEL_ROW_STYLE}>
-                <Text style={FIELD_LABEL_STYLE}>
+            <View style={field}>
+              <View style={fieldLabelRow}>
+                <Text style={fieldLabel}>
                   <Trans>Accessible from age</Trans>
                 </Text>
                 <MonteCarloHelpTooltip>
@@ -328,12 +337,12 @@ export function MonteCarloPotConfiguration({
           </View>
 
           <View style={{ gap: 10 }}>
-            <Text style={GROUP_HEADING_STYLE}>
+            <Text style={groupHeading}>
               <Trans>Tax</Trans>
             </Text>
-            <View style={FIELD_STYLE}>
-              <View style={FIELD_LABEL_ROW_STYLE}>
-                <Text style={FIELD_LABEL_STYLE}>
+            <View style={field}>
+              <View style={fieldLabelRow}>
+                <Text style={fieldLabel}>
                   {usesTaxBands ? (
                     <Trans>Taxable portion (%)</Trans>
                   ) : (
@@ -388,7 +397,7 @@ export function MonteCarloPotConfiguration({
           </View>
 
           <View style={{ gap: 10 }}>
-            <Text style={GROUP_HEADING_STYLE}>
+            <Text style={groupHeading}>
               <Trans>Fees</Trans>
             </Text>
             <View
@@ -399,9 +408,9 @@ export function MonteCarloPotConfiguration({
                 gap: 20,
               }}
             >
-              <View style={FIELD_STYLE}>
-                <View style={FIELD_LABEL_ROW_STYLE}>
-                  <Text style={FIELD_LABEL_STYLE}>
+              <View style={field}>
+                <View style={fieldLabelRow}>
+                  <Text style={fieldLabel}>
                     <Trans>Fixed yearly fee</Trans>
                   </Text>
                   <MonteCarloHelpTooltip>
@@ -436,9 +445,9 @@ export function MonteCarloPotConfiguration({
                 <Trans>Adjust by inflation</Trans>
               </LabeledCheckbox>
 
-              <View style={FIELD_STYLE}>
-                <View style={FIELD_LABEL_ROW_STYLE}>
-                  <Text style={FIELD_LABEL_STYLE}>
+              <View style={field}>
+                <View style={fieldLabelRow}>
+                  <Text style={fieldLabel}>
                     <Trans>Fee (% of balance)</Trans>
                   </Text>
                   <MonteCarloHelpTooltip>

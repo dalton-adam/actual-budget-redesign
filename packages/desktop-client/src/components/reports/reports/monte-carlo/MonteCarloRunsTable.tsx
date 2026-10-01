@@ -3,13 +3,15 @@ import { Trans, useTranslation } from 'react-i18next';
 
 import { Button } from '@actual-app/components/button';
 import { Select } from '@actual-app/components/select';
+import { StatusPill } from '@actual-app/components/status-pill';
 import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
 import { FinancialText } from '#components/FinancialText';
 import { PrivacyFilter } from '#components/PrivacyFilter';
-import { GROUP_HEADING_STYLE } from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useMonteCarloStyles } from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { useFormat } from '#hooks/useFormat';
 
 const PAGE_SIZE = 20;
@@ -33,6 +35,9 @@ export function MonteCarloRunsTable({
 }: MonteCarloRunsTableProps) {
   const { t } = useTranslation();
   const format = useFormat();
+  const { isCard, groupHeading } = useMonteCarloStyles();
+  const controlVariant = useReportControlVariant('normal');
+  const rowBorder = `1px solid ${isCard ? theme.cardHairline : theme.tableBorder}`;
 
   const [sortOrder, setSortOrder] = useState<SortOrder>('worst-first');
   const [page, setPage] = useState(0);
@@ -101,7 +106,7 @@ export function MonteCarloRunsTable({
           marginBottom: 10,
         }}
       >
-        <Text>
+        <Text style={isCard ? { color: theme.pageTextSecondary } : undefined}>
           {t('Showing {{from}}-{{to}} of {{total}} runs', {
             from: pageStart + 1,
             to: pageStart + pageIndices.length,
@@ -119,6 +124,7 @@ export function MonteCarloRunsTable({
             ['worst-first', t('Worst outcomes first')],
             ['best-first', t('Best outcomes first')],
           ]}
+          triggerVariant={controlVariant}
           style={{ width: 200 }}
         />
       </View>
@@ -130,24 +136,20 @@ export function MonteCarloRunsTable({
           paddingBottom: 8,
           paddingLeft: 8,
           paddingRight: 8,
-          borderBottom: `1px solid ${theme.tableBorder}`,
+          borderBottom: rowBorder,
           gap: 10,
         }}
       >
-        <Text style={{ ...GROUP_HEADING_STYLE, width: 80 }}>
+        <Text style={{ ...groupHeading, width: 80 }}>
           <Trans>Rank</Trans>
         </Text>
-        <Text style={{ ...GROUP_HEADING_STYLE, flex: 1 }}>
+        <Text style={{ ...groupHeading, flex: 1 }}>
           <Trans>Outcome</Trans>
         </Text>
-        <Text
-          style={{ ...GROUP_HEADING_STYLE, width: 160, textAlign: 'right' }}
-        >
+        <Text style={{ ...groupHeading, width: 160, textAlign: 'right' }}>
           <Trans>Ending balance</Trans>
         </Text>
-        <Text
-          style={{ ...GROUP_HEADING_STYLE, width: 160, textAlign: 'right' }}
-        >
+        <Text style={{ ...groupHeading, width: 160, textAlign: 'right' }}>
           <Trans>Total withdrawn</Trans>
         </Text>
       </View>
@@ -156,6 +158,13 @@ export function MonteCarloRunsTable({
         const depletionYear = depletionYearBySimulation[simulationIndex];
         const hasSurvived = depletionYear === -1;
         const isHighlighted = highlightedRank === pageStart + rowNumber;
+        const outcome = hasSurvived
+          ? t('Survived')
+          : t('Ran out at age {{age}}', {
+              // The age of the year that couldn't be funded, matching the
+              // drill-in's failure row
+              age: startAge + depletionYear - 1,
+            });
         return (
           <Button
             key={simulationIndex}
@@ -163,7 +172,7 @@ export function MonteCarloRunsTable({
             onPress={() => onSelectRun(simulationIndex)}
             style={{
               padding: '8px 0',
-              borderBottom: `1px solid ${theme.tableBorder}`,
+              borderBottom: rowBorder,
               borderRadius: 0,
               ...(isHighlighted && {
                 backgroundColor: theme.tableRowBackgroundHighlight,
@@ -189,18 +198,25 @@ export function MonteCarloRunsTable({
                 style={{
                   flex: 1,
                   textAlign: 'left',
-                  color: hasSurvived
-                    ? theme.reportsNumberPositive
-                    : theme.reportsNumberNegative,
+                  ...(!isCard && {
+                    color: hasSurvived
+                      ? theme.reportsNumberPositive
+                      : theme.reportsNumberNegative,
+                  }),
                 }}
               >
-                {hasSurvived
-                  ? t('Survived')
-                  : t('Ran out at age {{age}}', {
-                      // The age of the year that couldn't be funded, matching
-                      // the drill-in's failure row
-                      age: startAge + depletionYear - 1,
-                    })}
+                {isCard ? (
+                  // A status pill on the card, so colour is never the only
+                  // signal (APP-03d)
+                  <StatusPill
+                    tone={hasSurvived ? 'positive' : 'negative'}
+                    size="small"
+                  >
+                    {outcome}
+                  </StatusPill>
+                ) : (
+                  outcome
+                )}
               </Text>
               <Text style={{ width: 160, textAlign: 'right' }}>
                 {hasSurvived ? (
@@ -258,9 +274,11 @@ export function MonteCarloRunsTable({
             ['0.75', t('75th percentile')],
             ['1', t('Best run')],
           ]}
+          triggerVariant={controlVariant}
           style={{ width: 170 }}
         />
         <Button
+          variant={controlVariant}
           isDisabled={currentPage === 0}
           onPress={() => {
             setPage(currentPage - 1);
@@ -270,6 +288,7 @@ export function MonteCarloRunsTable({
           <Trans>Previous</Trans>
         </Button>
         <Button
+          variant={controlVariant}
           isDisabled={currentPage >= pageCount - 1}
           onPress={() => {
             setPage(currentPage + 1);

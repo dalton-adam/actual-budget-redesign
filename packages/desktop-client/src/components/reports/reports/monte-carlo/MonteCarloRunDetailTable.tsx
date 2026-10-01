@@ -18,7 +18,8 @@ import type {
   MonteCarloPot,
   MonteCarloRunDetailRow,
 } from '#components/reports/reports/monte-carlo/monteCarloSimulation';
-import { GROUP_HEADING_STYLE } from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useMonteCarloStyles } from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { useFormat } from '#hooks/useFormat';
 
 // The minWidth keeps amounts readable on narrow screens - the table
@@ -57,6 +58,8 @@ export function MonteCarloRunDetailTable({
   onBack,
 }: MonteCarloRunDetailTableProps) {
   const { t } = useTranslation();
+  const { groupHeading, rowBorder, mutedText } = useMonteCarloStyles();
+  const controlVariant = useReportControlVariant('normal');
   const format = useFormat();
   const [expandedYears, setExpandedYears] = useState<Set<number>>(new Set());
 
@@ -124,7 +127,7 @@ export function MonteCarloRunDetailTable({
           marginBottom: 10,
         }}
       >
-        <Button onPress={onBack}>
+        <Button variant={controlVariant} onPress={onBack}>
           <Trans>Back to all runs</Trans>
         </Button>
         <Text style={{ fontWeight: 600 }}>
@@ -159,7 +162,7 @@ export function MonteCarloRunDetailTable({
         </Button>
       </View>
 
-      <Text style={{ fontSize: 13, color: theme.pageText, marginBottom: 10 }}>
+      <Text style={{ fontSize: 13, color: mutedText, marginBottom: 10 }}>
         <PrivacyFilter>
           <FinancialText as="span">{getTotalsSentence()}</FinancialText>
         </PrivacyFilter>
@@ -172,34 +175,32 @@ export function MonteCarloRunDetailTable({
             style={{
               flexDirection: 'row',
               paddingBottom: 8,
-              borderBottom: `1px solid ${theme.tableBorder}`,
+              borderBottom: `1px solid ${rowBorder}`,
               gap: 10,
             }}
           >
             <View style={{ width: 36 }} />
-            <Text style={{ ...GROUP_HEADING_STYLE, width: 60 }}>
+            <Text style={{ ...groupHeading, width: 60 }}>
               <Trans>Age</Trans>
             </Text>
-            <Text style={{ ...GROUP_HEADING_STYLE, ...AMOUNT_CELL_STYLE }}>
+            <Text style={{ ...groupHeading, ...AMOUNT_CELL_STYLE }}>
               <Trans>Starting balance</Trans>
             </Text>
             {hasContributions && (
-              <Text style={{ ...GROUP_HEADING_STYLE, ...AMOUNT_CELL_STYLE }}>
+              <Text style={{ ...groupHeading, ...AMOUNT_CELL_STYLE }}>
                 <Trans>Contributions</Trans>
               </Text>
             )}
-            <Text style={{ ...GROUP_HEADING_STYLE, ...AMOUNT_CELL_STYLE }}>
+            <Text style={{ ...groupHeading, ...AMOUNT_CELL_STYLE }}>
               <Trans>Withdrawal</Trans>
             </Text>
-            <Text style={{ ...GROUP_HEADING_STYLE, ...AMOUNT_CELL_STYLE }}>
+            <Text style={{ ...groupHeading, ...AMOUNT_CELL_STYLE }}>
               <Trans>Investment growth</Trans>
             </Text>
-            <Text
-              style={{ ...GROUP_HEADING_STYLE, width: 90, textAlign: 'right' }}
-            >
+            <Text style={{ ...groupHeading, width: 90, textAlign: 'right' }}>
               <Trans>Return (%)</Trans>
             </Text>
-            <Text style={{ ...GROUP_HEADING_STYLE, ...AMOUNT_CELL_STYLE }}>
+            <Text style={{ ...groupHeading, ...AMOUNT_CELL_STYLE }}>
               <Trans>Ending balance</Trans>
             </Text>
           </View>
@@ -224,7 +225,7 @@ export function MonteCarloRunDetailTable({
                     flexDirection: 'row',
                     alignItems: 'center',
                     padding: '6px 0',
-                    borderBottom: `1px solid ${theme.tableBorder}`,
+                    borderBottom: `1px solid ${rowBorder}`,
                     gap: 10,
                   }}
                 >
@@ -322,7 +323,7 @@ export function MonteCarloRunDetailTable({
                 {isExpanded && (
                   <View
                     style={{
-                      borderBottom: `1px solid ${theme.tableBorder}`,
+                      borderBottom: `1px solid ${rowBorder}`,
                       padding: '10px 12px 12px 46px',
                       gap: 4,
                     }}
@@ -403,12 +404,12 @@ export function MonteCarloRunDetailTable({
                             flexDirection: 'row',
                             gap: 10,
                             paddingBottom: 4,
-                            borderBottom: `1px solid ${theme.tableBorder}`,
+                            borderBottom: `1px solid ${rowBorder}`,
                           }}
                         >
                           <Text
                             style={{
-                              ...GROUP_HEADING_STYLE,
+                              ...groupHeading,
                               flex: 1,
                               minWidth: 120,
                             }}
@@ -417,7 +418,7 @@ export function MonteCarloRunDetailTable({
                           </Text>
                           <Text
                             style={{
-                              ...GROUP_HEADING_STYLE,
+                              ...groupHeading,
                               ...POT_CELL_STYLE,
                               width: 130,
                             }}
@@ -427,7 +428,7 @@ export function MonteCarloRunDetailTable({
                           {hasContributions && (
                             <Text
                               style={{
-                                ...GROUP_HEADING_STYLE,
+                                ...groupHeading,
                                 ...POT_CELL_STYLE,
                                 width: 130,
                               }}
@@ -437,7 +438,7 @@ export function MonteCarloRunDetailTable({
                           )}
                           <Text
                             style={{
-                              ...GROUP_HEADING_STYLE,
+                              ...groupHeading,
                               ...POT_CELL_STYLE,
                               width: 130,
                             }}
@@ -446,7 +447,7 @@ export function MonteCarloRunDetailTable({
                           </Text>
                           <Text
                             style={{
-                              ...GROUP_HEADING_STYLE,
+                              ...groupHeading,
                               ...POT_CELL_STYLE,
                               width: 110,
                             }}
@@ -463,7 +464,7 @@ export function MonteCarloRunDetailTable({
                               gap: 4,
                             }}
                           >
-                            <Text style={GROUP_HEADING_STYLE}>
+                            <Text style={groupHeading}>
                               <Trans>Tax paid</Trans>
                             </Text>
                             <MonteCarloHelpTooltip placement="bottom end">
@@ -488,7 +489,7 @@ export function MonteCarloRunDetailTable({
                               gap: 4,
                             }}
                           >
-                            <Text style={GROUP_HEADING_STYLE}>
+                            <Text style={groupHeading}>
                               <Trans>Fees</Trans>
                             </Text>
                             <MonteCarloHelpTooltip placement="bottom end">
@@ -503,7 +504,7 @@ export function MonteCarloRunDetailTable({
                           </View>
                           <Text
                             style={{
-                              ...GROUP_HEADING_STYLE,
+                              ...groupHeading,
                               ...POT_CELL_STYLE,
                               width: 90,
                             }}
@@ -512,7 +513,7 @@ export function MonteCarloRunDetailTable({
                           </Text>
                           <Text
                             style={{
-                              ...GROUP_HEADING_STYLE,
+                              ...groupHeading,
                               ...POT_CELL_STYLE,
                               width: 130,
                             }}
@@ -641,7 +642,7 @@ export function MonteCarloRunDetailTable({
       </View>
 
       {lastRow?.inaccessibleBalance != null && (
-        <Text style={{ marginTop: 10, color: theme.pageText }}>
+        <Text style={{ marginTop: 10, color: mutedText }}>
           {t(
             'The plan failed at age {{age}} with {{amount}} still locked in pots that had not reached their access age.',
             {

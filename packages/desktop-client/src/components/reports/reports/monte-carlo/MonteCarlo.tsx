@@ -27,6 +27,8 @@ import { MonteCarloConfiguration } from '#components/reports/reports/monte-carlo
 import { HISTORICAL_ANNUAL_RETURNS } from '#components/reports/reports/monte-carlo/monteCarloHistoricalReturns';
 import { MonteCarloRunDetailTable } from '#components/reports/reports/monte-carlo/MonteCarloRunDetailTable';
 import { MonteCarloRunsTable } from '#components/reports/reports/monte-carlo/MonteCarloRunsTable';
+import { MonteCarloSection } from '#components/reports/reports/monte-carlo/MonteCarloSection';
+import { MonteCarloSectionTitle } from '#components/reports/reports/monte-carlo/MonteCarloSectionTitle';
 import {
   getMonteCarloHorizonYears,
   MONTE_CARLO_DEFAULTS,
@@ -34,8 +36,11 @@ import {
   runMonteCarloSimulation,
 } from '#components/reports/reports/monte-carlo/monteCarloSimulation';
 import type { MonteCarloConfig } from '#components/reports/reports/monte-carlo/monteCarloSimulation';
+import { MonteCarloStatTile } from '#components/reports/reports/monte-carlo/MonteCarloStatTile';
 import { GROUP_HEADING_STYLE } from '#components/reports/reports/monte-carlo/monteCarloStyles';
 import { useResolvedMonteCarloConfig } from '#components/reports/reports/monte-carlo/useResolvedMonteCarloConfig';
+import { ReportSegmentedControl } from '#components/reports/ReportSegmentedControl';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { useDashboardWidget } from '#hooks/useDashboardWidget';
 import { useFormat } from '#hooks/useFormat';
 import { useNavigate } from '#hooks/useNavigate';
@@ -58,7 +63,8 @@ export function MonteCarlo() {
   const dispatch = useDispatch();
   const format = useFormat();
   const navigate = useNavigate();
-  const { isNarrowWidth } = useResponsive();
+  const { isNarrowWidth, width } = useResponsive();
+  const controlVariant = useReportControlVariant('normal');
 
   const [config, setConfig] = useState<MonteCarloConfig>(MONTE_CARLO_DEFAULTS);
   const [graphView, setGraphView] = useState<MonteCarloGraphView>('all');
@@ -187,6 +193,209 @@ export function MonteCarlo() {
         ? theme.warningText
         : theme.reportsNumberNegative;
 
+  const graphViewOptions: Array<[MonteCarloGraphView, string]> = [
+    ['all', t('All scenarios')],
+    ['single-worst', t('Single worst run')],
+    ['worst-case', t('Worst-case scenario (5th percentile)')],
+    ['pessimistic', t('Pessimistic scenario (30th percentile)')],
+    ['median', t('Median scenario (50th percentile)')],
+    ['optimistic', t('Optimistic scenario (70th percentile)')],
+  ];
+
+  const todaysMoneyCheckbox = (
+    <LabeledCheckbox
+      id="mc-todays-money"
+      checked={showTodaysMoney}
+      onChange={event => setShowTodaysMoney(event.target.checked)}
+      style={{ flex: 'unset' }}
+    >
+      <Trans>Show values in today&apos;s money</Trans>
+    </LabeledCheckbox>
+  );
+
+  const summarySentence = t(
+    'In {{successPercent}}% of {{simulationCount}} simulated scenarios, your pot lasted until age {{endAge}}.',
+    {
+      successPercent,
+      simulationCount: result.simulationCount,
+      endAge,
+    },
+  );
+
+  // Desktop text under the titles is Secondary; mobile keeps the upstream
+  // page text (plan §19.4)
+  const secondaryTextColor = isNarrowWidth
+    ? theme.pageText
+    : theme.pageTextSecondary;
+
+  // Below this width the stat tiles take three columns with the success
+  // rate spanning two rows, and the histogram and explanation stack
+  const isWide = !isNarrowWidth && width >= MONTE_CARLO_WIDE_FROM;
+
+  const statTiles = (
+    <View
+      style={
+        isNarrowWidth
+          ? {
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              gap: 40,
+              rowGap: 20,
+              alignItems: 'flex-start',
+            }
+          : {
+              display: 'grid',
+              gridTemplateColumns: isWide
+                ? '1.15fr repeat(4, minmax(0, 1fr))'
+                : 'repeat(3, minmax(0, 1fr))',
+              gap: 10,
+            }
+      }
+    >
+      <MonteCarloStatTile
+        label={<Trans>Success rate</Trans>}
+        isHeadline
+        color={successColor}
+        style={!isNarrowWidth && !isWide ? { gridRow: 'span 2' } : undefined}
+      >
+        <FinancialText as="span">{`${successPercent}%`}</FinancialText>
+      </MonteCarloStatTile>
+      <MonteCarloStatTile label={<Trans>Median ending balance</Trans>}>
+        <PrivacyFilter>
+          <FinancialText as="span">
+            {format(result.medianEndingBalance, 'financial')}
+          </FinancialText>
+        </PrivacyFilter>
+      </MonteCarloStatTile>
+      <MonteCarloStatTile label={<Trans>Median total withdrawn</Trans>}>
+        <PrivacyFilter>
+          <FinancialText as="span">
+            {format(result.medianTotalWithdrawn, 'financial')}
+          </FinancialText>
+        </PrivacyFilter>
+      </MonteCarloStatTile>
+      <MonteCarloStatTile label={<Trans>Chance of running out of money</Trans>}>
+        <FinancialText as="span">{`${depletionPercent}%`}</FinancialText>
+      </MonteCarloStatTile>
+      {result.medianDepletionYear != null && (
+        <MonteCarloStatTile label={<Trans>Typical failure runs out at</Trans>}>
+          {t('Age {{age}}', {
+            // Ages here are the failure year itself, matching the
+            // drill-in's failure row
+            age: config.currentAge + result.medianDepletionYear - 1,
+          })}
+        </MonteCarloStatTile>
+      )}
+    </View>
+  );
+
+  const histogramSection = (
+    <MonteCarloSection style={isWide ? { flex: 1.15, minWidth: 0 } : {}}>
+      <MonteCarloSectionTitle style={{ marginBottom: 5 }}>
+        <Trans>When did the pot run out?</Trans>
+      </MonteCarloSectionTitle>
+      {hasFailures ? (
+        <>
+          <Text style={{ color: secondaryTextColor, marginBottom: 10 }}>
+            {t(
+              'Only the {{failedCount}} of {{simulationCount}} scenarios that ran out of money are shown here - the other {{survivedCount}} kept a positive balance for the full horizon.',
+              {
+                failedCount,
+                simulationCount: result.simulationCount,
+                survivedCount: result.simulationCount - failedCount,
+              },
+            )}
+          </Text>
+          <View style={{ height: 200, flexShrink: 0 }}>
+            <MonteCarloHistogram
+              depletionHistogram={result.depletionHistogram}
+              startAge={config.currentAge}
+              medianDepletionYear={result.medianDepletionYear}
+              simulationCount={result.simulationCount}
+              style={{ height: 200 }}
+            />
+          </View>
+          <View style={{ marginTop: 10, flexShrink: 0 }}>
+            <Text style={{ color: secondaryTextColor }}>
+              {t(
+                'Worst case: money ran out at age {{worst}}. Among failures, the typical depletion age was {{median}}; the luckiest failure lasted until age {{best}}.',
+                {
+                  worst:
+                    config.currentAge + (result.earliestDepletionYear ?? 1) - 1,
+                  median:
+                    config.currentAge + (result.medianDepletionYear ?? 1) - 1,
+                  best:
+                    config.currentAge + (result.latestDepletionYear ?? 1) - 1,
+                },
+              )}
+            </Text>
+          </View>
+        </>
+      ) : (
+        <Paragraph isLast={!isNarrowWidth}>
+          <Trans>
+            The pot survived the full time horizon in every simulated scenario.
+          </Trans>
+        </Paragraph>
+      )}
+    </MonteCarloSection>
+  );
+
+  const descriptionSection = (
+    <MonteCarloSection
+      style={{ userSelect: 'none', ...(isWide && { flex: 1, minWidth: 0 }) }}
+    >
+      <MonteCarloSectionTitle style={{ marginBottom: 10 }}>
+        <Trans>How does this simulation work?</Trans>
+      </MonteCarloSectionTitle>
+      <Paragraph>
+        <Trans>
+          Each scenario replays your retirement with a different sequence of
+          yearly investment returns. Every year, any contributions are added at
+          the start, then the withdrawal is taken, and then each pot grows or
+          shrinks with that year&apos;s return. Pots with an access age stay
+          invested but can&apos;t fund withdrawals until you reach it - if the
+          accessible pots can&apos;t cover a year&apos;s withdrawal, the plan
+          counts as having run out, even if locked pots still hold money. The
+          shaded bands show the range of outcomes across all scenarios: the
+          darker band covers the middle half, and the lighter band covers 80% of
+          them.
+        </Trans>
+      </Paragraph>
+      <Paragraph isLast={!isNarrowWidth}>
+        {config.returnModel === 'normal' ? (
+          <Trans>
+            Keep in mind this is a simplified model: returns are drawn
+            independently each year from a normal distribution, which ignores
+            sequence-of-returns clustering and fat tails, and fees and taxes are
+            modeled only as accurately as the rates you enter. Treat the results
+            as a rough guide, not a guarantee.
+          </Trans>
+        ) : config.returnModel === 'historical-bootstrap' ? (
+          <Trans>
+            Returns are actual US market years ({{ firstYear }}&ndash;
+            {{ lastYear }}, S&amp;P 500 / 10-year Treasuries / T-bills,
+            Damodaran data) drawn in random order for each pot&apos;s allocation
+            mix. Real crash years are included, but multi-year momentum is lost
+            by shuffling, fees and taxes are only as accurate as the rates you
+            enter, and US history has been unusually good, so results may be
+            optimistic for globally diversified portfolios.
+          </Trans>
+        ) : (
+          <Trans>
+            Each scenario replays actual US market history ({{ firstYear }}
+            &ndash;{{ lastYear }}, S&amp;P 500 / 10-year Treasuries / T-bills,
+            Damodaran data) starting from a different year, wrapping around the
+            end of the data. This preserves real crashes and recoveries, but
+            there are only as many scenarios as start years, fees and taxes are
+            only as accurate as the rates you enter, and US history may be
+            optimistic for globally diversified portfolios.
+          </Trans>
+        )}
+      </Paragraph>
+    </MonteCarloSection>
+  );
+
   return (
     <Page
       header={
@@ -211,6 +420,21 @@ export function MonteCarlo() {
       }
       padding={0}
     >
+      {!isNarrowWidth &&
+        widget && (
+          // Save widget sits under the header, as on the Formula page
+          <View
+            style={{
+              padding: 20,
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+            }}
+          >
+            <Button variant="primary" onPress={onSaveWidget}>
+              <Trans>Save widget</Trans>
+            </Button>
+          </View>
+        )}
       <View
         style={{
           flex: 1,
@@ -218,34 +442,36 @@ export function MonteCarlo() {
           paddingLeft: !isNarrowWidth ? 20 : 10,
           paddingRight: !isNarrowWidth ? 20 : 10,
           paddingBottom: 20,
-          gap: 10,
+          gap: isNarrowWidth ? 10 : 14,
         }}
       >
         {/* Configuration */}
         <View style={{ flexShrink: 0 }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '10px 0',
-              flexShrink: 0,
-            }}
-          >
-            <Text
+          {isNarrowWidth && (
+            <View
               style={{
-                ...styles.mediumText,
-                fontWeight: 600,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '10px 0',
+                flexShrink: 0,
               }}
             >
-              <Trans>Configuration</Trans>
-            </Text>
-            {widget && (
-              <Button variant="primary" onPress={onSaveWidget}>
-                <Trans>Save widget</Trans>
-              </Button>
-            )}
-          </View>
+              <Text
+                style={{
+                  ...styles.mediumText,
+                  fontWeight: 600,
+                }}
+              >
+                <Trans>Configuration</Trans>
+              </Text>
+              {widget && (
+                <Button variant="primary" onPress={onSaveWidget}>
+                  <Trans>Save widget</Trans>
+                </Button>
+              )}
+            </View>
+          )}
           <MonteCarloConfiguration
             config={resolvedConfig}
             onConfigChange={changes =>
@@ -255,138 +481,65 @@ export function MonteCarlo() {
         </View>
 
         {/* Results */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: 10,
-            padding: '10px 0',
-            flexShrink: 0,
-          }}
-        >
-          <Text
-            style={{
-              ...styles.mediumText,
-              fontWeight: 600,
-            }}
-          >
-            <Trans>Results</Trans>
-          </Text>
-          <LabeledCheckbox
-            id="mc-todays-money"
-            checked={showTodaysMoney}
-            onChange={event => setShowTodaysMoney(event.target.checked)}
-            style={{ flex: 'unset' }}
-          >
-            <Trans>Show values in today&apos;s money</Trans>
-          </LabeledCheckbox>
-        </View>
-
-        {/* Headline stats */}
-        <View
-          style={{
-            backgroundColor: theme.tableBackground,
-            padding: 20,
-            flexShrink: 0,
-            gap: 15,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              gap: 40,
-              rowGap: 20,
-              alignItems: 'flex-start',
-            }}
-          >
-            <View style={{ gap: 4 }}>
-              <Text style={GROUP_HEADING_STYLE}>
-                <Trans>Success rate</Trans>
-              </Text>
+        {isNarrowWidth ? (
+          <>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 10,
+                padding: '10px 0',
+                flexShrink: 0,
+              }}
+            >
               <Text
                 style={{
-                  ...styles.veryLargeText,
-                  color: successColor,
+                  ...styles.mediumText,
+                  fontWeight: 600,
                 }}
               >
-                <FinancialText as="span">{`${successPercent}%`}</FinancialText>
+                <Trans>Results</Trans>
               </Text>
+              {todaysMoneyCheckbox}
             </View>
-            <View style={{ gap: 4 }}>
-              <Text style={GROUP_HEADING_STYLE}>
-                <Trans>Median ending balance</Trans>
-              </Text>
-              <Text style={{ ...styles.mediumText, fontWeight: 500 }}>
-                <PrivacyFilter>
-                  <FinancialText as="span">
-                    {format(result.medianEndingBalance, 'financial')}
-                  </FinancialText>
-                </PrivacyFilter>
-              </Text>
-            </View>
-            <View style={{ gap: 4 }}>
-              <Text style={GROUP_HEADING_STYLE}>
-                <Trans>Median total withdrawn</Trans>
-              </Text>
-              <Text style={{ ...styles.mediumText, fontWeight: 500 }}>
-                <PrivacyFilter>
-                  <FinancialText as="span">
-                    {format(result.medianTotalWithdrawn, 'financial')}
-                  </FinancialText>
-                </PrivacyFilter>
-              </Text>
-            </View>
-            <View style={{ gap: 4 }}>
-              <Text style={GROUP_HEADING_STYLE}>
-                <Trans>Chance of running out of money</Trans>
-              </Text>
-              <Text style={{ ...styles.mediumText, fontWeight: 500 }}>
-                <FinancialText as="span">{`${depletionPercent}%`}</FinancialText>
-              </Text>
-            </View>
-            {result.medianDepletionYear != null && (
-              <View style={{ gap: 4 }}>
+            <MonteCarloSection style={{ gap: 15 }}>
+              {statTiles}
+              <View style={{ marginTop: 10, gap: 5 }}>
                 <Text style={GROUP_HEADING_STYLE}>
-                  <Trans>Typical failure runs out at</Trans>
+                  <Trans>Summary</Trans>
                 </Text>
-                <Text style={{ ...styles.mediumText, fontWeight: 500 }}>
-                  {t('Age {{age}}', {
-                    // Ages here are the failure year itself, matching the
-                    // drill-in's failure row
-                    age: config.currentAge + result.medianDepletionYear - 1,
-                  })}
-                </Text>
+                <Text>{summarySentence}</Text>
               </View>
-            )}
-          </View>
-          <View style={{ marginTop: 10, gap: 5 }}>
-            <Text style={GROUP_HEADING_STYLE}>
-              <Trans>Summary</Trans>
-            </Text>
-            <Text>
-              {t(
-                'In {{successPercent}}% of {{simulationCount}} simulated scenarios, your pot lasted until age {{endAge}}.',
-                {
-                  successPercent,
-                  simulationCount: result.simulationCount,
-                  endAge,
-                },
-              )}
-            </Text>
-          </View>
-        </View>
+            </MonteCarloSection>
+          </>
+        ) : (
+          <MonteCarloSection style={{ gap: 12 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 10,
+              }}
+            >
+              <MonteCarloSectionTitle>
+                <Trans>Results</Trans>
+              </MonteCarloSectionTitle>
+              {todaysMoneyCheckbox}
+            </View>
+            {statTiles}
+            <Text style={{ color: secondaryTextColor }}>{summarySentence}</Text>
+          </MonteCarloSection>
+        )}
 
         {/* Portfolio performance chart / simulation runs table */}
-        <View
+        <MonteCarloSection
           style={{
-            backgroundColor: theme.tableBackground,
-            padding: 20,
             paddingBottom: resultsView === 'chart' ? 10 : 20,
             ...(resultsView === 'chart' && { height: 470 }),
-            flexShrink: 0,
           }}
         >
           <View
@@ -396,47 +549,53 @@ export function MonteCarlo() {
               justifyContent: 'space-between',
               flexWrap: 'wrap',
               gap: 10,
-              marginBottom: 10,
+              marginBottom: isNarrowWidth ? 10 : 12,
               flexShrink: 0,
             }}
           >
             <View
               style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}
             >
-              <Text style={{ ...styles.mediumText, fontWeight: 600 }}>
+              <MonteCarloSectionTitle>
                 {resultsView === 'chart' ? (
                   <Trans>Portfolio performance</Trans>
                 ) : (
                   <Trans>Simulation runs</Trans>
                 )}
-              </Text>
-              <View style={{ flexDirection: 'row', gap: 5 }}>
-                <ModeButton
-                  selected={resultsView === 'chart'}
-                  onSelect={() => setResultsView('chart')}
-                >
-                  <Trans>Chart</Trans>
-                </ModeButton>
-                <ModeButton
-                  selected={resultsView === 'runs'}
-                  onSelect={() => setResultsView('runs')}
-                >
-                  <Trans>Runs</Trans>
-                </ModeButton>
-              </View>
+              </MonteCarloSectionTitle>
+              {isNarrowWidth ? (
+                <View style={{ flexDirection: 'row', gap: 5 }}>
+                  <ModeButton
+                    selected={resultsView === 'chart'}
+                    onSelect={() => setResultsView('chart')}
+                  >
+                    <Trans>Chart</Trans>
+                  </ModeButton>
+                  <ModeButton
+                    selected={resultsView === 'runs'}
+                    onSelect={() => setResultsView('runs')}
+                  >
+                    <Trans>Runs</Trans>
+                  </ModeButton>
+                </View>
+              ) : (
+                <ReportSegmentedControl
+                  aria-label={t('Results')}
+                  options={[
+                    { value: 'chart', label: t('Chart') },
+                    { value: 'runs', label: t('Runs') },
+                  ]}
+                  value={resultsView}
+                  onChange={setResultsView}
+                />
+              )}
             </View>
             {resultsView === 'chart' && (
               <Select
                 value={graphView}
                 onChange={value => setGraphView(value as MonteCarloGraphView)}
-                options={[
-                  ['all', t('All scenarios')],
-                  ['single-worst', t('Single worst run')],
-                  ['worst-case', t('Worst-case scenario (5th percentile)')],
-                  ['pessimistic', t('Pessimistic scenario (30th percentile)')],
-                  ['median', t('Median scenario (50th percentile)')],
-                  ['optimistic', t('Optimistic scenario (70th percentile)')],
-                ]}
+                options={graphViewOptions}
+                triggerVariant={controlVariant}
                 style={{ width: 280 }}
               />
             )}
@@ -446,7 +605,7 @@ export function MonteCarlo() {
               {graphView !== 'all' && (
                 <Text
                   style={{
-                    color: theme.pageText,
+                    color: secondaryTextColor,
                     marginBottom: 10,
                     flexShrink: 0,
                   }}
@@ -494,145 +653,31 @@ export function MonteCarlo() {
               }
             />
           )}
-        </View>
+        </MonteCarloSection>
 
-        {/* Depletion histogram */}
-        <View
-          style={{
-            backgroundColor: theme.tableBackground,
-            padding: 20,
-            flexShrink: 0,
-          }}
-        >
-          <Text
+        {isWide ? (
+          <View
             style={{
-              ...styles.mediumText,
-              fontWeight: 600,
-              marginBottom: 5,
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              gap: 14,
+              flexShrink: 0,
             }}
           >
-            <Trans>When did the pot run out?</Trans>
-          </Text>
-          {hasFailures ? (
-            <>
-              <Text style={{ color: theme.pageText, marginBottom: 10 }}>
-                {t(
-                  'Only the {{failedCount}} of {{simulationCount}} scenarios that ran out of money are shown here - the other {{survivedCount}} kept a positive balance for the full horizon.',
-                  {
-                    failedCount,
-                    simulationCount: result.simulationCount,
-                    survivedCount: result.simulationCount - failedCount,
-                  },
-                )}
-              </Text>
-              <View style={{ height: 200, flexShrink: 0 }}>
-                <MonteCarloHistogram
-                  depletionHistogram={result.depletionHistogram}
-                  startAge={config.currentAge}
-                  medianDepletionYear={result.medianDepletionYear}
-                  simulationCount={result.simulationCount}
-                  style={{ height: 200 }}
-                />
-              </View>
-              <View style={{ marginTop: 10, flexShrink: 0 }}>
-                <Text style={{ color: theme.pageText }}>
-                  {t(
-                    'Worst case: money ran out at age {{worst}}. Among failures, the typical depletion age was {{median}}; the luckiest failure lasted until age {{best}}.',
-                    {
-                      worst:
-                        config.currentAge +
-                        (result.earliestDepletionYear ?? 1) -
-                        1,
-                      median:
-                        config.currentAge +
-                        (result.medianDepletionYear ?? 1) -
-                        1,
-                      best:
-                        config.currentAge +
-                        (result.latestDepletionYear ?? 1) -
-                        1,
-                    },
-                  )}
-                </Text>
-              </View>
-            </>
-          ) : (
-            <Paragraph>
-              <Trans>
-                The pot survived the full time horizon in every simulated
-                scenario.
-              </Trans>
-            </Paragraph>
-          )}
-        </View>
-
-        {/* Description */}
-        <View
-          style={{
-            backgroundColor: theme.tableBackground,
-            padding: 20,
-            userSelect: 'none',
-            flexShrink: 0,
-          }}
-        >
-          <Text
-            style={{
-              ...styles.mediumText,
-              fontWeight: 600,
-              marginBottom: 10,
-            }}
-          >
-            <Trans>How does this simulation work?</Trans>
-          </Text>
-          <Paragraph>
-            <Trans>
-              Each scenario replays your retirement with a different sequence of
-              yearly investment returns. Every year, any contributions are added
-              at the start, then the withdrawal is taken, and then each pot
-              grows or shrinks with that year&apos;s return. Pots with an access
-              age stay invested but can&apos;t fund withdrawals until you reach
-              it - if the accessible pots can&apos;t cover a year&apos;s
-              withdrawal, the plan counts as having run out, even if locked pots
-              still hold money. The shaded bands show the range of outcomes
-              across all scenarios: the darker band covers the middle half, and
-              the lighter band covers 80% of them.
-            </Trans>
-          </Paragraph>
-          <Paragraph>
-            {config.returnModel === 'normal' ? (
-              <Trans>
-                Keep in mind this is a simplified model: returns are drawn
-                independently each year from a normal distribution, which
-                ignores sequence-of-returns clustering and fat tails, and fees
-                and taxes are modeled only as accurately as the rates you enter.
-                Treat the results as a rough guide, not a guarantee.
-              </Trans>
-            ) : config.returnModel === 'historical-bootstrap' ? (
-              <Trans>
-                Returns are actual US market years ({{ firstYear }}&ndash;
-                {{ lastYear }}, S&amp;P 500 / 10-year Treasuries / T-bills,
-                Damodaran data) drawn in random order for each pot&apos;s
-                allocation mix. Real crash years are included, but multi-year
-                momentum is lost by shuffling, fees and taxes are only as
-                accurate as the rates you enter, and US history has been
-                unusually good, so results may be optimistic for globally
-                diversified portfolios.
-              </Trans>
-            ) : (
-              <Trans>
-                Each scenario replays actual US market history ({{ firstYear }}
-                &ndash;{{ lastYear }}, S&amp;P 500 / 10-year Treasuries /
-                T-bills, Damodaran data) starting from a different year,
-                wrapping around the end of the data. This preserves real crashes
-                and recoveries, but there are only as many scenarios as start
-                years, fees and taxes are only as accurate as the rates you
-                enter, and US history may be optimistic for globally diversified
-                portfolios.
-              </Trans>
-            )}
-          </Paragraph>
-        </View>
+            {histogramSection}
+            {descriptionSection}
+          </View>
+        ) : (
+          <>
+            {histogramSection}
+            {descriptionSection}
+          </>
+        )}
       </View>
     </Page>
   );
 }
+
+// From this width the five stat tiles share one row and the histogram and
+// explanation sit side by side (APP-03d).
+const MONTE_CARLO_WIDE_FROM = 1280;
