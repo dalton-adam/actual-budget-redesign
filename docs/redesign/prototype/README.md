@@ -335,3 +335,65 @@ Questions for the owner:
 
 Regenerate with `node scripts/redesign-prototype-shots.cjs --app-03d`
 (`PW_CHANNEL=msedge` uses the installed Edge).
+
+## APP-04: Schedules proposal (October 1, 2026)
+
+**Status: drawn, awaiting owner review.** Choose **Page → Schedules** (or the
+Schedules tab). URL parameters: `sdlg=<schedule id>|add` (the schedule
+dialog), `stx=linked|matched`, `scompleted=0|1`, `sempty=0|1`, and for
+screenshots `sfilter`, `shover`, `smenu`, `ssel`.
+
+Source traced for the brief: the page is `C/schedules/index.tsx`, the table
+`C/schedules/SchedulesTable.tsx` (also used, `minimal`, by the Find schedules
+and link-schedule dialogs), the status pill `C/schedules/StatusBadge.tsx`
+(its colours, `getStatusProps`, are shared with the account register and the
+rule editor), the dialog `C/schedules/ScheduleEditModal.tsx`, and its body
+`C/schedules/ScheduleEditForm.tsx` (shared with the mobile schedule page).
+
+What the drawing proposes (each item is presentation only):
+
+| Surface             | Today                                                                                | Proposed                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page title          | Regular-weight page header                                                           | The 28px bold title used on the account and report pages; no eyebrow (no new string)                                                                                                                                                                                                                                                                                                                      |
+| Actions             | Find schedules and Change upcoming length bottom left, Add new schedule bottom right | One toolbar above the table, as on the account page: **Add new schedule** (primary), Find schedules, Change upcoming length, and the filter at the right. Below 1280px the three buttons drop to icons with their accessible names, as the account toolbar does                                                                                                                                           |
+| Table               | `tableBackground` container, 43px rows, sentence-case headers                        | A Surface card with Eyebrow headers, hairline dividers and 44px rows; Name in 600 weight; Account in Secondary text; "None" in Faint; long names truncate, full name on hover                                                                                                                                                                                                                             |
+| Status              | 13px icon and label badge, radius 4                                                  | The register's status pill shape (22px, radius 6, 11.5px semibold) **with its icon kept** at 12px; colours unchanged (`getStatusProps`)                                                                                                                                                                                                                                                                   |
+| Amount              | `~` / `±` glyph left, amount right, positive in `noticeTextLight`                    | Same meaning; glyph in Faint, positive amounts in the positive number role, tabular                                                                                                                                                                                                                                                                                                                       |
+| Recurring, ⋯ menu   | Check; bare ⋯ button opening the row's context menu                                  | Same check in Secondary text; ⋯ as a 28px tool button opening the existing menu (Post transaction, Post transaction today, Skip next scheduled date or Restart, Complete, Delete)                                                                                                                                                                                                                         |
+| Completed schedules | Italic centred row                                                                   | A quiet centred row in Secondary semibold (same string, same click)                                                                                                                                                                                                                                                                                                                                       |
+| Empty               | "No schedules" / "No matching schedules"                                             | Same strings, centred in the card                                                                                                                                                                                                                                                                                                                                                                         |
+| Schedule dialog     | One long form; 600-weight labels; Linked / Find matching as link buttons             | Sections split by hairlines with Eyebrow heads (**Date**, **Options**; see question 3); Control-style inputs and selects; upcoming dates in a Card Inset well beside the date; Edit as rule at the right of Options; Linked / Find matching as a segmented control; the transactions table in a hairline card with Eyebrow headers; Cancel and Save in a footer that stays visible while the body scrolls |
+
+Unchanged by design: every handler (post, post today, skip, complete,
+restart, delete, add, edit, link, unlink, find, upcoming length), the
+filter's matching, the order of schedules, the status rules and colours, the
+date and recurrence pickers (`DateSelect`, `RecurringSchedulePicker`), the
+amount inputs and `OpSelect`, validation and error text, privacy mode, and
+mobile (the form's new look applies at desktop widths only, so
+`MobileScheduleEditPage` keeps the upstream layout).
+
+Questions for the owner:
+
+1. **Toolbar on top:** move Find schedules, Change upcoming length and Add
+   new schedule from the bottom of the page into the toolbar (`73`, `74`)?
+2. **Status icon:** keep the icon in the pill (drawn), or drop it to match
+   the account register's pills exactly?
+3. **Dialog section heads:** add the Eyebrow headings **Date** and
+   **Options** (Date already exists as a string; Options would be new), or
+   split the dialog by hairlines only?
+4. The **Find schedules and link-schedule dialogs** also use this table.
+   Give them the new table look too, or leave them for APP-06 (the default,
+   as APP-02 did for the Calendar list)?
+
+| File                                        | Shows                                               |
+| ------------------------------------------- | --------------------------------------------------- |
+| `shots/73-schedules-dark-wide.png`          | Schedules, dark, 1440×900, a row hovered            |
+| `shots/74-schedules-light-1000.png`         | Light, 1000×700, pane collapsed, icon-only toolbar  |
+| `shots/75-schedules-midnight-wide-menu.png` | Row menu open; completed schedules shown; midnight  |
+| `shots/76-schedules-custom-theme-wide.png`  | Custom theme through the fallback layer             |
+| `shots/77-schedule-edit-dark-wide.png`      | Editing a schedule, one linked transaction selected |
+| `shots/78-schedule-add-light-1000.png`      | Adding a schedule, light, 1000×700                  |
+| `shots/79-schedules-empty-light-wide.png`   | No schedules                                        |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-04`
+(`PW_CHANNEL=msedge` uses the installed Edge).

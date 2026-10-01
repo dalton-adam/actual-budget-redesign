@@ -47,7 +47,8 @@ Budget header are reference material, not tasks to build.
 | APP-01             | verified    | `875ddad48`              | Linux VRT regenerated (69) on Windows. Custom theme, keyboard, privacy and desktop passed.                                 |
 | APP-02             | verified    | `f8fcc70d8`              | Linux VRT regenerated (66) and desktop window checked on Windows. E2E test "by payee" changed (SYNC-01 conflict risk).     |
 | APP-03a – d        | review      | `0a7384ab1`, `ba03773c2` | 03a – d merged. 03d: custom theme, keyboard, privacy and desktop build still to check (task-reports).                      |
-| APP-04 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
+| APP-04             | in progress | —                        | Drawn (prototype shots `73`–`79`), awaiting owner review. Files traced in the prototype README.                            |
+| APP-05, APP-06     | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                          |
 
 States follow plan §16: not started, ready, in progress, review, verified,
@@ -78,8 +79,8 @@ does not claim Claude's prototype is production-ready.
    ~~Then **APP-02**~~ Merged September 30, 2026; Linux VRT regenerated the same day.
    ~~Then **APP-03a**~~ Merged September 30, 2026. ~~Then **APP-03b**~~ Merged
    October 1, 2026. ~~Then **APP-03c**~~ Merged October 1, 2026. ~~Then **APP-03d**~~
-   Merged October 1, 2026. Then
-   and **APP-04** onward, then QA-01 and RELEASE-01.
+   Merged October 1, 2026. Then **APP-04** (Schedules; drawn October 1,
+   awaiting review) onward, then QA-01 and RELEASE-01.
 
 The review's reasoning is in plan §19.
 

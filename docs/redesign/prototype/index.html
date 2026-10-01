@@ -8,8 +8,10 @@
   DESIGN-01/02 prototype: fictional data only, no connection to Actual's code.
   Open with a local file URL after `yarn install` (fonts load from node_modules).
   URL params: layout=a|b, header=cards|trend, theme=light|dark|midnight|custom,
-  panel=0|1, privacy=0|1, controls=0|1, page=budget|account|reports
+  panel=0|1, privacy=0|1, controls=0|1, page=budget|account|reports|schedules
   APP-03: rview=dash|networth|custom|calendar|formula, redit=0|1, whover=<widget id>
+  APP-04 (page=schedules): sdlg=<schedule id>|add, stx=linked|matched, scompleted=0|1,
+  sempty=0|1, sfilter=<text>, shover=<id>, smenu=<id>, ssel=0|1
   APP-03c: rgraph=table|bar|stacked|line|area|donut, rlegend=0|1, rsummary=0|1, rlabels=0|1
   DESIGN-02: data=basic|states|many, density=50|44|38, rta=pos|zero|neg,
   when=past|current|future, cat=<category id>, pm=<panel month>, hover=<id>, edit=<id>:<month>,
@@ -3299,7 +3301,7 @@
       .code .str {
         color: var(--pillPositiveText);
       }
-      
+
       .fx-opts {
         display: flex;
         flex-wrap: wrap;
@@ -3732,6 +3734,468 @@
           padding: 0 7px;
         }
       }
+      /*
+       * APP-04 proposal: Schedules. Status pills keep upstream's colours
+       * (StatusBadge getStatusProps roles), shown here per theme.
+       */
+      :root,
+      [data-theme='light'] {
+        --stMissedBg: #ffe3e3;
+        --stMissed: #610316;
+        --stDueBg: #fcf088;
+        --stDue: #733309;
+        --stUpBg: #f2ebfe;
+        --stUp: #690cb0;
+        --stPaidBg: #effcf6;
+        --stPaid: #147d64;
+        --stNeutralBg: #f0f3f7;
+        --stNeutral: #243b53;
+      }
+      [data-theme='dark'] {
+        --stMissedBg: #8a041a;
+        --stMissed: #ffbdbd;
+        --stDueBg: #87540d;
+        --stDue: #fffbea;
+        --stUpBg: #690cb0;
+        --stUp: #f2ebfe;
+        --stPaidBg: #014d40;
+        --stPaid: #65d6ad;
+        --stNeutralBg: #2a2e3b;
+        --stNeutral: #d9e2ec;
+      }
+      [data-theme='midnight'] {
+        --stMissedBg: #8a041a;
+        --stMissed: #ffbdbd;
+        --stDueBg: #87540d;
+        --stDue: #fffbea;
+        --stUpBg: #580a94;
+        --stUp: #b990ff;
+        --stPaidBg: #014d40;
+        --stPaid: #65d6ad;
+        --stNeutralBg: #242733;
+        --stNeutral: #d4dae0;
+      }
+      [data-theme='custom'] {
+        --stMissedBg: var(--pillNegativeBackground);
+        --stMissed: var(--pillNegativeText);
+        --stDueBg: var(--pillWarningBackground);
+        --stDue: var(--pillWarningText);
+        --stUpBg: var(--selectionBackground);
+        --stUp: var(--accent);
+        --stPaidBg: var(--pillPositiveBackground);
+        --stPaid: var(--pillPositiveText);
+        --stNeutralBg: var(--pillNeutralBackground);
+        --stNeutral: var(--pillNeutralText);
+      }
+      .sch-main {
+        overflow: hidden;
+      }
+      .sch-table {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .schcols {
+        display: grid;
+        grid-template-columns:
+          minmax(150px, 1.4fr) minmax(110px, 1fr) minmax(120px, 1fr)
+          100px 118px 150px 78px 34px;
+        align-items: center;
+        column-gap: 12px;
+        padding: 0 10px 0 18px;
+      }
+      .sch-table .rhead {
+        border-radius: 18px 18px 0 0;
+      }
+      .srow {
+        height: 44px;
+        flex-shrink: 0;
+        border-bottom: 1px solid var(--cardBorder);
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .srow:hover,
+      .srow.hover {
+        background: var(--tableRowHover);
+      }
+      .srow .ell {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .srow .none {
+        color: var(--pageTextFaint);
+      }
+      .srow .sub {
+        color: var(--pageTextSubdued);
+      }
+      .srow.completed {
+        color: var(--pageTextSubdued);
+      }
+      .sname {
+        font-weight: 600;
+      }
+      .spill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        height: 22px;
+        padding: 0 8px;
+        border-radius: 6px;
+        font-size: 11.5px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .spill svg {
+        width: 12px;
+        height: 12px;
+        flex-shrink: 0;
+      }
+      .spill.missed {
+        background: var(--stMissedBg);
+        color: var(--stMissed);
+      }
+      .spill.due {
+        background: var(--stDueBg);
+        color: var(--stDue);
+      }
+      .spill.upcoming {
+        background: var(--stUpBg);
+        color: var(--stUp);
+      }
+      .spill.paid {
+        background: var(--stPaidBg);
+        color: var(--stPaid);
+      }
+      .spill.scheduled,
+      .spill.completed {
+        background: var(--stNeutralBg);
+        color: var(--stNeutral);
+      }
+      .samt {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        min-width: 0;
+      }
+      .samt .op {
+        color: var(--pageTextFaint);
+        margin-right: auto;
+        padding-left: 4px;
+      }
+      .samt .pos {
+        color: var(--pillPositiveText);
+      }
+      .srec {
+        display: grid;
+        place-items: center;
+        color: var(--pageTextSubdued);
+      }
+      .srow .tool {
+        opacity: 1;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        color: var(--pageTextSubdued);
+      }
+      .srow .tool:hover,
+      .srow .tool.open {
+        background: var(--cardInset);
+        color: var(--pageText);
+      }
+      .srow.more {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        color: var(--pageTextSubdued);
+        font-weight: 600;
+        font-size: 12.5px;
+      }
+      .sch-empty {
+        flex: 1;
+        display: grid;
+        place-items: center;
+        color: var(--pageTextSubdued);
+        font-size: 13px;
+        padding: 40px 0;
+      }
+      .sch-menu {
+        position: absolute;
+        right: 14px;
+        z-index: 5;
+        min-width: 220px;
+        padding: 6px;
+        border-radius: 12px;
+        background: var(--cardBackground);
+        border: 1px solid var(--cardBorder);
+        box-shadow: var(--popoverShadow);
+        font-size: 13px;
+        cursor: default;
+      }
+      .sch-menu div {
+        padding: 7px 10px;
+        border-radius: 8px;
+      }
+      .sch-menu div:first-child {
+        background: var(--tableRowHover);
+      }
+      /* Schedule dialog */
+      .sdlg-scrim {
+        position: fixed;
+        inset: 0;
+        background: var(--scrim);
+        z-index: 40;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+      .sdlg {
+        width: min(780px, 100%);
+        max-height: calc(100vh - 48px);
+        overflow: auto;
+        background: var(--cardBackground);
+        border: 1px solid var(--cardBorder);
+        border-radius: 18px;
+        box-shadow: var(--popoverShadow);
+        padding: 18px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .sdlg-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .sdlg-top h2 {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .sdlg-top .icon-btn {
+        margin-left: auto;
+        border: 0;
+        background: transparent;
+      }
+      .sdlg .ey {
+        font-size: 11px;
+        font-weight: 650;
+        color: var(--pageTextFaint);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
+      .sdlg-sec {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-top: 14px;
+        border-top: 1px solid var(--cardBorder);
+      }
+      .sdlg-sec.first {
+        border-top: 0;
+        padding-top: 0;
+      }
+      .sgrid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.15fr;
+        gap: 12px;
+      }
+      .sfld {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--pageTextSubdued);
+        min-width: 0;
+      }
+      .sfld .lrow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        height: 16px;
+      }
+      .sin {
+        height: 32px;
+        border-radius: 9px;
+        border: 1px solid var(--cardBorder);
+        background: var(--controlBackground);
+        color: var(--pageText);
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        font-weight: 500;
+        min-width: 0;
+      }
+      .sin.focus {
+        border-color: var(--selectionBorder);
+        box-shadow: 0 0 0 3px var(--selectionBackground);
+      }
+      .sin .ph {
+        color: var(--pageTextFaint);
+      }
+      .sin.num {
+        justify-content: flex-end;
+      }
+      .opbtn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--accent);
+      }
+      .stwo {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 12px 16px;
+        align-items: start;
+      }
+      .scol {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .stwo .tbtn {
+        justify-content: space-between;
+        width: 100%;
+        font-weight: 500;
+      }
+      .scheck {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--pageText);
+      }
+      .scheck .cb {
+        margin: 1px 0 0;
+        flex-shrink: 0;
+      }
+      .scheck small,
+      .sfld .help {
+        display: block;
+        margin-top: 2px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--pageTextSubdued);
+      }
+      .supc {
+        background: var(--cardInset);
+        border-radius: 12px;
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        font-size: 13px;
+      }
+      .supc .d {
+        display: flex;
+        justify-content: space-between;
+        color: var(--pageText);
+      }
+      .supc .d span:last-child {
+        color: var(--pageTextSubdued);
+      }
+      .srule {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        font-size: 12.5px;
+        color: var(--pageTextSubdued);
+      }
+      .stx-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .stx-top .seg > button {
+        padding: 0 12px;
+      }
+      .stx-top .seg > button.on {
+        background: var(--navActive);
+        color: var(--pageText);
+        box-shadow: var(--navActiveShadow);
+      }
+      [data-theme='light'] .stx-top .seg {
+        background: var(--navTrack);
+        border-color: transparent;
+      }
+      .stx-top .hint {
+        font-size: 12.5px;
+        color: var(--pageTextSubdued);
+      }
+      .stx-top > :last-child {
+        margin-left: auto;
+      }
+      .stx {
+        border: 1px solid var(--cardBorder);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .stxcols {
+        display: grid;
+        grid-template-columns:
+          30px 96px minmax(110px, 1fr) minmax(110px, 1.2fr)
+          96px;
+        align-items: center;
+        column-gap: 12px;
+        padding: 0 14px 0 8px;
+      }
+      .stx .rhead {
+        position: static;
+        background: transparent;
+      }
+      .stx .trow:last-child {
+        border-bottom: 0;
+      }
+      .stx .trow.selected {
+        background: var(--selectionBackground);
+      }
+      .stx-empty {
+        padding: 22px;
+        text-align: center;
+        font-size: 13px;
+        color: var(--pageTextSubdued);
+      }
+      .sdlg-foot {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 14px 0 18px;
+        margin-bottom: -18px;
+        border-top: 1px solid var(--cardBorder);
+        position: sticky;
+        bottom: -18px;
+        background: var(--cardBackground);
+      }
+      .sdlg .ey-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .sdlg .ey-row .srule {
+        margin-left: auto;
+      }
+      @media (max-width: 1279px) {
+        .schcols {
+          grid-template-columns:
+            minmax(130px, 1.3fr) minmax(100px, 1fr) minmax(100px, 1fr)
+            96px 112px 132px 70px 34px;
+          column-gap: 10px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -3781,6 +4245,17 @@
         // APP-03d: Monte Carlo configuration tab and results view.
         mctab: params.get('mctab') || 'plan',
         mcview: params.get('mcview') || 'chart',
+        // APP-04: schedule dialog (a schedule id or "add"), linked/matched
+        // transactions, completed schedules shown, empty list, search text,
+        // hovered row and open row menu, one dialog transaction selected.
+        sdlg: params.get('sdlg') || '',
+        stx: params.get('stx') || 'linked',
+        scompleted: params.get('scompleted') === '1',
+        sempty: params.get('sempty') === '1',
+        sfilter: params.get('sfilter') || '',
+        shover: params.get('shover') || '',
+        smenu: params.get('smenu') || '',
+        ssel: params.get('ssel') === '1',
         // Accounts pane: open or collapsed (device-local). Default: open at
         // 1280px and wider, collapsed below.
         pane:
@@ -4130,14 +4605,17 @@
       function topbar() {
         const navBtn = (label, key, opts = {}) =>
           `<button class="${
-            ({ account: 'accounts', reports: 'reports' }[state.page] ||
-              'budget') === key
+            ({
+              account: 'accounts',
+              reports: 'reports',
+              schedules: 'schedules',
+            }[state.page] || 'budget') === key
               ? 'on'
               : ''
           } ${state.menu === key ? 'open' : ''}" ${
             opts.menu
               ? `data-menu="${key}"`
-              : key === 'budget' || key === 'reports'
+              : key === 'budget' || key === 'reports' || key === 'schedules'
                 ? `data-set="page" data-val="${key}"`
                 : ''
           }
@@ -5312,6 +5790,7 @@
             ['budget', 'Budget'],
             ['account', 'Account'],
             ['reports', 'Reports'],
+            ['schedules', 'Schedules'],
           ]),
           grp('Theme', 'theme', [
             ['light', 'Light'],
@@ -5383,7 +5862,24 @@
             [true, 'On'],
           ]),
         ];
-        const pageGroups = { budget, account: acct, reports }[state.page];
+        const sched = [
+          grp('Dialog', 'sdlg', [
+            ['', 'Off'],
+            ['s3', 'Edit'],
+            ['add', 'Add'],
+          ]),
+          grp('Completed', 'scompleted', [
+            [false, 'Hidden'],
+            [true, 'Shown'],
+          ]),
+          grp('List', 'sempty', [
+            [false, 'Fixture'],
+            [true, 'Empty'],
+          ]),
+        ];
+        const pageGroups = { budget, account: acct, reports, schedules: sched }[
+          state.page
+        ];
         return `<div class="proto" aria-label="Prototype controls">
       ${[...common, ...pageGroups, pin].join('')}
       <div class="grp"><button data-reload title="Reload with the fixture's original amounts">Reset</button></div>
@@ -6100,120 +6596,123 @@
         </main>`;
       }
 
-// APP-03c proposal: custom report editor, the Calendar report's
-// transaction list and the Formula editor body (fictional data).
-const svgI = (d, w = 15) =>
-  `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
-const CI = {
-  table: svgI(
-    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 10v10"/>',
-  ),
-  bar: svgI('<path d="M6 20V10M12 20V4M18 20v-7"/>'),
-  stacked: svgI(
-    '<rect x="4" y="11" width="5" height="9" rx="1"/><rect x="4" y="5" width="5" height="6" rx="1"/><rect x="15" y="14" width="5" height="6" rx="1"/><rect x="15" y="8" width="5" height="6" rx="1"/>',
-  ),
-  line: svgI('<path d="m3 17 5-6 4 3 8-9"/>'),
-  area: svgI('<path d="M3 20v-4l5-6 4 3 9-8v15Z"/>'),
-  donut: svgI(
-    '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 4v4.5"/>',
-  ),
-  legend: svgI(
-    '<path d="M9 6h12M9 12h12M9 18h12"/><rect x="3" y="4.5" width="3" height="3" rx="1"/><rect x="3" y="10.5" width="3" height="3" rx="1"/><rect x="3" y="16.5" width="3" height="3" rx="1"/>',
-  ),
-  summary: svgI(
-    '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/>',
-  ),
-  labels: svgI(
-    '<path d="M3 12V4h8l9 9-8 8-9-9Z"/><circle cx="7.5" cy="7.5" r="1.2"/>',
-  ),
-  camera: svgI(
-    '<path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13" r="3.5"/>',
-  ),
-  copy: svgI(
-    '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10"/>',
-    13,
-  ),
-  sortD: svgI('<path d="M12 5v14M6 13l6 6 6-6"/>', 12),
-  all: svgI(
-    '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8 12 3 3 5-6"/>',
-  ),
-  none: svgI('<rect x="4" y="4" width="16" height="16" rx="3"/>'),
-};
-const chartQ = [
-  '#45b29d',
-  '#efc94c',
-  '#e27a3f',
-  '#df5a49',
-  '#5f91b8',
-  '#e2a37f',
-  '#55dbc1',
-  '#efda97',
-];
-const reportHead = (title, extra = '') => `<div class="head">
+      // APP-03c proposal: custom report editor, the Calendar report's
+      // transaction list and the Formula editor body (fictional data).
+      const svgI = (d, w = 15) =>
+        `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+      const CI = {
+        table: svgI(
+          '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 10v10"/>',
+        ),
+        bar: svgI('<path d="M6 20V10M12 20V4M18 20v-7"/>'),
+        stacked: svgI(
+          '<rect x="4" y="11" width="5" height="9" rx="1"/><rect x="4" y="5" width="5" height="6" rx="1"/><rect x="15" y="14" width="5" height="6" rx="1"/><rect x="15" y="8" width="5" height="6" rx="1"/>',
+        ),
+        line: svgI('<path d="m3 17 5-6 4 3 8-9"/>'),
+        area: svgI('<path d="M3 20v-4l5-6 4 3 9-8v15Z"/>'),
+        donut: svgI(
+          '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 4v4.5"/>',
+        ),
+        legend: svgI(
+          '<path d="M9 6h12M9 12h12M9 18h12"/><rect x="3" y="4.5" width="3" height="3" rx="1"/><rect x="3" y="10.5" width="3" height="3" rx="1"/><rect x="3" y="16.5" width="3" height="3" rx="1"/>',
+        ),
+        summary: svgI(
+          '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/>',
+        ),
+        labels: svgI(
+          '<path d="M3 12V4h8l9 9-8 8-9-9Z"/><circle cx="7.5" cy="7.5" r="1.2"/>',
+        ),
+        camera: svgI(
+          '<path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13" r="3.5"/>',
+        ),
+        copy: svgI(
+          '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10"/>',
+          13,
+        ),
+        sortD: svgI('<path d="M12 5v14M6 13l6 6 6-6"/>', 12),
+        all: svgI(
+          '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8 12 3 3 5-6"/>',
+        ),
+        none: svgI('<rect x="4" y="4" width="16" height="16" rx="3"/>'),
+      };
+      const chartQ = [
+        '#45b29d',
+        '#efc94c',
+        '#e27a3f',
+        '#df5a49',
+        '#5f91b8',
+        '#e2a37f',
+        '#55dbc1',
+        '#efda97',
+      ];
+      const reportHead = (title, extra = '') => `<div class="head">
             <div style="display:flex;flex-direction:column">
               <div class="eyebrow">Reports · Main</div>
               <div class="rp-title-row"><h1>${title}</h1><button class="tool" aria-label="Rename report">${I.pencil}</button></div>
             </div>${extra}
           </div>`;
 
-function customReportPage() {
-  const graph = state.rgraph;
-  const side = state.rside;
-  const groups = [
-    ['Usual Expenses', ['c-groc', 'c-dine', 'c-trans', 'c-cloth', 'c-gift']],
-    ['Bills', ['c-rent', 'c-util', 'c-subs']],
-    ['Savings', ['c-emerg', 'c-vac']],
-  ];
-  const names = Object.fromEntries(all.map(c => [c.id, c.n]));
-  const off = new Set(['c-emerg', 'c-vac']);
-  const ck = (on, mixed) =>
-    `<span class="cb ${on ? 'on' : ''} ${mixed ? 'mixed' : ''}">${
-      mixed
-        ? '<svg width="9" height="9" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M6 12h12"/></svg>'
-        : on
-          ? check
-          : ''
-    }</span>`;
-  const cats = groups
-    .map(([g, ids]) => {
-      const n = ids.filter(id => !off.has(id)).length;
-      return `<label class="ck grp">${ck(
-        n === ids.length,
-        n > 0 && n < ids.length,
-      )}${g}</label>${ids
-        .map(
-          id =>
-            `<label class="ck child ${off.has(id) ? 'off' : ''}">${ck(
-              !off.has(id),
-            )}<span class="cat-dot" style="background:${accent(
-              id,
-            )}"></span>${esc(names[id] || id)}</label>`,
-        )
-        .join('')}`;
-    })
-    .join('');
-  const data = [
-    ['Rent', 10800],
-    ['Groceries', 3214.5],
-    ['Dining out', 1187.2],
-    ['Transport', 964.0],
-    ['Utilities', 738.4],
-    ['Subscriptions', 402.9],
-    ['Clothing', 356.0],
-    ['Gifts', 220.0],
-  ];
-  const total = sum(data, d => d[1]);
-  const max = 12000;
-  const ticks = [12000, 9000, 6000, 3000, 0];
-  const seg = (k, label, icon) =>
-    `<button class="${graph === k ? 'on' : ''}" aria-pressed="${
-      graph === k
-    }" aria-label="${label}" title="${label}" data-set="rgraph" data-val="${k}">${icon}</button>`;
-  const tog = (k, label, icon) =>
-    `<button class="tbtn" aria-pressed="${state[k]}" aria-label="${label}" title="${label}" data-toggle="${k}">${icon}<span class="txt">${label}</span></button>`;
-  const plot =
-    graph === 'table'
-      ? `<div class="cal-reg" style="margin-top:12px;border:1px solid var(--cardBorder);border-radius:12px">
+      function customReportPage() {
+        const graph = state.rgraph;
+        const side = state.rside;
+        const groups = [
+          [
+            'Usual Expenses',
+            ['c-groc', 'c-dine', 'c-trans', 'c-cloth', 'c-gift'],
+          ],
+          ['Bills', ['c-rent', 'c-util', 'c-subs']],
+          ['Savings', ['c-emerg', 'c-vac']],
+        ];
+        const names = Object.fromEntries(all.map(c => [c.id, c.n]));
+        const off = new Set(['c-emerg', 'c-vac']);
+        const ck = (on, mixed) =>
+          `<span class="cb ${on ? 'on' : ''} ${mixed ? 'mixed' : ''}">${
+            mixed
+              ? '<svg width="9" height="9" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M6 12h12"/></svg>'
+              : on
+                ? check
+                : ''
+          }</span>`;
+        const cats = groups
+          .map(([g, ids]) => {
+            const n = ids.filter(id => !off.has(id)).length;
+            return `<label class="ck grp">${ck(
+              n === ids.length,
+              n > 0 && n < ids.length,
+            )}${g}</label>${ids
+              .map(
+                id =>
+                  `<label class="ck child ${off.has(id) ? 'off' : ''}">${ck(
+                    !off.has(id),
+                  )}<span class="cat-dot" style="background:${accent(
+                    id,
+                  )}"></span>${esc(names[id] || id)}</label>`,
+              )
+              .join('')}`;
+          })
+          .join('');
+        const data = [
+          ['Rent', 10800],
+          ['Groceries', 3214.5],
+          ['Dining out', 1187.2],
+          ['Transport', 964.0],
+          ['Utilities', 738.4],
+          ['Subscriptions', 402.9],
+          ['Clothing', 356.0],
+          ['Gifts', 220.0],
+        ];
+        const total = sum(data, d => d[1]);
+        const max = 12000;
+        const ticks = [12000, 9000, 6000, 3000, 0];
+        const seg = (k, label, icon) =>
+          `<button class="${graph === k ? 'on' : ''}" aria-pressed="${
+            graph === k
+          }" aria-label="${label}" title="${label}" data-set="rgraph" data-val="${k}">${icon}</button>`;
+        const tog = (k, label, icon) =>
+          `<button class="tbtn" aria-pressed="${state[k]}" aria-label="${label}" title="${label}" data-toggle="${k}">${icon}<span class="txt">${label}</span></button>`;
+        const plot =
+          graph === 'table'
+            ? `<div class="cal-reg" style="margin-top:12px;border:1px solid var(--cardBorder);border-radius:12px">
                 <div class="rhead" style="display:grid;grid-template-columns:minmax(0,1fr) repeat(6,minmax(0,90px)) minmax(0,100px);align-items:center;padding:0 14px;column-gap:10px"><div>Category</div>${[
                   'Apr',
                   'May',
@@ -6244,7 +6743,7 @@ function customReportPage() {
                   )
                   .join('')}
               </div>`
-      : `<div class="rp-plot">
+            : `<div class="rp-plot">
               <div class="rp-y num">${ticks
                 .map(t => `<span>${fmt(t)}</span>`)
                 .join('')}</div>
@@ -6262,9 +6761,9 @@ function customReportPage() {
                 .map(([n]) => `<span title="${n}">${n}</span>`)
                 .join('')}</div>
             </div>`;
-  const sideHtml =
-    (state.rsummary || state.rlegend) && graph !== 'table'
-      ? `<aside class="cr-side" aria-label="Summary and legend">
+        const sideHtml =
+          (state.rsummary || state.rlegend) && graph !== 'table'
+            ? `<aside class="cr-side" aria-label="Summary and legend">
               ${
                 state.rsummary
                   ? `<div class="stat"><div class="k">Total payments</div><div class="v num">${fmt2(
@@ -6290,8 +6789,8 @@ function customReportPage() {
                   : ''
               }
             </aside>`
-      : '';
-  return `<main class="main rmain" style="display:flex;flex-direction:column;gap:14px">
+            : '';
+        return `<main class="main rmain" style="display:flex;flex-direction:column;gap:14px">
           ${reportHead(
             'Spending by category',
             `<div class="head-controls"><span class="saved"><i></i>Unsaved changes</span><button class="tbtn" aria-haspopup="menu">Report ${I.chevD}</button></div>`,
@@ -6372,174 +6871,175 @@ function customReportPage() {
             </section>
           </div>
         </main>`;
-}
-
-function calendarPage() {
-  const months = [
-    ['July 2026', 3, 31, 5320.14, 4102.33],
-    ['August 2026', 6, 31, 5410.0, 4388.9],
-    ['September 2026', 2, 30, 5400.0, 4212.4],
-  ];
-  const tiles = months
-    .map(([name, first, days, inc, exp], mi) => {
-      const cells = [];
-      for (let i = 0; i < first; i++)
-        {cells.push('<div class="cal-d blank"></div>');}
-      for (let d = 1; d <= days; d++) {
-        const r = ((d * 37 + mi * 11) % 17) / 17;
-        const kind = d % 14 === 1 ? 'in' : r > 0.35 ? 'out' : '';
-        const hgt = kind === 'in' ? 100 : Math.round(r * 70);
-        cells.push(
-          `<div class="cal-d">${d}${
-            kind
-              ? `<i style="height:${hgt}%;background:var(${
-                  kind === 'in' ? '--reportsGreen' : '--reportsRed'
-                })"></i>`
-              : ''
-          }</div>`,
-        );
       }
-      return `<section class="rcard"><div class="cal-m"><div class="w-title">${name}</div><div class="cal-h" style="margin-bottom:4px"><span class="num pos-t">↑ ${fmt2(
-        inc,
-      )}</span><span class="num neg-t">↓ ${fmt2(exp)}</span></div>
+
+      function calendarPage() {
+        const months = [
+          ['July 2026', 3, 31, 5320.14, 4102.33],
+          ['August 2026', 6, 31, 5410.0, 4388.9],
+          ['September 2026', 2, 30, 5400.0, 4212.4],
+        ];
+        const tiles = months
+          .map(([name, first, days, inc, exp], mi) => {
+            const cells = [];
+            for (let i = 0; i < first; i++) {
+              cells.push('<div class="cal-d blank"></div>');
+            }
+            for (let d = 1; d <= days; d++) {
+              const r = ((d * 37 + mi * 11) % 17) / 17;
+              const kind = d % 14 === 1 ? 'in' : r > 0.35 ? 'out' : '';
+              const hgt = kind === 'in' ? 100 : Math.round(r * 70);
+              cells.push(
+                `<div class="cal-d">${d}${
+                  kind
+                    ? `<i style="height:${hgt}%;background:var(${
+                        kind === 'in' ? '--reportsGreen' : '--reportsRed'
+                      })"></i>`
+                    : ''
+                }</div>`,
+              );
+            }
+            return `<section class="rcard"><div class="cal-m"><div class="w-title">${name}</div><div class="cal-h" style="margin-bottom:4px"><span class="num pos-t">↑ ${fmt2(
+              inc,
+            )}</span><span class="num neg-t">↓ ${fmt2(exp)}</span></div>
               <div class="cal-g">${['S', 'M', 'T', 'W', 'T', 'F', 'S']
                 .map(x => `<div class="dow">${x}</div>`)
                 .join('')}${cells.join('')}</div></div></section>`;
-    })
-    .join('');
-  const rows = [
-    [
-      '09/30/2026',
-      'Everyday Checking',
-      'Employer Inc',
-      'Paycheck',
-      null,
-      'Income',
-      null,
-      2700,
-      'c',
-    ],
-    [
-      '09/29/2026',
-      'Everyday Checking',
-      'SuperMart',
-      '',
-      'c-groc',
-      'Groceries',
-      86.12,
-      null,
-      'c',
-      [['#groceries', '#2f855a']],
-    ],
-    [
-      '09/28/2026',
-      'Rewards Card',
-      'Bistro 21',
-      'Dinner with Sam',
-      'c-dine',
-      'Dining out',
-      64.5,
-      null,
-      'c',
-    ],
-    [
-      '09/27/2026',
-      'Everyday Checking',
-      'City Power',
-      'Electric bill',
-      'c-util',
-      'Utilities',
-      120,
-      null,
-      'r',
-    ],
-    [
-      '09/26/2026',
-      'Rewards Card',
-      'Metro Transit',
-      'Monthly pass',
-      'c-trans',
-      'Transport',
-      98,
-      null,
-      'r',
-    ],
-    [
-      '09/25/2026',
-      'Rewards Card',
-      'Streamly',
-      '',
-      'c-subs',
-      'Subscriptions',
-      15.99,
-      null,
-      'r',
-      [['#online', '#2b6cb0']],
-    ],
-    [
-      '09/24/2026',
-      'Everyday Checking',
-      'SuperMart',
-      '',
-      'c-groc',
-      'Groceries',
-      112.4,
-      null,
-      'r',
-    ],
-    [
-      '09/23/2026',
-      'Rewards Card',
-      'Threads & Co',
-      'Jacket',
-      'c-cloth',
-      'Clothing',
-      89,
-      null,
-      'r',
-    ],
-    [
-      '09/22/2026',
-      'Everyday Checking',
-      'Fuel Stop',
-      '',
-      'c-trans',
-      'Transport',
-      52.3,
-      null,
-      'r',
-    ],
-    [
-      '09/21/2026',
-      'Rewards Card',
-      'Corner Café',
-      '',
-      'c-dine',
-      'Dining out',
-      12.75,
-      null,
-      'r',
-    ],
-    [
-      '09/20/2026',
-      'Everyday Checking',
-      'SuperMart',
-      '',
-      'c-groc',
-      'Groceries',
-      74.06,
-      null,
-      'r',
-    ],
-  ];
-  const reg = rows
-    .map(([d, acct, p, notes, cat, cn, out, inn, c, tags]) => {
-      const catCell = cat
-        ? `<div class="cat-cell"><span class="cat-dot" style="background:${accent(
-            cat,
-          )}"></span><span class="ell">${cn}</span></div>`
-        : `<div class="cat-cell"><span class="ell" style="color:var(--pageTextSubdued)">${cn}</span></div>`;
-      return `<div class="calcols trow" role="row">
+          })
+          .join('');
+        const rows = [
+          [
+            '09/30/2026',
+            'Everyday Checking',
+            'Employer Inc',
+            'Paycheck',
+            null,
+            'Income',
+            null,
+            2700,
+            'c',
+          ],
+          [
+            '09/29/2026',
+            'Everyday Checking',
+            'SuperMart',
+            '',
+            'c-groc',
+            'Groceries',
+            86.12,
+            null,
+            'c',
+            [['#groceries', '#2f855a']],
+          ],
+          [
+            '09/28/2026',
+            'Rewards Card',
+            'Bistro 21',
+            'Dinner with Sam',
+            'c-dine',
+            'Dining out',
+            64.5,
+            null,
+            'c',
+          ],
+          [
+            '09/27/2026',
+            'Everyday Checking',
+            'City Power',
+            'Electric bill',
+            'c-util',
+            'Utilities',
+            120,
+            null,
+            'r',
+          ],
+          [
+            '09/26/2026',
+            'Rewards Card',
+            'Metro Transit',
+            'Monthly pass',
+            'c-trans',
+            'Transport',
+            98,
+            null,
+            'r',
+          ],
+          [
+            '09/25/2026',
+            'Rewards Card',
+            'Streamly',
+            '',
+            'c-subs',
+            'Subscriptions',
+            15.99,
+            null,
+            'r',
+            [['#online', '#2b6cb0']],
+          ],
+          [
+            '09/24/2026',
+            'Everyday Checking',
+            'SuperMart',
+            '',
+            'c-groc',
+            'Groceries',
+            112.4,
+            null,
+            'r',
+          ],
+          [
+            '09/23/2026',
+            'Rewards Card',
+            'Threads & Co',
+            'Jacket',
+            'c-cloth',
+            'Clothing',
+            89,
+            null,
+            'r',
+          ],
+          [
+            '09/22/2026',
+            'Everyday Checking',
+            'Fuel Stop',
+            '',
+            'c-trans',
+            'Transport',
+            52.3,
+            null,
+            'r',
+          ],
+          [
+            '09/21/2026',
+            'Rewards Card',
+            'Corner Café',
+            '',
+            'c-dine',
+            'Dining out',
+            12.75,
+            null,
+            'r',
+          ],
+          [
+            '09/20/2026',
+            'Everyday Checking',
+            'SuperMart',
+            '',
+            'c-groc',
+            'Groceries',
+            74.06,
+            null,
+            'r',
+          ],
+        ];
+        const reg = rows
+          .map(([d, acct, p, notes, cat, cn, out, inn, c, tags]) => {
+            const catCell = cat
+              ? `<div class="cat-cell"><span class="cat-dot" style="background:${accent(
+                  cat,
+                )}"></span><span class="ell">${cn}</span></div>`
+              : `<div class="cat-cell"><span class="ell" style="color:var(--pageTextSubdued)">${cn}</span></div>`;
+            return `<div class="calcols trow" role="row">
               <div class="num">${d}</div>
               <div class="ell acct-cell">${acct}</div>
               <div class="payee-cell"><div class="payee" style="color:${
@@ -6560,9 +7060,9 @@ function calendarPage() {
                   : ''
               }</div>
             </div>`;
-    })
-    .join('');
-  return `<main class="main rmain" style="display:flex;flex-direction:column;gap:14px">
+          })
+          .join('');
+        return `<main class="main rmain" style="display:flex;flex-direction:column;gap:14px">
           ${reportHead('Transaction Calendar')}
           <div class="rp-tools">
             <div class="seg" role="group" aria-label="Date range mode"><button class="on" aria-pressed="true">Live</button><button aria-pressed="false">Static</button></div>
@@ -6589,10 +7089,10 @@ function calendarPage() {
             ${reg}
           </section>
         </main>`;
-}
+      }
 
-function formulaPage() {
-  return `<main class="main rmain" style="display:flex;flex-direction:column;gap:14px">
+      function formulaPage() {
+        return `<main class="main rmain" style="display:flex;flex-direction:column;gap:14px">
           ${reportHead(
             'Savings rate',
             '<div class="head-controls"><button class="tbtn primary">Save widget</button></div>',
@@ -6651,7 +7151,7 @@ function formulaPage() {
             </section>
           </div>
         </main>`;
-}
+      }
       // APP-03d proposal: Monte Carlo (fictional plan, ages 62 to 95).
       function monteCarloPage() {
         const q = `<span class="qi" title="Help">${I.help}</span>`;
@@ -6730,11 +7230,26 @@ function formulaPage() {
             '7.0',
             '16.0',
           ],
-          ['Cash savings', 51500, 'Savings', 'Cash / money market', '2.0', '1.0'],
+          [
+            'Cash savings',
+            51500,
+            'Savings',
+            'Cash / money market',
+            '2.0',
+            '1.0',
+          ],
         ];
         const potRows = pots
           .map(
-            ([n, bal, acct, mix, ret, vol, open]) => `<div class="mccols trow" role="row">
+            ([
+              n,
+              bal,
+              acct,
+              mix,
+              ret,
+              vol,
+              open,
+            ]) => `<div class="mccols trow" role="row">
               <span class="grip">${I.grip}</span>
               <div class="mc-in"><span class="ell">${n}</span></div>
               <div class="mc-in r num">${fmt(bal)}</div>
@@ -6845,7 +7360,12 @@ function formulaPage() {
                 <div class="runcols rhead" role="row"><div>Rank</div><div>Outcome</div><div class="r">Ending balance</div><div class="r">Total withdrawn</div></div>
                 ${runs
                   .map(
-                    ([r, age, end, wd]) => `<div class="runcols trow" role="row">
+                    ([
+                      r,
+                      age,
+                      end,
+                      wd,
+                    ]) => `<div class="runcols trow" role="row">
                   <div class="num">${r}</div>
                   <div>${
                     age
@@ -6864,7 +7384,9 @@ function formulaPage() {
               })();
         const chart = `<section class="rcard mc-card rp-chart mc-chart" aria-label="Portfolio performance">
             <div class="mc-top"><h2>${
-              state.mcview === 'chart' ? 'Portfolio performance' : 'Simulation runs'
+              state.mcview === 'chart'
+                ? 'Portfolio performance'
+                : 'Simulation runs'
             }</h2>
               <div class="seg sm" role="group" aria-label="Results view"><button class="${
                 state.mcview === 'chart' ? 'on' : ''
@@ -6917,6 +7439,377 @@ function formulaPage() {
         </main>`;
       }
 
+      // APP-04 proposal: Schedules page and the schedule dialog
+      // (fictional data; "today" is 09/27/2026 as on the account register).
+      const SI = {
+        missed:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="8"/><path d="M9 11h.01M15 11h.01M10 19v-3M14 19v-3"/></svg>',
+        due: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>',
+        upcoming:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+        paid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+        completed:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>',
+      };
+      SI.scheduled = SI.upcoming;
+      const schedules = [
+        {
+          id: 's1',
+          n: 'Internet bill',
+          p: 'Fast Internet',
+          a: 'Everyday Checking',
+          d: '09/20/2026',
+          st: 'missed',
+          amt: -65,
+          op: 'isapprox',
+          rec: true,
+        },
+        {
+          id: 's2',
+          n: 'Phone bill',
+          p: 'Dominion Mobile',
+          a: 'Everyday Checking',
+          d: '09/27/2026',
+          st: 'due',
+          amt: -48,
+          rec: true,
+        },
+        {
+          id: 's3',
+          n: 'Rent',
+          p: 'Landlord Co',
+          a: 'Everyday Checking',
+          d: '10/01/2026',
+          st: 'upcoming',
+          amt: -1800,
+          rec: true,
+        },
+        {
+          id: 's4',
+          n: 'Streaming',
+          p: 'StreamCo',
+          a: 'Rewards Credit Card',
+          d: '10/03/2026',
+          st: 'upcoming',
+          amt: -15.99,
+          rec: true,
+        },
+        {
+          id: 's5',
+          n: 'Car insurance',
+          p: 'SafeDrive Insurance',
+          a: 'Everyday Checking',
+          d: '10/15/2026',
+          st: 'paid',
+          amt: -130,
+          op: 'isbetween',
+          lo: 120,
+          hi: 140,
+          rec: true,
+        },
+        {
+          id: 's6',
+          n: 'Paycheck',
+          p: 'Acme Corp',
+          a: 'Everyday Checking',
+          d: '10/09/2026',
+          st: 'scheduled',
+          amt: 2600,
+          rec: true,
+        },
+        {
+          id: 's7',
+          n: 'Gym membership',
+          p: 'FitClub',
+          a: 'Rewards Credit Card',
+          d: '10/14/2026',
+          st: 'scheduled',
+          amt: -40,
+          rec: true,
+        },
+        {
+          id: 's8',
+          n: 'Property tax, second instalment for the county assessor',
+          p: null,
+          a: 'Everyday Checking',
+          d: '11/30/2026',
+          st: 'scheduled',
+          amt: -1240.5,
+          rec: false,
+        },
+        {
+          id: 's9',
+          n: null,
+          p: 'Water District',
+          a: null,
+          d: '10/21/2026',
+          st: 'scheduled',
+          amt: -36,
+          op: 'isapprox',
+          rec: true,
+        },
+      ];
+      const schedCompleted = [
+        {
+          id: 's10',
+          n: 'Wedding',
+          p: null,
+          a: null,
+          d: '06/12/2026',
+          st: 'completed',
+          amt: -27000,
+          rec: false,
+        },
+      ];
+      const stLabel = {
+        missed: 'Missed',
+        due: 'Due',
+        upcoming: 'Upcoming',
+        paid: 'Paid',
+        scheduled: 'Scheduled',
+        completed: 'Completed',
+      };
+      const statusPill = st =>
+        `<span class="spill ${st}">${SI[st]}${stLabel[st]}</span>`;
+
+      function schedRow(s, i) {
+        const none = '<span class="none">None</span>';
+        const amt = money(Math.abs(s.amt));
+        const title =
+          s.op === 'isapprox'
+            ? `Approximately ${amt}`
+            : s.op === 'isbetween'
+              ? `${money(s.lo)} to ${money(s.hi)}`
+              : amt;
+        const menuOpen = state.smenu === s.id;
+        return `<div class="schcols srow ${s.st === 'completed' ? 'completed' : ''} ${
+          state.shover === s.id ? 'hover' : ''
+        }" role="row" data-set="sdlg" data-val="${s.id}">
+          <div class="ell ${s.n ? 'sname' : ''}" title="${s.n || ''}">${
+            s.n ? esc(s.n) : none
+          }</div>
+          <div class="ell">${s.p ? esc(s.p) : none}</div>
+          <div class="ell sub">${s.a ? esc(s.a) : none}</div>
+          <div class="num">${s.d}</div>
+          <div>${statusPill(s.st)}</div>
+          <div class="samt num" title="${title}">${
+            s.op === 'isapprox'
+              ? '<span class="op">~</span>'
+              : s.op === 'isbetween'
+                ? '<span class="op">±</span>'
+                : ''
+          }<span class="ell ${s.amt > 0 ? 'pos' : ''}">${
+            s.amt > 0 ? '+' : ''
+          }${amt}</span></div>
+          <div class="srec" title="${s.rec ? 'Repeats' : ''}">${
+            s.rec ? check.replace(/10/g, '13') : ''
+          }</div>
+          <div><button class="tool ${menuOpen ? 'open' : ''}" aria-label="Menu" aria-haspopup="menu" aria-expanded="${menuOpen}">${I.dots}</button></div>
+        </div>${
+          menuOpen
+            ? `<div class="sch-menu" role="menu" style="top:${
+                38 + (i + 1) * 44 + 2
+              }px">${[
+                'Post transaction',
+                'Post transaction today',
+                ...(s.st === 'completed'
+                  ? ['Restart']
+                  : ['Skip next scheduled date', 'Complete']),
+                'Delete',
+              ]
+                .map(x => `<div role="menuitem">${x}</div>`)
+                .join('')}</div>`
+            : ''
+        }`;
+      }
+
+      function schedulesPage() {
+        const q = state.sfilter.toLowerCase();
+        const match = s =>
+          !q ||
+          [s.n, s.p, s.a, s.d, stLabel[s.st], money(Math.abs(s.amt))].some(
+            v => v && v.toLowerCase().includes(q),
+          );
+        const list = state.sempty ? [] : schedules.filter(match);
+        const done = state.sempty ? [] : schedCompleted.filter(match);
+        const rows = [...list, ...(state.scompleted ? done : [])];
+        const body = rows.length
+          ? rows.map(schedRow).join('') +
+            (!state.scompleted && done.length
+              ? `<div class="srow more" role="row" data-set="scompleted" data-val="true">Show completed schedules</div>`
+              : '')
+          : `<div class="sch-empty">${
+              q ? 'No matching schedules' : 'No schedules'
+            }</div>`;
+        return `<main class="main sch-main">
+          <div class="head sch-head"><h1>Schedules</h1></div>
+          <div class="toolbar">
+            <button class="tbtn primary" data-set="sdlg" data-val="add">${
+              I.plus
+            }<span class="txt">Add new schedule</span></button>
+            <button class="tbtn">${
+              I.rules
+            }<span class="txt">Find schedules</span></button>
+            <button class="tbtn">${
+              I.calendar
+            }<span class="txt">Change upcoming length</span></button>
+            <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>${
+              q
+                ? `<span style="color:var(--pageText)">${esc(
+                    state.sfilter,
+                  )}</span>`
+                : 'Filter schedules…'
+            }</div>
+          </div>
+          <div class="card sch-table" role="table" aria-label="Schedules">
+            <div class="schcols rhead" role="row"><div>Name</div><div>Payee</div><div>Account</div><div>Next date</div><div>Status</div><div class="r">Amount</div><div style="text-align:center">Recurring</div><div></div></div>
+            ${body}
+          </div>
+        </main>${state.sdlg ? scheduleDialog() : ''}`;
+      }
+
+      function scheduleDialog() {
+        const adding = state.sdlg === 'add';
+        const s = adding
+          ? null
+          : [...schedules, ...schedCompleted].find(x => x.id === state.sdlg) ||
+            schedules[2];
+        const linked = state.stx !== 'matched';
+        const tx = adding
+          ? []
+          : [
+              ['09/01/2026', s.p || 'Landlord Co', s.n || '', s.amt],
+              ['08/01/2026', s.p || 'Landlord Co', s.n || '', s.amt],
+              ['07/01/2026', s.p || 'Landlord Co', s.n || '', s.amt],
+            ];
+        const upc = [
+          '10/01/2026 Thursday',
+          '11/02/2026 Monday',
+          '12/01/2026 Tuesday',
+          '01/01/2027 Friday',
+          '02/01/2027 Monday',
+        ];
+        const cb = (on, label, help) =>
+          `<label class="scheck"><span class="cb ${on ? 'on' : ''}">${
+            on ? check : ''
+          }</span><span>${label}${help ? `<small>${help}</small>` : ''}</span></label>`;
+        return `<div class="sdlg-scrim"><div class="sdlg" role="dialog" aria-label="Schedule">
+          <div class="sdlg-top"><h2>${
+            s && s.p ? `Schedule: ${esc(s.p)}` : 'Schedule'
+          }</h2><button class="icon-btn" data-set="sdlg" data-val="" aria-label="Close">${
+            I.x
+          }</button></div>
+          <section class="sdlg-sec first">
+            <div class="sfld">Schedule Name<div class="sin focus">${
+              s && s.n ? esc(s.n) : '<span class="ph">nothing</span>'
+            }</div></div>
+            <div class="sgrid">
+              <div class="sfld">Payee<div class="sin">${
+                s && s.p ? esc(s.p) : '<span class="ph">(none)</span>'
+              }</div></div>
+              <div class="sfld">Account<div class="sin">${
+                s && s.a ? esc(s.a) : '<span class="ph">(none)</span>'
+              }</div></div>
+              <div class="sfld"><div class="lrow">Amount<span class="opbtn">${
+                s && s.op === 'isbetween'
+                  ? 'is between'
+                  : s && s.op === 'is'
+                    ? 'is exactly'
+                    : 'is approximately'
+              } ${I.chevD}</span></div><div class="sin num">${
+                s ? money(Math.abs(s.amt)) : '0.00'
+              }</div></div>
+            </div>
+          </section>
+          <section class="sdlg-sec">
+            <div class="ey">Date</div>
+            <div class="stwo">
+              <div class="scol">
+                <button class="tbtn">${
+                  adding || (s && s.rec) ? 'Every month on the 1st' : s.d
+                }${I.chevD}</button>
+                ${cb(adding || (s && s.rec), 'Repeats')}
+              </div>
+              ${
+                adding || (s && s.rec)
+                  ? `<div class="supc"><div class="ey">Upcoming dates</div>${upc
+                      .map(d => {
+                        const [a, b] = d.split(' ');
+                        return `<div class="d num"><span>${a}</span><span>${b}</span></div>`;
+                      })
+                      .join('')}</div>`
+                  : '<div></div>'
+              }
+            </div>
+          </section>
+          <section class="sdlg-sec">
+            <div class="ey-row"><div class="ey">Options</div>${
+              adding
+                ? ''
+                : `<div class="srule">${
+                    s.id === 's5'
+                      ? 'This schedule has custom conditions and actions'
+                      : ''
+                  }<button class="tbtn">Edit as rule</button></div>`
+            }</div>
+            <div class="stwo">
+              <div class="sfld">Upcoming length<button class="tbtn">Use global default${
+                I.chevD
+              }</button><span class="help">How far in advance this schedule appears as upcoming</span></div>
+              <div class="sfld"><span>&nbsp;</span>${cb(
+                s && s.id === 's3',
+                'Automatically add transaction',
+                'Automatically create transactions in the specified account',
+              )}</div>
+            </div>
+          </section>
+          <section class="sdlg-sec">
+            <div class="stx-top">${
+              adding
+                ? '<span class="hint">These transactions match this schedule:</span><span class="hint">Select transactions to link on save</span>'
+                : `<div class="seg" role="tablist"><button role="tab" class="${
+                    linked ? 'on' : ''
+                  }" aria-selected="${linked}" data-set="stx" data-val="linked">Linked transactions</button><button role="tab" class="${
+                    linked ? '' : 'on'
+                  }" aria-selected="${!linked}" data-set="stx" data-val="matched">Find matching transactions</button></div><button class="tbtn" ${
+                    state.ssel ? '' : 'disabled style="opacity:.5"'
+                  }>${state.ssel ? '<span class="num">1</span> transaction' : '0 transactions'} ${
+                    I.chevD
+                  }</button>`
+            }</div>
+            <div class="stx" role="table" aria-label="Transactions">
+              <div class="stxcols rhead" role="row"><div><span class="cb"></span></div><div>Date</div><div>Payee</div><div>Notes</div><div class="r">Amount</div></div>
+              ${
+                tx.length && linked
+                  ? tx
+                      .map(
+                        ([d, p, n, a], i) =>
+                          `<div class="stxcols trow ${
+                            state.ssel && i === 0 ? 'selected' : ''
+                          }" role="row"><div><span class="cb ${
+                            state.ssel && i === 0 ? 'on' : ''
+                          }">${state.ssel && i === 0 ? check : ''}</span></div><div class="num">${d}</div><div class="ell">${esc(
+                            p,
+                          )}</div><div class="ell sub" style="color:var(--pageTextSubdued)">${esc(
+                            n,
+                          )}</div><div class="r num">${money(a)}</div></div>`,
+                      )
+                      .join('')
+                  : `<div class="stx-empty">${
+                      linked || adding
+                        ? adding
+                          ? 'No matching transactions'
+                          : 'No linked transactions'
+                        : 'No matching transactions'
+                    }</div>`
+              }
+            </div>
+          </section>
+          <div class="sdlg-foot"><button class="tbtn" data-set="sdlg" data-val="">Cancel</button><button class="tbtn primary" data-set="sdlg" data-val="">${
+            adding ? 'Add' : 'Save'
+          }</button></div>
+        </div></div>`;
+      }
       const reportsPage = () =>
         ({
           networth: netWorthPage,
@@ -6960,7 +7853,9 @@ function formulaPage() {
               ? accountPage()
               : state.page === 'reports'
                 ? reportsPage()
-                : `<main class="main">
+                : state.page === 'schedules'
+                  ? schedulesPage()
+                  : `<main class="main">
             ${header()}
             ${summary}
             ${ledger(offs)}
@@ -7017,6 +7912,12 @@ function formulaPage() {
           u.searchParams.set('rgraph', state.rgraph);
           for (const k of ['rlegend', 'rsummary', 'rlabels'])
             u.searchParams.set(k, state[k] ? '1' : '0');
+        }
+        if (state.page === 'schedules') {
+          u.searchParams.set('sdlg', state.sdlg);
+          u.searchParams.set('stx', state.stx);
+          u.searchParams.set('scompleted', state.scompleted ? '1' : '0');
+          u.searchParams.set('sempty', state.sempty ? '1' : '0');
         }
         if (state.rview === 'montecarlo') {
           u.searchParams.set('mctab', state.mctab);
