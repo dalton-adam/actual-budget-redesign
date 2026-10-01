@@ -713,3 +713,49 @@ reloading, from the launcher's own server on 127.0.0.1:3001:
 `overflow: auto`), and the dynamically sized result is 3px taller than it
 (scroll height 123). Edge's headless screenshots draw no scrollbar for the
 same overflow.
+
+## APP-04 and APP-03d follow-up checks (October 1, 2026)
+
+Against `redesign/main` at `35a0d128b` (APP-04 merged), on Windows 11.
+Browser checks ran against a fresh `build:browser` preview
+(`scripts/redesign.mjs preview`, port 3018, demo budget) with the installed
+Edge through a scratch Playwright script; the desktop checks over CDP.
+Screenshots in [verification/app-04](verification/app-04/) and
+[verification/app-03d](verification/app-03d/) (`keyboard-*`, `privacy-*`,
+`custom-*`, `desktop-*`).
+
+| Check                    | Result                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Schedules keyboard       | From the title, Tab reaches Add new schedule, Find schedules, Change upcoming length, the filter, the table, then each row's ⋯ button, each with a visible ring except the table container (upstream `table.tsx` sets `outline: none` on it; unchanged since v26.9.0). Enter on ⋯ opens the menu with its first item highlighted; Escape closes it and returns focus to ⋯. Enter on Add new schedule opens the dialog with focus in the name field; Escape closes it and returns focus to the button. Rows open by mouse only, as upstream. |
+| Schedule dialog keyboard | Edit dialog at 1000×700: Tab runs name → payee → account → amount options → amount → date → Repeats → upcoming length → Automatically add → Edit as rule → Linked / Find matching transactions → transactions table → Cancel → Save, in visual order. Enter on Find matching transactions switches the segmented control (`aria-pressed` moves). Save shows its ring with the footer in view; after scrolling the dialog to its end, Save stays at the same place (sticky footer).                                                          |
+| Schedules privacy        | Ctrl+Shift+P on the page turns privacy on. Dark 1440×900 and light 1000×700: all four amounts masked (the real text sits at opacity 0 under the redacted copy). The dialog's Amount field shows its value: upstream (`AmountInput` and `ScheduleEditForm` have no privacy handling at v26.9.0; APP-04 did not touch the field).                                                                                                                                                                                                             |
+| Schedules custom theme   | APP-04's check covered `role="main"`, which holds the toolbar and table but not the page header. Rerun over the whole page with its header (QA-00 method, bases dark and light, 1440×900): **0 misses** in both.                                                                                                                                                                                                                                                                                                                            |
+| Monte Carlo custom theme | QA-00 method, bases dark and light, 1440×900 and 1000×700, experimental flag on. Per run: Results with the chart, each configuration tab (Investment pots with a pot's settings expanded, Contributions, Spending, Tax) and the Runs view, over the whole page with its header: **0 misses in 24 views**. No page errors.                                                                                                                                                                                                                   |
+| Monte Carlo keyboard     | Dark 1440×900, from Configuration: Plan details, Investment pots, Contributions, Spending, Tax (segmented, ring on each), then the plan's fields and Help buttons, Return model, Simulations, the today's-money checkbox, Chart, Runs, All scenarios. Enter on Spending and on Runs presses them. In Runs: the sort control, then each run row with a ring.                                                                                                                                                                                 |
+| Monte Carlo privacy      | Midnight 1440×900: the Median ending balance and Median total withdrawn tiles, the chart's axis labels, the pot's Starting balance and Fixed yearly fee, and all 20 run amounts are masked. Percentages and ages are not amounts and stay visible.                                                                                                                                                                                                                                                                                          |
+| Desktop build            | `scripts/redesign-electron.mjs --remote-debugging-port=9333 --inspect=9339`, fresh `data/redesign-electron/`, `better-sqlite3` rebuilt for Electron and restored from a backup afterwards (it loads under Node again). See below.                                                                                                                                                                                                                                                                                                           |
+
+**Desktop.** The welcome screen listed no budget; **Don't use a server**,
+**Try the demo**, then in the Electron window:
+
+- Schedules, dark 1440×900: the card table and toolbar as in the browser;
+  the same Tab order; Enter on ⋯ opens the menu and Escape returns focus to
+  it; Enter on Add new schedule opens the dialog and Escape closes it, focus
+  back on the button.
+- Schedule dialog, light 1000×700: Enter on Find matching transactions
+  presses it; Save's bottom edge at 655 of 700px, and still at 655 after
+  scrolling the dialog body to its end.
+- Schedules, midnight 1440×900 with privacy on: every amount masked.
+- Monte Carlo, dark 1440×900: Results, the pots tab with settings
+  expanded and Runs; Investment pots and Runs pressed by Enter. Light
+  1000×700: no horizontal page overflow. Midnight with privacy on: tiles
+  and chart axis masked.
+- Console: one React warning, "`value` prop on `input` should not be null",
+  when the Add schedule dialog opens: upstream's name field
+  (`value={fields.name}` with `name: null` for a new schedule at v26.9.0).
+  The Vite log also shows react-aria's "Draggable items in a GridList must
+  contain a `<Button slot="drag">`" on the Monte Carlo pots table; upstream
+  has no drag button there either.
+- Quit with `app.quit()` over the inspector: "Isolation check: nothing
+  changed" for `%APPDATA%\Actual`, `OneDrive\Documents\Actual` and
+  `Documents\Actual`.

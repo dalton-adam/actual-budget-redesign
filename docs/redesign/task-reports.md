@@ -1421,7 +1421,13 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   layout unchanged); no horizontal page overflow and no page errors in any
   shot. **Not run:** custom theme, keyboard walk-through, privacy mode and
   the desktop build (open for the follow-up checks, as for APP-03b and
-  APP-03c).
+  APP-03c). **Follow-up checks (October 1, 2026):** custom theme 0 misses
+  in 24 views (Results, each configuration tab, Runs; bases dark and light;
+  1440×900 and 1000×700); keyboard reaches and presses every segmented
+  control, field and run row with a visible ring; privacy masks the tiles,
+  chart axis, pot amounts and runs; desktop build checked, with "Isolation
+  check: nothing changed" (verification.md). Every APP-03d check is now
+  done.
 
 - APP-04: **merged October 1, 2026** into `redesign/main` (branch
   `redesign/app-04-schedules`, code `197c58b49`, merge `f0052659d`). Drawing approved the same
@@ -1478,4 +1484,13 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   visually hidden Dismiss button (clipped to 1px, not visible). Row menu,
   Add dialog and "No matching schedules" checked in dark. No page errors.
   **Not run:** keyboard walk-through, privacy mode (amounts keep
-  `PrivacyFilter`, unchanged) and the desktop build.
+  `PrivacyFilter`, unchanged) and the desktop build. **Follow-up checks
+  (same day):** keyboard order follows the layout with a visible ring on
+  every stop except upstream's table container; the row menu and both
+  dialogs open by Enter and return focus on Escape; the segmented control
+  switches by Enter and the dialog footer stays in view while scrolling.
+  Privacy masks every amount on the page (the dialog's Amount field shows
+  its value, as upstream). The custom theme, rerun over the page header
+  that the first check missed, has 0 misses. Desktop build checked, with
+  "Isolation check: nothing changed" (verification.md). Every APP-04 check
+  is now done.
