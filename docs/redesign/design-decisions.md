@@ -566,6 +566,26 @@ keeps its settings sidebar on the page background. Mobile is
 unchanged: at narrow widths the old toggle, button variants and right-aligned
 total come back.
 
+**APP-03c (approved October 1, 2026):** drawn in the prototype (Page →
+Reports → Custom, Calendar, Formula; shots `59`–`66`, prototype README) and
+approved with these owner answers:
+
+- Scope: the custom report editor, the Calendar report's transaction list and
+  the Formula editor body. **Monte Carlo moves to its own task, APP-03d.**
+- The custom report's settings sit in a **Settings card** beside the chart
+  card; the six chart types are one **segmented icon control**; Legend,
+  Summary and Labels are toggle Control buttons with their names.
+- The saved-report menu moves to the header as a Control button labelled
+  **"Report"**, with **"Unsaved changes"** beside it for the existing modified
+  status (two new strings, approved).
+- Below 1280px the summary and legend move **under the chart** in the same
+  card (left to the implementer; chosen so the colour key never disappears).
+- The Calendar's list uses the APP-02 register look in its own card (no
+  selection, balance or cleared column, as today); month names sit on their
+  own line above the totals.
+- Formula: Result, Formula and Appearance cards, with Query Definitions as a
+  card on the right (stacked below 1280px).
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the

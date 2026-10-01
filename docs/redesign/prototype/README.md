@@ -214,7 +214,13 @@ installed).
 
 ## APP-03c: custom report, Calendar and Formula proposal (October 1, 2026)
 
-**Status: drawn October 1, 2026, awaiting owner approval.** Choose **Page →
+**Status: approved October 1, 2026**, with the owner's answers: yes to the
+"Unsaved changes" label and the "Report ▾" menu button (question 1); the
+summary and legend placement below 1280px was left to the implementer
+(question 2): they move **under the chart** inside the same card (stat tiles
+in a row, then the legend in columns) rather than hiding, because the legend
+is the only key to the colours in the donut, stacked, line and area views,
+and a side column at 1000px would squeeze the chart to about 360px. Choose **Page →
 Reports**, then **View** Custom, Calendar or Formula. URL parameters:
 `rview=custom|calendar|formula`; for the custom report also
 `rgraph=table|bar|stacked|line|area|donut` and `rlegend`, `rsummary`,
@@ -236,7 +242,7 @@ What the drawing proposes (each item is presentation only):
 | Custom report header      | "Custom Report: ‹name›" in purple, 25px; saved-report menu at the right of the icon row | The APP-03b pattern: "Reports · ‹dashboard›" over the report name at Display. The saved-report menu moves to the header as a Control button ("Report ▾"), with the unsaved state as a dot and "Unsaved changes" (the existing modified status)                                                                                     |
 | Custom report toolbar     | 11 bare icon buttons with dividers                                                      | One segmented icon control for the six chart types (`aria-pressed`, same icons and order); Legend, Summary and Labels as toggle Control buttons with their names; Copy to clipboard and Filter as Control buttons; Save widget primary at the right. Below 1280px the toggles show icons only, named by `aria-label`               |
 | Custom report settings    | Flush sidebar, 13px labels, upstream selects and toggle                                 | A Surface card: **Display** (Mode as a segmented control; Split, Type, Interval, Sort and Options as full-width Control buttons), **Date filters** (Live/Static segmented, Range), **Categories** (select all/none tools, Hide unchecked, the checklist with each category's accent dot). The checklist scrolls inside the card    |
-| Custom report chart       | Chart on the table background; "Payment: −7,768.41" right-aligned above it              | The chart in a Surface card: title and date range left, total at Display right. Summary and legend share a right column inside the card (stat tiles, then legend rows with amounts); hidden below 1280px, as the sidebar legend is today at narrow widths. The data table view sits in the same card                               |
+| Custom report chart       | Chart on the table background; "Payment: −7,768.41" right-aligned above it              | The chart in a Surface card: title and date range left, total at Display right. Summary and legend share a right column inside the card (stat tiles, then legend rows with amounts); below 1280px they move under the chart in the same card (owner decision, question 2). The data table view sits in the same card               |
 | Calendar transaction list | Upstream table on the page background                                                   | The APP-02 register (`isRegister`) in its own card: Eyebrow headers, payee initials in the category accent, accent dots before categories, reconciled locks. Read-only as today: no selection column, no balance, no cleared column                                                                                                |
 | Calendar month tiles      | Surface tiles (APP-03b), month name and totals on one line                              | Month name on its own line with the totals under it, so long names ("September 2026") never wrap into the grid; the totals card uses stat tiles. Below 1280px the tiles scroll sideways, as they do today                                                                                                                          |
 | Formula body              | Labels and fields on the page background; result in a 6px-corner box                    | Cards: **Result** (the existing result on a Card Inset well), **Formula** (the editor with line numbers), **Appearance** (Show title, Font size as Dynamic/Static segments, size, conditional color and its help text). **Query Definitions** is a card on the right (below the others under 1280px), each query a Card Inset tile |

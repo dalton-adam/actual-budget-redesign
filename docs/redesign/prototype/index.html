@@ -3393,9 +3393,24 @@
         }
         .cr-chart {
           grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: minmax(320px, 1fr) auto;
         }
         .cr-side {
-          display: none;
+          border-left: 0;
+          padding-left: 0;
+          border-top: 1px solid var(--cardBorder);
+          padding-top: 14px;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          align-items: start;
+          gap: 10px 14px;
+        }
+        .cr-side .lg {
+          grid-column: 1 / -1;
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+          column-gap: 24px;
+          overflow: visible;
         }
         .cal-tiles {
           grid-template-columns: none;
