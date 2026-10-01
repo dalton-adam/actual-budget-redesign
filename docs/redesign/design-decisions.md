@@ -612,6 +612,18 @@ the open questions to the implementer:
 - The histogram and explanation sit **side by side at 1280px and wider**,
   stacked below.
 
+**As implemented (APP-03d):** the axes and grid of both charts are
+unchanged, as on every other report page (APP-03b kept them); Save widget
+sits in a row under the header, as on the Formula page, rather than beside
+the title; the plan's field groups get their dividers only at 1280px and
+wider (narrower, they wrap with the upstream spacing so no line starts with
+a divider); on the card the Investment pots table sizes its columns to fill
+the card and scrolls only below their minimum widths (the uppercase Eyebrow
+headers would otherwise widen every column), and the expanded pot's groups
+sit on the Card Inset well without dividers. Mobile keeps the upstream
+layout: tabs and Chart/Runs as mode buttons, uppercase headings, plain
+blocks.
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the

@@ -1375,3 +1375,50 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   changed". Upstream's Formula Result box shows a classic scrollbar in
   Electron at 1000×700 (3px overflow, not changed). Details in
   verification.md.
+- APP-03d: **done October 1, 2026** on branch
+  `redesign/app-03d-monte-carlo`. Drawing approved the same day (prototype
+  shots `67`–`72`; the owner left the three questions to the implementer:
+  Configuration stays above Results, histogram and explanation side by side
+  at 1280px and wider, "Summary" label dropped; design-decisions §10a).
+  Screenshots in [verification/app-03d](verification/app-03d/).
+  **Change** (all under `C/reports/reports/monte-carlo/`): new
+  `MonteCarloSection.tsx` (a `ReportPageCard` on desktop, the upstream
+  `tableBackground` block at narrow widths), `MonteCarloSectionTitle.tsx`
+  and `MonteCarloStatTile.tsx` (Card Inset tile; Success rate at Display in
+  its existing threshold colour). `monteCarloStyles.ts` gains
+  `useMonteCarloStyles()`, which returns Eyebrow group and column headings,
+  Secondary labels, narrower fields, hairline table frames and card-surface
+  rows on desktop and the old constants at narrow widths. `MonteCarlo.tsx`:
+  Results is one card (today's-money checkbox beside the title, five tiles
+  in one row at 1280px and wider, three columns below with Success rate
+  spanning two rows, the summary sentence without its label); Chart/Runs is
+  a `ReportSegmentedControl`; the scenario select a Control button; the
+  histogram and explanation share a row at 1280px and wider; Save widget
+  moves under the header. `MonteCarloConfiguration.tsx`: the five tabs are a
+  segmented control beside the card's title; the plan's groups are split by
+  hairlines at 1280px and wider. Pots table (`MonteCarloPotsTableHeader`,
+  `MonteCarloPotConfiguration`): Eyebrow headers, 46px rows on the card
+  surface, wider minimums for the uppercase headers on the card, the
+  expanded settings on a Card Inset well. Contributions, Spending phases and
+  Tax bands take the same table frame and headers; their Add buttons and
+  every select are Control buttons. Runs table: outcomes are status pills
+  (positive "Survived", negative "Ran out at age N"), Eyebrow headers,
+  hairline rows, Control sort, Jump to, Previous and Next; the single-run
+  drill-in takes the same headings and hairlines. Charts unchanged. No
+  handler, simulation, config field, saved widget meta, route or string
+  changed (the Chart/Runs control's accessible name reuses "Results").
+  **Checks:** typecheck passes; `oxlint --type-aware` over the folder 0
+  errors; oxfmt applied; web unit tests under `src/components/reports`
+  **271/271** (17 files, including `monteCarloSimulation.test.ts`).
+  Impeccable detector over the 14 changed files: no findings. No E2E or VRT
+  covers Monte Carlo (it sits behind the experimental `monteCarloReport`
+  flag), so none changed. VISUAL against the dev server (port 3001, demo
+  budget, flag on, installed Edge via a scratch Playwright script): dark
+  1440×900 (Plan details, Investment pots with a pot expanded, Contributions,
+  Spending, Tax, Runs, histogram and explanation), light 1000×700 (plan
+  groups wrap without dividers; the pots table scrolls sideways, as
+  upstream), midnight 1440×900 (chart and Runs), mobile 375 (upstream
+  layout unchanged); no horizontal page overflow and no page errors in any
+  shot. **Not run:** custom theme, keyboard walk-through, privacy mode and
+  the desktop build (open for the follow-up checks, as for APP-03b and
+  APP-03c).
