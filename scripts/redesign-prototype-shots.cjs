@@ -1,8 +1,9 @@
 // Screenshots of the static redesign prototype (docs/redesign/prototype).
-// Usage: node scripts/redesign-prototype-shots.cjs [--design-01 | --app-03]
+// Usage: node scripts/redesign-prototype-shots.cjs [--design-01 | --app-03 | --app-03c]
 // Default: the DESIGN-02 set (18+). --design-01 regenerates 01-17 from the
 // current prototype with the fixture and row height they were taken with.
-// --app-03 takes the Reports proposal (51+).
+// --app-03 takes the Reports proposal (51+); --app-03c the custom report,
+// Calendar and Formula proposal (59+).
 const { chromium } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
@@ -168,15 +169,43 @@ const app03 = [
   ['58-reports-privacy-dark-wide', W, H, 'page=reports&theme=dark&privacy=1'],
 ];
 
+const app03c = [
+  ['59-custom-report-dark-wide', W, H, 'page=reports&rview=custom&theme=dark'],
+  [
+    '60-custom-report-light-1000',
+    w,
+    h,
+    'page=reports&rview=custom&theme=light',
+  ],
+  [
+    '61-custom-report-table-midnight-wide',
+    W,
+    H,
+    'page=reports&rview=custom&theme=midnight&rgraph=table',
+  ],
+  ['62-calendar-dark-wide', W, H, 'page=reports&rview=calendar&theme=dark'],
+  ['63-calendar-light-1000', w, h, 'page=reports&rview=calendar&theme=light'],
+  ['64-formula-dark-wide', W, H, 'page=reports&rview=formula&theme=dark'],
+  ['65-formula-light-1000', w, h, 'page=reports&rview=formula&theme=light'],
+  [
+    '66-app03c-custom-theme-wide',
+    W,
+    H,
+    'page=reports&rview=custom&theme=custom',
+  ],
+];
+
 (async () => {
   const dir = path.resolve('docs/redesign/prototype');
   const out = path.join(dir, 'shots');
   fs.mkdirSync(out, { recursive: true });
   const shots = process.argv.includes('--design-01')
     ? design01
-    : process.argv.includes('--app-03')
-      ? app03
-      : design02;
+    : process.argv.includes('--app-03c')
+      ? app03c
+      : process.argv.includes('--app-03')
+        ? app03
+        : design02;
   // PW_CHANNEL=msedge uses an installed browser instead of Playwright's.
   const b = await chromium.launch(
     process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {},
