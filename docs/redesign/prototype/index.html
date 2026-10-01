@@ -9,7 +9,8 @@
   Open with a local file URL after `yarn install` (fonts load from node_modules).
   URL params: layout=a|b, header=cards|trend, theme=light|dark|midnight|custom,
   panel=0|1, privacy=0|1, controls=0|1, page=budget|account|reports
-  APP-03: rview=dash|networth, redit=0|1, whover=<widget id>
+  APP-03: rview=dash|networth|custom|calendar|formula, redit=0|1, whover=<widget id>
+  APP-03c: rgraph=table|bar|stacked|line|area|donut, rlegend=0|1, rsummary=0|1, rlabels=0|1
   DESIGN-02: data=basic|states|many, density=50|44|38, rta=pos|zero|neg,
   when=past|current|future, cat=<category id>, pm=<panel month>, hover=<id>, edit=<id>:<month>,
   compact=1, hidden=0, collapsed=<group ids>, pane=open|collapsed, recon=0|diff|done,
@@ -2933,6 +2934,506 @@
       .rp-title-row:focus-within .tool {
         opacity: 1;
       }
+      /* APP-03c proposal: custom report editor, Calendar list, Formula */
+      .cr-body {
+        display: grid;
+        grid-template-columns: 272px minmax(0, 1fr);
+        gap: 14px;
+        flex: 1;
+        min-height: 0;
+      }
+      .cr-set {
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        min-height: 0;
+        overflow: hidden;
+      }
+      .cr-sec {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--cardBorder);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .cr-sec h2,
+      .fx-card h2 {
+        font-size: 13.5px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .cr-row {
+        display: grid;
+        grid-template-columns: 64px minmax(0, 1fr);
+        align-items: center;
+        gap: 10px;
+        font-size: 12.5px;
+        color: var(--pageTextSubdued);
+      }
+      .cr-row .tbtn,
+      .cr-row .seg {
+        justify-self: start;
+      }
+      .tbtn.sm {
+        height: 30px;
+        padding: 0 10px;
+        border-radius: 9px;
+        font-size: 12.5px;
+      }
+      .tbtn .r-end {
+        margin-left: auto;
+        display: inline-flex;
+      }
+      .cr-row .tbtn.sm {
+        width: 100%;
+      }
+      .seg.sm > button {
+        height: 26px;
+        font-size: 12.5px;
+        padding: 0 10px;
+      }
+      .seg.ico > button {
+        width: 32px;
+        padding: 0;
+      }
+      .seg.on-fill > button.on,
+      .cr-set .seg > button.on,
+      .fx-card .seg > button.on {
+        background: var(--navActive);
+        color: var(--pageText);
+        box-shadow: var(--navActiveShadow);
+      }
+      [data-theme='light'] .cr-set .seg,
+      [data-theme='light'] .fx-card .seg {
+        background: var(--navTrack);
+        border-color: transparent;
+      }
+      .cr-cats {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 6px 8px 10px;
+      }
+      .cr-cats-head {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 16px 4px;
+        flex-shrink: 0;
+      }
+      .cr-cats-head h2 {
+        font-size: 13.5px;
+        font-weight: 600;
+        margin-right: auto;
+      }
+      .ck {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        height: 30px;
+        padding: 0 8px;
+        border-radius: 8px;
+        font-size: 13px;
+      }
+      .ck:hover {
+        background: var(--tableRowHover);
+      }
+      .ck.grp {
+        font-weight: 600;
+        margin-top: 4px;
+      }
+      .ck.child {
+        padding-left: 32px;
+      }
+      .ck.off {
+        color: var(--pageTextSubdued);
+      }
+      .ck .cb {
+        margin-left: 0;
+        flex-shrink: 0;
+      }
+      .ck .cb.mixed {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      .ck .cat-dot {
+        margin-left: -2px;
+      }
+      .cr-chart {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 240px;
+        gap: 20px;
+        min-height: 0;
+      }
+      .cr-chart.no-side {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .cr-main {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        min-height: 0;
+      }
+      .bars {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: flex-end;
+        padding: 0 8px;
+      }
+      .bars > span {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      .bars i {
+        width: 56%;
+        border-radius: 5px 5px 1px 1px;
+        display: block;
+      }
+      .bars-x {
+        grid-column: 2;
+        display: flex;
+        font-size: 11px;
+        color: var(--pageTextFaint);
+        padding: 6px 8px 0;
+      }
+      .bars-x span {
+        flex: 1;
+        min-width: 0;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0 2px;
+      }
+      .cr-side {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-height: 0;
+        border-left: 1px solid var(--cardBorder);
+        padding-left: 20px;
+      }
+      .stat {
+        background: var(--cardInset);
+        border-radius: 10px;
+        padding: 8px 10px;
+      }
+      .stat .k {
+        font-size: 12px;
+        color: var(--pageTextSubdued);
+        font-weight: 600;
+      }
+      .stat .v {
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        margin-top: 2px;
+      }
+      .lg {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        overflow-y: auto;
+        min-height: 0;
+      }
+      .lg-row {
+        display: grid;
+        grid-template-columns: 10px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 8px;
+        height: 28px;
+        font-size: 12.5px;
+      }
+      .lg-row i {
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+      }
+      .lg-row .num {
+        color: var(--pageTextSubdued);
+        font-weight: 600;
+      }
+      .rp-tools .vsep {
+        width: 1px;
+        height: 22px;
+        background: var(--cardBorder);
+        margin: 0 2px;
+      }
+      .tbtn.ico {
+        width: 34px;
+        padding: 0;
+        justify-content: center;
+      }
+      .tbtn[aria-pressed='true'] {
+        background: var(--cardInset);
+        color: var(--pageText);
+      }
+      .tbtn[aria-pressed='false'] {
+        color: var(--pageTextSubdued);
+      }
+      .saved {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--pageTextSubdued);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .saved i {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--pillWarningText);
+      }
+      /* Calendar report */
+      .cal-tiles {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) 220px;
+        gap: 14px;
+        flex-shrink: 0;
+      }
+      .cal-tiles .rcard {
+        padding: 14px 16px;
+      }
+      .cal-tiles .cal-d {
+        height: 30px;
+      }
+      .cal-tot {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .cal-reg {
+        flex: 1;
+        min-height: 280px;
+        overflow: auto;
+        padding: 0;
+      }
+      .calcols {
+        display: grid;
+        grid-template-columns:
+          96px minmax(120px, 1fr) minmax(140px, 1.3fr) minmax(110px, 1fr)
+          minmax(120px, 1fr) 100px 100px 30px;
+        align-items: center;
+        column-gap: 12px;
+        padding: 0 14px 0 16px;
+      }
+      .cal-reg .rhead {
+        border-radius: 18px 18px 0 0;
+      }
+      .acct-cell {
+        color: var(--pageTextSubdued);
+      }
+      .sort-on {
+        color: var(--pageTextSubdued);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      /* Formula */
+      .fx-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 14px;
+        align-items: start;
+      }
+      .fx-col {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        min-width: 0;
+      }
+      .fx-card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .fx-result {
+        min-height: 120px;
+        display: grid;
+        place-items: center;
+        background: var(--cardInset);
+        border-radius: 10px;
+        font-size: 44px;
+        font-weight: 700;
+        letter-spacing: -0.8px;
+      }
+      .code {
+        font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+        font-size: 12.5px;
+        line-height: 1.75;
+        background: var(--cardInset);
+        border: 1px solid var(--cardBorder);
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: 36px minmax(0, 1fr);
+        overflow: hidden;
+      }
+      .code .ln {
+        color: var(--pageTextFaint);
+        text-align: right;
+        padding: 10px 8px 10px 0;
+        border-right: 1px solid var(--cardBorder);
+        user-select: none;
+      }
+      .code .src {
+        padding: 10px 12px;
+        white-space: pre;
+        overflow-x: auto;
+      }
+      .code.one {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .code .fn {
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .code .str {
+        color: var(--pillPositiveText);
+      }
+      
+      .fx-opts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px 28px;
+        align-items: flex-start;
+      }
+      .fld {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--pageTextSubdued);
+      }
+      .fld input {
+        height: 30px;
+        width: 88px;
+        border-radius: 9px;
+        border: 1px solid var(--cardBorder);
+        background: var(--controlBackground);
+        color: var(--pageText);
+        padding: 0 10px;
+        font: inherit;
+        font-weight: 500;
+        font-size: 13px;
+      }
+      .sw {
+        margin-top: 5px;
+        width: 34px;
+        height: 20px;
+        border-radius: 99px;
+        background: var(--accent);
+        position: relative;
+        display: inline-block;
+      }
+      .sw::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+      }
+      .help {
+        font-size: 12px;
+        color: var(--pageTextSubdued);
+        line-height: 1.5;
+      }
+      .qd {
+        background: var(--cardInset);
+        border-radius: 12px;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .qd-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .qd-top .tool {
+        width: 26px;
+        height: 26px;
+      }
+      .qd-top .tool:first-of-type {
+        margin-left: auto;
+      }
+      .qd-meta {
+        font-size: 12px;
+        color: var(--pageTextSubdued);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+      }
+      .qd .code {
+        font-size: 11.5px;
+        line-height: 1.5;
+      }
+      .qd .code .src {
+        padding: 4px 8px;
+      }
+      @media (max-width: 1279px) {
+        .cr-body {
+          grid-template-columns: 248px minmax(0, 1fr);
+        }
+        .cr-chart {
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: minmax(320px, 1fr) auto;
+        }
+        .cr-side {
+          border-left: 0;
+          padding-left: 0;
+          border-top: 1px solid var(--cardBorder);
+          padding-top: 14px;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          align-items: start;
+          gap: 10px 14px;
+        }
+        .cr-side .lg {
+          grid-column: 1 / -1;
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+          column-gap: 24px;
+          overflow: visible;
+        }
+        .cal-tiles {
+          grid-template-columns: none;
+          grid-auto-flow: column;
+          grid-auto-columns: 340px;
+          overflow-x: auto;
+        }
+        .cal-tot {
+          grid-column: auto;
+        }
+        .calcols {
+          grid-template-columns:
+            84px minmax(90px, 1fr) minmax(110px, 1.2fr) minmax(70px, 0.8fr)
+            minmax(100px, 1fr) 84px 84px 26px;
+          column-gap: 10px;
+        }
+        .calcols .payee-cell .payee {
+          display: none;
+        }
+        .fx-body {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
     </style>
   </head>
   <body>
@@ -2974,6 +3475,11 @@
         rview: params.get('rview') || 'dash',
         redit: params.get('redit') === '1',
         whover: params.get('whover') || '',
+        // APP-03c: custom report chart type and its toolbar toggles.
+        rgraph: params.get('rgraph') || 'bar',
+        rlegend: params.get('rlegend') !== '0',
+        rsummary: params.get('rsummary') !== '0',
+        rlabels: params.get('rlabels') === '1',
         // Accounts pane: open or collapsed (device-local). Default: open at
         // 1280px and wider, collapsed below.
         pane:
@@ -4554,6 +5060,9 @@
           grp('View', 'rview', [
             ['dash', 'Dashboard'],
             ['networth', 'Net Worth'],
+            ['custom', 'Custom'],
+            ['calendar', 'Calendar'],
+            ['formula', 'Formula'],
           ]),
           grp('Edit', 'redit', [
             [false, 'Off'],
@@ -5277,8 +5786,565 @@
         </main>`;
       }
 
+// APP-03c proposal: custom report editor, the Calendar report's
+// transaction list and the Formula editor body (fictional data).
+const svgI = (d, w = 15) =>
+  `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const CI = {
+  table: svgI(
+    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 10v10"/>',
+  ),
+  bar: svgI('<path d="M6 20V10M12 20V4M18 20v-7"/>'),
+  stacked: svgI(
+    '<rect x="4" y="11" width="5" height="9" rx="1"/><rect x="4" y="5" width="5" height="6" rx="1"/><rect x="15" y="14" width="5" height="6" rx="1"/><rect x="15" y="8" width="5" height="6" rx="1"/>',
+  ),
+  line: svgI('<path d="m3 17 5-6 4 3 8-9"/>'),
+  area: svgI('<path d="M3 20v-4l5-6 4 3 9-8v15Z"/>'),
+  donut: svgI(
+    '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 4v4.5"/>',
+  ),
+  legend: svgI(
+    '<path d="M9 6h12M9 12h12M9 18h12"/><rect x="3" y="4.5" width="3" height="3" rx="1"/><rect x="3" y="10.5" width="3" height="3" rx="1"/><rect x="3" y="16.5" width="3" height="3" rx="1"/>',
+  ),
+  summary: svgI(
+    '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/>',
+  ),
+  labels: svgI(
+    '<path d="M3 12V4h8l9 9-8 8-9-9Z"/><circle cx="7.5" cy="7.5" r="1.2"/>',
+  ),
+  camera: svgI(
+    '<path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13" r="3.5"/>',
+  ),
+  copy: svgI(
+    '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10"/>',
+    13,
+  ),
+  sortD: svgI('<path d="M12 5v14M6 13l6 6 6-6"/>', 12),
+  all: svgI(
+    '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8 12 3 3 5-6"/>',
+  ),
+  none: svgI('<rect x="4" y="4" width="16" height="16" rx="3"/>'),
+};
+const chartQ = [
+  '#45b29d',
+  '#efc94c',
+  '#e27a3f',
+  '#df5a49',
+  '#5f91b8',
+  '#e2a37f',
+  '#55dbc1',
+  '#efda97',
+];
+const reportHead = (title, extra = '') => `<div class="head">
+            <div style="display:flex;flex-direction:column">
+              <div class="eyebrow">Reports · Main</div>
+              <div class="rp-title-row"><h1>${title}</h1><button class="tool" aria-label="Rename report">${I.pencil}</button></div>
+            </div>${extra}
+          </div>`;
+
+function customReportPage() {
+  const graph = state.rgraph;
+  const side = state.rside;
+  const groups = [
+    ['Usual Expenses', ['c-groc', 'c-dine', 'c-trans', 'c-cloth', 'c-gift']],
+    ['Bills', ['c-rent', 'c-util', 'c-subs']],
+    ['Savings', ['c-emerg', 'c-vac']],
+  ];
+  const names = Object.fromEntries(all.map(c => [c.id, c.n]));
+  const off = new Set(['c-emerg', 'c-vac']);
+  const ck = (on, mixed) =>
+    `<span class="cb ${on ? 'on' : ''} ${mixed ? 'mixed' : ''}">${
+      mixed
+        ? '<svg width="9" height="9" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M6 12h12"/></svg>'
+        : on
+          ? check
+          : ''
+    }</span>`;
+  const cats = groups
+    .map(([g, ids]) => {
+      const n = ids.filter(id => !off.has(id)).length;
+      return `<label class="ck grp">${ck(
+        n === ids.length,
+        n > 0 && n < ids.length,
+      )}${g}</label>${ids
+        .map(
+          id =>
+            `<label class="ck child ${off.has(id) ? 'off' : ''}">${ck(
+              !off.has(id),
+            )}<span class="cat-dot" style="background:${accent(
+              id,
+            )}"></span>${esc(names[id] || id)}</label>`,
+        )
+        .join('')}`;
+    })
+    .join('');
+  const data = [
+    ['Rent', 10800],
+    ['Groceries', 3214.5],
+    ['Dining out', 1187.2],
+    ['Transport', 964.0],
+    ['Utilities', 738.4],
+    ['Subscriptions', 402.9],
+    ['Clothing', 356.0],
+    ['Gifts', 220.0],
+  ];
+  const total = sum(data, d => d[1]);
+  const max = 12000;
+  const ticks = [12000, 9000, 6000, 3000, 0];
+  const seg = (k, label, icon) =>
+    `<button class="${graph === k ? 'on' : ''}" aria-pressed="${
+      graph === k
+    }" aria-label="${label}" title="${label}" data-set="rgraph" data-val="${k}">${icon}</button>`;
+  const tog = (k, label, icon) =>
+    `<button class="tbtn" aria-pressed="${state[k]}" aria-label="${label}" title="${label}" data-toggle="${k}">${icon}<span class="txt">${label}</span></button>`;
+  const plot =
+    graph === 'table'
+      ? `<div class="cal-reg" style="margin-top:12px;border:1px solid var(--cardBorder);border-radius:12px">
+                <div class="rhead" style="display:grid;grid-template-columns:minmax(0,1fr) repeat(6,minmax(0,90px)) minmax(0,100px);align-items:center;padding:0 14px;column-gap:10px"><div>Category</div>${[
+                  'Apr',
+                  'May',
+                  'Jun',
+                  'Jul',
+                  'Aug',
+                  'Sep',
+                ]
+                  .map(m => `<div class="r">${m}</div>`)
+                  .join('')}<div class="r">Total</div></div>
+                ${data
+                  .map(
+                    ([n, v], i) =>
+                      `<div class="trow" style="display:grid;grid-template-columns:minmax(0,1fr) repeat(6,minmax(0,90px)) minmax(0,100px);align-items:center;padding:0 14px;column-gap:10px"><div class="ell">${n}</div>${[
+                        0.17, 0.16, 0.18, 0.15, 0.17, 0.17,
+                      ]
+                        .map(
+                          (f, j) =>
+                            `<div class="r num" style="color:var(--pageTextSubdued)">${fmt2(
+                              -Math.round(v * f * (1 + ((i + j) % 3) / 50)),
+                            )}</div>`,
+                        )
+                        .join(
+                          '',
+                        )}<div class="r num" style="font-weight:650">${fmt2(
+                        -v,
+                      )}</div></div>`,
+                  )
+                  .join('')}
+              </div>`
+      : `<div class="rp-plot">
+              <div class="rp-y num">${ticks
+                .map(t => `<span>${fmt(t)}</span>`)
+                .join('')}</div>
+              <div class="rp-area">${[0, 25, 50, 75]
+                .map(p => `<div class="gl" style="top:${p}%"></div>`)
+                .join('')}<div class="bars">${data
+                .map(
+                  ([n, v], i) =>
+                    `<span><i style="height:${(v / max) * 100}%;background:${
+                      chartQ[i % chartQ.length]
+                    }" title="${n}"></i></span>`,
+                )
+                .join('')}</div></div>
+              <div class="bars-x">${data
+                .map(([n]) => `<span title="${n}">${n}</span>`)
+                .join('')}</div>
+            </div>`;
+  const sideHtml =
+    (state.rsummary || state.rlegend) && graph !== 'table'
+      ? `<aside class="cr-side" aria-label="Summary and legend">
+              ${
+                state.rsummary
+                  ? `<div class="stat"><div class="k">Total payments</div><div class="v num">${fmt2(
+                      -total,
+                    )}</div></div>
+                <div class="stat"><div class="k">Average per month</div><div class="v num">${fmt2(
+                  -total / 6,
+                )}</div></div>`
+                  : ''
+              }
+              ${
+                state.rlegend
+                  ? `<div class="lg">${data
+                      .map(
+                        ([n, v], i) =>
+                          `<div class="lg-row"><i style="background:${
+                            chartQ[i % chartQ.length]
+                          }"></i><span class="ell">${n}</span><span class="num">${fmt2(
+                            -v,
+                          )}</span></div>`,
+                      )
+                      .join('')}</div>`
+                  : ''
+              }
+            </aside>`
+      : '';
+  return `<main class="main rmain" style="display:flex;flex-direction:column;gap:14px">
+          ${reportHead(
+            'Spending by category',
+            `<div class="head-controls"><span class="saved"><i></i>Unsaved changes</span><button class="tbtn" aria-haspopup="menu">Report ${I.chevD}</button></div>`,
+          )}
+          <div class="rp-tools">
+            <div class="seg ico on-fill" role="group" aria-label="Chart type">${seg(
+              'table',
+              'Data table',
+              CI.table,
+            )}${seg('bar', 'Bar graph', CI.bar)}${seg(
+              'stacked',
+              'Stacked bar graph',
+              CI.stacked,
+            )}${seg('line', 'Line graph', CI.line)}${seg(
+              'area',
+              'Area graph',
+              CI.area,
+            )}${seg('donut', 'Donut graph', CI.donut)}</div>
+            ${tog('rlegend', 'Legend', CI.legend)}${tog(
+              'rsummary',
+              'Summary',
+              CI.summary,
+            )}${tog('rlabels', 'Labels', CI.labels)}
+            <button class="tbtn ico" aria-label="Copy to clipboard" title="Copy to clipboard">${
+              CI.camera
+            }</button>
+            <button class="tbtn" aria-label="Filter">${I.rules}<span class="txt">Filter</span></button>
+            <button class="tbtn primary" style="margin-left:auto">Save widget</button>
+          </div>
+          <div class="cr-body">
+            <section class="rcard cr-set" aria-label="Report settings">
+              <div class="cr-sec">
+                <h2>Display</h2>
+                <div class="cr-row">Mode<div class="seg sm" role="group" aria-label="Mode"><button class="on" aria-pressed="true">Total</button><button aria-pressed="false">Time</button></div></div>
+                <div class="cr-row">Split<button class="tbtn sm" aria-haspopup="listbox">Category<span class="r-end">${
+                  I.chevD
+                }</span></button></div>
+                <div class="cr-row">Type<button class="tbtn sm" aria-haspopup="listbox">Payment<span class="r-end">${
+                  I.chevD
+                }</span></button></div>
+                <div class="cr-row">Interval<button class="tbtn sm" aria-haspopup="listbox">Monthly<span class="r-end">${
+                  I.chevD
+                }</span></button></div>
+                <div class="cr-row">Sort<button class="tbtn sm" aria-haspopup="listbox">Descending<span class="r-end">${
+                  I.chevD
+                }</span></button></div>
+                <div class="cr-row"><span></span><button class="tbtn sm" aria-haspopup="menu">Options<span class="r-end">${
+                  I.chevD
+                }</span></button></div>
+              </div>
+              <div class="cr-sec">
+                <h2>Date filters</h2>
+                <div class="cr-row">Mode<div class="seg sm" role="group" aria-label="Date range mode"><button class="on" aria-pressed="true">Live</button><button aria-pressed="false">Static</button></div></div>
+                <div class="cr-row">Range<button class="tbtn sm" aria-haspopup="listbox"><span class="num">Last 6 months</span><span class="r-end">${
+                  I.chevD
+                }</span></button></div>
+              </div>
+              <div class="cr-cats-head"><h2>Categories</h2>
+                <button class="tool" aria-label="Select all" title="Select all">${
+                  CI.all
+                }</button><button class="tool" aria-label="Unselect all" title="Unselect all">${
+                  CI.none
+                }</button></div>
+              <div class="cr-sec" style="border:0;padding-top:0;padding-bottom:4px"><button class="tbtn sm" aria-pressed="false" style="justify-content:center">Hide unchecked</button></div>
+              <div class="cr-cats" role="group" aria-label="Categories">${cats}</div>
+            </section>
+            <section class="rcard rp-chart cr-chart ${
+              sideHtml ? '' : 'no-side'
+            }" style="height:auto" aria-label="Report">
+              <div class="cr-main">
+                <div class="w-top"><div><div class="w-title">Payment by category</div><div class="w-sub">Apr 2026 – Sep 2026</div></div>
+                  <div class="w-val" style="font-size:28px;letter-spacing:-0.4px"><div class="num">${fmt2(
+                    -total,
+                  )}</div></div></div>
+                ${plot}
+              </div>
+              ${sideHtml}
+            </section>
+          </div>
+        </main>`;
+}
+
+function calendarPage() {
+  const months = [
+    ['July 2026', 3, 31, 5320.14, 4102.33],
+    ['August 2026', 6, 31, 5410.0, 4388.9],
+    ['September 2026', 2, 30, 5400.0, 4212.4],
+  ];
+  const tiles = months
+    .map(([name, first, days, inc, exp], mi) => {
+      const cells = [];
+      for (let i = 0; i < first; i++)
+        {cells.push('<div class="cal-d blank"></div>');}
+      for (let d = 1; d <= days; d++) {
+        const r = ((d * 37 + mi * 11) % 17) / 17;
+        const kind = d % 14 === 1 ? 'in' : r > 0.35 ? 'out' : '';
+        const hgt = kind === 'in' ? 100 : Math.round(r * 70);
+        cells.push(
+          `<div class="cal-d">${d}${
+            kind
+              ? `<i style="height:${hgt}%;background:var(${
+                  kind === 'in' ? '--reportsGreen' : '--reportsRed'
+                })"></i>`
+              : ''
+          }</div>`,
+        );
+      }
+      return `<section class="rcard"><div class="cal-m"><div class="w-title">${name}</div><div class="cal-h" style="margin-bottom:4px"><span class="num pos-t">↑ ${fmt2(
+        inc,
+      )}</span><span class="num neg-t">↓ ${fmt2(exp)}</span></div>
+              <div class="cal-g">${['S', 'M', 'T', 'W', 'T', 'F', 'S']
+                .map(x => `<div class="dow">${x}</div>`)
+                .join('')}${cells.join('')}</div></div></section>`;
+    })
+    .join('');
+  const rows = [
+    [
+      '09/30/2026',
+      'Everyday Checking',
+      'Employer Inc',
+      'Paycheck',
+      null,
+      'Income',
+      null,
+      2700,
+      'c',
+    ],
+    [
+      '09/29/2026',
+      'Everyday Checking',
+      'SuperMart',
+      '',
+      'c-groc',
+      'Groceries',
+      86.12,
+      null,
+      'c',
+      [['#groceries', '#2f855a']],
+    ],
+    [
+      '09/28/2026',
+      'Rewards Card',
+      'Bistro 21',
+      'Dinner with Sam',
+      'c-dine',
+      'Dining out',
+      64.5,
+      null,
+      'c',
+    ],
+    [
+      '09/27/2026',
+      'Everyday Checking',
+      'City Power',
+      'Electric bill',
+      'c-util',
+      'Utilities',
+      120,
+      null,
+      'r',
+    ],
+    [
+      '09/26/2026',
+      'Rewards Card',
+      'Metro Transit',
+      'Monthly pass',
+      'c-trans',
+      'Transport',
+      98,
+      null,
+      'r',
+    ],
+    [
+      '09/25/2026',
+      'Rewards Card',
+      'Streamly',
+      '',
+      'c-subs',
+      'Subscriptions',
+      15.99,
+      null,
+      'r',
+      [['#online', '#2b6cb0']],
+    ],
+    [
+      '09/24/2026',
+      'Everyday Checking',
+      'SuperMart',
+      '',
+      'c-groc',
+      'Groceries',
+      112.4,
+      null,
+      'r',
+    ],
+    [
+      '09/23/2026',
+      'Rewards Card',
+      'Threads & Co',
+      'Jacket',
+      'c-cloth',
+      'Clothing',
+      89,
+      null,
+      'r',
+    ],
+    [
+      '09/22/2026',
+      'Everyday Checking',
+      'Fuel Stop',
+      '',
+      'c-trans',
+      'Transport',
+      52.3,
+      null,
+      'r',
+    ],
+    [
+      '09/21/2026',
+      'Rewards Card',
+      'Corner Café',
+      '',
+      'c-dine',
+      'Dining out',
+      12.75,
+      null,
+      'r',
+    ],
+    [
+      '09/20/2026',
+      'Everyday Checking',
+      'SuperMart',
+      '',
+      'c-groc',
+      'Groceries',
+      74.06,
+      null,
+      'r',
+    ],
+  ];
+  const reg = rows
+    .map(([d, acct, p, notes, cat, cn, out, inn, c, tags]) => {
+      const catCell = cat
+        ? `<div class="cat-cell"><span class="cat-dot" style="background:${accent(
+            cat,
+          )}"></span><span class="ell">${cn}</span></div>`
+        : `<div class="cat-cell"><span class="ell" style="color:var(--pageTextSubdued)">${cn}</span></div>`;
+      return `<div class="calcols trow" role="row">
+              <div class="num">${d}</div>
+              <div class="ell acct-cell">${acct}</div>
+              <div class="payee-cell"><div class="payee" style="color:${
+                cat ? accent(cat) : 'var(--pageTextSubdued)'
+              }">${firstGrapheme(p)}</div><span class="ell">${p}</span></div>
+              <div class="ell">${(tags || [])
+                .map(
+                  ([t, col]) =>
+                    `<span class="tag" style="background:${col}">${t}</span> `,
+                )
+                .join('')}${notes}</div>
+              ${catCell}
+              <div class="r num">${out ? fmt2(out).replace('$', '') : ''}</div>
+              <div class="r num">${inn ? fmt2(inn).replace('$', '') : ''}</div>
+              <div>${
+                c === 'r'
+                  ? `<span class="clr r" title="Reconciled">${lock}</span>`
+                  : ''
+              }</div>
+            </div>`;
+    })
+    .join('');
+  return `<main class="main rmain" style="display:flex;flex-direction:column;gap:14px">
+          ${reportHead('Transaction Calendar')}
+          <div class="rp-tools">
+            <div class="seg" role="group" aria-label="Date range mode"><button class="on" aria-pressed="true">Live</button><button aria-pressed="false">Static</button></div>
+            <button class="tbtn"><span class="num">Jul 2026 – Sep 2026</span></button>
+            <button class="tbtn" aria-label="Filter">${I.rules}<span class="txt">Filter</span></button>
+            <span class="filter-pill">transfer is false <button aria-label="Remove filter">${I.x}</button></span>
+            <button class="tbtn primary" style="margin-left:auto">Save widget</button>
+          </div>
+          <div class="cal-tiles">${tiles}
+            <section class="rcard cal-tot" aria-label="Totals">
+              <div class="w-sub" style="margin:0">Jul 2026 – Sep 2026</div>
+              <div class="stat"><div class="k">Income</div><div class="v num pos-t">${fmt2(
+                16130.14,
+              )}</div></div>
+              <div class="stat"><div class="k">Expenses</div><div class="v num neg-t">${fmt2(
+                12703.63,
+              )}</div></div>
+            </section>
+          </div>
+          <section class="rcard register cal-reg" role="table" aria-label="Transactions">
+            <div class="calcols rhead" role="row"><div><span class="sort-on">Date ${
+              CI.sortD
+            }</span></div><div>Account</div><div>Payee</div><div>Notes</div><div>Category</div><div class="r">Payment</div><div class="r">Deposit</div><div class="clr-head"></div></div>
+            ${reg}
+          </section>
+        </main>`;
+}
+
+function formulaPage() {
+  return `<main class="main rmain" style="display:flex;flex-direction:column;gap:14px">
+          ${reportHead(
+            'Savings rate',
+            '<div class="head-controls"><button class="tbtn primary">Save widget</button></div>',
+          )}
+          <div class="fx-body">
+            <div class="fx-col">
+              <section class="rcard fx-card" aria-label="Result">
+                <h2>Result</h2>
+                <div class="fx-result num pos-t">21.4%</div>
+              </section>
+              <section class="rcard fx-card" aria-label="Formula">
+                <h2>Formula</h2>
+                <div class="code" role="textbox" aria-multiline="true" aria-label="Formula"><div class="ln">1<br>2<br>3</div><div class="src"><span class="fn">ROUND</span>(
+  (<span class="fn">QUERY</span>(<span class="str q">"income"</span>) + <span class="fn">QUERY</span>(<span class="str q">"expenses"</span>))
+    / <span class="fn">QUERY</span>(<span class="str q">"income"</span>) * 100, 1) &amp; "%"</div></div>
+              </section>
+              <section class="rcard fx-card" aria-label="Appearance">
+                <h2>Appearance</h2>
+                <div class="fx-opts">
+                  <label class="fld">Show title<span class="sw" role="switch" aria-checked="true"></span></label>
+                  <div class="fld">Font size<div class="seg sm" role="group" aria-label="Font size"><button aria-pressed="false">Dynamic</button><button class="on" aria-pressed="true">Static</button></div></div>
+                  <label class="fld">Font size (px)<input class="num" value="44" inputmode="numeric" /></label>
+                </div>
+                <div class="fld" style="margin-top:4px">Conditional color (optional)
+                  <div class="code one"><div class="src"><span class="fn">IF</span>(RESULT &gt;= 20, <span class="str">"green"</span>, <span class="str">"orange"</span>)</div></div>
+                </div>
+                <div class="help">Formula that returns a color (e.g., "red", "#ff0000"). Leave blank for default. Use RESULT variable to access the main formula result.</div>
+              </section>
+            </div>
+            <section class="rcard fx-card" aria-label="Query definitions">
+              <h2>Query Definitions<button class="tbtn sm" style="margin-left:auto">${
+                I.plus
+              }<span class="txt">Add Query</span></button></h2>
+              ${[
+                ['income', 'Year to date', 'Category group is Income'],
+                [
+                  'expenses',
+                  'Year to date',
+                  'Category group is not Income · transfer is false',
+                ],
+              ]
+                .map(
+                  ([n, range, f]) => `<div class="qd">
+                <div class="qd-top">${n}<button class="tool" aria-label="Edit query">${
+                  I.pencil
+                }</button><button class="tool" aria-label="Copy query">${
+                  CI.copy
+                }</button><button class="tool" aria-label="Delete query">${
+                  I.x
+                }</button></div>
+                <div class="qd-meta"><span class="chip sm">${range}</span>${f}</div>
+                <div class="code one"><div class="src">QUERY("${n}")</div></div>
+              </div>`,
+                )
+                .join('')}
+            </section>
+          </div>
+        </main>`;
+}
       const reportsPage = () =>
-        state.rview === 'networth' ? netWorthPage() : reportsDashboard();
+        ({
+          networth: netWorthPage,
+          custom: customReportPage,
+          calendar: calendarPage,
+          formula: formulaPage,
+        })[state.rview]?.() ?? reportsDashboard();
 
       let totB = 0,
         totS = 0;
@@ -5367,6 +6433,11 @@
         u.searchParams.set('recon', state.recon);
         u.searchParams.set('rview', state.rview);
         u.searchParams.set('redit', state.redit ? '1' : '0');
+        if (state.rview === 'custom') {
+          u.searchParams.set('rgraph', state.rgraph);
+          for (const k of ['rlegend', 'rsummary', 'rlabels'])
+            u.searchParams.set(k, state[k] ? '1' : '0');
+        }
         for (const k of [
           'menu',
           'for',

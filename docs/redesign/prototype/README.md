@@ -211,3 +211,71 @@ Net Worth page's header and card pattern.
 Regenerate with `node scripts/redesign-prototype-shots.cjs --app-03`
 (`PW_CHANNEL=msedge` uses the installed Edge when Playwright's Chromium is not
 installed).
+
+## APP-03c: custom report, Calendar and Formula proposal (October 1, 2026)
+
+**Status: approved October 1, 2026**, with the owner's answers: yes to the
+"Unsaved changes" label and the "Report ▾" menu button (question 1); the
+summary and legend placement below 1280px was left to the implementer
+(question 2): they move **under the chart** inside the same card (stat tiles
+in a row, then the legend in columns) rather than hiding, because the legend
+is the only key to the colours in the donut, stacked, line and area views,
+and a side column at 1000px would squeeze the chart to about 360px. Choose **Page →
+Reports**, then **View** Custom, Calendar or Formula. URL parameters:
+`rview=custom|calendar|formula`; for the custom report also
+`rgraph=table|bar|stacked|line|area|donut` and `rlegend`, `rsummary`,
+`rlabels` (`0|1`).
+
+Owner decisions before drawing (October 1, 2026):
+
+1. **Scope:** the custom report editor, the Calendar report's transaction list
+   and the Formula editor body. Monte Carlo moves to its own task (APP-03d).
+2. **Custom report settings sit in a Settings card** beside the chart card,
+   not flush on the page background.
+3. **The six chart types become one segmented icon control**; Legend, Summary
+   and Labels become toggle Control buttons.
+
+What the drawing proposes (each item is presentation only):
+
+| Surface                   | Today                                                                                   | Proposed                                                                                                                                                                                                                                                                                                                           |
+| ------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Custom report header      | "Custom Report: ‹name›" in purple, 25px; saved-report menu at the right of the icon row | The APP-03b pattern: "Reports · ‹dashboard›" over the report name at Display. The saved-report menu moves to the header as a Control button ("Report ▾"), with the unsaved state as a dot and "Unsaved changes" (the existing modified status)                                                                                     |
+| Custom report toolbar     | 11 bare icon buttons with dividers                                                      | One segmented icon control for the six chart types (`aria-pressed`, same icons and order); Legend, Summary and Labels as toggle Control buttons with their names; Copy to clipboard and Filter as Control buttons; Save widget primary at the right. Below 1280px the toggles show icons only, named by `aria-label`               |
+| Custom report settings    | Flush sidebar, 13px labels, upstream selects and toggle                                 | A Surface card: **Display** (Mode as a segmented control; Split, Type, Interval, Sort and Options as full-width Control buttons), **Date filters** (Live/Static segmented, Range), **Categories** (select all/none tools, Hide unchecked, the checklist with each category's accent dot). The checklist scrolls inside the card    |
+| Custom report chart       | Chart on the table background; "Payment: −7,768.41" right-aligned above it              | The chart in a Surface card: title and date range left, total at Display right. Summary and legend share a right column inside the card (stat tiles, then legend rows with amounts); below 1280px they move under the chart in the same card (owner decision, question 2). The data table view sits in the same card               |
+| Calendar transaction list | Upstream table on the page background                                                   | The APP-02 register (`isRegister`) in its own card: Eyebrow headers, payee initials in the category accent, accent dots before categories, reconciled locks. Read-only as today: no selection column, no balance, no cleared column                                                                                                |
+| Calendar month tiles      | Surface tiles (APP-03b), month name and totals on one line                              | Month name on its own line with the totals under it, so long names ("September 2026") never wrap into the grid; the totals card uses stat tiles. Below 1280px the tiles scroll sideways, as they do today                                                                                                                          |
+| Formula body              | Labels and fields on the page background; result in a 6px-corner box                    | Cards: **Result** (the existing result on a Card Inset well), **Formula** (the editor with line numbers), **Appearance** (Show title, Font size as Dynamic/Static segments, size, conditional color and its help text). **Query Definitions** is a card on the right (below the others under 1280px), each query a Card Inset tile |
+
+Unchanged by design: every setting, menu item, filter, saved report, the
+chart colours (`chartQual*` and `reports*` roles), Formula's editor and
+QueryManager behavior, the Calendar's sort and its read-only rows, strings
+(the "Unsaved changes" label reuses the existing modified status; see
+question 1), and mobile. Not drawn: Monte Carlo (APP-03d), the Options menu
+contents, the saved-report menu contents, the stacked/line/area/donut views
+(the card frames them as it frames the bar graph).
+
+Questions for the owner:
+
+1. The header shows **"Unsaved changes"** for the existing modified status.
+   Today that status only shows as "(modified)" inside the saved-report menu
+   button, which is labelled with the report's name. The drawing labels the
+   button "Report ▾" because the name is now the page title. Are the new
+   wording and label acceptable (two new strings), or should the button keep
+   "‹name› (modified)" with no separate label?
+2. Should the **summary and legend column** hide below 1280px as drawn, or
+   stay and narrow the chart?
+
+| File                                         | Shows                                            |
+| -------------------------------------------- | ------------------------------------------------ |
+| `shots/59-custom-report-dark-wide.png`       | Custom report, bar graph, dark, 1440×900         |
+| `shots/60-custom-report-light-1000.png`      | Custom report, light, 1000×700, pane collapsed   |
+| `shots/61-custom-report-table-midnight-wide` | Custom report, data table, midnight, 1440×900    |
+| `shots/62-calendar-dark-wide.png`            | Calendar report with the register list, dark     |
+| `shots/63-calendar-light-1000.png`           | Calendar report, light, 1000×700                 |
+| `shots/64-formula-dark-wide.png`             | Formula editor body, dark, 1440×900              |
+| `shots/65-formula-light-1000.png`            | Formula editor body, light, 1000×700             |
+| `shots/66-app03c-custom-theme-wide.png`      | Custom report in a custom theme (fallback layer) |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-03c`
+(`PW_CHANNEL=msedge` uses the installed Edge).

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { Ref } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router';
 import { animated, config, useSpring } from 'react-spring';
@@ -572,6 +572,7 @@ function CalendarInner({ widget, parameters }: CalendarInnerProps) {
           style={{
             backgroundColor: theme.pageBackground,
             paddingTop: 0,
+            ...(!isNarrowWidth && { paddingLeft: 20, paddingRight: 20 }),
             minHeight: '350px',
             overflowY: 'auto',
           }}
@@ -638,6 +639,7 @@ function CalendarInner({ widget, parameters }: CalendarInnerProps) {
                 width: '100%',
                 flexGrow: 1,
                 overflow: isNarrowWidth ? 'auto' : 'hidden',
+                ...(!isNarrowWidth && { padding: '0 20px 20px' }),
               }}
               // TODO: make TableHandleRef conform to HTMLDivEle
               ref={table as unknown as Ref<HTMLDivElement>}
@@ -645,6 +647,8 @@ function CalendarInner({ widget, parameters }: CalendarInnerProps) {
               {!isNarrowWidth ? (
                 <SplitsExpandedProvider initialMode="collapse">
                   <TransactionList
+                    isRegister
+                    isFlatRegister
                     tableRef={table}
                     account={undefined}
                     transactions={transactionsGrouped}
@@ -825,19 +829,23 @@ function CalendarWithHeader({
       }
     >
       <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          marginBottom: 16,
-        }}
+        style={
+          isNarrowWidth
+            ? {
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                marginBottom: 16,
+              }
+            : { alignItems: 'flex-start', gap: 4, marginBottom: 12 }
+        }
       >
         <Button
           variant="bare"
           style={{
-            color: theme.pageTextSubdued,
-            fontWeight: 'bold',
-            fontSize: '14px',
+            color: isNarrowWidth ? theme.pageTextSubdued : theme.pageText,
+            fontWeight: isNarrowWidth ? 'bold' : 600,
+            fontSize: isNarrowWidth ? '14px' : '13.5px',
             margin: 0,
             padding: 0,
             display: 'inline-block',
@@ -864,7 +872,16 @@ function CalendarWithHeader({
           {formatDate(calendar.start, 'MMMM yyyy')}
         </Button>
         <View
-          style={{ display: 'grid', gridTemplateColumns: '16px 1fr', gap: 2 }}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isNarrowWidth
+              ? '16px 1fr'
+              : '16px auto 16px auto',
+            alignItems: 'center',
+            columnGap: isNarrowWidth ? 2 : 4,
+            rowGap: 2,
+            ...(!isNarrowWidth && { fontSize: 12.5, fontWeight: 600 }),
+          }}
         >
           <SvgArrowThickUp
             width={16}
@@ -889,7 +906,11 @@ function CalendarWithHeader({
           <SvgArrowThickDown
             width={16}
             height={16}
-            style={{ color: theme.reportsNumberNegative, flexShrink: 0 }}
+            style={{
+              color: theme.reportsNumberNegative,
+              flexShrink: 0,
+              ...(!isNarrowWidth && { marginLeft: 8 }),
+            }}
           />
           <View
             style={{
@@ -966,7 +987,8 @@ function CalendarCardHeader({
         marginTop: isNarrowWidth ? 16 : 0,
         justifyContent: isNarrowWidth ? 'center' : 'flex-end',
         flexDirection: 'row',
-        height: '100px',
+        height: isNarrowWidth ? '100px' : undefined,
+        alignItems: 'flex-start',
         minWidth: '210px',
       }}
     >
@@ -983,39 +1005,99 @@ function CalendarCardHeader({
         }}
       >
         <DateRange start={start} end={end} />
-        <View style={{ lineHeight: 1.5 }}>
-          <View
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '70px 1fr',
-              gridAutoRows: '1fr',
-            }}
-          >
+        {isNarrowWidth ? (
+          <View style={{ lineHeight: 1.5 }}>
             <View
               style={{
-                textAlign: 'right',
-                marginRight: 4,
+                display: 'grid',
+                gridTemplateColumns: '70px 1fr',
+                gridAutoRows: '1fr',
               }}
             >
-              <Trans>Income:</Trans>
-            </View>
-            <View style={{ color: theme.reportsNumberPositive }}>
-              <PrivacyFilter>{format(totalIncome, 'financial')}</PrivacyFilter>
-            </View>
+              <View
+                style={{
+                  textAlign: 'right',
+                  marginRight: 4,
+                }}
+              >
+                <Trans>Income:</Trans>
+              </View>
+              <View style={{ color: theme.reportsNumberPositive }}>
+                <PrivacyFilter>
+                  {format(totalIncome, 'financial')}
+                </PrivacyFilter>
+              </View>
 
-            <View
-              style={{
-                textAlign: 'right',
-                marginRight: 4,
-              }}
-            >
-              <Trans>Expenses:</Trans>
-            </View>
-            <View style={{ color: theme.reportsNumberNegative }}>
-              <PrivacyFilter>{format(totalExpense, 'financial')}</PrivacyFilter>
+              <View
+                style={{
+                  textAlign: 'right',
+                  marginRight: 4,
+                }}
+              >
+                <Trans>Expenses:</Trans>
+              </View>
+              <View style={{ color: theme.reportsNumberNegative }}>
+                <PrivacyFilter>
+                  {format(totalExpense, 'financial')}
+                </PrivacyFilter>
+              </View>
             </View>
           </View>
-        </View>
+        ) : (
+          <View style={{ gap: 8, marginTop: 8 }}>
+            <CalendarTotalTile
+              label={<Trans>Income:</Trans>}
+              color={theme.reportsNumberPositive}
+              value={format(totalIncome, 'financial')}
+            />
+            <CalendarTotalTile
+              label={<Trans>Expenses:</Trans>}
+              color={theme.reportsNumberNegative}
+              value={format(totalExpense, 'financial')}
+            />
+          </View>
+        )}
+      </View>
+    </View>
+  );
+}
+
+function CalendarTotalTile({
+  label,
+  color,
+  value,
+}: {
+  label: ReactNode;
+  color: string;
+  value: string;
+}) {
+  return (
+    <View
+      style={{
+        backgroundColor: theme.cardInset,
+        borderRadius: 10,
+        padding: '8px 10px',
+      }}
+    >
+      <View
+        style={{
+          fontSize: 12,
+          fontWeight: 600,
+          color: theme.pageTextSecondary,
+        }}
+      >
+        {label}
+      </View>
+      <View
+        style={{
+          ...styles.tnum,
+          fontSize: 18,
+          fontWeight: 700,
+          letterSpacing: -0.3,
+          color,
+        }}
+      >
+        <PrivacyFilter>{value}</PrivacyFilter>
       </View>
     </View>
   );

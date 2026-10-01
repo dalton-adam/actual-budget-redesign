@@ -10,12 +10,14 @@ import {
   SvgViewShow,
 } from '@actual-app/components/icons/v2';
 import { Text } from '@actual-app/components/text';
+import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import type {
   CategoryEntity,
   CategoryGroupEntity,
 } from '@actual-app/core/types/models';
 
+import { getCategoryAccentIndex } from '#components/budget/categoryPresentation';
 import { Checkbox } from '#components/forms';
 
 import { GraphButton } from './GraphButton';
@@ -64,7 +66,7 @@ export function CategorySelector({
   );
 
   return (
-    <View>
+    <View style={{ flex: 1, minHeight: 0 }}>
       <View
         style={{
           flexDirection: 'row',
@@ -74,9 +76,9 @@ export function CategorySelector({
         }}
       >
         <Button
-          variant="bare"
+          variant="control"
+          aria-pressed={uncheckedHidden}
           onPress={() => setUncheckedHidden(state => !state)}
-          style={{ padding: 8 }}
         >
           <View>
             {uncheckedHidden ? (
@@ -104,7 +106,6 @@ export function CategorySelector({
                 />
                 <Text
                   style={{
-                    maxWidth: 100,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -172,8 +173,10 @@ export function CategorySelector({
                   style={{
                     display:
                       noCategorySelected && uncheckedHidden ? 'none' : 'flex',
-                    marginBottom: 8,
+                    minHeight: 28,
+                    marginTop: 4,
                     flexDirection: 'row',
+                    alignItems: 'center',
                   }}
                 >
                   <Checkbox
@@ -203,7 +206,7 @@ export function CategorySelector({
                   />
                   <label
                     htmlFor={`form_${categoryGroup.id}`}
-                    style={{ userSelect: 'none', fontWeight: 'bold' }}
+                    style={{ userSelect: 'none', fontWeight: 600 }}
                   >
                     {categoryGroup.name}
                   </label>
@@ -213,8 +216,8 @@ export function CategorySelector({
                     style={{
                       listStyle: 'none',
                       marginLeft: 0,
-                      marginBottom: 10,
-                      paddingLeft: 10,
+                      marginBottom: 4,
+                      paddingLeft: 22,
                     }}
                   >
                     {filteredGroup(categoryGroup).map(category => {
@@ -228,7 +231,8 @@ export function CategorySelector({
                             display:
                               !isChecked && uncheckedHidden ? 'none' : 'flex',
                             flexDirection: 'row',
-                            marginBottom: 4,
+                            alignItems: 'center',
+                            minHeight: 26,
                           }}
                         >
                           <Checkbox
@@ -252,8 +256,29 @@ export function CategorySelector({
                           />
                           <label
                             htmlFor={`form_${category.id}`}
-                            style={{ userSelect: 'none' }}
+                            style={{
+                              userSelect: 'none',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 7,
+                              color: isChecked
+                                ? theme.pageText
+                                : theme.pageTextSecondary,
+                            }}
                           >
+                            <span
+                              aria-hidden
+                              style={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: 3,
+                                flexShrink: 0,
+                                backgroundColor:
+                                  theme[
+                                    `categoryAccent${getCategoryAccentIndex(category.id)}` as keyof typeof theme
+                                  ],
+                              }}
+                            />
                             {category.name}
                           </label>
                         </li>

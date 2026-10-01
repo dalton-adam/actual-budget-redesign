@@ -62,9 +62,15 @@ function isPresetTimeRangeMode(
 type QueryManagerProps = {
   queries: Record<string, QueryConfig>;
   onQueriesChange: (queries: Record<string, QueryConfig>) => void;
+  /** Inside the Formula page's Query Definitions card (APP-03c). */
+  isCard?: boolean;
 };
 
-export function QueryManager({ queries, onQueriesChange }: QueryManagerProps) {
+export function QueryManager({
+  queries,
+  onQueriesChange,
+  isCard = false,
+}: QueryManagerProps) {
   const { t } = useTranslation();
   const [newQueryName, setNewQueryName] = useState('');
   const [isAddingQuery, setIsAddingQuery] = useState(false);
@@ -116,21 +122,27 @@ export function QueryManager({ queries, onQueriesChange }: QueryManagerProps) {
   }
 
   return (
-    <View style={{ padding: 20, flex: 1, minWidth: 400 }}>
+    <View
+      style={
+        isCard
+          ? { flex: 1, minWidth: 0 }
+          : { padding: 20, flex: 1, minWidth: 400 }
+      }
+    >
       <View
         style={{
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: 16,
+          marginBottom: isCard ? 12 : 16,
         }}
       >
-        <Text style={{ fontSize: 18, fontWeight: 600 }}>
+        <Text style={{ fontSize: isCard ? 15 : 18, fontWeight: 600 }}>
           <Trans>Query Definitions</Trans>
         </Text>
         <Button
-          variant="primary"
+          variant={isCard ? 'control' : 'primary'}
           onPress={() => setIsAddingQuery(!isAddingQuery)}
         >
           {isAddingQuery ? <Trans>Cancel</Trans> : <Trans>Add Query</Trans>}
@@ -139,13 +151,17 @@ export function QueryManager({ queries, onQueriesChange }: QueryManagerProps) {
 
       {isAddingQuery && (
         <View
-          style={{
-            padding: 16,
-            border: `1px solid ${theme.tableBorder}`,
-            borderRadius: 4,
-            marginBottom: 16,
-            backgroundColor: theme.tableBackground,
-          }}
+          style={
+            isCard
+              ? QUERY_TILE_STYLE
+              : {
+                  padding: 16,
+                  border: `1px solid ${theme.tableBorder}`,
+                  borderRadius: 4,
+                  marginBottom: 16,
+                  backgroundColor: theme.tableBackground,
+                }
+          }
         >
           <View style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
             <Input
@@ -172,9 +188,11 @@ export function QueryManager({ queries, onQueriesChange }: QueryManagerProps) {
             padding: 32,
             textAlign: 'center',
             color: theme.pageTextSubdued,
-            border: `1px dashed ${theme.tableBorder}`,
-            borderRadius: 4,
-            maxWidth: 400,
+            border: `1px dashed ${
+              isCard ? theme.cardHairline : theme.tableBorder
+            }`,
+            borderRadius: isCard ? 12 : 4,
+            maxWidth: isCard ? undefined : 400,
           }}
         >
           <Text>
@@ -198,6 +216,7 @@ export function QueryManager({ queries, onQueriesChange }: QueryManagerProps) {
               defaultConfig={config}
               onUpdate={newConfig => handleUpdateQuery(queryName, newConfig)}
               onRemove={() => handleRemoveQuery(queryName)}
+              isCard={isCard}
             />
           ))}
         </View>
@@ -211,6 +230,7 @@ type QueryItemProps = {
   defaultConfig: QueryConfig;
   onUpdate: (config: QueryConfig) => void;
   onRemove: () => void;
+  isCard?: boolean;
 };
 
 function QueryItem({
@@ -218,6 +238,7 @@ function QueryItem({
   defaultConfig,
   onUpdate,
   onRemove,
+  isCard = false,
 }: QueryItemProps) {
   const locale = useLocale();
   const { t } = useTranslation();
@@ -521,15 +542,19 @@ function QueryItem({
 
   return (
     <View
-      style={{
-        padding: 16,
-        marginBottom: 16,
-        border: `1px solid ${theme.tableBorder}`,
-        borderRadius: 4,
-        backgroundColor: theme.tableBackground,
-        display: 'block',
-        flex: 1,
-      }}
+      style={
+        isCard
+          ? { ...QUERY_TILE_STYLE, display: 'block', flex: 1 }
+          : {
+              padding: 16,
+              marginBottom: 16,
+              border: `1px solid ${theme.tableBorder}`,
+              borderRadius: 4,
+              backgroundColor: theme.tableBackground,
+              display: 'block',
+              flex: 1,
+            }
+      }
     >
       <View
         style={{
@@ -966,3 +991,11 @@ function QueryItem({
     </View>
   );
 }
+
+// The Formula page's query tiles inside the Query Definitions card (APP-03c).
+const QUERY_TILE_STYLE = {
+  padding: '10px 12px',
+  marginBottom: 10,
+  borderRadius: 12,
+  backgroundColor: theme.cardInset,
+} as const;

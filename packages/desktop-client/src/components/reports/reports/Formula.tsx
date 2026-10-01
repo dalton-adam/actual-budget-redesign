@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useMemo, useRef, useState } from 'react';
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, ReactNode } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
@@ -18,7 +18,9 @@ import { MobileBackButton } from '#components/mobile/MobileBackButton';
 import { MobilePageHeader, Page, PageHeader } from '#components/Page';
 import { FormulaResult } from '#components/reports/FormulaResult';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
+import { ReportPageCard } from '#components/reports/ReportPageCard';
 import { ReportPageTitle } from '#components/reports/ReportPageTitle';
+import { ReportSegmentedControl } from '#components/reports/ReportSegmentedControl';
 import { useAccounts } from '#hooks/useAccounts';
 import { useCategories } from '#hooks/useCategories';
 import { useDashboardWidget } from '#hooks/useDashboardWidget';
@@ -57,7 +59,7 @@ function FormulaInner({ widget }: FormulaInnerProps) {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isNarrowWidth } = useResponsive();
+  const { isNarrowWidth, width } = useResponsive();
   const themeColors = useThemeColors();
 
   const queriesRef = useRef(widget?.meta?.queries || {});
@@ -276,119 +278,24 @@ function FormulaInner({ widget }: FormulaInnerProps) {
           </Button>
         </View>
       )}
-      <View
-        style={{
-          width: '100%',
-          height: '100%',
-          background: theme.pageBackground,
-          display: 'flex',
-          flexDirection: 'row',
-        }}
-      >
+      {isNarrowWidth ? (
         <View
           style={{
-            flex: 1,
+            width: '100%',
+            height: '100%',
+            background: theme.pageBackground,
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: 'row',
           }}
         >
-          <View style={{ padding: 20, paddingBottom: 0 }}>
-            <div
-              style={{
-                fontSize: 13,
-                color: theme.pageTextSubdued,
-                marginBottom: 5,
-              }}
-            >
-              <label htmlFor="formula-show-title">
-                <Trans>Show title:</Trans>
-              </label>
-            </div>
-            <Toggle
-              id="formula-show-title"
-              isOn={showTitle}
-              onToggle={setShowTitle}
-            />
-          </View>
-          <View
-            style={{
-              padding: 20,
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              gap: 10,
-              minHeight: 120,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 14,
-                color: theme.pageTextSubdued,
-              }}
-            >
-              <Trans>Result:</Trans>
-            </div>
-            <View
-              style={{
-                height: 120,
-                width: '100%',
-                overflow: 'auto',
-                backgroundColor: theme.cardBackground,
-                borderRadius: 6,
-                ...styles.horizontalScrollbar,
-                '::-webkit-scrollbar': {
-                  height: '8px',
-                },
-              }}
-            >
-              <FormulaResult
-                value={result}
-                error={error}
-                loading={isExecuting}
-                fontSizeMode={fontSizeMode}
-                staticFontSize={staticFontSize}
-                customColor={customColor}
-              />
-            </View>
-          </View>
           <View
             style={{
               flex: 1,
-              minHeight: 50,
-              margin: 20,
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              style={{
-                fontSize: 13,
-                color: theme.pageTextSubdued,
-                marginBottom: 5,
-              }}
-            >
-              <Trans>Formula:</Trans>
-            </div>
-            <Suspense fallback={<div style={{ padding: 10 }}>Loading...</div>}>
-              <FormulaEditor
-                value={formula}
-                onChange={setFormula}
-                mode="query"
-                queries={queriesRef.current}
-                categoryBadges={categoryBadges}
-                singleLine={false}
-                showLineNumbers
-              />
-            </Suspense>
-          </View>
-          <View
-            style={{
-              padding: '0 20px 20px 20px',
               display: 'flex',
-              flexDirection: 'row',
-              gap: 20,
-              alignItems: 'flex-end',
+              flexDirection: 'column',
             }}
           >
-            <View>
+            <View style={{ padding: 20, paddingBottom: 0 }}>
               <div
                 style={{
                   fontSize: 13,
@@ -396,21 +303,96 @@ function FormulaInner({ widget }: FormulaInnerProps) {
                   marginBottom: 5,
                 }}
               >
-                <Trans>Font size:</Trans>
+                <label htmlFor="formula-show-title">
+                  <Trans>Show title:</Trans>
+                </label>
               </div>
-              <Select
-                value={fontSizeMode}
-                onChange={(value: 'dynamic' | 'static') =>
-                  setFontSizeMode(value)
-                }
-                options={[
-                  ['dynamic', t('Dynamic')],
-                  ['static', t('Static')],
-                ]}
+              <Toggle
+                id="formula-show-title"
+                isOn={showTitle}
+                onToggle={setShowTitle}
               />
             </View>
-
-            {fontSizeMode === 'static' && (
+            <View
+              style={{
+                padding: 20,
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                gap: 10,
+                minHeight: 120,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 14,
+                  color: theme.pageTextSubdued,
+                }}
+              >
+                <Trans>Result:</Trans>
+              </div>
+              <View
+                style={{
+                  height: 120,
+                  width: '100%',
+                  overflow: 'auto',
+                  backgroundColor: theme.cardBackground,
+                  borderRadius: 6,
+                  ...styles.horizontalScrollbar,
+                  '::-webkit-scrollbar': {
+                    height: '8px',
+                  },
+                }}
+              >
+                <FormulaResult
+                  value={result}
+                  error={error}
+                  loading={isExecuting}
+                  fontSizeMode={fontSizeMode}
+                  staticFontSize={staticFontSize}
+                  customColor={customColor}
+                />
+              </View>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                minHeight: 50,
+                margin: 20,
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 13,
+                  color: theme.pageTextSubdued,
+                  marginBottom: 5,
+                }}
+              >
+                <Trans>Formula:</Trans>
+              </div>
+              <Suspense
+                fallback={<div style={{ padding: 10 }}>Loading...</div>}
+              >
+                <FormulaEditor
+                  value={formula}
+                  onChange={setFormula}
+                  mode="query"
+                  queries={queriesRef.current}
+                  categoryBadges={categoryBadges}
+                  singleLine={false}
+                  showLineNumbers
+                />
+              </Suspense>
+            </View>
+            <View
+              style={{
+                padding: '0 20px 20px 20px',
+                display: 'flex',
+                flexDirection: 'row',
+                gap: 20,
+                alignItems: 'flex-end',
+              }}
+            >
               <View>
                 <div
                   style={{
@@ -419,81 +401,316 @@ function FormulaInner({ widget }: FormulaInnerProps) {
                     marginBottom: 5,
                   }}
                 >
-                  <Trans>Font size (px):</Trans>
+                  <Trans>Font size:</Trans>
                 </div>
-                <Input
-                  type="number"
-                  value={String(staticFontSize)}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setStaticFontSize(Number(e.target.value))
+                <Select
+                  value={fontSizeMode}
+                  onChange={(value: 'dynamic' | 'static') =>
+                    setFontSizeMode(value)
                   }
+                  options={[
+                    ['dynamic', t('Dynamic')],
+                    ['static', t('Static')],
+                  ]}
                 />
               </View>
-            )}
-          </View>
-          <View
-            style={{
-              padding: 20,
-              marginBottom: 20,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 13,
-                color: theme.pageTextSubdued,
-                marginBottom: 5,
-              }}
-            >
-              <Trans>Conditional color (optional):</Trans>
-            </div>
+
+              {fontSizeMode === 'static' && (
+                <View>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: theme.pageTextSubdued,
+                      marginBottom: 5,
+                    }}
+                  >
+                    <Trans>Font size (px):</Trans>
+                  </div>
+                  <Input
+                    type="number"
+                    value={String(staticFontSize)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      setStaticFontSize(Number(e.target.value))
+                    }
+                  />
+                </View>
+              )}
+            </View>
             <View
               style={{
-                border: `1px solid ${theme.formInputBorder}`,
-                borderRadius: 4,
-                overflow: 'hidden',
-                backgroundColor: theme.tableBackground,
+                padding: 20,
+                marginBottom: 20,
               }}
             >
-              <Suspense fallback={<div style={{ height: 32 }} />}>
-                <FormulaEditor
-                  value={colorFormula}
-                  variables={colorVariables}
-                  onChange={setColorFormula}
-                  mode="query"
-                  queries={queriesRef.current}
-                  categoryBadges={categoryBadges}
-                  singleLine
-                  showLineNumbers={false}
-                />
-              </Suspense>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: theme.pageTextSubdued,
+                  marginBottom: 5,
+                }}
+              >
+                <Trans>Conditional color (optional):</Trans>
+              </div>
+              <View
+                style={{
+                  border: `1px solid ${theme.formInputBorder}`,
+                  borderRadius: 4,
+                  overflow: 'hidden',
+                  backgroundColor: theme.tableBackground,
+                }}
+              >
+                <Suspense fallback={<div style={{ height: 32 }} />}>
+                  <FormulaEditor
+                    value={colorFormula}
+                    variables={colorVariables}
+                    onChange={setColorFormula}
+                    mode="query"
+                    queries={queriesRef.current}
+                    categoryBadges={categoryBadges}
+                    singleLine
+                    showLineNumbers={false}
+                  />
+                </Suspense>
+              </View>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: theme.pageTextSubdued,
+                  marginTop: 5,
+                }}
+              >
+                <Trans>
+                  Formula that returns a color (e.g., &ldquo;red&rdquo;,
+                  &ldquo;#ff0000&rdquo;). Leave blank for default. Use RESULT
+                  variable to access the main formula result.
+                </Trans>
+              </div>
             </View>
-            <div
-              style={{
-                fontSize: 11,
-                color: theme.pageTextSubdued,
-                marginTop: 5,
-              }}
-            >
-              <Trans>
-                Formula that returns a color (e.g., &ldquo;red&rdquo;,
-                &ldquo;#ff0000&rdquo;). Leave blank for default. Use RESULT
-                variable to access the main formula result.
-              </Trans>
-            </div>
+          </View>
+
+          <View
+            style={{
+              overflowY: 'auto',
+            }}
+          >
+            <QueryManager
+              queries={queriesRef.current}
+              onQueriesChange={handleQueriesChange}
+            />
           </View>
         </View>
-
+      ) : (
         <View
           style={{
+            flexDirection: width >= FORMULA_SIDE_COLUMN_FROM ? 'row' : 'column',
+            alignItems:
+              width >= FORMULA_SIDE_COLUMN_FROM ? 'flex-start' : 'stretch',
+            gap: 14,
+            padding: '0 20px 20px',
+            flex: 1,
             overflowY: 'auto',
           }}
         >
-          <QueryManager
-            queries={queriesRef.current}
-            onQueriesChange={handleQueriesChange}
-          />
+          <View
+            style={{
+              minWidth: 0,
+              gap: 14,
+              ...(width >= FORMULA_SIDE_COLUMN_FROM
+                ? { flex: 1 }
+                : { flexShrink: 0 }),
+            }}
+          >
+            <ReportPageCard style={{ flexShrink: 0 }}>
+              <FormulaCardTitle>
+                <Trans>Result</Trans>
+              </FormulaCardTitle>
+              <View
+                style={{
+                  height: 120,
+                  width: '100%',
+                  overflow: 'auto',
+                  backgroundColor: theme.cardInset,
+                  borderRadius: 10,
+                  ...styles.horizontalScrollbar,
+                  '::-webkit-scrollbar': {
+                    height: '8px',
+                  },
+                }}
+              >
+                <FormulaResult
+                  value={result}
+                  error={error}
+                  loading={isExecuting}
+                  fontSizeMode={fontSizeMode}
+                  staticFontSize={staticFontSize}
+                  customColor={customColor}
+                />
+              </View>
+            </ReportPageCard>
+            <ReportPageCard style={{ flexShrink: 0 }}>
+              <FormulaCardTitle>
+                <Trans>Formula</Trans>
+              </FormulaCardTitle>
+              <View
+                style={{
+                  minHeight: 120,
+                  border: `1px solid ${theme.cardHairline}`,
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                }}
+              >
+                <Suspense
+                  fallback={<div style={{ padding: 10 }}>Loading...</div>}
+                >
+                  <FormulaEditor
+                    value={formula}
+                    onChange={setFormula}
+                    mode="query"
+                    queries={queriesRef.current}
+                    categoryBadges={categoryBadges}
+                    singleLine={false}
+                    showLineNumbers
+                  />
+                </Suspense>
+              </View>
+            </ReportPageCard>
+            <ReportPageCard style={{ flexShrink: 0 }}>
+              <FormulaCardTitle>
+                <Trans>Appearance</Trans>
+              </FormulaCardTitle>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  alignItems: 'flex-start',
+                  gap: '18px 28px',
+                }}
+              >
+                <View style={{ gap: 6 }}>
+                  <label
+                    htmlFor="formula-show-title"
+                    style={FORMULA_FIELD_LABEL_STYLE}
+                  >
+                    <Trans>Show title:</Trans>
+                  </label>
+                  <Toggle
+                    id="formula-show-title"
+                    isOn={showTitle}
+                    onToggle={setShowTitle}
+                  />
+                </View>
+                <View style={{ gap: 6 }}>
+                  <View style={FORMULA_FIELD_LABEL_STYLE}>
+                    <Trans>Font size:</Trans>
+                  </View>
+                  <ReportSegmentedControl
+                    aria-label={t('Font size')}
+                    options={[
+                      { value: 'dynamic', label: t('Dynamic') },
+                      { value: 'static', label: t('Static') },
+                    ]}
+                    value={fontSizeMode}
+                    onChange={setFontSizeMode}
+                  />
+                </View>
+                {fontSizeMode === 'static' && (
+                  <View style={{ gap: 6 }}>
+                    <View style={FORMULA_FIELD_LABEL_STYLE}>
+                      <Trans>Font size (px):</Trans>
+                    </View>
+                    <Input
+                      type="number"
+                      value={String(staticFontSize)}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setStaticFontSize(Number(e.target.value))
+                      }
+                      style={{ width: 88 }}
+                    />
+                  </View>
+                )}
+              </View>
+              <View style={{ gap: 6, marginTop: 16 }}>
+                <View style={FORMULA_FIELD_LABEL_STYLE}>
+                  <Trans>Conditional color (optional):</Trans>
+                </View>
+                <View
+                  style={{
+                    border: `1px solid ${theme.cardHairline}`,
+                    borderRadius: 10,
+                    overflow: 'hidden',
+                    backgroundColor: theme.tableBackground,
+                  }}
+                >
+                  <Suspense fallback={<div style={{ height: 32 }} />}>
+                    <FormulaEditor
+                      value={colorFormula}
+                      variables={colorVariables}
+                      onChange={setColorFormula}
+                      mode="query"
+                      queries={queriesRef.current}
+                      categoryBadges={categoryBadges}
+                      singleLine
+                      showLineNumbers={false}
+                    />
+                  </Suspense>
+                </View>
+                <div
+                  style={{
+                    fontSize: 12,
+                    lineHeight: 1.5,
+                    color: theme.pageTextSecondary,
+                  }}
+                >
+                  <Trans>
+                    Formula that returns a color (e.g., &ldquo;red&rdquo;,
+                    &ldquo;#ff0000&rdquo;). Leave blank for default. Use RESULT
+                    variable to access the main formula result.
+                  </Trans>
+                </div>
+              </View>
+            </ReportPageCard>
+          </View>
+          <ReportPageCard
+            style={{
+              flexShrink: 0,
+              ...(width >= FORMULA_SIDE_COLUMN_FROM && {
+                width: 380,
+                flexShrink: 0,
+              }),
+            }}
+          >
+            <QueryManager
+              queries={queriesRef.current}
+              onQueriesChange={handleQueriesChange}
+              isCard
+            />
+          </ReportPageCard>
         </View>
-      </View>
+      )}
     </Page>
+  );
+}
+
+// From this width the query definitions sit beside the editor (APP-03c).
+const FORMULA_SIDE_COLUMN_FROM = 1280;
+
+const FORMULA_FIELD_LABEL_STYLE = {
+  fontSize: 12,
+  fontWeight: 600,
+  color: theme.pageTextSecondary,
+} as const;
+
+function FormulaCardTitle({ children }: { children: ReactNode }) {
+  return (
+    <View
+      style={{
+        fontSize: 15,
+        fontWeight: 600,
+        color: theme.pageText,
+        marginBottom: 10,
+      }}
+    >
+      {children}
+    </View>
   );
 }

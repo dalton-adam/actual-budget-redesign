@@ -7,6 +7,7 @@ import { Popover } from '@actual-app/components/popover';
 import { Select } from '@actual-app/components/select';
 import { SpaceBetween } from '@actual-app/components/space-between';
 import { Text } from '@actual-app/components/text';
+import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import type {
   CustomReportEntity,
@@ -248,30 +249,41 @@ export function SaveReport({
         alignItems: 'center',
       }}
     >
+      {savedStatus === 'modified' && (
+        <Text
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            marginRight: 10,
+            fontSize: 12.5,
+            fontWeight: 600,
+            color: theme.pageTextSecondary,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <View
+            aria-hidden
+            style={{
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              backgroundColor: theme.pillWarningText,
+            }}
+          />
+          <Trans>Unsaved changes</Trans>
+        </Text>
+      )}
       <Button
         ref={triggerRef}
-        variant="bare"
+        variant="control"
         onPress={() => {
           setMenuOpen(true);
         }}
+        style={{ gap: 6 }}
       >
-        <Text
-          style={{
-            maxWidth: 150,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            flexShrink: 0,
-          }}
-        >
-          {!report.id ? <Trans>Unsaved report</Trans> : report.name}&nbsp;
-        </Text>
-        {savedStatus === 'modified' && (
-          <Text>
-            <Trans>(modified)</Trans>&nbsp;
-          </Text>
-        )}
-        <SvgExpandArrow width={8} height={8} style={{ marginRight: 5 }} />
+        <Trans>Report</Trans>
+        <SvgExpandArrow width={8} height={8} />
       </Button>
 
       <Popover

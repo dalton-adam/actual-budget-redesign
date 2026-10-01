@@ -1,11 +1,12 @@
 import React, { useEffect, useEffectEvent, useMemo, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router';
 
 import { AlignedText } from '@actual-app/components/aligned-text';
 import { Block } from '@actual-app/components/block';
 import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { styles } from '@actual-app/components/styles';
+import { SurfaceCard } from '@actual-app/components/surface-card';
 import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -21,7 +22,6 @@ import type {
   TransactionEntity,
 } from '@actual-app/core/types/models';
 import type { SyncedPrefs } from '@actual-app/core/types/prefs';
-import type { TransObjectLiteral } from '@actual-app/core/types/util';
 
 import { Warning } from '#components/alerts';
 import { AppliedFilters } from '#components/filters/AppliedFilters';
@@ -30,6 +30,7 @@ import { MobileBackButton } from '#components/mobile/MobileBackButton';
 import { MobilePageHeader, Page, PageHeader } from '#components/Page';
 import { PrivacyFilter } from '#components/PrivacyFilter';
 import { ChooseGraph } from '#components/reports/ChooseGraph';
+import { REPORT_PAGE_CARD_STYLE } from '#components/reports/constants';
 import {
   defaultsGraphList,
   defaultsList,
@@ -45,8 +46,13 @@ import {
   ReportOptions,
 } from '#components/reports/ReportOptions';
 import type { dateRangeProps } from '#components/reports/ReportOptions';
+import { ReportPageCardHeader } from '#components/reports/ReportPageCardHeader';
+import { ReportPageTitle } from '#components/reports/ReportPageTitle';
 import { ReportSidebar } from '#components/reports/ReportSidebar';
-import { ReportSummary } from '#components/reports/ReportSummary';
+import {
+  ReportSummary,
+  useReportDateRangeText,
+} from '#components/reports/ReportSummary';
 import { ReportTopbar } from '#components/reports/ReportTopbar';
 import type { SavedStatus } from '#components/reports/SaveReportMenu';
 import { setSessionReport } from '#components/reports/setSessionReport';
@@ -147,7 +153,7 @@ function CustomReportInner({
   const format = useFormat();
 
   const { data: categories = { grouped: [], list: [] } } = useCategories();
-  const { isNarrowWidth } = useResponsive();
+  const { isNarrowWidth, width } = useResponsive();
   const [_firstDayOfWeekIdx] = useSyncedPref('firstDayOfWeekIdx');
   const firstDayOfWeekIdx = _firstDayOfWeekIdx || '0';
 
@@ -268,6 +274,7 @@ function CustomReportInner({
   const [isDateStatic, setIsDateStatic] = useState(loadReport.isDateStatic);
   const [groupBy, setGroupBy] = useState(loadReport.groupBy);
   const [interval, setInterval] = useState(loadReport.interval);
+  const dateRangeText = useReportDateRangeText(startDate, endDate, interval);
   const [balanceType, setBalanceType] = useState(loadReport.balanceType);
   const [sortBy, setSortBy] = useState(loadReport.sortBy);
 
@@ -838,6 +845,89 @@ function CustomReportInner({
     void navigate('/reports');
   };
 
+  const reportTitle =
+    report.name?.length > 0 ? report.name : t('Unsaved report');
+
+  const appliedFilters = conditions && conditions.length > 0 && (
+    <View
+      style={{
+        marginBottom: 10,
+        marginLeft: isNarrowWidth ? 5 : 0,
+        marginRight: isNarrowWidth ? 5 : 0,
+        gap: 10,
+        flexShrink: 0,
+      }}
+    >
+      <View
+        style={{
+          flexShrink: 0,
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          justifyContent: 'flex-start',
+        }}
+      >
+        <AppliedFilters
+          conditions={conditions}
+          onUpdate={(oldFilter, newFilter) => {
+            setSessionReport(
+              'conditions',
+              conditions.map(f => (f === oldFilter ? newFilter : f)),
+            );
+            onReportChange({ type: 'modify' });
+            onUpdateFilter(oldFilter, newFilter);
+          }}
+          onDelete={deletedFilter => {
+            setSessionReport(
+              'conditions',
+              conditions.filter(f => f !== deletedFilter),
+            );
+            onDeleteFilter(deletedFilter);
+            onReportChange({ type: 'modify' });
+          }}
+          conditionsOp={conditionsOp}
+          onConditionsOpChange={co => {
+            onConditionsOpChange(co);
+            onReportChange({ type: 'modify' });
+          }}
+        />
+      </View>
+
+      {hasWarning && (
+        <Warning style={{ paddingTop: 5, paddingBottom: 5 }}>
+          {t(
+            'This report is configured to use a non-existing filter value (i.e. category/account/payee).',
+          )}
+        </Warning>
+      )}
+    </View>
+  );
+
+  const graph = data ? (
+    <ChooseGraph
+      data={data}
+      filters={conditions}
+      mode={mode}
+      graphType={graphType}
+      balanceType={balanceType}
+      groupBy={groupBy}
+      interval={interval}
+      setScrollWidth={setScrollWidth}
+      viewLabels={viewLabels}
+      compact={false}
+      showHiddenCategories={showHiddenCategories}
+      showOffBudget={showOffBudget}
+      showTrendLines={showTrendLines}
+      intervalsCount={intervals.length}
+    />
+  ) : (
+    <LoadingIndicator message={t('Loading report...')} />
+  );
+
+  // Summary and legend sit beside the chart from 1280px and under it below
+  // (APP-03c, design-decisions §10a), so the colour key never disappears.
+  const isSideColumn = width >= REPORT_SIDE_COLUMN_FROM;
+  const hasSideContent = (viewLegend || viewSummary) && data;
+
   return (
     <Page
       header={
@@ -849,238 +939,187 @@ function CustomReportInner({
             leftContent={<MobileBackButton onPress={onBackClick} />}
           />
         ) : (
-          <PageHeader
-            title={
-              <Trans>
-                <Text>
-                  <Trans>Custom Report:</Trans>
-                </Text>{' '}
-                <Text style={{ marginLeft: 5, color: theme.pageTextPositive }}>
-                  {
-                    {
-                      name:
-                        report.name?.length > 0
-                          ? report.name
-                          : t('Unsaved report'),
-                    } as TransObjectLiteral
-                  }
-                </Text>
-              </Trans>
-            }
-          />
+          <PageHeader title={<ReportPageTitle title={reportTitle} />} />
         )
       }
       padding={0}
     >
-      <View
-        style={{
-          flexDirection: 'row',
-          paddingLeft: !isNarrowWidth ? 20 : undefined,
-          flex: 1,
-        }}
-      >
-        {!isNarrowWidth && (
-          <ReportSidebar
-            customReportItems={customReportItems}
-            selectedCategories={selectedCategories}
-            categories={categories}
-            dateRangeLine={dateRangeLine}
-            allIntervals={allIntervals}
-            setDateRange={setDateRange}
-            setGraphType={setGraphType}
-            setGroupBy={setGroupBy}
-            setInterval={setInterval}
-            setBalanceType={setBalanceType}
-            setSortBy={setSortBy}
-            setMode={setMode}
-            setIsDateStatic={setIsDateStatic}
-            setShowEmpty={setShowEmpty}
-            setShowOffBudget={setShowOffBudget}
-            setShowHiddenCategories={setShowHiddenCategories}
-            setIncludeCurrentInterval={setIncludeCurrentInterval}
-            setShowUncategorized={setShowUncategorized}
-            setTrimIntervals={setTrimIntervals}
-            setShowTrendLines={setShowTrendLines}
-            setSelectedCategories={setSelectedCategories}
-            onChangeDates={onChangeDates}
-            onReportChange={onReportChange}
-            disabledItems={disabledItems}
-            defaultItems={defaultItems}
-            defaultModeItems={defaultModeItems}
-            earliestTransaction={earliestTransactionDate}
-            latestTransaction={latestTransactionDate}
-            firstDayOfWeekIdx={firstDayOfWeekIdx}
-            isComplexCategoryCondition={isComplexCategoryCondition}
-          />
-        )}
-        <View
-          style={{
-            flex: 1,
-          }}
-        >
-          {!isNarrowWidth && (
-            <ReportTopbar
-              customReportItems={customReportItems}
-              report={report}
-              savedStatus={savedStatus}
-              setGraphType={setGraphType}
-              viewLegend={viewLegend}
-              viewSummary={viewSummary}
-              viewLabels={viewLabels}
-              onApplyFilter={onApplyFilter}
-              onChangeViews={onChangeViews}
-              onReportChange={onReportChange}
-              isItemDisabled={isItemDisabled}
-              defaultItems={defaultItems}
-            />
-          )}
-          {conditions && conditions.length > 0 && (
+      {isNarrowWidth ? (
+        <View style={{ flexDirection: 'row', flex: 1 }}>
+          <View style={{ flex: 1 }}>
+            {appliedFilters}
             <View
+              id="custom-report-content"
               style={{
-                marginBottom: 10,
-                marginLeft: 5,
-                marginRight: 5,
-                gap: 10,
-                flexShrink: 0,
+                backgroundColor: theme.tableBackground,
+                flexDirection: 'row',
+                flex: '1 0 auto',
               }}
             >
-              <View
-                style={{
-                  flexShrink: 0,
-                  flexDirection: 'row',
-                  alignItems: 'flex-start',
-                  justifyContent: 'flex-start',
-                }}
-              >
-                <AppliedFilters
-                  conditions={conditions}
-                  onUpdate={(oldFilter, newFilter) => {
-                    setSessionReport(
-                      'conditions',
-                      conditions.map(f => (f === oldFilter ? newFilter : f)),
-                    );
-                    onReportChange({ type: 'modify' });
-                    onUpdateFilter(oldFilter, newFilter);
-                  }}
-                  onDelete={deletedFilter => {
-                    setSessionReport(
-                      'conditions',
-                      conditions.filter(f => f !== deletedFilter),
-                    );
-                    onDeleteFilter(deletedFilter);
-                    onReportChange({ type: 'modify' });
-                  }}
-                  conditionsOp={conditionsOp}
-                  onConditionsOpChange={co => {
-                    onConditionsOpChange(co);
-                    onReportChange({ type: 'modify' });
-                  }}
-                />
-              </View>
-
-              {hasWarning && (
-                <Warning style={{ paddingTop: 5, paddingBottom: 5 }}>
-                  {t(
-                    'This report is configured to use a non-existing filter value (i.e. category/account/payee).',
-                  )}
-                </Warning>
-              )}
-            </View>
-          )}
-          <View
-            id="custom-report-content"
-            style={{
-              backgroundColor: theme.tableBackground,
-              flexDirection: 'row',
-              flex: '1 0 auto',
-            }}
-          >
-            <View
-              style={{
-                flex: 1,
-                padding: 10,
-              }}
-            >
-              {graphType !== 'TableGraph' && data && (
-                <View
-                  style={{
-                    alignItems: 'flex-end',
-                    paddingTop: 10,
-                  }}
-                >
-                  <View
-                    style={{
-                      ...styles.mediumText,
-                      fontWeight: 500,
-                      marginBottom: 5,
-                    }}
-                  >
-                    <AlignedText
-                      left={<Block>{balanceType}:</Block>}
-                      right={
-                        <FinancialText>
-                          <PrivacyFilter>
-                            {format(data[balanceTypeOp], 'financial')}
-                          </PrivacyFilter>
-                        </FinancialText>
-                      }
-                    />
+              <View style={{ flex: 1, padding: 10 }}>
+                {graphType !== 'TableGraph' && data && (
+                  <View style={{ alignItems: 'flex-end', paddingTop: 10 }}>
+                    <View
+                      style={{
+                        ...styles.mediumText,
+                        fontWeight: 500,
+                        marginBottom: 5,
+                      }}
+                    >
+                      <AlignedText
+                        left={<Block>{balanceType}:</Block>}
+                        right={
+                          <FinancialText>
+                            <PrivacyFilter>
+                              {format(data[balanceTypeOp], 'financial')}
+                            </PrivacyFilter>
+                          </FinancialText>
+                        }
+                      />
+                    </View>
                   </View>
-                </View>
-              )}
-              <View style={{ flex: 1, overflow: 'auto' }}>
-                {data ? (
-                  <ChooseGraph
-                    data={data}
-                    filters={conditions}
-                    mode={mode}
-                    graphType={graphType}
-                    balanceType={balanceType}
-                    groupBy={groupBy}
-                    interval={interval}
-                    setScrollWidth={setScrollWidth}
-                    viewLabels={viewLabels}
-                    compact={false}
-                    showHiddenCategories={showHiddenCategories}
-                    showOffBudget={showOffBudget}
-                    showTrendLines={showTrendLines}
-                    intervalsCount={intervals.length}
-                  />
-                ) : (
-                  <LoadingIndicator message={t('Loading report...')} />
                 )}
+                <View style={{ flex: 1, overflow: 'auto' }}>{graph}</View>
               </View>
             </View>
-            {(viewLegend || viewSummary) && data && !isNarrowWidth && (
-              <View
-                style={{
-                  padding: 10,
-                  minWidth: 300,
-                  textAlign: 'center',
-                }}
-              >
-                {viewSummary && (
-                  <ReportSummary
-                    startDate={startDate}
-                    endDate={endDate}
-                    balanceTypeOp={balanceTypeOp}
-                    data={data}
-                    interval={interval}
-                    intervalsCount={intervals.length}
-                  />
-                )}
-                {viewLegend && (
-                  <ReportLegend
-                    legend={data.legend}
-                    groupBy={groupBy}
-                    interval={interval}
-                  />
-                )}
-              </View>
-            )}
           </View>
         </View>
-      </View>
+      ) : (
+        <View style={{ flex: 1, minHeight: 0, padding: '0 20px 20px' }}>
+          <ReportTopbar
+            customReportItems={customReportItems}
+            report={report}
+            savedStatus={savedStatus}
+            setGraphType={setGraphType}
+            viewLegend={viewLegend}
+            viewSummary={viewSummary}
+            viewLabels={viewLabels}
+            onApplyFilter={onApplyFilter}
+            onChangeViews={onChangeViews}
+            onReportChange={onReportChange}
+            isItemDisabled={isItemDisabled}
+            defaultItems={defaultItems}
+          />
+          {appliedFilters}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'stretch',
+              gap: 14,
+              flex: 1,
+              minHeight: 0,
+            }}
+          >
+            <ReportSidebar
+              customReportItems={customReportItems}
+              selectedCategories={selectedCategories}
+              categories={categories}
+              dateRangeLine={dateRangeLine}
+              allIntervals={allIntervals}
+              setDateRange={setDateRange}
+              setGraphType={setGraphType}
+              setGroupBy={setGroupBy}
+              setInterval={setInterval}
+              setBalanceType={setBalanceType}
+              setSortBy={setSortBy}
+              setMode={setMode}
+              setIsDateStatic={setIsDateStatic}
+              setShowEmpty={setShowEmpty}
+              setShowOffBudget={setShowOffBudget}
+              setShowHiddenCategories={setShowHiddenCategories}
+              setIncludeCurrentInterval={setIncludeCurrentInterval}
+              setShowUncategorized={setShowUncategorized}
+              setTrimIntervals={setTrimIntervals}
+              setShowTrendLines={setShowTrendLines}
+              setSelectedCategories={setSelectedCategories}
+              onChangeDates={onChangeDates}
+              onReportChange={onReportChange}
+              disabledItems={disabledItems}
+              defaultItems={defaultItems}
+              defaultModeItems={defaultModeItems}
+              earliestTransaction={earliestTransactionDate}
+              latestTransaction={latestTransactionDate}
+              firstDayOfWeekIdx={firstDayOfWeekIdx}
+              isComplexCategoryCondition={isComplexCategoryCondition}
+            />
+            <SurfaceCard
+              id="custom-report-content"
+              style={{
+                ...REPORT_PAGE_CARD_STYLE,
+                flex: 1,
+                minWidth: 0,
+                flexDirection: isSideColumn ? 'row' : 'column',
+                gap: 20,
+                overflowY: 'auto',
+              }}
+            >
+              <View style={{ flex: 1, minWidth: 0, minHeight: 320 }}>
+                <ReportPageCardHeader
+                  title={balanceType}
+                  subtitle={
+                    <Text
+                      style={{ fontSize: 12, color: theme.pageTextSecondary }}
+                    >
+                      {dateRangeText}
+                    </Text>
+                  }
+                  total={
+                    graphType !== 'TableGraph' &&
+                    data && (
+                      <FinancialText>
+                        <PrivacyFilter>
+                          {format(data[balanceTypeOp], 'financial')}
+                        </PrivacyFilter>
+                      </FinancialText>
+                    )
+                  }
+                />
+                <View style={{ flex: 1, overflow: 'auto' }}>{graph}</View>
+              </View>
+              {hasSideContent && (
+                <View
+                  style={
+                    isSideColumn
+                      ? {
+                          width: 240,
+                          flexShrink: 0,
+                          gap: 14,
+                          paddingLeft: 20,
+                          borderLeft: `1px solid ${theme.cardHairline}`,
+                        }
+                      : {
+                          gap: 14,
+                          flexShrink: 0,
+                          paddingTop: 14,
+                          borderTop: `1px solid ${theme.cardHairline}`,
+                        }
+                  }
+                >
+                  {viewSummary && (
+                    <ReportSummary
+                      balanceTypeOp={balanceTypeOp}
+                      data={data}
+                      interval={interval}
+                      intervalsCount={intervals.length}
+                      isRow={!isSideColumn}
+                    />
+                  )}
+                  {viewLegend && (
+                    <ReportLegend
+                      legend={data.legend}
+                      groupBy={groupBy}
+                      interval={interval}
+                      isRow={!isSideColumn}
+                    />
+                  )}
+                </View>
+              )}
+            </SurfaceCard>
+          </View>
+        </View>
+      )}
     </Page>
   );
 }
+
+const REPORT_SIDE_COLUMN_FROM = 1280;

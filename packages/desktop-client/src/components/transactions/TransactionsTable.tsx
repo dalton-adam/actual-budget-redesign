@@ -2772,6 +2772,7 @@ type TransactionTableInnerProps = {
   onSort: (field: string, ascDesc: 'asc' | 'desc') => void;
   showHiddenCategories?: boolean;
   isRegister?: boolean;
+  isFlatRegister?: boolean;
   isReconciling?: boolean;
   // Drag and drop props
   canDrag?: boolean;
@@ -3018,11 +3019,11 @@ function TransactionTableInner({
           // The register in one card (design-decisions §10), aligned with
           // the hero and toolbar above it.
           ...(props.isRegister && {
-            margin: '0 20px 20px',
+            margin: props.isFlatRegister ? 0 : '0 20px 20px',
             backgroundColor: theme.cardBackground,
             border: '1px solid ' + theme.cardHairline,
             borderRadius: 18,
-            boxShadow: theme.cardElevation,
+            boxShadow: props.isFlatRegister ? 'none' : theme.cardElevation,
             overflow: 'hidden',
           }),
         }}
@@ -3199,6 +3200,11 @@ export type TransactionTableProps = {
    * in one card. Other users of this table keep upstream's.
    */
   isRegister?: boolean;
+  /**
+   * With `isRegister`, the card without Card elevation or page margins, for
+   * the Calendar report's list (APP-03c; report cards have no shadow).
+   */
+  isFlatRegister?: boolean;
   /** Accents the cleared column header while reconciling. */
   isReconciling?: boolean;
 };

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
+import type { ComponentProps, CSSProperties } from 'react';
 
 import { Button } from './Button';
 import { SvgExpandArrow } from './icons/v0';
@@ -27,6 +27,8 @@ type SelectProps<Value> = {
   style?: CSSProperties;
   popoverStyle?: CSSProperties;
   className?: string;
+  /** The trigger button's variant; report pages pass `control`. */
+  triggerVariant?: ComponentProps<typeof Button>['variant'];
 };
 
 /**
@@ -54,6 +56,7 @@ export function Select<const Value = string>({
   style = {},
   popoverStyle = {},
   className,
+  triggerVariant,
 }: SelectProps<Value>) {
   const targetOption = options
     .filter(isValueOption)
@@ -67,7 +70,7 @@ export function Select<const Value = string>({
       <Button
         ref={triggerRef}
         id={id}
-        variant={bare ? 'bare' : 'normal'}
+        variant={triggerVariant ?? (bare ? 'bare' : 'normal')}
         isDisabled={disabled}
         onPress={() => {
           setIsOpen(true);

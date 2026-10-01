@@ -96,6 +96,7 @@ type TransactionListProps = Pick<
   | 'isNew'
   | 'isReconciling'
   | 'isRegister'
+  | 'isFlatRegister'
   | 'loadMoreTransactions'
   | 'onBatchDelete'
   | 'onBatchDuplicate'
@@ -178,6 +179,7 @@ export function TransactionList({
   onScheduleAction,
   onMakeAsNonSplitTransactions,
   isRegister,
+  isFlatRegister,
   isReconciling,
 }: TransactionListProps) {
   const dispatch = useDispatch();
@@ -567,6 +569,7 @@ export function TransactionList({
         showSelection={showSelection}
         allowSplitTransaction={allowSplitTransaction}
         isRegister={isRegister}
+        isFlatRegister={isFlatRegister}
         isReconciling={isReconciling}
       />
     </ErrorBoundary>
