@@ -1315,7 +1315,8 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   (Net Worth, Cash Flow and the three forecast tests, three themes each);
   rerun with `command-bar.test.ts` 19/19 (verification.md).
   **Open:** custom theme, desktop build.
-- APP-03c: **built October 1, 2026** on branch `redesign/app-03c-editors`.
+- APP-03c: **merged October 1, 2026** into `redesign/main` (`0a7384ab1`,
+  branch `redesign/app-03c-editors`).
   Drawing approved the same day (prototype shots `59`–`66`,
   design-decisions §10a; Monte Carlo split off as APP-03d). Screenshots in
   [verification/app-03c](verification/app-03c/). **Change:** the custom

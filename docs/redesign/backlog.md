@@ -46,7 +46,7 @@ Budget header are reference material, not tasks to build.
 | SYNC-01            | blocked     | —                        | No upstream release after v26.9.0 (checked September 29, 2026). Start when v26.10.0 ships; before RELEASE-01 (D-1).        |
 | APP-01             | verified    | `875ddad48`              | Linux VRT regenerated (69) on Windows. Custom theme, keyboard, privacy and desktop passed.                                 |
 | APP-02             | verified    | `f8fcc70d8`              | Linux VRT regenerated (66) and desktop window checked on Windows. E2E test "by payee" changed (SYNC-01 conflict risk).     |
-| APP-03a – d        | in progress | `d63b275d0`, `e94d71e27` | 03a, 03b merged (03b: custom theme, desktop open). 03c drawn and approved; building. 03d (Monte Carlo) after.              |
+| APP-03a – d        | in progress | `e94d71e27`, `0a7384ab1` | 03a – c merged; 03b and 03c open: custom theme, desktop build. APP-03d (Monte Carlo) next.                                 |
 | APP-04 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                          |
 
@@ -77,7 +77,7 @@ does not claim Claude's prototype is production-ready.
 9. ~~**APP-01**~~ Merged September 29, 2026; Linux VRT regenerated September 30.
    ~~Then **APP-02**~~ Merged September 30, 2026; Linux VRT regenerated the same day.
    ~~Then **APP-03a**~~ Merged September 30, 2026. ~~Then **APP-03b**~~ Merged
-   October 1, 2026. Then **APP-03c** (drawing approved October 1), **APP-03d**
+   October 1, 2026. ~~Then **APP-03c**~~ Merged October 1, 2026. Then **APP-03d**
    (Monte Carlo)
    and **APP-04** onward, then QA-01 and RELEASE-01.
 
