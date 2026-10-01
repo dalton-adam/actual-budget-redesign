@@ -1,10 +1,11 @@
 // Screenshots of the static redesign prototype (docs/redesign/prototype).
-// Usage: node scripts/redesign-prototype-shots.cjs [--design-01 | --app-03 | --app-03c | --app-03d | --app-04]
+// Usage: node scripts/redesign-prototype-shots.cjs [--design-01 | --app-03 | --app-03c | --app-03d | --app-04 |
+//   --app-05a]
 // Default: the DESIGN-02 set (18+). --design-01 regenerates 01-17 from the
 // current prototype with the fixture and row height they were taken with.
 // --app-03 takes the Reports proposal (51+); --app-03c the custom report,
 // Calendar and Formula proposal (59+); --app-03d Monte Carlo (67+);
-// --app-04 Schedules (73+).
+// --app-04 Schedules (73+); --app-05a Payees (80+).
 const { chromium } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
@@ -222,21 +223,44 @@ const app04 = [
   ['79-schedules-empty-light-wide', W, H, `${sc}&theme=light&sempty=1`],
 ];
 
+const py = 'page=payees';
+const app05a = [
+  ['80-payees-dark-wide', W, H, `${py}&theme=dark&phover=p4`],
+  ['81-payees-light-1000', w, h, `${py}&theme=light&pane=collapsed`],
+  [
+    '82-payees-midnight-wide-selected',
+    W,
+    H,
+    `${py}&theme=midnight&psel=1&pmenu=1`,
+  ],
+  ['83-payees-custom-theme-wide', W, H, `${py}&theme=custom&phover=p7`],
+  ['84-payees-unused-light-wide', W, H, `${py}&theme=light&punused=1`],
+  ['85-payees-row-menu-dark-1000', w, h, `${py}&theme=dark&prow=p6&phover=p6`],
+  [
+    '86-payees-no-match-dark-wide',
+    W,
+    H,
+    `${py}&theme=dark&pfilter=asdf&pempty=1`,
+  ],
+];
+
 (async () => {
   const dir = path.resolve('docs/redesign/prototype');
   const out = path.join(dir, 'shots');
   fs.mkdirSync(out, { recursive: true });
   const shots = process.argv.includes('--design-01')
     ? design01
-    : process.argv.includes('--app-04')
-      ? app04
-      : process.argv.includes('--app-03d')
-        ? app03d
-        : process.argv.includes('--app-03c')
-          ? app03c
-          : process.argv.includes('--app-03')
-            ? app03
-            : design02;
+    : process.argv.includes('--app-05a')
+      ? app05a
+      : process.argv.includes('--app-04')
+        ? app04
+        : process.argv.includes('--app-03d')
+          ? app03d
+          : process.argv.includes('--app-03c')
+            ? app03c
+            : process.argv.includes('--app-03')
+              ? app03
+              : design02;
   // PW_CHANNEL=msedge uses an installed browser instead of Playwright's.
   const b = await chromium.launch(
     process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {},

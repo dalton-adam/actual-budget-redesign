@@ -402,3 +402,69 @@ Questions for the owner:
 
 Regenerate with `node scripts/redesign-prototype-shots.cjs --app-04`
 (`PW_CHANNEL=msedge` uses the installed Edge).
+
+## APP-05a: Payees proposal (October 1, 2026)
+
+**Status: drawn, awaiting owner review.** Choose **Page → Payees** (or More →
+Payees). URL parameters: `psel=0|1` (three payees selected), `pmenu=0|1`
+(the selection menu), `punused=0|1` (unused payees only), `pempty=0|1`
+(no match), and for screenshots `pfilter`, `phover`, `prow` (a row's
+context menu).
+
+Source traced for the brief: the page is `C/payees/ManagePayeesPage.tsx`
+(the `Page` and its header), the toolbar, header row, empty state and the
+Category learning settings button are in `C/payees/ManagePayees.tsx`, the
+table in `C/payees/PayeeTable.tsx` (the shared `Table` with its default
+32px rows; `rowHeight` is a prop, so no shared constant changes), each row
+with its icons, rule button and context menu in `C/payees/PayeeTableRow.tsx`,
+and the selection menu in `C/payees/PayeeMenu.tsx`.
+`C/payees/PayeeRuleCountLabel.tsx` is shared with the mobile payee list
+(`C/mobile/payees/PayeesListItem.tsx`), so its text stays as it is. The
+Category Learning dialog (`C/payees/CategoryLearning.tsx`) and the merge
+confirmation (`C/modals/`) are dialogs. E2E: `e2e/payees.test.ts` with
+`e2e/page-models/payees-page.ts` (finds the filter by its placeholder,
+`Filter payees...`, and rows by the `table` and `row` test ids).
+
+What the drawing proposes (each item is presentation only):
+
+| Surface     | Today                                                                           | Proposed                                                                                                                                                                                                                |
+| ----------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page title  | Regular-weight page header                                                      | The 28px bold title used on the account, report and schedule pages                                                                                                                                                      |
+| Toolbar     | Bare text buttons (selection, unused payees); Category learning settings bottom | One toolbar above the table, as on Schedules: the selection button and Show unused payees as control buttons (the unused toggle shows as pressed while on), Category learning settings beside them, filter at the right |
+| Table       | `tableBackground` container, 32px rows, sentence-case header                    | A Surface card with an Eyebrow header, hairline dividers and 44px rows; names in 500 weight; transfer payees in Secondary text with "Transfer:" in Faint                                                                |
+| Row icons   | Favourite bookmark in text colour; learning-off bulb hard-coded `red`           | Bookmark in the accent; bulb in the warning pill colour (a theme role, so custom themes reach it); tooltip unchanged                                                                                                    |
+| Rule button | Green notice button on every row ("Create rule →" / "N associated rules →")     | Rows with rules: an accent pill on the selection tint. Rows without: quiet Secondary text with the arrow, a hairline border on row hover. Same strings, same click and keyboard focus                                   |
+| Selection   | Row highlight, checkbox shown on hover                                          | Same behaviour; selected rows on the selection tint, accent checkbox; while anything is selected every selectable row shows its checkbox                                                                                |
+| Menus       | Selection menu and row context menu (shared `Menu`)                             | Unchanged content; they already follow the popover look                                                                                                                                                                 |
+| Empty       | Italic "No payees" under the header                                             | Same string, centred in the card, not italic                                                                                                                                                                            |
+
+Unchanged by design: every handler (rename, delete, favourite, merge,
+category learning per payee and globally, view and create rule, select
+all and range select), the filter's matching, the unused-payees list, the
+sort order, transfer payees being read-only, keyboard navigation between
+select, name and rule cells, and mobile.
+
+Questions for the owner:
+
+1. **Category learning settings in the toolbar:** move it from below the
+   table into the toolbar (drawn), or keep it at the bottom?
+2. **Rule button:** quiet "Create rule" with an accent pill only where rules
+   exist (drawn), or the same pill on every row?
+3. **Rule column header:** leave it blank (drawn; no new string), or label it
+   "Rules" (an existing string)?
+4. The **Category Learning dialog** and **merge confirmation**: leave them
+   for APP-06 (the default, as APP-04 did for its other dialogs), or restyle
+   the Category Learning dialog here since it sits in `C/payees/`?
+
+| File                                         | Shows                                                |
+| -------------------------------------------- | ---------------------------------------------------- |
+| `shots/80-payees-dark-wide.png`              | Payees, dark, 1440×900, a row hovered                |
+| `shots/81-payees-light-1000.png`             | Light, 1000×700, pane collapsed                      |
+| `shots/82-payees-midnight-wide-selected.png` | Three payees selected, selection menu open, midnight |
+| `shots/83-payees-custom-theme-wide.png`      | Custom theme through the fallback layer              |
+| `shots/84-payees-unused-light-wide.png`      | Unused payees only, toggle pressed                   |
+| `shots/85-payees-row-menu-dark-1000.png`     | A row's context menu                                 |
+| `shots/86-payees-no-match-dark-wide.png`     | No matching payees                                   |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-05a`
+(`PW_CHANNEL=msedge` uses the installed Edge).

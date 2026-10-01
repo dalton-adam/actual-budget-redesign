@@ -8,10 +8,12 @@
   DESIGN-01/02 prototype: fictional data only, no connection to Actual's code.
   Open with a local file URL after `yarn install` (fonts load from node_modules).
   URL params: layout=a|b, header=cards|trend, theme=light|dark|midnight|custom,
-  panel=0|1, privacy=0|1, controls=0|1, page=budget|account|reports|schedules
+  panel=0|1, privacy=0|1, controls=0|1, page=budget|account|reports|schedules|payees
   APP-03: rview=dash|networth|custom|calendar|formula, redit=0|1, whover=<widget id>
   APP-04 (page=schedules): sdlg=<schedule id>|add, stx=linked|matched, scompleted=0|1,
   sempty=0|1, sfilter=<text>, shover=<id>, smenu=<id>, ssel=0|1
+  APP-05a (page=payees): psel=0|1, pmenu=0|1, punused=0|1, pempty=0|1, pfilter=<text>,
+  phover=<id>, prow=<id> (row context menu)
   APP-03c: rgraph=table|bar|stacked|line|area|donut, rlegend=0|1, rsummary=0|1, rlabels=0|1
   DESIGN-02: data=basic|states|many, density=50|44|38, rta=pos|zero|neg,
   when=past|current|future, cat=<category id>, pm=<panel month>, hover=<id>, edit=<id>:<month>,
@@ -4196,6 +4198,169 @@
           column-gap: 10px;
         }
       }
+
+      /* APP-05a: Payees page */
+      .pay-main {
+        overflow: hidden;
+      }
+      .pay-table {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .pay-table .rhead {
+        border-radius: 18px 18px 0 0;
+        flex-shrink: 0;
+      }
+      .paycols {
+        display: grid;
+        grid-template-columns: 34px 22px minmax(0, 1fr) auto;
+        align-items: center;
+        column-gap: 10px;
+        padding: 0 14px 0 10px;
+      }
+      .prow {
+        height: 44px;
+        flex-shrink: 0;
+        border-bottom: 1px solid var(--cardBorder);
+        font-size: 13px;
+      }
+      .prow:hover,
+      .prow.hover {
+        background: var(--tableRowHover);
+      }
+      .prow.selected {
+        background: var(--selectionBackground);
+      }
+      .prow .cb {
+        opacity: 0;
+      }
+      .prow.hover .cb,
+      .prow:hover .cb,
+      .prow.selected .cb,
+      .pay-table.has-sel .prow:not(.transfer) .cb {
+        opacity: 1;
+      }
+      .prow.transfer .cb {
+        visibility: hidden;
+      }
+      .pname {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-weight: 500;
+      }
+      .prow.transfer .pname {
+        color: var(--pageTextSubdued);
+        font-weight: 400;
+      }
+      .prow.transfer .pname .pfx {
+        color: var(--pageTextFaint);
+      }
+      .pmarks {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+      }
+      .pmarks span {
+        display: inline-flex;
+      }
+      .pmarks svg {
+        width: 12px;
+        height: 12px;
+      }
+      .pmarks .fav {
+        color: var(--accent);
+      }
+      .pmarks .nolearn {
+        color: var(--pillWarningText);
+      }
+      .prule {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 24px;
+        padding: 0 9px;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        color: var(--pageTextSubdued);
+        border: 1px solid transparent;
+      }
+      .prule svg {
+        width: 10px;
+        height: 10px;
+      }
+      .prule.has {
+        background: var(--selectionBackground);
+        color: var(--accent);
+      }
+      .prow:hover .prule:not(.has),
+      .prow.hover .prule:not(.has) {
+        border-color: var(--cardBorder);
+        color: var(--pageText);
+      }
+      .pay-empty {
+        flex: 1;
+        display: grid;
+        place-items: center;
+        color: var(--pageTextSubdued);
+        font-size: 13px;
+        padding: 40px 0;
+      }
+      .tbtn[disabled] {
+        color: var(--pageTextFaint);
+        background: transparent;
+        cursor: default;
+      }
+      .tbtn .chev {
+        display: inline-flex;
+        opacity: 0.8;
+      }
+      .pay-menu {
+        position: absolute;
+        z-index: 20;
+        width: 250px;
+        padding: 6px;
+        border-radius: 12px;
+        background: var(--cardBackground);
+        border: 1px solid var(--cardBorder);
+        box-shadow: var(--popoverShadow);
+        font-size: 13px;
+      }
+      .pay-menu .mi {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 10px;
+        border-radius: 8px;
+      }
+      .pay-menu .mi svg {
+        width: 13px;
+        height: 13px;
+        color: var(--pageTextSubdued);
+      }
+      .pay-menu .mi.hl {
+        background: var(--tableRowHover);
+      }
+      .pay-menu .mi.dis {
+        color: var(--pageTextFaint);
+      }
+      .pay-menu hr {
+        border: 0;
+        border-top: 1px solid var(--cardBorder);
+        margin: 6px 4px;
+      }
+      .pay-menu .foot {
+        padding: 4px 10px 6px;
+        font-size: 11.5px;
+        color: var(--pageTextSubdued);
+      }
     </style>
   </head>
   <body>
@@ -4256,6 +4421,15 @@
         shover: params.get('shover') || '',
         smenu: params.get('smenu') || '',
         ssel: params.get('ssel') === '1',
+        // APP-05a: three payees selected, the selection menu open, unused
+        // payees only, empty list, search text, hovered row, row context menu.
+        psel: params.get('psel') === '1',
+        pmenu: params.get('pmenu') === '1',
+        punused: params.get('punused') === '1',
+        pempty: params.get('pempty') === '1',
+        pfilter: params.get('pfilter') || '',
+        phover: params.get('phover') || '',
+        prow: params.get('prow') || '',
         // Accounts pane: open or collapsed (device-local). Default: open at
         // 1280px and wider, collapsed below.
         pane:
@@ -4609,6 +4783,7 @@
               account: 'accounts',
               reports: 'reports',
               schedules: 'schedules',
+              payees: 'more',
             }[state.page] || 'budget') === key
               ? 'on'
               : ''
@@ -4707,7 +4882,7 @@
         }" ${inDrawer ? '' : 'id="pop-more" role="menu"'} style="left:${
           inDrawer ? 0 : 440
         }px">
-      ${it(I.payees, 'Payees')}${it(I.rules, 'Rules')}${it(
+      <button class="item" data-set="page" data-val="payees"><span class="ico">${I.payees}</span>Payees</button>${it(I.rules, 'Rules')}${it(
         I.bank,
         'Bank Sync',
         '<span class="amt muted">if enabled</span>',
@@ -5791,6 +5966,7 @@
             ['account', 'Account'],
             ['reports', 'Reports'],
             ['schedules', 'Schedules'],
+            ['payees', 'Payees'],
           ]),
           grp('Theme', 'theme', [
             ['light', 'Light'],
@@ -5877,9 +6053,31 @@
             [true, 'Empty'],
           ]),
         ];
-        const pageGroups = { budget, account: acct, reports, schedules: sched }[
-          state.page
+        const pay = [
+          grp('Selection', 'psel', [
+            [false, 'None'],
+            [true, 'Three'],
+          ]),
+          grp('Menu', 'pmenu', [
+            [false, 'Closed'],
+            [true, 'Open'],
+          ]),
+          grp('Show', 'punused', [
+            [false, 'All'],
+            [true, 'Unused'],
+          ]),
+          grp('List', 'pempty', [
+            [false, 'Fixture'],
+            [true, 'No match'],
+          ]),
         ];
+        const pageGroups = {
+          budget,
+          account: acct,
+          reports,
+          schedules: sched,
+          payees: pay,
+        }[state.page];
         return `<div class="proto" aria-label="Prototype controls">
       ${[...common, ...pageGroups, pin].join('')}
       <div class="grp"><button data-reload title="Reload with the fixture's original amounts">Reset</button></div>
@@ -7819,6 +8017,160 @@
           montecarlo: monteCarloPage,
         })[state.rview]?.() ?? reportsDashboard();
 
+      // APP-05a proposal: Payees page (fictional data). r = rule count,
+      // fav = favourite, nolearn = category learning off for this payee,
+      // unused = no transactions (the "unused payees" filter), t = transfer.
+      const PI = {
+        bookmark:
+          '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
+        bulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>',
+        arrow:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>',
+        trash:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15"/></svg>',
+        merge:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v6a6 6 0 0 0 6 6h6M6 21v-6M15 12l3 3-3 3"/></svg>',
+      };
+      const payees = [
+        { id: 'p1', n: 'Acme Corp', r: 1 },
+        { id: 'p2', n: 'Corner Bakery', unused: true },
+        { id: 'p3', n: 'Dominion Mobile', r: 1 },
+        { id: 'p4', n: 'Fast Internet', r: 2 },
+        { id: 'p5', n: 'FitClub' },
+        { id: 'p6', n: 'Grocery Mart', fav: true, r: 3 },
+        { id: 'p7', n: 'Home Hardware', nolearn: true },
+        { id: 'p8', n: 'Lakeside Pharmacy', unused: true },
+        { id: 'p9', n: 'Landlord Co', fav: true, r: 1 },
+        {
+          id: 'p10',
+          n: 'Metropolitan Transit Authority, monthly pass vending machines and fare top-ups at every station',
+        },
+        { id: 'p11', n: 'Northside Cafe' },
+        { id: 'p12', n: 'Old Gym Membership', unused: true },
+        { id: 'p13', n: 'SafeDrive Insurance', r: 1 },
+        { id: 'p14', n: 'StreamCo', fav: true, nolearn: true },
+        { id: 'p15', n: 'Water District', r: 1 },
+        { id: 'p16', n: 'Everyday Checking', t: true },
+        { id: 'p17', n: 'High-Yield Savings', t: true, r: 1 },
+        { id: 'p18', n: 'Rewards Credit Card', t: true },
+      ];
+      const paySelIds = ['p2', 'p11', 'p12'];
+
+      function payRow(p) {
+        const sel = state.psel && paySelIds.includes(p.id);
+        const r = p.r || 0;
+        return `<div class="paycols prow ${p.t ? 'transfer' : ''} ${
+          sel ? 'selected' : ''
+        } ${state.phover === p.id ? 'hover' : ''}" role="row">
+          <div><span class="cb ${sel ? 'on' : ''}">${sel ? check : ''}</span></div>
+          <div class="pmarks">${
+            p.fav
+              ? `<span class="fav" title="Favorite">${PI.bookmark}</span>`
+              : ''
+          }${
+            p.nolearn
+              ? `<span class="nolearn" title="Category learning disabled">${PI.bulb}</span>`
+              : ''
+          }</div>
+          <div class="pname" title="${esc(p.n)}">${
+            p.t ? '<span class="pfx">Transfer: </span>' : ''
+          }${esc(p.n)}</div>
+          <div><button class="prule ${r ? 'has' : ''}">${
+            r
+              ? `<span class="num">${r}</span> associated rule${r === 1 ? '' : 's'}`
+              : 'Create rule'
+          }${PI.arrow}</button></div>
+        </div>`;
+      }
+
+      function payeesPage() {
+        const q = state.pfilter.toLowerCase();
+        const unusedCount = payees.filter(p => p.unused).length;
+        const list = state.pempty
+          ? []
+          : payees.filter(
+              p =>
+                (!q ||
+                  ((p.t ? 'transfer: ' : '') + p.n)
+                    .toLowerCase()
+                    .includes(q)) &&
+                (!state.punused || p.unused),
+            );
+        const nSel = state.psel ? paySelIds.length : 0;
+        const selNames = paySelIds
+          .map(id => payees.find(p => p.id === id).n)
+          .join(', ');
+        const mi = (icon, l, hl) =>
+          `<div class="mi ${hl ? 'hl' : ''}" role="menuitem">${icon}${l}</div>`;
+        const menu =
+          state.pmenu && nSel
+            ? `<div class="pay-menu" role="menu" style="top:86px;left:0">
+              ${mi(PI.trash, 'Delete', true)}${mi(PI.bookmark, 'Favorite')}${mi(
+                PI.merge,
+                'Merge',
+              )}${mi(PI.bulb, 'Category Learning')}<hr><div class="foot">${esc(
+                selNames,
+              )}</div></div>`
+            : '';
+        const rowMenuFor = list.find(p => p.id === state.prow);
+        const body = list.length
+          ? list.map(payRow).join('')
+          : `<div class="pay-empty">No payees</div>`;
+        return `<main class="main pay-main" style="position:relative">
+          <div class="head"><h1>Payees</h1></div>
+          <div class="toolbar">
+            <button class="tbtn" ${nSel ? '' : 'disabled'} aria-haspopup="menu" aria-expanded="${
+              state.pmenu && nSel ? 'true' : 'false'
+            }">${
+              nSel
+                ? `<span><span class="num">${nSel}</span> payees</span>`
+                : 'No payees selected'
+            }<span class="chev">${I.chevD}</span></button>
+            ${
+              unusedCount || state.punused
+                ? `<button class="tbtn ${state.punused ? 'sel' : ''}" aria-pressed="${state.punused}" data-set="punused" data-val="${!state.punused}">${
+                    state.punused
+                      ? 'Show all payees'
+                      : `<span>Show <span class="num">${unusedCount}</span> unused payees</span>`
+                  }</button>`
+                : ''
+            }
+            <button class="tbtn">Category learning settings</button>
+            <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>${
+              q
+                ? `<span style="color:var(--pageText)">${esc(state.pfilter)}</span>`
+                : 'Filter payees...'
+            }</div>
+          </div>
+          <div class="card pay-table ${nSel ? 'has-sel' : ''}" role="table" aria-label="Payees">
+            <div class="paycols rhead" role="row"><div><span class="cb ${
+              nSel ? 'on' : ''
+            }" style="opacity:1">${
+              nSel
+                ? '<svg width="9" height="9" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M5 12h14"/></svg>'
+                : ''
+            }</span></div><div></div><div>Name</div><div></div></div>
+            ${body}
+            ${
+              rowMenuFor
+                ? `<div class="pay-menu" role="menu" style="top:${
+                    38 + (list.indexOf(rowMenuFor) + 1) * 44 - 6
+                  }px;left:260px;width:200px">${mi('', 'Delete', true)}${mi(
+                    '',
+                    rowMenuFor.fav ? 'Unfavorite' : 'Favorite',
+                  )}${rowMenuFor.r ? mi('', 'View rules') : ''}${mi(
+                    '',
+                    'Create rule',
+                  )}${mi(
+                    '',
+                    rowMenuFor.nolearn ? 'Enable learning' : 'Disable learning',
+                  )}</div>`
+                : ''
+            }
+          </div>
+          ${menu}
+        </main>`;
+      }
       let totB = 0,
         totS = 0;
       function render() {
@@ -7855,7 +8207,9 @@
                 ? reportsPage()
                 : state.page === 'schedules'
                   ? schedulesPage()
-                  : `<main class="main">
+                  : state.page === 'payees'
+                    ? payeesPage()
+                    : `<main class="main">
             ${header()}
             ${summary}
             ${ledger(offs)}
@@ -7918,6 +8272,10 @@
           u.searchParams.set('stx', state.stx);
           u.searchParams.set('scompleted', state.scompleted ? '1' : '0');
           u.searchParams.set('sempty', state.sempty ? '1' : '0');
+        }
+        if (state.page === 'payees') {
+          for (const k of ['psel', 'pmenu', 'punused', 'pempty'])
+            u.searchParams.set(k, state[k] ? '1' : '0');
         }
         if (state.rview === 'montecarlo') {
           u.searchParams.set('mctab', state.mctab);
