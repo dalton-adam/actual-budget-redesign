@@ -3,12 +3,11 @@ import { Trans, useTranslation } from 'react-i18next';
 
 import { Button } from '@actual-app/components/button';
 import { Menu } from '@actual-app/components/menu';
-import { ModeButton } from '@actual-app/components/mode-button';
 import { Popover } from '@actual-app/components/popover';
 import { Select } from '@actual-app/components/select';
 import type { SelectOption } from '@actual-app/components/select';
-import { SpaceBetween } from '@actual-app/components/space-between';
 import { styles } from '@actual-app/components/styles';
+import { SurfaceCard } from '@actual-app/components/surface-card';
 import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { Tooltip } from '@actual-app/components/tooltip';
@@ -33,6 +32,7 @@ import { getLiveRange } from './getLiveRange';
 import { ReportOptions } from './ReportOptions';
 import type { dateRangeProps } from './ReportOptions';
 import { validateEnd, validateStart } from './reportRanges';
+import { ReportSegmentedControl } from './ReportSegmentedControl';
 import { setSessionReport } from './setSessionReport';
 
 type ReportSidebarProps = {
@@ -242,64 +242,42 @@ export function ReportSidebar({
         false));
 
   return (
-    <View
+    <SurfaceCard
       style={{
-        minWidth: 225,
-        maxWidth: 250,
-        paddingTop: 10,
-        paddingRight: 10,
+        boxShadow: 'none',
+        padding: 0,
+        width: 272,
         flexShrink: 0,
         overflowY: 'auto',
+        alignSelf: 'stretch',
       }}
     >
-      <View style={{ flexShrink: 0 }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            marginBottom: 5,
-            alignItems: 'center',
-          }}
-        >
-          <Text>
-            <strong>
-              <Trans>Display</Trans>
-            </strong>
-          </Text>
-        </View>
-        <SpaceBetween
-          gap={5}
-          style={{
-            padding: 5,
-          }}
-        >
-          <Text style={{ width: 50, textAlign: 'right' }}>
+      <View style={{ ...SECTION_STYLE, flexShrink: 0 }}>
+        <Text style={SECTION_TITLE_STYLE}>
+          <Trans>Display</Trans>
+        </Text>
+        <View style={ROW_STYLE}>
+          <Text style={LABEL_STYLE}>
             <Trans>Mode:</Trans>
           </Text>
-          <ModeButton
-            selected={customReportItems.mode === 'total'}
-            onSelect={() => onChangeMode('total')}
-          >
-            <Trans>Total</Trans>
-          </ModeButton>
-          <ModeButton
-            selected={customReportItems.mode === 'time'}
-            onSelect={() => onChangeMode('time')}
-          >
-            <Trans>Time</Trans>
-          </ModeButton>
-        </SpaceBetween>
+          <ReportSegmentedControl
+            aria-label={t('Mode')}
+            options={[
+              { value: 'total', label: t('Total') },
+              { value: 'time', label: t('Time') },
+            ]}
+            value={customReportItems.mode === 'time' ? 'time' : 'total'}
+            onChange={onChangeMode}
+          />
+        </View>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            padding: 5,
-            alignItems: 'center',
-          }}
-        >
-          <Text style={{ width: 50, textAlign: 'right', marginRight: 5 }}>
+        <View style={ROW_STYLE}>
+          <Text style={LABEL_STYLE}>
             <Trans>Split:</Trans>
           </Text>
           <Select
+            triggerVariant="control"
+            style={SELECT_STYLE}
             value={customReportItems.groupBy}
             onChange={e => onChangeSplit(e)}
             options={ReportOptions.groupBy.map(option => [
@@ -314,17 +292,13 @@ export function ReportSidebar({
           />
         </View>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            padding: 5,
-            alignItems: 'center',
-          }}
-        >
-          <Text style={{ width: 50, textAlign: 'right', marginRight: 5 }}>
+        <View style={ROW_STYLE}>
+          <Text style={LABEL_STYLE}>
             <Trans>Type:</Trans>
           </Text>
           <Select
+            triggerVariant="control"
+            style={SELECT_STYLE}
             value={customReportItems.balanceType}
             onChange={e => onChangeBalanceType(e)}
             options={ReportOptions.balanceType.map(option => [
@@ -334,17 +308,13 @@ export function ReportSidebar({
             disabledKeys={disabledItems('type')}
           />
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            padding: 5,
-            alignItems: 'center',
-          }}
-        >
-          <Text style={{ width: 50, textAlign: 'right', marginRight: 5 }}>
+        <View style={ROW_STYLE}>
+          <Text style={LABEL_STYLE}>
             <Trans>Interval:</Trans>
           </Text>
           <Select
+            triggerVariant="control"
+            style={SELECT_STYLE}
             value={customReportItems.interval}
             onChange={e => {
               setSessionReport('interval', e);
@@ -372,17 +342,13 @@ export function ReportSidebar({
         </View>
 
         {!disableSort && (
-          <View
-            style={{
-              flexDirection: 'row',
-              padding: 5,
-              alignItems: 'center',
-            }}
-          >
-            <Text style={{ width: 50, textAlign: 'right', marginRight: 5 }}>
+          <View style={ROW_STYLE}>
+            <Text style={LABEL_STYLE}>
               <Trans>Sort:</Trans>
             </Text>
             <Select
+              triggerVariant="control"
+              style={SELECT_STYLE}
               value={customReportItems.sortBy}
               onChange={(e?: sortByOpType) => onChangeSortBy(e)}
               options={ReportOptions.sortBy.map(option => [
@@ -394,23 +360,15 @@ export function ReportSidebar({
           </View>
         )}
 
-        <View
-          style={{
-            flexDirection: 'row',
-            padding: 5,
-            alignItems: 'center',
-          }}
-        >
-          <Text style={{ width: 50, textAlign: 'right', marginRight: 5 }} />
+        <View style={ROW_STYLE}>
+          <Text style={LABEL_STYLE} />
           <Button
             ref={triggerRef}
             onPress={() => {
               setMenuOpen(true);
             }}
-            style={{
-              color: 'currentColor',
-              padding: '5px 10px',
-            }}
+            variant="control"
+            style={SELECT_STYLE}
           >
             <Trans>Options</Trans>
           </Button>
@@ -524,64 +482,51 @@ export function ReportSidebar({
             />
           </Popover>
         </View>
+      </View>
+      <View style={{ ...SECTION_STYLE, flexShrink: 0 }}>
         <View
           style={{
-            height: 1,
-            backgroundColor: theme.pillBorderDark,
-            marginTop: 10,
-            flexShrink: 0,
-          }}
-        />
-        <SpaceBetween
-          gap={5}
-          style={{
-            marginTop: 10,
-            marginBottom: 5,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
           }}
         >
-          <Text>
-            <strong>
-              <Trans>Date filters</Trans>
-            </strong>
+          <Text style={SECTION_TITLE_STYLE}>
+            <Trans>Date filters</Trans>
           </Text>
-          <View style={{ flex: 1 }} />
-          <ModeButton
-            selected={!customReportItems.isDateStatic}
-            onSelect={() => {
-              setSessionReport('isDateStatic', false);
-              setIsDateStatic(false);
-              onSelectRange(customReportItems.dateRange);
+          <ReportSegmentedControl
+            aria-label={t('Date filters')}
+            options={[
+              { value: 'live', label: t('Live') },
+              { value: 'static', label: t('Static') },
+            ]}
+            value={customReportItems.isDateStatic ? 'static' : 'live'}
+            onChange={value => {
+              if (value === 'live') {
+                setSessionReport('isDateStatic', false);
+                setIsDateStatic(false);
+                onSelectRange(customReportItems.dateRange);
+              } else {
+                setSessionReport('isDateStatic', true);
+                setIsDateStatic(true);
+                onChangeDates(
+                  customReportItems.startDate,
+                  customReportItems.endDate,
+                  'static',
+                );
+              }
             }}
-          >
-            <Trans>Live</Trans>
-          </ModeButton>
-          <ModeButton
-            selected={customReportItems.isDateStatic}
-            onSelect={() => {
-              setSessionReport('isDateStatic', true);
-              setIsDateStatic(true);
-              onChangeDates(
-                customReportItems.startDate,
-                customReportItems.endDate,
-                'static',
-              );
-            }}
-          >
-            <Trans>Static</Trans>
-          </ModeButton>
-        </SpaceBetween>
+          />
+        </View>
         {!customReportItems.isDateStatic ? (
-          <View
-            style={{
-              flexDirection: 'row',
-              padding: 5,
-              alignItems: 'center',
-            }}
-          >
-            <Text style={{ width: 50, textAlign: 'right', marginRight: 5 }}>
+          <View style={ROW_STYLE}>
+            <Text style={LABEL_STYLE}>
               <Trans>Range:</Trans>
             </Text>
             <Select
+              triggerVariant="control"
+              style={SELECT_STYLE}
               value={customReportItems.dateRange}
               onChange={onSelectRange}
               options={rangeOptions}
@@ -608,17 +553,13 @@ export function ReportSidebar({
           </View>
         ) : (
           <>
-            <View
-              style={{
-                flexDirection: 'row',
-                padding: 5,
-                alignItems: 'center',
-              }}
-            >
-              <Text style={{ width: 50, textAlign: 'right', marginRight: 5 }}>
+            <View style={ROW_STYLE}>
+              <Text style={LABEL_STYLE}>
                 <Trans>From:</Trans>
               </Text>
               <Select
+                triggerVariant="control"
+                style={SELECT_STYLE}
                 onChange={newValue =>
                   onChangeDates(
                     ...validateStart(
@@ -642,17 +583,13 @@ export function ReportSidebar({
                 options={allIntervals.map(({ name, pretty }) => [name, pretty])}
               />
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                padding: 5,
-                alignItems: 'center',
-              }}
-            >
-              <Text style={{ width: 50, textAlign: 'right', marginRight: 5 }}>
+            <View style={ROW_STYLE}>
+              <Text style={LABEL_STYLE}>
                 <Trans>To:</Trans>
               </Text>
               <Select
+                triggerVariant="control"
+                style={SELECT_STYLE}
                 onChange={newValue =>
                   onChangeDates(
                     ...validateEnd(
@@ -678,18 +615,11 @@ export function ReportSidebar({
             </View>
           </>
         )}
-        <View
-          style={{
-            height: 1,
-            backgroundColor: theme.pillBorderDark,
-            marginTop: 10,
-            flexShrink: 0,
-          }}
-        />
       </View>
       <View
         style={{
-          marginTop: 10,
+          padding: '12px 6px 14px 16px',
+          flex: 1,
           minHeight: 200,
         }}
       >
@@ -715,6 +645,37 @@ export function ReportSidebar({
           />
         )}
       </View>
-    </View>
+    </SurfaceCard>
   );
 }
+
+// The custom report's settings card (APP-03c, design-decisions §10a).
+const SECTION_STYLE = {
+  padding: '14px 16px',
+  gap: 8,
+  borderBottom: `1px solid ${theme.cardHairline}`,
+} as const;
+
+const SECTION_TITLE_STYLE = {
+  fontSize: 13.5,
+  fontWeight: 600,
+  color: theme.pageText,
+} as const;
+
+const ROW_STYLE = {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 10,
+} as const;
+
+const LABEL_STYLE = {
+  width: 64,
+  flexShrink: 0,
+  fontSize: 12.5,
+  color: theme.pageTextSecondary,
+} as const;
+
+const SELECT_STYLE = {
+  flex: 1,
+  minWidth: 0,
+} as const;
