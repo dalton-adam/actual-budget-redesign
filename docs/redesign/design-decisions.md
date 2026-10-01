@@ -624,6 +624,27 @@ sit on the Card Inset well without dividers. Mobile keeps the upstream
 layout: tabs and Chart/Runs as mode buttons, uppercase headings, plain
 blocks.
 
+## 10b. Schedules (APP-04)
+
+**APP-04 (approved October 1, 2026):** drawn in the prototype (Page →
+Schedules; shots `73`–`79`, prototype README). The owner left the open
+questions to the implementer, who chose:
+
+- Find schedules, Change upcoming length and Add new schedule move from the
+  bottom of the page into one toolbar above the table, with the filter at
+  the right, as on the account page (Add new schedule is the primary).
+- The table is a Surface card with Eyebrow headers, hairline dividers and
+  44px rows. Status pills take the register's pill shape and **keep their
+  icon** (a list sorted around status reads faster with it); colours stay on
+  `getStatusProps`.
+- The schedule dialog adds **no new headings**: the form's existing "Date"
+  label becomes the Eyebrow for its section, and the other sections are
+  split by hairlines only (no new string). Desktop only; the mobile
+  schedule page keeps the upstream form.
+- The Find schedules and link-schedule dialogs, which reuse the table, keep
+  the upstream look until APP-06 (the new look is opt-in from the page, as
+  APP-02 did for the Calendar list).
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the

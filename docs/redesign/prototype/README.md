@@ -338,7 +338,12 @@ Regenerate with `node scripts/redesign-prototype-shots.cjs --app-03d`
 
 ## APP-04: Schedules proposal (October 1, 2026)
 
-**Status: drawn, awaiting owner review.** Choose **Page → Schedules** (or the
+**Status: approved October 1, 2026.** The owner left the four questions
+below to the implementer, who chose: the actions move to the top toolbar
+(question 1); pills keep their icon (question 2); no new headings, the
+existing "Date" label becomes its section's Eyebrow and the rest are split
+by hairlines (question 3); the two other dialogs wait for APP-06
+(question 4). Choose **Page → Schedules** (or the
 Schedules tab). URL parameters: `sdlg=<schedule id>|add` (the schedule
 dialog), `stx=linked|matched`, `scompleted=0|1`, `sempty=0|1`, and for
 screenshots `sfilter`, `shover`, `smenu`, `ssel`.
