@@ -1375,8 +1375,8 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   changed". Upstream's Formula Result box shows a classic scrollbar in
   Electron at 1000×700 (3px overflow, not changed). Details in
   verification.md.
-- APP-03d: **done October 1, 2026** on branch
-  `redesign/app-03d-monte-carlo`. Drawing approved the same day (prototype
+- APP-03d: **merged October 1, 2026** into `redesign/main` (`ba03773c2`,
+  branch `redesign/app-03d-monte-carlo`). Drawing approved the same day (prototype
   shots `67`–`72`; the owner left the three questions to the implementer:
   Configuration stays above Results, histogram and explanation side by side
   at 1280px and wider, "Summary" label dropped; design-decisions §10a).
