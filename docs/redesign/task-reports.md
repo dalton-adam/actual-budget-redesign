@@ -1422,3 +1422,60 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   shot. **Not run:** custom theme, keyboard walk-through, privacy mode and
   the desktop build (open for the follow-up checks, as for APP-03b and
   APP-03c).
+
+- APP-04: **merged October 1, 2026** into `redesign/main` (branch
+  `redesign/app-04-schedules`, code `197c58b49`). Drawing approved the same
+  day (prototype shots `73`–`79`; the owner left the four questions to the
+  implementer: actions in a top toolbar, pills keep their icon, no new
+  headings in the dialog, the two other dialogs wait for APP-06;
+  design-decisions §10b). Screenshots in
+  [verification/app-04](verification/app-04/). **Change** (all under
+  `C/schedules/`): `index.tsx` gives the page the Display title and moves
+  Add new schedule (primary), Find schedules and Change upcoming length into
+  a toolbar above the table, with the filter at the right.
+  `SchedulesTable.tsx` takes an opt-in `isCard` prop, shared with its rows
+  through a context: the table is one Surface card with Eyebrow headers,
+  hairline dividers and 44px rows; names in 600 weight, the account in
+  Secondary text, "None" in Faint; the `~`/`±` glyph Faint and positive
+  amounts in `numberPositive`; the Recurring check in Secondary text and
+  the column 96px wide (the uppercase header did not fit 80px); the ⋯
+  button 28px; the Show completed row quiet (Secondary, 600, not italic).
+  The Find schedules and link-schedule dialogs don't pass it, so they keep
+  upstream's look. `StatusBadge.tsx` takes an opt-in `isPill` (22px, radius
+  6, 12px semibold, 12px icon); `getStatusProps` and its colours are
+  unchanged, so the register and rule editor are unaffected.
+  `ScheduleEditForm.tsx` takes an opt-in `isDialog`, passed only by
+  `ScheduleEditModal.tsx` (the mobile page keeps upstream's form): the
+  existing "Date" label is the Eyebrow of a hairline-topped section with the
+  date picker and Repeats on the left and the upcoming dates on a Card Inset
+  well on the right (date, then weekday in Secondary text); the options
+  section is hairline-topped; Linked / Find matching transactions is a
+  `ReportSegmentedControl`; the transactions table is a hairline card with
+  radius 12. The modal's Cancel / Save footer sits under a hairline and
+  stays in view while the dialog scrolls. **Deviations from the drawing:**
+  the toolbar buttons keep their labels below 1280px (the shipped account
+  toolbar does, unlike the drawing); only Add new schedule has an icon (no
+  fitting icon for the other two); the dialog's inputs, pickers and the
+  transactions table's header keep their upstream styling (shared
+  components outside the task); the dialog title stays centred, as in every
+  upstream modal. No handler, query, status rule, filter matching, pref,
+  route or string changed. **Checks:** typecheck passes; oxlint over the
+  folder 0 errors (type-aware in the commit hook); oxfmt applied; web unit
+  tests **1052 passed, 1 skipped**. E2E against the `build:browser` preview
+  (port 3018) with the installed Edge (a local Playwright config, not
+  committed): schedules, schedules.mobile, transactions, rules and accounts
+  **38/38**. Linux VRT (Playwright v1.61.1 Docker image, HTTPS dev server on
+  3021 over the LAN address, checkout mounted at its `/mnt/host` path):
+  **27 snapshots changed**, all Schedules page shots in `schedules.test.ts`
+  (light, dark, midnight); the account and rules shots in the same tests and
+  the mobile file did not change; the re-run without updates passed 11/11.
+  Impeccable detector over the five changed files: no findings. VISUAL
+  (scratch Playwright script, demo budget, installed Edge) at 1440×900 and
+  1000×700 in light, dark, midnight and two custom themes (QA-00 method:
+  every v26.9.0 `--color-*` role hue-rotated 150°, bases dark and light):
+  every text, background and border colour on the page is a theme role
+  (**0 misses** in all 10 runs); in the dialog the only miss is react-aria's
+  visually hidden Dismiss button (clipped to 1px, not visible). Row menu,
+  Add dialog and "No matching schedules" checked in dark. No page errors.
+  **Not run:** keyboard walk-through, privacy mode (amounts keep
+  `PrivacyFilter`, unchanged) and the desktop build.

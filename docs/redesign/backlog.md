@@ -47,7 +47,7 @@ Budget header are reference material, not tasks to build.
 | APP-01             | verified    | `875ddad48`              | Linux VRT regenerated (69) on Windows. Custom theme, keyboard, privacy and desktop passed.                                 |
 | APP-02             | verified    | `f8fcc70d8`              | Linux VRT regenerated (66) and desktop window checked on Windows. E2E test "by payee" changed (SYNC-01 conflict risk).     |
 | APP-03a – d        | review      | `0a7384ab1`, `ba03773c2` | 03a – d merged. 03d: custom theme, keyboard, privacy and desktop build still to check (task-reports).                      |
-| APP-04             | in progress | —                        | Drawn and approved (design-decisions §10b); building. Files traced in the prototype README.                                |
+| APP-04             | review      | `197c58b49`              | Linux VRT regenerated (27). Keyboard, privacy and desktop build still to check (task-reports).                             |
 | APP-05, APP-06     | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                          |
 

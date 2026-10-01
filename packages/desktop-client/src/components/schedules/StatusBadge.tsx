@@ -92,7 +92,17 @@ export function getStatusProps(status: StatusTypes | null | undefined) {
   }
 }
 
-export function StatusBadge({ status }: { status: ScheduleStatusType }) {
+export function StatusBadge({
+  status,
+  isPill = false,
+}: {
+  status: ScheduleStatusType;
+  /**
+   * The register's pill shape, keeping the icon and upstream's colours
+   * (design-decisions §10b, APP-04).
+   */
+  isPill?: boolean;
+}) {
   const { color, backgroundColor, Icon } = getStatusProps(status);
   return (
     <View
@@ -104,13 +114,20 @@ export function StatusBadge({ status }: { status: ScheduleStatusType }) {
         flexDirection: 'row',
         alignItems: 'center',
         flexShrink: 0,
+        ...(isPill && {
+          height: 22,
+          padding: '0 8px',
+          borderRadius: 6,
+          fontSize: 12,
+          fontWeight: 600,
+        }),
       }}
     >
       <Icon
         style={{
-          width: 13,
-          height: 13,
-          marginRight: 7,
+          width: isPill ? 12 : 13,
+          height: isPill ? 12 : 13,
+          marginRight: isPill ? 5 : 7,
         }}
       />
       <Text style={{ lineHeight: '1em' }}>
