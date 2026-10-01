@@ -22,6 +22,7 @@ import type {
 } from '@actual-app/core/types/models';
 
 import { Checkbox, FormField, FormLabel } from '#components/forms';
+import { ReportSegmentedControl } from '#components/reports/ReportSegmentedControl';
 import { OpSelect } from '#components/rules/RuleEditor';
 import { CustomUpcomingLength } from '#components/schedules/CustomUpcomingLength';
 import { DateSelect } from '#components/select/DateSelect';
@@ -98,6 +99,12 @@ type ScheduleEditFormProps = {
   onSwitchTransactions: (mode: 'linked' | 'matched') => void;
   onLinkTransactions: (ids: string[], scheduleId?: string) => Promise<void>;
   onUnlinkTransactions: (ids: string[]) => Promise<void>;
+  /**
+   * The desktop dialog's look (design-decisions §10b, APP-04): sections
+   * split by hairlines, upcoming dates on a Card Inset well and a segmented
+   * Linked/Find matching control. The mobile page keeps upstream's.
+   */
+  isDialog?: boolean;
 };
 
 export function ScheduleEditForm({
@@ -116,11 +123,51 @@ export function ScheduleEditForm({
   onSwitchTransactions,
   onLinkTransactions,
   onUnlinkTransactions,
+  isDialog = false,
 }: ScheduleEditFormProps) {
   const locale = useLocale();
   const { t } = useTranslation();
   const dateFormat = useDateFormat() || 'MM/dd/yyyy';
   const { isNarrowWidth } = useResponsive();
+
+  const datePicker = repeats ? (
+    <RecurringSchedulePicker
+      // @ts-expect-error fix me
+      value={fields.date}
+      onChange={value => dispatch({ type: 'set-field', field: 'date', value })}
+    />
+  ) : (
+    <DateSelect
+      // @ts-expect-error fix me
+      value={fields.date}
+      onSelect={date =>
+        dispatch({ type: 'set-field', field: 'date', value: date })
+      }
+      dateFormat={dateFormat}
+    />
+  );
+
+  const repeatsCheckbox = (
+    <View
+      style={{
+        marginTop: 5,
+        flexDirection: 'row',
+        alignItems: 'center',
+        userSelect: 'none',
+      }}
+    >
+      <Checkbox
+        id="form_repeats"
+        checked={repeats}
+        onChange={e => {
+          dispatch({ type: 'set-repeats', repeats: e.target.checked });
+        }}
+      />
+      <label htmlFor="form_repeats" style={{ userSelect: 'none' }}>
+        <Trans>Repeats</Trans>
+      </label>
+    </View>
+  );
 
   return (
     <>
@@ -244,86 +291,119 @@ export function ScheduleEditForm({
           </FormField>
         </SpaceBetween>
 
-        <View style={{ marginTop: 20 }}>
-          <FormLabel title={t('Date')} />
-        </View>
-
-        <SpaceBetween
-          style={{
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-          }}
-        >
-          <View style={{ width: '13.44rem' }}>
-            {repeats ? (
-              <RecurringSchedulePicker
-                // @ts-expect-error fix me
-                value={fields.date}
-                onChange={value =>
-                  dispatch({ type: 'set-field', field: 'date', value })
-                }
-              />
-            ) : (
-              <DateSelect
-                // @ts-expect-error fix me
-                value={fields.date}
-                onSelect={date =>
-                  dispatch({ type: 'set-field', field: 'date', value: date })
-                }
-                dateFormat={dateFormat}
-              />
-            )}
-
-            {upcomingDates && (
-              <View style={{ fontSize: 13, marginTop: 20 }}>
-                <Text style={{ color: theme.pageTextLight, fontWeight: 600 }}>
-                  <Trans>Upcoming dates</Trans>
-                </Text>
-                <SpaceBetween
-                  direction="vertical"
-                  gap={5}
+        {isDialog ? (
+          <View style={dialogSectionStyle}>
+            <FormLabel title={t('Date')} style={eyebrowLabelStyle} />
+            <View
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+                gap: 16,
+                alignItems: 'start',
+              }}
+            >
+              <SpaceBetween direction="vertical" gap={12} align="start">
+                <View style={{ width: '13.44rem' }}>{datePicker}</View>
+                {repeatsCheckbox}
+              </SpaceBetween>
+              {upcomingDates && (
+                <View
                   style={{
-                    marginTop: 10,
-                    color: theme.pageTextLight,
-                    alignItems: 'flex-start',
+                    backgroundColor: theme.cardInset,
+                    borderRadius: 12,
+                    padding: '12px 14px',
+                    fontSize: 13,
                   }}
                 >
-                  {upcomingDates.map(date => (
-                    <View key={date}>
-                      {monthUtils.format(date, `${dateFormat} EEEE`, locale)}
-                    </View>
-                  ))}
-                </SpaceBetween>
-              </View>
-            )}
+                  <Text style={eyebrowLabelStyle}>
+                    <Trans>Upcoming dates</Trans>
+                  </Text>
+                  <SpaceBetween
+                    direction="vertical"
+                    gap={6}
+                    align="stretch"
+                    style={styles.tnum}
+                  >
+                    {upcomingDates.map(date => (
+                      <View
+                        key={date}
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Text>
+                          {monthUtils.format(date, dateFormat, locale)}
+                        </Text>
+                        <Text style={{ color: theme.pageTextSubdued }}>
+                          {monthUtils.format(date, 'EEEE', locale)}
+                        </Text>
+                      </View>
+                    ))}
+                  </SpaceBetween>
+                </View>
+              )}
+            </View>
           </View>
+        ) : (
+          <>
+            <View style={{ marginTop: 20 }}>
+              <FormLabel title={t('Date')} />
+            </View>
 
-          <View
-            style={{
-              marginTop: 5,
-              flexDirection: 'row',
-              alignItems: 'center',
-              userSelect: 'none',
-            }}
-          >
-            <Checkbox
-              id="form_repeats"
-              checked={repeats}
-              onChange={e => {
-                dispatch({ type: 'set-repeats', repeats: e.target.checked });
+            <SpaceBetween
+              style={{
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
               }}
-            />
-            <label htmlFor="form_repeats" style={{ userSelect: 'none' }}>
-              <Trans>Repeats</Trans>
-            </label>
-          </View>
-        </SpaceBetween>
+            >
+              <View style={{ width: '13.44rem' }}>
+                {datePicker}
+
+                {upcomingDates && (
+                  <View style={{ fontSize: 13, marginTop: 20 }}>
+                    <Text
+                      style={{ color: theme.pageTextLight, fontWeight: 600 }}
+                    >
+                      <Trans>Upcoming dates</Trans>
+                    </Text>
+                    <SpaceBetween
+                      direction="vertical"
+                      gap={5}
+                      style={{
+                        marginTop: 10,
+                        color: theme.pageTextLight,
+                        alignItems: 'flex-start',
+                      }}
+                    >
+                      {upcomingDates.map(date => (
+                        <View key={date}>
+                          {monthUtils.format(
+                            date,
+                            `${dateFormat} EEEE`,
+                            locale,
+                          )}
+                        </View>
+                      ))}
+                    </SpaceBetween>
+                  </View>
+                )}
+              </View>
+
+              {repeatsCheckbox}
+            </SpaceBetween>
+          </>
+        )}
 
         <SpaceBetween
           style={{
             marginTop: 20,
             display: isNarrowWidth ? 'grid' : 'flex',
             gridTemplateColumns: '1fr 1fr',
+            ...(isDialog && {
+              ...dialogSectionStyle,
+              alignItems: 'flex-start',
+            }),
           }}
         >
           <FormField style={{ flex: 1 }}>
@@ -487,6 +567,10 @@ export function ScheduleEditForm({
           padding: 10,
           minHeight: '30vh',
           borderTop: `1px solid ${theme.tableBorder}`,
+          ...(isDialog && {
+            padding: '14px 10px 10px',
+            borderTopColor: theme.cardHairline,
+          }),
         }}
       >
         <SelectedProvider instance={selectedInst}>
@@ -502,33 +586,49 @@ export function ScheduleEditForm({
             </View>
           ) : (
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Button
-                variant="bare"
-                style={{
-                  color:
-                    transactionsMode === 'linked'
-                      ? theme.pageTextLink
-                      : theme.pageTextSubdued,
-                  marginRight: 10,
-                  fontSize: 14,
-                }}
-                onPress={() => onSwitchTransactions('linked')}
-              >
-                <Trans>Linked transactions</Trans>
-              </Button>{' '}
-              <Button
-                variant="bare"
-                style={{
-                  color:
-                    transactionsMode === 'matched'
-                      ? theme.pageTextLink
-                      : theme.pageTextSubdued,
-                  fontSize: 14,
-                }}
-                onPress={() => onSwitchTransactions('matched')}
-              >
-                <Trans>Find matching transactions</Trans>
-              </Button>
+              {isDialog ? (
+                <ReportSegmentedControl
+                  value={transactionsMode}
+                  onChange={onSwitchTransactions}
+                  options={[
+                    { value: 'linked', label: t('Linked transactions') },
+                    {
+                      value: 'matched',
+                      label: t('Find matching transactions'),
+                    },
+                  ]}
+                />
+              ) : (
+                <>
+                  <Button
+                    variant="bare"
+                    style={{
+                      color:
+                        transactionsMode === 'linked'
+                          ? theme.pageTextLink
+                          : theme.pageTextSubdued,
+                      marginRight: 10,
+                      fontSize: 14,
+                    }}
+                    onPress={() => onSwitchTransactions('linked')}
+                  >
+                    <Trans>Linked transactions</Trans>
+                  </Button>{' '}
+                  <Button
+                    variant="bare"
+                    style={{
+                      color:
+                        transactionsMode === 'matched'
+                          ? theme.pageTextLink
+                          : theme.pageTextSubdued,
+                      fontSize: 14,
+                    }}
+                    onPress={() => onSwitchTransactions('matched')}
+                  >
+                    <Trans>Find matching transactions</Trans>
+                  </Button>
+                </>
+              )}
               <View style={{ flex: 1 }} />
               <SelectedItemsButton
                 id="transactions"
@@ -566,6 +666,12 @@ export function ScheduleEditForm({
               ...styles.tableContainer,
               marginTop: 5,
               maxHeight: 200,
+              // A hairline card, as in the drawing (design-decisions §10b).
+              ...(isDialog && {
+                marginTop: 10,
+                borderColor: theme.cardHairline,
+                borderRadius: 12,
+              }),
             }}
           />
         </SelectedProvider>
@@ -606,3 +712,19 @@ function NoTransactionsMessage(props: NoTransactionsMessageProps) {
     </View>
   );
 }
+
+const dialogSectionStyle = {
+  marginTop: 16,
+  paddingTop: 14,
+  borderTop: `1px solid ${theme.cardHairline}`,
+} as const;
+
+/** Eyebrow heading (DESIGN.md typography) for the dialog's sections. */
+const eyebrowLabelStyle = {
+  color: theme.pageTextFaint,
+  fontSize: 11,
+  fontWeight: 650,
+  textTransform: 'uppercase',
+  letterSpacing: '0.07em',
+  marginBottom: 10,
+} as const;

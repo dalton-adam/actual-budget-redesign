@@ -4,6 +4,7 @@ import { Trans, useTranslation } from 'react-i18next';
 
 import { Button } from '@actual-app/components/button';
 import { SpaceBetween } from '@actual-app/components/space-between';
+import { theme } from '@actual-app/components/theme';
 import { send, sendCatch } from '@actual-app/core/platform/client/connection';
 import * as monthUtils from '@actual-app/core/shared/months';
 import { q } from '@actual-app/core/shared/query';
@@ -243,13 +244,26 @@ export function ScheduleEditModal({ id, transaction }: ScheduleEditModalProps) {
             onSwitchTransactions={onSwitchTransactions}
             onLinkTransactions={onLinkTransactions}
             onUnlinkTransactions={onUnlinkTransactions}
+            isDialog
           />
 
           <SpaceBetween
+            gap={8}
             style={{
               marginTop: 20,
               justifyContent: 'flex-end',
               alignItems: 'center',
+              // Footer under a hairline that stays in view while the dialog
+              // scrolls (design-decisions §10b); the negative margin covers
+              // the modal's 10px padding.
+              paddingTop: 14,
+              paddingBottom: 10,
+              marginBottom: -10,
+              borderTop: `1px solid ${theme.cardHairline}`,
+              position: 'sticky',
+              bottom: -10,
+              zIndex: 300,
+              backgroundColor: theme.modalBackground,
             }}
           >
             <Button onPress={() => modalState.close()}>
