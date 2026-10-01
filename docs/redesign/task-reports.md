@@ -1258,8 +1258,8 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   "Isolation check: nothing changed" (verification.md). Every APP-03a
   check is now done.
 - LINT budget-import: **done September 30, 2026.** `EnvelopeBudgetComponents.tsx` and `TrackingBudgetComponents.tsx` now import the month prop types from `#components/budget` instead of `'..'`, clearing the two `absolute-parent-import` oxlint errors; typecheck, oxlint 0 errors, budget tests 86/86.
-- APP-03b: **built September 30, 2026, not yet merged** (branch
-  `redesign/app-03b-report-header`). Screenshots in
+- APP-03b: **merged October 1, 2026** into `redesign/main` (`e94d71e27`,
+  branch `redesign/app-03b-report-header`). Screenshots in
   [verification/app-03b](verification/app-03b/). **Owner decisions before
   starting:** the Net Worth pattern applies to every report page; the chart
   card's subline is the date range only (design-decisions §10a).

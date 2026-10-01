@@ -46,7 +46,7 @@ Budget header are reference material, not tasks to build.
 | SYNC-01            | blocked     | —                        | No upstream release after v26.9.0 (checked September 29, 2026). Start when v26.10.0 ships; before RELEASE-01 (D-1).        |
 | APP-01             | verified    | `875ddad48`              | Linux VRT regenerated (69) on Windows. Custom theme, keyboard, privacy and desktop passed.                                 |
 | APP-02             | verified    | `f8fcc70d8`              | Linux VRT regenerated (66) and desktop window checked on Windows. E2E test "by payee" changed (SYNC-01 conflict risk).     |
-| APP-03a – c        | in progress | `d63b275d0` (a)          | APP-03a merged. APP-03b in review (WIDE 74/74 dev and built, Linux VRT 15; custom theme, desktop open). APP-03c next.      |
+| APP-03a – c        | in progress | `d63b275d0`, `e94d71e27` | APP-03a, 03b merged (in that order). APP-03b open: custom theme, desktop build. APP-03c next.                              |
 | APP-04 – APP-06    | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                          |
 
@@ -76,7 +76,8 @@ does not claim Claude's prototype is production-ready.
    2026: no upstream release after v26.9.0 yet, so APP-01 goes first.
 9. ~~**APP-01**~~ Merged September 29, 2026; Linux VRT regenerated September 30.
    ~~Then **APP-02**~~ Merged September 30, 2026; Linux VRT regenerated the same day.
-   ~~Then **APP-03a**~~ Merged September 30, 2026. Then **APP-03b**, **APP-03c**
+   ~~Then **APP-03a**~~ Merged September 30, 2026. ~~Then **APP-03b**~~ Merged
+   October 1, 2026. Then **APP-03c**
    and **APP-04** onward, then QA-01 and RELEASE-01.
 
 The review's reasoning is in plan §19.
