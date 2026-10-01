@@ -3434,6 +3434,304 @@
           grid-template-columns: minmax(0, 1fr);
         }
       }
+      /* APP-03d proposal: Monte Carlo */
+      .mc-card {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        flex-shrink: 0;
+      }
+      .mc-card h2 {
+        font-size: 13.5px;
+        font-weight: 600;
+      }
+      .mc-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .mc-top .tbtn,
+      .mc-top .ckl {
+        margin-left: auto;
+      }
+      .mc-card .seg > button.on {
+        background: var(--navActive);
+        color: var(--pageText);
+        box-shadow: var(--navActiveShadow);
+      }
+      [data-theme='light'] .mc-card .seg {
+        background: var(--navTrack);
+        border-color: transparent;
+      }
+      .mc-desc {
+        font-size: 13px;
+        color: var(--pageTextSubdued);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: -2px;
+      }
+      .qi {
+        display: inline-grid;
+        place-items: center;
+        color: var(--pageTextFaint);
+      }
+      .qi svg {
+        width: 13px;
+        height: 13px;
+      }
+      .mc-groups {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px 0;
+      }
+      .mc-grp {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 0 24px;
+        border-left: 1px solid var(--cardBorder);
+      }
+      .mc-grp:first-child {
+        padding-left: 0;
+        border-left: 0;
+      }
+      .mc-grp .ey,
+      .mc-x .ey {
+        font-size: 11px;
+        font-weight: 650;
+        color: var(--pageTextFaint);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
+      .mc-fields {
+        display: flex;
+        gap: 14px;
+        align-items: flex-end;
+      }
+      .mc-fields .fld > span {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .fld input.wide {
+        width: 120px;
+      }
+      .fld input::placeholder {
+        color: var(--pageTextFaint);
+      }
+      .fld input:disabled {
+        opacity: 0.5;
+      }
+      .fld .tbtn.sm {
+        min-width: 230px;
+        color: var(--pageText);
+      }
+      .mc-tbl {
+        border: 1px solid var(--cardBorder);
+        border-radius: 12px;
+        overflow-x: auto;
+      }
+      .mccols {
+        display: grid;
+        grid-template-columns:
+          18px minmax(130px, 1.3fr) 132px minmax(150px, 1.2fr)
+          minmax(200px, 1.4fr) 132px 150px 28px 28px;
+        align-items: center;
+        column-gap: 10px;
+        padding: 0 10px 0 8px;
+        min-width: 980px;
+      }
+      .mc-tbl .rhead {
+        position: static;
+        background: transparent;
+      }
+      .mc-tbl .trow {
+        height: 46px;
+      }
+      .mc-tbl .trow:last-child {
+        border-bottom: 0;
+      }
+      .mc-in {
+        height: 30px;
+        border-radius: 8px;
+        border: 1px solid var(--cardBorder);
+        background: var(--controlBackground);
+        display: flex;
+        align-items: center;
+        padding: 0 9px;
+        min-width: 0;
+        gap: 6px;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .mc-in.r {
+        justify-content: flex-end;
+      }
+      .mc-in.sel {
+        justify-content: space-between;
+      }
+      .mc-in.ph {
+        color: var(--pageTextFaint);
+      }
+      .mc-in .ell {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .mccols .grip {
+        color: var(--pageTextFaint);
+        cursor: grab;
+      }
+      .mccols .tool {
+        width: 26px;
+        height: 26px;
+        opacity: 1;
+        color: var(--pageTextSubdued);
+      }
+      .mc-x {
+        background: var(--cardInset);
+        margin: 0 10px 10px 36px;
+        border-radius: 10px;
+        padding: 12px 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 0;
+        min-width: 860px;
+      }
+      .mc-x .mc-grp {
+        padding: 0 20px;
+      }
+      .mc-x .mc-grp:first-child {
+        padding-left: 0;
+      }
+      .ckl {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--pageText);
+      }
+      .ckl .cb.on,
+      .fld .cb.on {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+        display: inline-grid;
+        place-items: center;
+      }
+      .mc-stats {
+        display: grid;
+        grid-template-columns: 1.15fr repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .mc-stats .stat {
+        padding: 10px 12px;
+      }
+      .mc-stats .stat .v {
+        font-size: 17px;
+      }
+      .mc-stats .mc-hero .v {
+        font-size: 28px;
+        letter-spacing: -0.4px;
+        line-height: 1.15;
+      }
+      .mc-sum {
+        font-size: 13px;
+        color: var(--pageTextSubdued);
+      }
+      .mc-sum b {
+        color: var(--pageText);
+        font-weight: 600;
+      }
+      .mc-chart {
+        height: min(440px, calc(100vh - 200px));
+        min-height: 300px;
+      }
+      .mc-chart .rp-plot {
+        margin-top: 0;
+      }
+      .mc-bottom {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+        gap: 14px;
+        align-items: start;
+      }
+      .mc-hist .rp-plot {
+        height: 200px;
+        flex: none;
+      }
+      .hbars {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: flex-end;
+        gap: 3px;
+        padding: 0 2px;
+      }
+      .hbars i {
+        flex: 1;
+        background: var(--reportsNeg);
+        border-radius: 3px 3px 0 0;
+        opacity: 0.85;
+      }
+      .hmed {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        border-left: 2px dashed var(--pillWarningText);
+      }
+      .mc-bottom .rp-notes p + p {
+        margin-top: 8px;
+      }
+      .runcols {
+        display: grid;
+        grid-template-columns: 64px minmax(160px, 1fr) 160px 160px;
+        align-items: center;
+        column-gap: 12px;
+        padding: 0 14px;
+      }
+      .mc-runs {
+        border: 1px solid var(--cardBorder);
+        border-radius: 12px;
+        overflow: hidden;
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+      }
+      .mc-runs .trow {
+        cursor: pointer;
+      }
+      .mc-runs .trow:last-child {
+        border-bottom: 0;
+      }
+      .mc-pager {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .mc-pager .count {
+        font-size: 12.5px;
+        color: var(--pageTextSubdued);
+        margin-right: auto;
+      }
+      @media (max-width: 1279px) {
+        .mc-stats {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .mc-stats .mc-hero {
+          grid-row: span 2;
+        }
+        .mc-bottom {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .mc-grp {
+          padding: 0 16px;
+        }
+        .mc-top .seg > button {
+          padding: 0 7px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -3480,6 +3778,9 @@
         rlegend: params.get('rlegend') !== '0',
         rsummary: params.get('rsummary') !== '0',
         rlabels: params.get('rlabels') === '1',
+        // APP-03d: Monte Carlo configuration tab and results view.
+        mctab: params.get('mctab') || 'plan',
+        mcview: params.get('mcview') || 'chart',
         // Accounts pane: open or collapsed (device-local). Default: open at
         // 1280px and wider, collapsed below.
         pane:
@@ -5063,7 +5364,20 @@
             ['custom', 'Custom'],
             ['calendar', 'Calendar'],
             ['formula', 'Formula'],
+            ['montecarlo', 'Monte Carlo'],
           ]),
+          ...(state.rview === 'montecarlo'
+            ? [
+                grp('Tab', 'mctab', [
+                  ['plan', 'Plan'],
+                  ['pots', 'Pots'],
+                ]),
+                grp('Results', 'mcview', [
+                  ['chart', 'Chart'],
+                  ['runs', 'Runs'],
+                ]),
+              ]
+            : []),
           grp('Edit', 'redit', [
             [false, 'Off'],
             [true, 'On'],
@@ -6338,12 +6652,278 @@ function formulaPage() {
           </div>
         </main>`;
 }
+      // APP-03d proposal: Monte Carlo (fictional plan, ages 62 to 95).
+      function monteCarloPage() {
+        const q = `<span class="qi" title="Help">${I.help}</span>`;
+        const startAge = 62,
+          years = 34;
+        const band = Array.from({ length: years }, (_, i) => {
+          const base = 850 - 8 * i + 0.25 * i * i;
+          const s = 30 + 22 * i;
+          return [
+            Math.max(0, base - 1.1 * s),
+            Math.max(0, base - 0.6 * s),
+            base,
+            base + 0.8 * s,
+            base + 1.95 * s,
+          ];
+        });
+        const yMax = 2400;
+        const y = v => (40 - (v / yMax) * 40).toFixed(2);
+        const x = i => ((i / (years - 1)) * 100).toFixed(2);
+        const line = k => band.map((b, i) => `${x(i)},${y(b[k])}`);
+        const area = (lo, hi) =>
+          `M${line(hi).join(' L')} L${line(lo).reverse().join(' L')} Z`;
+        const fan = `<svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
+          <path d="${area(0, 4)}" fill="var(--reportsPos)" fill-opacity="0.15"/>
+          <path d="${area(1, 3)}" fill="var(--reportsPos)" fill-opacity="0.3"/>
+          <path d="M${line(2).join(' L')}" fill="none" stroke="var(--reportsPos)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+        const tabs = [
+          ['plan', 'Plan details'],
+          ['pots', 'Investment pots'],
+          ['contributions', 'Contributions'],
+          ['withdrawals', 'Spending'],
+          ['tax', 'Tax'],
+        ];
+        const desc = {
+          plan: 'Who this plan is for and how the simulation generates market returns.',
+          pots: 'The invested accounts your plan draws from - each with its own balance, allocation, and return assumptions. Drag rows to reorder pots; expand a row for access, tax and fee settings.',
+        };
+        const fld = (label, val, opts = {}) =>
+          `<label class="fld"><span>${label}${opts.help ? q : ''}</span><input class="num${
+            opts.wide ? ' wide' : ''
+          }" value="${val}"${opts.ph ? ` placeholder="${opts.ph}"` : ''}${
+            opts.dis ? ' disabled' : ''
+          } /></label>`;
+        const plan = `<div class="mc-groups">
+              <div class="mc-grp"><div class="ey">Your plan</div><div class="mc-fields">${fld(
+                'Your current age',
+                62,
+              )}${fld('Pot must last until age', 95)}</div></div>
+              <div class="mc-grp"><div class="ey">Inflation</div><div class="mc-fields">${fld(
+                'Mean (%)',
+                '2.5',
+                { help: 1, ph: 'None' },
+              )}${fld('Std dev (%)', '2', { help: 1 })}</div></div>
+              <div class="mc-grp"><div class="ey">Simulation</div><div class="mc-fields">
+                <div class="fld"><span>Return model${q}</span><button class="tbtn sm" aria-haspopup="listbox"><span>Random (normal distribution)</span><span class="r-end">${
+                  I.chevD
+                }</span></button></div>${fld('Simulations', '1,000', {
+                  help: 1,
+                })}</div></div>
+            </div>`;
+        const pots = [
+          [
+            'Workplace pension',
+            612000,
+            'None',
+            '80% stocks / 20% bonds',
+            '6.4',
+            '13.0',
+            true,
+          ],
+          [
+            'Stocks & shares ISA',
+            186500,
+            'Brokerage',
+            '100% stocks',
+            '7.0',
+            '16.0',
+          ],
+          ['Cash savings', 51500, 'Savings', 'Cash / money market', '2.0', '1.0'],
+        ];
+        const potRows = pots
+          .map(
+            ([n, bal, acct, mix, ret, vol, open]) => `<div class="mccols trow" role="row">
+              <span class="grip">${I.grip}</span>
+              <div class="mc-in"><span class="ell">${n}</span></div>
+              <div class="mc-in r num">${fmt(bal)}</div>
+              <div class="mc-in sel${acct === 'None' ? ' ph' : ''}"><span class="ell">${acct}</span>${
+                I.chevD
+              }</div>
+              <div class="mc-in sel"><span class="ell">${mix}</span>${I.chevD}</div>
+              <div class="mc-in r num">${ret}</div>
+              <div class="mc-in r num">${vol}</div>
+              <button class="tool" aria-expanded="${!!open}" aria-label="${
+                open ? 'Hide more settings' : 'Show more settings'
+              }">${open ? I.chevD : I.chevR}</button>
+              <button class="tool" aria-label="Remove pot">${I.x}</button>
+            </div>${
+              open
+                ? `<div class="mc-x">
+              <div class="mc-grp"><div class="ey">Access</div><div class="mc-fields">${fld(
+                'Accessible from age',
+                '',
+                { help: 1, ph: 'Immediately', wide: 1 },
+              )}</div></div>
+              <div class="mc-grp"><div class="ey">Tax</div><div class="mc-fields">${fld(
+                'Taxable portion (%)',
+                '75',
+                { help: 1 },
+              )}${fld('Tax (%)', '20', { help: 1 })}</div></div>
+              <div class="mc-grp"><div class="ey">Fees</div><div class="mc-fields">${fld(
+                'Fixed yearly fee',
+                '$120',
+                { help: 1 },
+              )}<label class="ckl" style="height:30px"><span class="cb on">${check}</span>Adjust by inflation</label>${fld(
+                'Fee (% of balance)',
+                '0.45',
+                { help: 1 },
+              )}</div></div>
+            </div>`
+                : ''
+            }`,
+          )
+          .join('');
+        const potsTab = `<div class="mc-tbl">
+              <div class="mccols rhead" role="row"><div></div><div>Pot name</div><div class="r">Starting balance</div><div>Linked account ${q}</div><div>Portfolio allocation ${q}</div><div class="r">Expected return (%)</div><div class="r">Volatility (std dev %)</div><div></div><div></div></div>
+              ${potRows}
+            </div>
+            <div><button class="tbtn sm">${I.plus}<span class="txt">Add pot</span></button></div>`;
+        const other = `<div class="mc-desc" style="font-style:italic">Not drawn: this tab's fields use the same field, table and Control button styles as Plan details and Investment pots.</div>`;
+        const config = `<section class="rcard mc-card" aria-label="Configuration">
+            <div class="mc-top"><h2>Configuration</h2>
+              <div class="seg sm" role="tablist" aria-label="Configuration">${tabs
+                .map(
+                  ([k, l]) =>
+                    `<button role="tab" class="${
+                      state.mctab === k ? 'on' : ''
+                    }" aria-selected="${state.mctab === k}" data-set="mctab" data-val="${k}">${l}</button>`,
+                )
+                .join('')}</div>
+            </div>
+            <div class="mc-desc">${desc[state.mctab] ?? ''}</div>
+            ${
+              state.mctab === 'plan'
+                ? plan
+                : state.mctab === 'pots'
+                  ? potsTab
+                  : other
+            }
+          </section>`;
+        const stat = (k, v, cls = '') =>
+          `<div class="stat${cls}"><div class="k">${k}</div><div class="v num">${v}</div></div>`;
+        const results = `<section class="rcard mc-card" aria-label="Results">
+            <div class="mc-top"><h2>Results</h2>
+              <label class="ckl"><span class="cb on">${check}</span>Show values in today's money</label>
+            </div>
+            <div class="mc-stats">
+              <div class="stat mc-hero"><div class="k">Success rate</div><div class="v num pos-t">88.4%</div></div>
+              ${stat('Median ending balance', fmt2(858240))}
+              ${stat('Median total withdrawn', fmt2(1512000))}
+              ${stat('Chance of running out of money', '11.6%')}
+              ${stat('Typical failure runs out at', 'Age 89')}
+            </div>
+            <div class="mc-sum">In <b>88.4%</b> of <b>1000</b> simulated scenarios, your pot lasted until age <b>95</b>.</div>
+          </section>`;
+        const ages = [62, 67, 72, 77, 82, 87, 92, 95];
+        const chartBody =
+          state.mcview === 'chart'
+            ? `<div class="rp-plot">
+              <div class="rp-y num">${[2400000, 1800000, 1200000, 600000, 0]
+                .map(t => `<span>${fmt(t)}</span>`)
+                .join('')}</div>
+              <div class="rp-area">${[0, 25, 50, 75]
+                .map(p => `<div class="gl" style="top:${p}%"></div>`)
+                .join('')}${fan}</div>
+              <div class="rp-x">${ages.map(a => `<span>${a}</span>`).join('')}</div>
+            </div>`
+            : (() => {
+                const runs = Array.from({ length: 12 }, (_, i) => {
+                  const fail = i < 9;
+                  return [
+                    i + 1,
+                    fail ? 79 + Math.floor(i * 0.9) : null,
+                    fail ? 0 : 41200 + i * 9300,
+                    fail ? 912000 + i * 31000 : 1418000 + i * 2500,
+                  ];
+                });
+                return `<div class="mc-pager"><span class="count">Showing 1-25 of 1000 runs</span><button class="tbtn sm" aria-haspopup="listbox">Worst outcomes first <span class="r-end">${
+                  I.chevD
+                }</span></button></div>
+              <div class="mc-runs" role="table" aria-label="Simulation runs">
+                <div class="runcols rhead" role="row"><div>Rank</div><div>Outcome</div><div class="r">Ending balance</div><div class="r">Total withdrawn</div></div>
+                ${runs
+                  .map(
+                    ([r, age, end, wd]) => `<div class="runcols trow" role="row">
+                  <div class="num">${r}</div>
+                  <div>${
+                    age
+                      ? `<span class="chip sm bad">Ran out at age ${age}</span>`
+                      : `<span class="chip sm ok">Survived</span>`
+                  }</div>
+                  <div class="r num">${fmt2(end)}</div>
+                  <div class="r num">${fmt2(wd)}</div>
+                </div>`,
+                  )
+                  .join('')}
+              </div>
+              <div class="mc-pager"><button class="tbtn sm" aria-haspopup="listbox" style="margin-right:auto">Jump to… <span class="r-end">${
+                I.chevD
+              }</span></button><button class="tbtn sm" disabled style="opacity:.5">Previous</button><button class="tbtn sm">Next</button></div>`;
+              })();
+        const chart = `<section class="rcard mc-card rp-chart mc-chart" aria-label="Portfolio performance">
+            <div class="mc-top"><h2>${
+              state.mcview === 'chart' ? 'Portfolio performance' : 'Simulation runs'
+            }</h2>
+              <div class="seg sm" role="group" aria-label="Results view"><button class="${
+                state.mcview === 'chart' ? 'on' : ''
+              }" aria-pressed="${state.mcview === 'chart'}" data-set="mcview" data-val="chart">Chart</button><button class="${
+                state.mcview === 'runs' ? 'on' : ''
+              }" aria-pressed="${state.mcview === 'runs'}" data-set="mcview" data-val="runs">Runs</button></div>
+              ${
+                state.mcview === 'chart'
+                  ? `<button class="tbtn sm" aria-haspopup="listbox">All scenarios <span class="r-end">${I.chevD}</span></button>`
+                  : ''
+              }
+            </div>
+            ${chartBody}
+          </section>`;
+        const hist = [2, 2, 3, 5, 6, 8, 9, 10, 11, 13, 12, 11, 9, 7, 5, 2, 1];
+        const histogram = `<section class="rcard mc-card mc-hist" aria-label="When did the pot run out?">
+            <h2>When did the pot run out?</h2>
+            <div class="mc-sum">Only the 116 of 1000 scenarios that ran out of money are shown here - the other 884 kept a positive balance for the full horizon.</div>
+            <div class="rp-plot">
+              <div class="rp-y num">${[16, 12, 8, 4, 0]
+                .map(t => `<span>${t}</span>`)
+                .join('')}</div>
+              <div class="rp-area">${[0, 25, 50, 75]
+                .map(p => `<div class="gl" style="top:${p}%"></div>`)
+                .join('')}<div class="hbars">${hist
+                .map(c => `<i style="height:${(c / 16) * 100}%"></i>`)
+                .join('')}</div><div class="hmed" style="left:${
+                (10.5 / 17) * 100
+              }%"></div></div>
+              <div class="rp-x">${[79, 83, 87, 91, 95]
+                .map(a => `<span>${a}</span>`)
+                .join('')}</div>
+            </div>
+            <div class="mc-sum">Worst case: money ran out at age 79. Among failures, the typical depletion age was 89; the luckiest failure lasted until age 95.</div>
+          </section>`;
+        const notes = `<section class="rcard rp-notes">
+            <h2>How does this simulation work?</h2>
+            <p>Each scenario replays your retirement with a different sequence of yearly investment returns. Every year, any contributions are added at the start, then the withdrawal is taken, and then each pot grows or shrinks with that year's return. Pots with an access age stay invested but can't fund withdrawals until you reach it - if the accessible pots can't cover a year's withdrawal, the plan counts as having run out, even if locked pots still hold money. The shaded bands show the range of outcomes across all scenarios: the darker band covers the middle half, and the lighter band covers 80% of them.</p>
+            <p>Keep in mind this is a simplified model: returns are drawn independently each year from a normal distribution, which ignores sequence-of-returns clustering and fat tails, and fees and taxes are modeled only as accurately as the rates you enter. Treat the results as a rough guide, not a guarantee.</p>
+          </section>`;
+        return `<main class="main rmain" style="display:flex;flex-direction:column;gap:14px">
+          ${reportHead(
+            'Retirement plan',
+            '<div class="head-controls"><button class="tbtn primary">Save widget</button></div>',
+          )}
+          ${config}
+          ${results}
+          ${chart}
+          <div class="mc-bottom">${histogram}${notes}</div>
+        </main>`;
+      }
+
       const reportsPage = () =>
         ({
           networth: netWorthPage,
           custom: customReportPage,
           calendar: calendarPage,
           formula: formulaPage,
+          montecarlo: monteCarloPage,
         })[state.rview]?.() ?? reportsDashboard();
 
       let totB = 0,
@@ -6437,6 +7017,10 @@ function formulaPage() {
           u.searchParams.set('rgraph', state.rgraph);
           for (const k of ['rlegend', 'rsummary', 'rlabels'])
             u.searchParams.set(k, state[k] ? '1' : '0');
+        }
+        if (state.rview === 'montecarlo') {
+          u.searchParams.set('mctab', state.mctab);
+          u.searchParams.set('mcview', state.mcview);
         }
         for (const k of [
           'menu',

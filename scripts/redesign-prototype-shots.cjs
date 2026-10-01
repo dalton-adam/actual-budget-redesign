@@ -1,9 +1,9 @@
 // Screenshots of the static redesign prototype (docs/redesign/prototype).
-// Usage: node scripts/redesign-prototype-shots.cjs [--design-01 | --app-03 | --app-03c]
+// Usage: node scripts/redesign-prototype-shots.cjs [--design-01 | --app-03 | --app-03c | --app-03d]
 // Default: the DESIGN-02 set (18+). --design-01 regenerates 01-17 from the
 // current prototype with the fixture and row height they were taken with.
 // --app-03 takes the Reports proposal (51+); --app-03c the custom report,
-// Calendar and Formula proposal (59+).
+// Calendar and Formula proposal (59+); --app-03d Monte Carlo (67+).
 const { chromium } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
@@ -195,22 +195,34 @@ const app03c = [
   ],
 ];
 
+const mc = 'page=reports&rview=montecarlo';
+const app03d = [
+  ['67-montecarlo-dark-wide', W, H, `${mc}&theme=dark`],
+  ['68-montecarlo-light-1000', w, h, `${mc}&theme=light`],
+  ['69-montecarlo-pots-midnight-wide', W, H, `${mc}&theme=midnight&mctab=pots`],
+  ['70-montecarlo-runs-dark-wide', W, H, `${mc}&theme=dark&mcview=runs`],
+  ['71-montecarlo-light-wide-full', W, H, `${mc}&theme=light`, true],
+  ['72-montecarlo-custom-theme-wide', W, H, `${mc}&theme=custom`],
+];
+
 (async () => {
   const dir = path.resolve('docs/redesign/prototype');
   const out = path.join(dir, 'shots');
   fs.mkdirSync(out, { recursive: true });
   const shots = process.argv.includes('--design-01')
     ? design01
-    : process.argv.includes('--app-03c')
-      ? app03c
-      : process.argv.includes('--app-03')
-        ? app03
-        : design02;
+    : process.argv.includes('--app-03d')
+      ? app03d
+      : process.argv.includes('--app-03c')
+        ? app03c
+        : process.argv.includes('--app-03')
+          ? app03
+          : design02;
   // PW_CHANNEL=msedge uses an installed browser instead of Playwright's.
   const b = await chromium.launch(
     process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {},
   );
-  for (const [name, sw, sh, q] of shots) {
+  for (const [name, sw, sh, q, full] of shots) {
     const p = await b.newPage({
       viewport: { width: sw, height: sh },
       deviceScaleFactor: 2,
@@ -237,7 +249,16 @@ const app03c = [
           : null,
       };
     });
-    await p.screenshot({ path: `${out}/${name}.png` });
+    if (full) {
+      // Unclip the scrolling report so the whole page is captured.
+      await p.evaluate(() => {
+        for (const el of document.querySelectorAll(
+          'html, body, .app, .page, .rmain',
+        ))
+          Object.assign(el.style, { height: 'auto', overflow: 'visible' });
+      });
+    }
+    await p.screenshot({ path: `${out}/${name}.png`, fullPage: !!full });
     console.log(
       name,
       errs.length ? 'ERR ' + errs : 'ok',

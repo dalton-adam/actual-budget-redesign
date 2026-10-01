@@ -279,3 +279,55 @@ Questions for the owner:
 
 Regenerate with `node scripts/redesign-prototype-shots.cjs --app-03c`
 (`PW_CHANNEL=msedge` uses the installed Edge).
+
+## APP-03d: Monte Carlo proposal (October 1, 2026)
+
+**Status: drawn, awaiting owner review.** Choose **Page → Reports**, then
+**View** Monte Carlo. URL parameters: `rview=montecarlo`, `mctab=plan|pots`
+(configuration tab), `mcview=chart|runs` (results view). The page title and
+eyebrow already follow the APP-03b pattern; this drawing covers the body.
+
+What the drawing proposes (each item is presentation only):
+
+| Surface               | Today                                                                                           | Proposed                                                                                                                                                                                                                                                                         |
+| --------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Save widget           | Primary button beside a "Configuration" heading on the page background                          | In the page header, as on the other report pages (APP-03b)                                                                                                                                                                                                                       |
+| Configuration         | `tableBackground` block; five `ModeButton` tabs; 600-weight field labels; uppercase group heads | A Surface card titled **Configuration** with the five tabs as one segmented control (`role="tab"`), the tab's description in Secondary text, field groups under Eyebrow headings split by hairlines, Control-style inputs and the Return model select as a Control button        |
+| Investment pots       | Upstream table container and header; inline inputs                                              | A hairline-bordered table inside the card with Eyebrow column headers and 46px rows; each field is a Control-style input; drag grip, expand and remove stay where they are; the expanded row's Access, Tax and Fees groups sit on a Card Inset well. Add pot is a Control button |
+| Other tabs            | Contributions, Spending, Tax                                                                    | **Not drawn**; they take the same field, table and Control button styles                                                                                                                                                                                                         |
+| Results headline      | "Results" heading and checkbox on the page; stats on `tableBackground`, success rate 36px       | A **Results** card: the today's-money checkbox at the right of its title; five stat tiles on Card Inset, Success rate at Display in the same colour thresholds; the summary sentence below (the old "Summary" label is dropped, see question 3)                                  |
+| Portfolio performance | `tableBackground` block; Chart/Runs `ModeButton`s; scenario `Select`                            | A Surface chart card: Chart/Runs as a segmented control beside the title, the scenario select as a Control button at the right; axis text Faint 11px and a dashed hairline grid; bands and median line keep `reportsChartFill` and their opacities                               |
+| Simulation runs       | Upstream table with rank, outcome, balances, pager                                              | The same card: Eyebrow headers, 50px rows; outcome as a status pill ("Survived" positive, "Ran out at age N" negative) so colour is never the only signal; sort, Jump to, Previous and Next as Control buttons                                                                   |
+| Depletion histogram   | `tableBackground` block, red bars, median reference line                                        | A Surface card; bars keep `reportsNumberNegative`, the median line keeps its colour, dashed; both sentences in Secondary text                                                                                                                                                    |
+| Explanation           | Full-width block                                                                                | The APP-03b explanation card. At 1280px and wider it sits beside the histogram; below 1280px they stack                                                                                                                                                                          |
+
+Below 1280px the stat tiles fall to three columns with Success rate spanning
+two rows, and the pots table scrolls sideways as it does today.
+
+Unchanged by design: every field, help tooltip, validation and default; the
+simulation and its results; drag-to-reorder pots; the runs table's paging and
+drill-in to a single run (not drawn; it takes the same table style); the chart
+and histogram colours; all strings; privacy mode; and mobile.
+
+Questions for the owner:
+
+1. **Order:** the drawing keeps Configuration above Results, as today. On a
+   1440×900 window only the headline stats show without scrolling (`67`).
+   Should Results come first, with Configuration below?
+2. **Histogram and explanation side by side** at 1280px and wider (`71`), or
+   keep every card full width as today?
+3. The **"Summary" label** above the summary sentence is dropped, since the
+   sentence sits directly under the stats in the Results card. Fine to drop,
+   or keep it?
+
+| File                                         | Shows                                                |
+| -------------------------------------------- | ---------------------------------------------------- |
+| `shots/67-montecarlo-dark-wide.png`          | Plan details tab and results, dark, 1440×900         |
+| `shots/68-montecarlo-light-1000.png`         | Light, 1000×700, pane collapsed                      |
+| `shots/69-montecarlo-pots-midnight-wide.png` | Investment pots tab with one pot expanded, midnight  |
+| `shots/70-montecarlo-runs-dark-wide.png`     | Simulation runs view, dark                           |
+| `shots/71-montecarlo-light-wide-full.png`    | Whole page, light, 1440 wide (histogram beside text) |
+| `shots/72-montecarlo-custom-theme-wide.png`  | Custom theme through the fallback layer              |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-03d`
+(`PW_CHANNEL=msedge` uses the installed Edge).
