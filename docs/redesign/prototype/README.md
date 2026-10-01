@@ -282,7 +282,11 @@ Regenerate with `node scripts/redesign-prototype-shots.cjs --app-03c`
 
 ## APP-03d: Monte Carlo proposal (October 1, 2026)
 
-**Status: drawn, awaiting owner review.** Choose **Page → Reports**, then
+**Status: approved October 1, 2026.** The owner left the three questions
+below to the implementer, who chose: Configuration stays above Results (the
+order upstream users know, inputs before outputs; question 1); the
+histogram and explanation sit side by side at 1280px and wider (question 2);
+the "Summary" label is dropped (question 3). Choose **Page → Reports**, then
 **View** Monte Carlo. URL parameters: `rview=montecarlo`, `mctab=plan|pots`
 (configuration tab), `mcview=chart|runs` (results view). The page title and
 eyebrow already follow the APP-03b pattern; this drawing covers the body.

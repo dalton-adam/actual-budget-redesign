@@ -596,6 +596,22 @@ the Calendar list's card has no elevation (`isFlatRegister`), matching the
 other report cards. Crossover's category list gets the same checklist look,
 since it shares `CategorySelector`.
 
+**APP-03d (approved October 1, 2026):** drawn in the prototype (Page →
+Reports → Monte Carlo; shots `67`–`72`, prototype README). The owner left
+the open questions to the implementer:
+
+- Configuration stays **above** Results, as upstream (inputs before outputs).
+- Save widget moves to the page header, as on the other report pages.
+- Configuration, Results, the chart/runs view, the histogram and the
+  explanation are Surface cards; the configuration tabs and Chart/Runs are
+  segmented controls; selects are Control buttons.
+- Results: five stat tiles on Card Inset with Success rate at Display (same
+  colour thresholds); the "Summary" label is **dropped** (no new string).
+- Runs: outcomes become status pills (positive "Survived", negative "Ran out
+  at age N").
+- The histogram and explanation sit **side by side at 1280px and wider**,
+  stacked below.
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the
