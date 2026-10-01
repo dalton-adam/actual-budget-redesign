@@ -15,7 +15,7 @@ import type { PayeeEntity } from '@actual-app/core/types/models';
 import { Table, useTableNavigator } from '#components/table';
 import { useSelectedItems } from '#hooks/useSelected';
 
-import { PayeeTableRow } from './PayeeTableRow';
+import { PAYEE_ROW_HEIGHT, PayeeTableRow } from './PayeeTableRow';
 
 // Table items require an ID to work, it's optional in the loot-core
 // model so would need to verify accuracy of that before changing there
@@ -67,7 +67,10 @@ export const PayeeTable = forwardRef<
           navigator={tableNavigator}
           ref={ref}
           items={payees}
-          backgroundColor={theme.tableBackground}
+          // 44px rows on the card (design-decisions §10c); the shared
+          // ROW_HEIGHT stays as it is.
+          rowHeight={PAYEE_ROW_HEIGHT}
+          backgroundColor={theme.cardBackground}
           renderItem={({ item, editing, focusedField, onEdit }) => {
             return (
               <PayeeTableRow

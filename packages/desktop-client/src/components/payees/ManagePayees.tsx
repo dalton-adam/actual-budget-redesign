@@ -5,6 +5,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '@actual-app/components/button';
 import { SvgExpandArrow, SvgSubtract } from '@actual-app/components/icons/v0';
 import { Popover } from '@actual-app/components/popover';
+import { SpaceBetween } from '@actual-app/components/space-between';
 import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -30,6 +31,15 @@ import { PayeeTable } from './PayeeTable';
 
 const getPayeesById = memoizeOne((payees: PayeeEntity[]) => groupById(payees));
 
+/** Eyebrow column headers, as on the account register and Schedules. */
+const eyebrowHeaderStyle = {
+  color: theme.pageTextFaint,
+  fontSize: 11,
+  fontWeight: 650,
+  textTransform: 'uppercase',
+  letterSpacing: '0.07em',
+} as const;
+
 function PayeeTableHeader() {
   const { t } = useTranslation();
 
@@ -38,7 +48,16 @@ function PayeeTableHeader() {
 
   return (
     <View>
-      <TableHeader collapsed>
+      <TableHeader
+        collapsed
+        height={38}
+        style={{
+          // Eyebrow header on the card (design-decisions §10c).
+          ...eyebrowHeaderStyle,
+          backgroundColor: theme.cardBackground,
+          '& > div': { borderColor: theme.cardHairline },
+        }}
+      >
         <SelectCell
           exposed
           focused={false}
@@ -221,19 +240,18 @@ export const ManagePayees = ({
 
   return (
     <View style={{ height: '100%' }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          padding: '0 0 15px',
-        }}
+      {/* One toolbar above the table, as on Schedules (design-decisions §10c). */}
+      <SpaceBetween
+        gap={8}
+        wrap={false}
+        style={{ margin: '14px 0', flexShrink: 0 }}
       >
         <View style={{ flexShrink: 0 }}>
           <Button
             ref={triggerRef}
-            variant="bare"
-            style={{ marginRight: 10 }}
+            variant="control"
             isDisabled={buttonsDisabled}
+            style={{ gap: 6 }}
             onPress={() => setMenuOpen(true)}
           >
             {buttonsDisabled
@@ -241,7 +259,7 @@ export const ManagePayees = ({
               : t('{{count}} payees', {
                   count: selected.items.size,
                 })}
-            <SvgExpandArrow width={8} height={8} style={{ marginLeft: 5 }} />
+            <SvgExpandArrow width={8} height={8} />
           </Button>
 
           <Popover
@@ -262,44 +280,62 @@ export const ManagePayees = ({
             />
           </Popover>
         </View>
-        <View
-          style={{
-            flexShrink: 0,
-          }}
+        {(orphanedOnly || (orphanedPayees && orphanedPayees.length > 0)) && (
+          <Button
+            variant="control"
+            aria-pressed={orphanedOnly}
+            style={{
+              flexShrink: 0,
+              ...(orphanedOnly && {
+                backgroundColor: theme.selectionBackground,
+                borderColor: theme.selectionBorder,
+              }),
+            }}
+            onPress={() => setOrphanedOnly(prev => !prev)}
+          >
+            {orphanedOnly
+              ? t('Show all payees')
+              : t('Show {{count}} unused payees', {
+                  count: orphanedPayees.length,
+                })}
+          </Button>
+        )}
+        <Button
+          aria-label={t('Category learning settings')}
+          variant="control"
+          style={{ flexShrink: 0 }}
+          onPress={onChangeCategoryLearning}
         >
-          {(orphanedOnly || (orphanedPayees && orphanedPayees.length > 0)) && (
-            <Button
-              variant="bare"
-              style={{ marginRight: 10 }}
-              onPress={() => setOrphanedOnly(prev => !prev)}
-            >
-              {orphanedOnly
-                ? t('Show all payees')
-                : t('Show {{count}} unused payees', {
-                    count: orphanedPayees.length,
-                  })}
-            </Button>
-          )}
-        </View>
+          <Trans>Category learning settings</Trans>
+        </Button>
         <View style={{ flex: 1 }} />
         <Search
           placeholder={t('Filter payees...')}
           value={filter}
           onChange={applyFilter}
         />
-      </View>
+      </SpaceBetween>
 
       <SelectedProvider instance={selected} fetchAllIds={getSelectableIds}>
-        <View style={styles.tableContainer}>
+        <View
+          style={{
+            ...styles.tableContainer,
+            // One Surface card with hairlines (design-decisions §10c).
+            ...styles.surfaceCard,
+            overflow: 'hidden',
+            marginBottom: 20,
+          }}
+        >
           <PayeeTableHeader />
           {filteredPayees.length === 0 ? (
             <View
               style={{
+                flex: 1,
+                justifyContent: 'center',
                 textAlign: 'center',
                 color: theme.pageTextSubdued,
-                fontStyle: 'italic',
                 fontSize: 13,
-                marginTop: 5,
+                padding: '40px 0',
               }}
             >
               <Trans>No payees</Trans>
@@ -317,31 +353,6 @@ export const ManagePayees = ({
           )}
         </View>
       </SelectedProvider>
-
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          margin: '20px 0',
-          flexShrink: 0,
-        }}
-      >
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: '1em',
-          }}
-        >
-          <Button
-            aria-label={t('Category learning settings')}
-            variant="normal"
-            onPress={onChangeCategoryLearning}
-          >
-            <Trans>Category learning settings</Trans>
-          </Button>
-        </View>
-      </View>
     </View>
   );
 };
