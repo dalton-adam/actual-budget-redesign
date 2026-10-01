@@ -1494,3 +1494,42 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   that the first check missed, has 0 misses. Desktop build checked, with
   "Isolation check: nothing changed" (verification.md). Every APP-04 check
   is now done.
+
+- APP-05a: **merged October 1, 2026** into `redesign/main` (branch
+  `redesign/app-05a-payees`, code `fffd31a34`, merge `3623d9384`). Drawing
+  approved the same day (prototype shots `80`–`86`; the owner left the four
+  questions to the implementer: Category learning settings in the toolbar,
+  the quiet Create rule with pills only where rules exist, no header on the
+  rule column, both dialogs wait for APP-06; design-decisions §10c).
+  **Change** (all under `C/payees/`): `ManagePayeesPage.tsx` gives the page
+  the Display title. `ManagePayees.tsx` puts the selection button, Show
+  unused payees (selection tint while on, `aria-pressed`) and Category
+  learning settings, all `control` buttons, in one toolbar above the table
+  with the filter at the right, and removes the footer; the table is one
+  Surface card with an Eyebrow header; "No payees" is centred, not italic.
+  `PayeeTable.tsx` uses 44px rows through the table's `rowHeight` prop on
+  the card background. `PayeeTableRow.tsx` sets the row height, hairline
+  dividers, `tableRowHover` hover and the selection tint for selected rows;
+  names in 500 weight and transfers in Secondary text; the bookmark in the
+  primary purple and the learning-off bulb in `pillWarningText` (was
+  hard-coded `red`); the rule button is an accent pill on the selection tint
+  where rules exist, otherwise Secondary text that takes the control-button
+  look on row hover. **Deviations from the drawing:** the checkbox keeps the
+  shared `SelectCell` look; "Transfer:" is not split into a fainter prefix
+  (it is part of the cell's value); the quiet button's hover uses the
+  control background and hairline, because `cardBorder` is purple in the
+  built-in dark theme. No handler, filter, pref, route or string changed;
+  `PayeeRuleCountLabel.tsx` (shared with mobile) is untouched. **Checks:**
+  typecheck passes; oxlint over the folder 0 errors (type-aware in the
+  commit hook); oxfmt applied; web unit tests **1052 passed, 1 skipped**.
+  E2E against the `build:browser` preview (port 3018) with the installed
+  Edge (a local Playwright config, not committed): payees, payees.mobile,
+  rules and transactions **25/25**. Linux VRT (Playwright v1.61.1 Docker
+  image, HTTPS dev server on 3021 over the LAN address, checkout mounted at
+  its `/mnt/host` path): **6 snapshots changed**, the payees page visuals
+  (light, dark, midnight, before and after filtering); the re-run without
+  updates, with payees.mobile, passed 10/10. Impeccable detector over the
+  four changed files: no findings. VISUAL in the dev server (demo budget):
+  dark at 1440×900 (hover, selection, selection menu) and light at
+  1000×700. **Not run:** custom theme, keyboard walk-through, privacy mode
+  (the page shows no amounts) and the desktop build.
