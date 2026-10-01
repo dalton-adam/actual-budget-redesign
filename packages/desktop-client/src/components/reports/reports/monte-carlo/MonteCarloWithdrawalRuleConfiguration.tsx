@@ -10,11 +10,8 @@ import { MonteCarloHelpTooltip } from '#components/reports/reports/monte-carlo/M
 import { MonteCarloNumberInput } from '#components/reports/reports/monte-carlo/MonteCarloNumberInput';
 import { MAX_AMOUNT } from '#components/reports/reports/monte-carlo/monteCarloSimulation';
 import type { MonteCarloWithdrawalRuleConfig } from '#components/reports/reports/monte-carlo/monteCarloSimulation';
-import {
-  FIELD_LABEL_ROW_STYLE,
-  FIELD_LABEL_STYLE,
-  FIELD_STYLE,
-} from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useMonteCarloStyles } from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { FinancialInput } from '#components/util/FinancialInput';
 
 const SENTENCE_STYLE = {
@@ -44,13 +41,15 @@ export function MonteCarloWithdrawalRuleConfiguration({
   onMinimumWithdrawalChange,
 }: MonteCarloWithdrawalRuleConfigurationProps) {
   const { t } = useTranslation();
+  const { fieldLabel, field, fieldLabelRow } = useMonteCarloStyles();
+  const controlVariant = useReportControlVariant('normal');
 
   return (
     <View style={{ marginTop: 20, gap: 10 }}>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 20 }}>
         <View style={{ width: 250 }}>
-          <View style={FIELD_LABEL_ROW_STYLE}>
-            <Text style={FIELD_LABEL_STYLE}>
+          <View style={fieldLabelRow}>
+            <Text style={fieldLabel}>
               <Trans>Withdrawal rule</Trans>
             </Text>
             <MonteCarloHelpTooltip>
@@ -73,13 +72,14 @@ export function MonteCarloWithdrawalRuleConfiguration({
               ['floor-ceiling', t('Floor & ceiling (Bengen)')],
               ['boundaries', t('Boundaries')],
             ]}
+            triggerVariant={controlVariant}
           />
         </View>
 
         {rule.type !== 'none' && (
-          <View style={FIELD_STYLE}>
-            <View style={FIELD_LABEL_ROW_STYLE}>
-              <Text style={FIELD_LABEL_STYLE}>
+          <View style={field}>
+            <View style={fieldLabelRow}>
+              <Text style={fieldLabel}>
                 <Trans>Minimum withdrawal</Trans>
               </Text>
               <MonteCarloHelpTooltip>

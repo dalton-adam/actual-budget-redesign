@@ -18,7 +18,8 @@ import {
   sortMonteCarloSpendingPhases,
 } from '#components/reports/reports/monte-carlo/monteCarloSimulation';
 import type { MonteCarloSpendingPhase } from '#components/reports/reports/monte-carlo/monteCarloSimulation';
-import { FIELD_LABEL_STYLE } from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useMonteCarloStyles } from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { Field, Row, TableHeader } from '#components/table';
 import { FinancialInput } from '#components/util/FinancialInput';
 
@@ -47,6 +48,9 @@ export function MonteCarloSpendingPhases({
   onPhasesChange,
 }: MonteCarloSpendingPhasesProps) {
   const { t } = useTranslation();
+  const { fieldLabel, tableContainer, tableHeader, rowBackground, rowBorder } =
+    useMonteCarloStyles();
+  const controlVariant = useReportControlVariant('normal');
 
   function updatePhase(
     phaseId: string,
@@ -87,7 +91,7 @@ export function MonteCarloSpendingPhases({
   return (
     <View style={{ gap: 10, marginBottom: 20 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-        <Text style={FIELD_LABEL_STYLE}>
+        <Text style={fieldLabel}>
           <Trans>Spending phases</Trans>
         </Text>
         <MonteCarloHelpTooltip>
@@ -106,7 +110,7 @@ export function MonteCarloSpendingPhases({
 
       <View
         style={{
-          ...styles.tableContainer,
+          ...tableContainer,
           ...styles.horizontalScrollbar,
           flex: 'unset',
           // Scroll sideways when the columns' minimum widths don't fit,
@@ -115,7 +119,7 @@ export function MonteCarloSpendingPhases({
         }}
       >
         <View style={{ minWidth: 'fit-content' }}>
-          <TableHeader>
+          <TableHeader style={tableHeader}>
             <Field width="flex" style={{ minWidth: PHASE_COLUMNS.name }}>
               <Trans>Phase name</Trans>
             </Field>
@@ -139,7 +143,8 @@ export function MonteCarloSpendingPhases({
                 collapsed
                 height={PHASE_ROW_HEIGHT}
                 style={{
-                  backgroundColor: theme.tableBackground,
+                  backgroundColor: rowBackground,
+                  borderColor: rowBorder,
                   ':hover': { backgroundColor: theme.tableRowBackgroundHover },
                 }}
               >
@@ -240,7 +245,7 @@ export function MonteCarloSpendingPhases({
       </View>
 
       <View style={{ flexDirection: 'row' }}>
-        <Button onPress={addPhase}>
+        <Button variant={controlVariant} onPress={addPhase}>
           <SvgAdd width={10} height={10} style={{ marginRight: 5 }} />
           <Trans>Add phase</Trans>
         </Button>

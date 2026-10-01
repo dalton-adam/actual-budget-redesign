@@ -1,9 +1,11 @@
 import { Trans } from 'react-i18next';
 
 import { Text } from '@actual-app/components/text';
+import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
 import { MonteCarloHelpTooltip } from '#components/reports/reports/monte-carlo/MonteCarloHelpTooltip';
+import { useMonteCarloStyles } from '#components/reports/reports/monte-carlo/monteCarloStyles';
 import { Field, TableHeader } from '#components/table';
 
 // Shared by the header and the pot rows so the columns line up. The
@@ -22,6 +24,29 @@ export const POT_COLUMNS = {
   remove: 36,
 } as const;
 
+// The card's Eyebrow headers are uppercase and tracked, so the two longest
+// labels need more room there (APP-03d)
+const CARD_POT_COLUMNS = {
+  ...POT_COLUMNS,
+  name: 114,
+  startingBalance: 156,
+  linkedAccount: 156,
+  allocation: 204,
+  expectedReturn: 192,
+  volatility: 206,
+} as const;
+
+/** The sum of the columns' minimum widths: below it the table scrolls */
+export function getPotColumnsMinWidth(columns: Record<string, number>) {
+  return Object.values(columns).reduce((sum, width) => sum + width, 0);
+}
+
+/** The pot table's column widths for the current width. */
+export function usePotColumns() {
+  const { isCard } = useMonteCarloStyles();
+  return isCard ? CARD_POT_COLUMNS : POT_COLUMNS;
+}
+
 const HEADER_LABEL_STYLE = {
   flexDirection: 'row',
   alignItems: 'center',
@@ -30,18 +55,36 @@ const HEADER_LABEL_STYLE = {
 } as const;
 
 export function MonteCarloPotsTableHeader() {
+  const { isCard, groupHeading } = useMonteCarloStyles();
+  const columns = usePotColumns();
+
   return (
-    <TableHeader>
-      <Field width={POT_COLUMNS.expand} />
-      <Field width="flex" style={{ minWidth: POT_COLUMNS.name }}>
+    <TableHeader
+      // Eyebrow headers on the card, as the register's (APP-03d)
+      style={
+        isCard
+          ? {
+              ...groupHeading,
+              backgroundColor: theme.cardBackground,
+              borderColor: theme.cardHairline,
+            }
+          : undefined
+      }
+    >
+      <Field width={columns.expand} />
+      <Field width="flex" style={{ minWidth: columns.name }}>
         <Trans>Pot name</Trans>
       </Field>
-      <Field width="flex" style={{ minWidth: POT_COLUMNS.startingBalance }}>
+      <Field
+        width="flex"
+        style={{ minWidth: columns.startingBalance }}
+        truncate={false}
+      >
         <Trans>Starting balance</Trans>
       </Field>
       <Field
         width="flex"
-        style={{ minWidth: POT_COLUMNS.linkedAccount }}
+        style={{ minWidth: columns.linkedAccount }}
         truncate={false}
       >
         <View style={HEADER_LABEL_STYLE}>
@@ -62,7 +105,7 @@ export function MonteCarloPotsTableHeader() {
       </Field>
       <Field
         width="flex"
-        style={{ minWidth: POT_COLUMNS.allocation }}
+        style={{ minWidth: columns.allocation }}
         truncate={false}
       >
         <View style={HEADER_LABEL_STYLE}>
@@ -80,7 +123,7 @@ export function MonteCarloPotsTableHeader() {
       </Field>
       <Field
         width="flex"
-        style={{ minWidth: POT_COLUMNS.expectedReturn }}
+        style={{ minWidth: columns.expectedReturn }}
         truncate={false}
       >
         <View style={HEADER_LABEL_STYLE}>
@@ -97,7 +140,7 @@ export function MonteCarloPotsTableHeader() {
       </Field>
       <Field
         width="flex"
-        style={{ minWidth: POT_COLUMNS.volatility }}
+        style={{ minWidth: columns.volatility }}
         truncate={false}
       >
         <View style={HEADER_LABEL_STYLE}>
@@ -113,7 +156,7 @@ export function MonteCarloPotsTableHeader() {
           </MonteCarloHelpTooltip>
         </View>
       </Field>
-      <Field width={POT_COLUMNS.remove} />
+      <Field width={columns.remove} />
     </TableHeader>
   );
 }

@@ -22,6 +22,8 @@ import type {
   MonteCarloContribution,
   MonteCarloPot,
 } from '#components/reports/reports/monte-carlo/monteCarloSimulation';
+import { useMonteCarloStyles } from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { Field, Row, TableHeader } from '#components/table';
 import { FinancialInput } from '#components/util/FinancialInput';
 
@@ -43,6 +45,9 @@ export function MonteCarloContributions({
   onConfigChange,
 }: MonteCarloContributionsProps) {
   const { t } = useTranslation();
+  const { tableContainer, tableHeader, rowBackground, rowBorder, mutedText } =
+    useMonteCarloStyles();
+  const controlVariant = useReportControlVariant('normal');
 
   function updateContribution(
     contributionId: string,
@@ -76,7 +81,7 @@ export function MonteCarloContributions({
 
   if (pots.length === 0) {
     return (
-      <Text style={{ color: theme.pageText }}>
+      <Text style={{ color: mutedText }}>
         <Trans>
           Add an investment pot first - contributions are paid into a pot.
         </Trans>
@@ -96,7 +101,7 @@ export function MonteCarloContributions({
     <View style={{ gap: 10 }}>
       <View
         style={{
-          ...styles.tableContainer,
+          ...tableContainer,
           ...styles.horizontalScrollbar,
           flex: 'unset',
           // Scroll sideways when the columns' minimum widths don't fit,
@@ -105,7 +110,7 @@ export function MonteCarloContributions({
         }}
       >
         <View style={{ minWidth: 'fit-content' }}>
-          <TableHeader>
+          <TableHeader style={tableHeader}>
             <Field width="flex" style={{ minWidth: 150 }}>
               <Trans>Contribution name</Trans>
             </Field>
@@ -131,7 +136,8 @@ export function MonteCarloContributions({
               collapsed
               height={CONTRIBUTION_ROW_HEIGHT}
               style={{
-                backgroundColor: theme.tableBackground,
+                backgroundColor: rowBackground,
+                borderColor: rowBorder,
                 ':hover': { backgroundColor: theme.tableRowBackgroundHover },
               }}
             >
@@ -241,7 +247,7 @@ export function MonteCarloContributions({
       </View>
 
       <View style={{ flexDirection: 'row' }}>
-        <Button onPress={addContribution}>
+        <Button variant={controlVariant} onPress={addContribution}>
           <SvgAdd width={10} height={10} style={{ marginRight: 5 }} />
           <Trans>Add contribution</Trans>
         </Button>

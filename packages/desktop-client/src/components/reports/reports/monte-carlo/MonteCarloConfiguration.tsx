@@ -4,6 +4,7 @@ import { DropIndicator, GridList, useDragAndDrop } from 'react-aria-components';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { Button } from '@actual-app/components/button';
+import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { SvgAdd } from '@actual-app/components/icons/v1';
 import { ModeButton } from '@actual-app/components/mode-button';
 import { Select } from '@actual-app/components/select';
@@ -22,7 +23,13 @@ import { MonteCarloContributions } from '#components/reports/reports/monte-carlo
 import { MonteCarloHelpTooltip } from '#components/reports/reports/monte-carlo/MonteCarloHelpTooltip';
 import { MonteCarloNumberInput } from '#components/reports/reports/monte-carlo/MonteCarloNumberInput';
 import { MonteCarloPotConfiguration } from '#components/reports/reports/monte-carlo/MonteCarloPotConfiguration';
-import { MonteCarloPotsTableHeader } from '#components/reports/reports/monte-carlo/MonteCarloPotsTableHeader';
+import {
+  getPotColumnsMinWidth,
+  MonteCarloPotsTableHeader,
+  usePotColumns,
+} from '#components/reports/reports/monte-carlo/MonteCarloPotsTableHeader';
+import { MonteCarloSection } from '#components/reports/reports/monte-carlo/MonteCarloSection';
+import { MonteCarloSectionTitle } from '#components/reports/reports/monte-carlo/MonteCarloSectionTitle';
 import {
   createMonteCarloPot,
   MAX_SIMULATION_COUNT,
@@ -34,14 +41,11 @@ import type {
   MonteCarloPot,
 } from '#components/reports/reports/monte-carlo/monteCarloSimulation';
 import { MonteCarloSpendingPhases } from '#components/reports/reports/monte-carlo/MonteCarloSpendingPhases';
-import {
-  FIELD_LABEL_ROW_STYLE,
-  FIELD_LABEL_STYLE,
-  FIELD_STYLE,
-  GROUP_HEADING_STYLE,
-} from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useMonteCarloStyles } from '#components/reports/reports/monte-carlo/monteCarloStyles';
 import { MonteCarloTaxConfiguration } from '#components/reports/reports/monte-carlo/MonteCarloTaxConfiguration';
 import { MonteCarloWithdrawalRuleConfiguration } from '#components/reports/reports/monte-carlo/MonteCarloWithdrawalRuleConfiguration';
+import { ReportSegmentedControl } from '#components/reports/ReportSegmentedControl';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 
 type ConfigurationTab =
   | 'plan'
@@ -56,6 +60,9 @@ const PLAN_GROUP_FIELDS_STYLE = {
   alignItems: 'flex-end',
 } as const;
 
+// From this width the plan's field groups fit on one row (APP-03d)
+const PLAN_GROUP_DIVIDERS_FROM = 1280;
+
 type MonteCarloConfigurationProps = {
   config: MonteCarloConfig;
   onConfigChange: (changes: Partial<MonteCarloConfig>) => void;
@@ -67,6 +74,11 @@ export function MonteCarloConfiguration({
 }: MonteCarloConfigurationProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<ConfigurationTab>('plan');
+  const { isCard, groupHeading, fieldLabel, field, fieldLabelRow } =
+    useMonteCarloStyles();
+  const controlVariant = useReportControlVariant('normal');
+  const { width } = useResponsive();
+  const potColumns = usePotColumns();
 
   function onPotChange(potId: string, changes: Partial<MonteCarloPot>) {
     onConfigChange({
@@ -114,51 +126,71 @@ export function MonteCarloConfiguration({
     },
   });
 
+  const tabOptions: Array<{ value: ConfigurationTab; label: string }> = [
+    { value: 'plan', label: t('Plan details') },
+    { value: 'pots', label: t('Investment pots') },
+    { value: 'contributions', label: t('Contributions') },
+    { value: 'withdrawals', label: t('Spending') },
+    { value: 'tax', label: t('Tax') },
+  ];
+
+  // On a wide card the plan's field groups share one row, split by
+  // hairlines; when they would wrap they keep the upstream spacing instead,
+  // so no line starts with a divider
+  const hasGroupDividers = isCard && width >= PLAN_GROUP_DIVIDERS_FROM;
+  const planGroupStyle = hasGroupDividers
+    ? {
+        gap: 10,
+        paddingLeft: 24,
+        paddingRight: 24,
+        borderLeft: `1px solid ${theme.cardHairline}`,
+      }
+    : { gap: 10 };
+  const planGroupFieldsStyle = {
+    ...PLAN_GROUP_FIELDS_STYLE,
+    ...(isCard && { gap: 14 }),
+  };
+
   return (
-    <View
-      style={{
-        backgroundColor: theme.tableBackground,
-        padding: 20,
-        flexShrink: 0,
-        gap: 15,
-      }}
-    >
-      {/* Tab bar; wraps onto extra lines on narrow screens */}
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
-        <ModeButton
-          selected={activeTab === 'plan'}
-          onSelect={() => setActiveTab('plan')}
+    <MonteCarloSection style={{ gap: isCard ? 12 : 15 }}>
+      {isCard ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 12,
+          }}
         >
-          <Trans>Plan details</Trans>
-        </ModeButton>
-        <ModeButton
-          selected={activeTab === 'pots'}
-          onSelect={() => setActiveTab('pots')}
-        >
-          <Trans>Investment pots</Trans>
-        </ModeButton>
-        <ModeButton
-          selected={activeTab === 'contributions'}
-          onSelect={() => setActiveTab('contributions')}
-        >
-          <Trans>Contributions</Trans>
-        </ModeButton>
-        <ModeButton
-          selected={activeTab === 'withdrawals'}
-          onSelect={() => setActiveTab('withdrawals')}
-        >
-          <Trans>Spending</Trans>
-        </ModeButton>
-        <ModeButton
-          selected={activeTab === 'tax'}
-          onSelect={() => setActiveTab('tax')}
-        >
-          <Trans>Tax</Trans>
-        </ModeButton>
-      </View>
+          <MonteCarloSectionTitle>
+            <Trans>Configuration</Trans>
+          </MonteCarloSectionTitle>
+          <ReportSegmentedControl
+            aria-label={t('Configuration')}
+            options={tabOptions}
+            value={activeTab}
+            onChange={setActiveTab}
+          />
+        </View>
+      ) : (
+        /* Tab bar; wraps onto extra lines on narrow screens */
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+          {tabOptions.map(option => (
+            <ModeButton
+              key={option.value}
+              selected={activeTab === option.value}
+              onSelect={() => setActiveTab(option.value)}
+            >
+              {option.label}
+            </ModeButton>
+          ))}
+        </View>
+      )}
 
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-        <Text style={{ color: theme.pageText }}>
+        <Text
+          style={{ color: isCard ? theme.pageTextSecondary : theme.pageText }}
+        >
           {activeTab === 'plan'
             ? t(
                 'Who this plan is for and how the simulation generates market returns.',
@@ -202,17 +234,23 @@ export function MonteCarloConfiguration({
             flexWrap: 'wrap',
             alignItems: 'flex-start',
             rowGap: 20,
-            columnGap: 40,
+            columnGap: hasGroupDividers ? 0 : 40,
           }}
         >
-          <View style={{ gap: 10 }}>
-            <Text style={GROUP_HEADING_STYLE}>
+          <View
+            style={{
+              ...planGroupStyle,
+              paddingLeft: 0,
+              borderLeftWidth: 0,
+            }}
+          >
+            <Text style={groupHeading}>
               <Trans>Your plan</Trans>
             </Text>
-            <View style={PLAN_GROUP_FIELDS_STYLE}>
-              <View style={FIELD_STYLE}>
-                <View style={FIELD_LABEL_ROW_STYLE}>
-                  <Text style={FIELD_LABEL_STYLE}>
+            <View style={planGroupFieldsStyle}>
+              <View style={field}>
+                <View style={fieldLabelRow}>
+                  <Text style={fieldLabel}>
                     <Trans>Your current age</Trans>
                   </Text>
                 </View>
@@ -231,9 +269,9 @@ export function MonteCarloConfiguration({
                 />
               </View>
 
-              <View style={FIELD_STYLE}>
-                <View style={FIELD_LABEL_ROW_STYLE}>
-                  <Text style={FIELD_LABEL_STYLE}>
+              <View style={field}>
+                <View style={fieldLabelRow}>
+                  <Text style={fieldLabel}>
                     <Trans>Pot must last until age</Trans>
                   </Text>
                 </View>
@@ -254,14 +292,14 @@ export function MonteCarloConfiguration({
             </View>
           </View>
 
-          <View style={{ gap: 10 }}>
-            <Text style={GROUP_HEADING_STYLE}>
+          <View style={planGroupStyle}>
+            <Text style={groupHeading}>
               <Trans>Inflation</Trans>
             </Text>
-            <View style={PLAN_GROUP_FIELDS_STYLE}>
-              <View style={FIELD_STYLE}>
-                <View style={FIELD_LABEL_ROW_STYLE}>
-                  <Text style={FIELD_LABEL_STYLE}>
+            <View style={planGroupFieldsStyle}>
+              <View style={field}>
+                <View style={fieldLabelRow}>
+                  <Text style={fieldLabel}>
                     <Trans>Mean (%)</Trans>
                   </Text>
                   <MonteCarloHelpTooltip>
@@ -289,9 +327,9 @@ export function MonteCarloConfiguration({
                 />
               </View>
 
-              <View style={FIELD_STYLE}>
-                <View style={FIELD_LABEL_ROW_STYLE}>
-                  <Text style={FIELD_LABEL_STYLE}>
+              <View style={field}>
+                <View style={fieldLabelRow}>
+                  <Text style={fieldLabel}>
                     <Trans>Std dev (%)</Trans>
                   </Text>
                   <MonteCarloHelpTooltip>
@@ -322,14 +360,14 @@ export function MonteCarloConfiguration({
             </View>
           </View>
 
-          <View style={{ gap: 10 }}>
-            <Text style={GROUP_HEADING_STYLE}>
+          <View style={planGroupStyle}>
+            <Text style={groupHeading}>
               <Trans>Simulation</Trans>
             </Text>
-            <View style={PLAN_GROUP_FIELDS_STYLE}>
-              <View style={{ width: 250 }}>
-                <View style={FIELD_LABEL_ROW_STYLE}>
-                  <Text style={FIELD_LABEL_STYLE}>
+            <View style={planGroupFieldsStyle}>
+              <View style={{ width: isCard ? 230 : 250 }}>
+                <View style={fieldLabelRow}>
+                  <Text style={fieldLabel}>
                     <Trans>Return model</Trans>
                   </Text>
                   <MonteCarloHelpTooltip>
@@ -361,6 +399,7 @@ export function MonteCarloConfiguration({
                       returnModel: value as MonteCarloReturnModel,
                     })
                   }
+                  triggerVariant={controlVariant}
                   options={[
                     ['normal', t('Random (normal distribution)')],
                     ['historical-bootstrap', t('Historical returns, shuffled')],
@@ -369,9 +408,9 @@ export function MonteCarloConfiguration({
                 />
               </View>
 
-              <View style={FIELD_STYLE}>
-                <View style={FIELD_LABEL_ROW_STYLE}>
-                  <Text style={FIELD_LABEL_STYLE}>
+              <View style={field}>
+                <View style={fieldLabelRow}>
+                  <Text style={fieldLabel}>
                     <Trans>Simulations</Trans>
                   </Text>
                   <MonteCarloHelpTooltip>
@@ -408,7 +447,13 @@ export function MonteCarloConfiguration({
         <View>
           <View
             style={{
-              ...styles.tableContainer,
+              ...(isCard
+                ? {
+                    border: `1px solid ${theme.cardHairline}`,
+                    borderRadius: 12,
+                    overflow: 'hidden',
+                  }
+                : styles.tableContainer),
               ...styles.horizontalScrollbar,
               flex: 'unset',
               // Scroll sideways when the columns' minimum widths don't fit,
@@ -416,7 +461,16 @@ export function MonteCarloConfiguration({
               overflowX: 'auto',
             }}
           >
-            <View style={{ minWidth: 'fit-content' }}>
+            <View
+              style={{
+                // On the card the columns flex to fill it and only scroll
+                // below their minimum widths; fit-content would size every
+                // flex column to the widest Eyebrow label
+                minWidth: isCard
+                  ? getPotColumnsMinWidth(potColumns)
+                  : 'fit-content',
+              }}
+            >
               <MonteCarloPotsTableHeader />
               <GridList
                 aria-label={t('Investment pots')}
@@ -455,6 +509,7 @@ export function MonteCarloConfiguration({
           </View>
           <View style={{ flexDirection: 'row', marginTop: 10 }}>
             <Button
+              variant={controlVariant}
               onPress={() =>
                 onConfigChange({
                   pots: [...config.pots, createMonteCarloPot(uuidv4())],
@@ -492,8 +547,8 @@ export function MonteCarloConfiguration({
           />
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 20 }}>
             <View style={{ width: 220 }}>
-              <View style={FIELD_LABEL_ROW_STYLE}>
-                <Text style={FIELD_LABEL_STYLE}>
+              <View style={fieldLabelRow}>
+                <Text style={fieldLabel}>
                   <Trans>Withdrawal order</Trans>
                 </Text>
                 <MonteCarloHelpTooltip>
@@ -534,6 +589,7 @@ export function MonteCarloConfiguration({
                     withdrawalStrategy: value as MonteCarloWithdrawalStrategy,
                   })
                 }
+                triggerVariant={controlVariant}
                 options={[
                   ['proportional', t('Split proportionally across pots')],
                   ['sequential', t('Drain pots in order')],
@@ -566,6 +622,6 @@ export function MonteCarloConfiguration({
           onConfigChange={onConfigChange}
         />
       )}
-    </View>
+    </MonteCarloSection>
   );
 }
