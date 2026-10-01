@@ -550,6 +550,22 @@ icon; the dashed border, menu and resize handle mark edit mode); Finish
 editing dashboard stays a Control button so Add new widget remains the one
 primary.
 
+**As implemented (APP-03b, September 30, 2026):** owner answers before
+starting: the Net Worth pattern applies to **every report page**, and the
+chart card's subline is the **date range only** (the drawn "· all accounts"
+would be wrong once a filter is applied; no new string). The title, eyebrow,
+segmented Live/Static and Control buttons apply to all twelve pages; the
+chart and explanation cards to the nine chart pages. Formula and Monte Carlo
+are editors, so only their title changed (their bodies follow with APP-03c).
+Sankey's Spent/Budgeted and Spending's Single month/Budgeted/Average became
+segmented controls too. Deviations from the drawing: the date range button
+keeps no calendar icon or chevron (the interval button already carries the
+calendar icon); the divider lines between Sankey's and Spending's control
+groups are gone on desktop, as drawn (Sankey keeps them on mobile); Crossover
+keeps its settings sidebar on the page background. Mobile is
+unchanged: at narrow widths the old toggle, button variants and right-aligned
+total come back.
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the

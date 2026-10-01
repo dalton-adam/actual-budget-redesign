@@ -14,27 +14,28 @@ import { SvgCalendar, SvgChart } from '@actual-app/components/icons/v1';
 import { Menu } from '@actual-app/components/menu';
 import { Paragraph } from '@actual-app/components/paragraph';
 import { Popover } from '@actual-app/components/popover';
-import { styles } from '@actual-app/components/styles';
-import { theme } from '@actual-app/components/theme';
-import { View } from '@actual-app/components/view';
 import { send } from '@actual-app/core/platform/client/connection';
 import * as monthUtils from '@actual-app/core/shared/months';
 import type { NetWorthWidget, TimeFrame } from '@actual-app/core/types/models';
 import * as d from 'date-fns';
 
-import { EditablePageHeaderTitle } from '#components/EditablePageHeaderTitle';
 import { FinancialText } from '#components/FinancialText';
 import { MobileBackButton } from '#components/mobile/MobileBackButton';
 import { MobilePageHeader, Page, PageHeader } from '#components/Page';
 import { PrivacyFilter } from '#components/PrivacyFilter';
-import { Change } from '#components/reports/Change';
+import { DateRange } from '#components/reports/DateRange';
 import { NetWorthGraph } from '#components/reports/graphs/NetWorthGraph';
 import { Header } from '#components/reports/Header';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
 import { ReportOptions } from '#components/reports/ReportOptions';
+import { ReportPageBody } from '#components/reports/ReportPageBody';
+import { ReportPageCard } from '#components/reports/ReportPageCard';
+import { ReportPageCardHeader } from '#components/reports/ReportPageCardHeader';
+import { ReportPageTitle } from '#components/reports/ReportPageTitle';
 import { calculateTimeRange } from '#components/reports/reportRanges';
 import { createSpreadsheet as netWorthSpreadsheet } from '#components/reports/spreadsheets/net-worth-spreadsheet';
 import { useReport } from '#components/reports/useReport';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { fromDateRepr } from '#components/reports/util';
 import { useAccounts } from '#hooks/useAccounts';
 import { useDashboardWidget } from '#hooks/useDashboardWidget';
@@ -301,14 +302,11 @@ function NetWorthInner({ widget }: NetWorthInnerProps) {
         ) : (
           <PageHeader
             title={
-              widget ? (
-                <EditablePageHeaderTitle
-                  title={title}
-                  onSave={onSaveWidgetName}
-                />
-              ) : (
-                title
-              )
+              <ReportPageTitle
+                title={title}
+                widget={widget}
+                onSave={onSaveWidgetName}
+              />
             }
           />
         )
@@ -345,50 +343,37 @@ function NetWorthInner({ widget }: NetWorthInnerProps) {
         )}
       </Header>
 
-      <View
-        style={{
-          backgroundColor: theme.tableBackground,
-          padding: 20,
-          paddingTop: 0,
-          flex: '1 0 auto',
-          overflowY: 'auto',
-        }}
-      >
-        <View
-          style={{
-            textAlign: 'right',
-            paddingTop: 20,
-          }}
-        >
-          <View
-            style={{ ...styles.largeText, fontWeight: 400, marginBottom: 5 }}
-          >
-            <PrivacyFilter>
-              <FinancialText>
-                {format(data.netWorth, 'financial')}
-              </FinancialText>
-            </PrivacyFilter>
-          </View>
-          <PrivacyFilter>
-            <Change amount={data.totalChange} />
-          </PrivacyFilter>
-        </View>
+      <ReportPageBody>
+        <ReportPageCard>
+          <ReportPageCardHeader
+            title={title}
+            subtitle={<DateRange start={start} end={end} isWidget />}
+            total={
+              <PrivacyFilter>
+                <FinancialText>
+                  {format(data.netWorth, 'financial')}
+                </FinancialText>
+              </PrivacyFilter>
+            }
+            changeAmount={data.totalChange}
+          />
 
-        <NetWorthGraph
-          graphData={data.graphData}
-          accounts={data.accounts}
-          showTooltip={!isNarrowWidth}
-          interval={interval}
-          mode={graphMode}
-        />
+          <NetWorthGraph
+            graphData={data.graphData}
+            accounts={data.accounts}
+            showTooltip={!isNarrowWidth}
+            interval={interval}
+            mode={graphMode}
+          />
+        </ReportPageCard>
 
-        <View style={{ marginTop: 30, userSelect: 'none' }}>
+        <ReportPageCard style={{ userSelect: 'none' }}>
           <Paragraph>
             <strong>
               <Trans>How is net worth calculated?</Trans>
             </strong>
           </Paragraph>
-          <Paragraph>
+          <Paragraph isLast>
             <Trans>
               Net worth shows the balance of all accounts over time, including
               all of your investments. Your "net worth" is considered to be the
@@ -397,8 +382,8 @@ function NetWorthInner({ widget }: NetWorthInnerProps) {
               the amount of assets and debt individually.
             </Trans>
           </Paragraph>
-        </View>
-      </View>
+        </ReportPageCard>
+      </ReportPageBody>
     </Page>
   );
 }
@@ -411,6 +396,7 @@ function IntervalSelector({
   interval: 'Daily' | 'Weekly' | 'Monthly' | 'Yearly';
   onChange: (val: 'Daily' | 'Weekly' | 'Monthly' | 'Yearly') => void;
 }) {
+  const bareControlVariant = useReportControlVariant('bare');
   const { t } = useTranslation();
 
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -424,7 +410,7 @@ function IntervalSelector({
     <>
       <Button
         ref={triggerRef}
-        variant="bare"
+        variant={bareControlVariant}
         onPress={() => setIsOpen(true)}
         aria-label={t('Change interval')}
       >
@@ -460,6 +446,7 @@ function ModeSelector({
   mode: 'trend' | 'stacked';
   onChange: (val: 'trend' | 'stacked') => void;
 }) {
+  const bareControlVariant = useReportControlVariant('bare');
   const { t } = useTranslation();
 
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -477,7 +464,7 @@ function ModeSelector({
     <>
       <Button
         ref={triggerRef}
-        variant="bare"
+        variant={bareControlVariant}
         onPress={() => setIsOpen(true)}
         aria-label={t('Change mode')}
       >

@@ -7,7 +7,6 @@ import { Block } from '@actual-app/components/block';
 import { Button } from '@actual-app/components/button';
 import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { Paragraph } from '@actual-app/components/paragraph';
-import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import { send } from '@actual-app/core/platform/client/connection';
@@ -19,18 +18,22 @@ import type {
 } from '@actual-app/core/types/models';
 import * as d from 'date-fns';
 
-import { EditablePageHeaderTitle } from '#components/EditablePageHeaderTitle';
 import { FinancialText } from '#components/FinancialText';
 import { MobileBackButton } from '#components/mobile/MobileBackButton';
 import { MobilePageHeader, Page, PageHeader } from '#components/Page';
 import { PrivacyFilter } from '#components/PrivacyFilter';
-import { Change } from '#components/reports/Change';
+import { DateRange } from '#components/reports/DateRange';
 import { CashFlowGraph } from '#components/reports/graphs/CashFlowGraph';
 import { Header } from '#components/reports/Header';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
+import { ReportPageBody } from '#components/reports/ReportPageBody';
+import { ReportPageCard } from '#components/reports/ReportPageCard';
+import { ReportPageCardHeader } from '#components/reports/ReportPageCardHeader';
+import { ReportPageTitle } from '#components/reports/ReportPageTitle';
 import { calculateTimeRange } from '#components/reports/reportRanges';
 import { cashFlowByDate } from '#components/reports/spreadsheets/cash-flow-spreadsheet';
 import { useReport } from '#components/reports/useReport';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { useDashboardWidget } from '#hooks/useDashboardWidget';
 import { useFormat } from '#hooks/useFormat';
 import { useLocale } from '#hooks/useLocale';
@@ -68,6 +71,7 @@ type CashFlowInnerProps = {
 };
 
 function CashFlowInner({ widget }: CashFlowInnerProps) {
+  const normalControlVariant = useReportControlVariant('normal');
   const locale = useLocale();
   const dispatch = useDispatch();
   const { t } = useTranslation();
@@ -264,14 +268,11 @@ function CashFlowInner({ widget }: CashFlowInnerProps) {
         ) : (
           <PageHeader
             title={
-              widget ? (
-                <EditablePageHeaderTitle
-                  title={title}
-                  onSave={onSaveWidgetName}
-                />
-              ) : (
-                title
-              )
+              <ReportPageTitle
+                title={title}
+                widget={widget}
+                onSave={onSaveWidgetName}
+              />
             }
           />
         )
@@ -296,7 +297,10 @@ function CashFlowInner({ widget }: CashFlowInnerProps) {
         conditionsOp={conditionsOp}
         onConditionsOpChange={onConditionsOpChange}
       >
-        <Button onPress={() => setShowBalance(state => !state)}>
+        <Button
+          variant={normalControlVariant}
+          onPress={() => setShowBalance(state => !state)}
+        >
           {showBalance ? t('Hide balance') : t('Show balance')}
         </Button>
 
@@ -306,101 +310,86 @@ function CashFlowInner({ widget }: CashFlowInnerProps) {
           </Button>
         )}
       </Header>
-      <View
-        style={{
-          backgroundColor: theme.tableBackground,
-          padding: 20,
-          paddingTop: 0,
-          flex: '1 0 auto',
-          overflowY: 'auto',
-        }}
-      >
-        <View
-          style={{
-            paddingTop: 20,
-            alignItems: 'flex-end',
-            color: theme.pageText,
-          }}
-        >
-          <AlignedText
-            style={{ marginBottom: 5, minWidth: 160 }}
-            left={
-              <Block>
-                <Trans>Income:</Trans>
-              </Block>
+      <ReportPageBody>
+        <ReportPageCard>
+          <ReportPageCardHeader
+            title={title}
+            subtitle={<DateRange start={start} end={end} isWidget />}
+            summary={
+              <View style={{ alignItems: 'flex-end', color: theme.pageText }}>
+                <AlignedText
+                  style={{ marginBottom: 5, minWidth: 160 }}
+                  left={
+                    <Block>
+                      <Trans>Income:</Trans>
+                    </Block>
+                  }
+                  right={
+                    <FinancialText style={{ fontWeight: 600 }}>
+                      <PrivacyFilter>
+                        {format(totalIncome, 'financial')}
+                      </PrivacyFilter>
+                    </FinancialText>
+                  }
+                />
+
+                <AlignedText
+                  style={{ marginBottom: 5, minWidth: 160 }}
+                  left={
+                    <Block>
+                      <Trans>Expenses:</Trans>
+                    </Block>
+                  }
+                  right={
+                    <FinancialText style={{ fontWeight: 600 }}>
+                      <PrivacyFilter>
+                        {format(totalExpenses, 'financial')}
+                      </PrivacyFilter>
+                    </FinancialText>
+                  }
+                />
+
+                <AlignedText
+                  style={{ marginBottom: 5, minWidth: 160 }}
+                  left={
+                    <Block>
+                      <Trans>Transfers:</Trans>
+                    </Block>
+                  }
+                  right={
+                    <FinancialText style={{ fontWeight: 600 }}>
+                      <PrivacyFilter>
+                        {format(totalTransfers, 'financial')}
+                      </PrivacyFilter>
+                    </FinancialText>
+                  }
+                />
+              </View>
             }
-            right={
-              <FinancialText style={{ fontWeight: 600 }}>
-                <PrivacyFilter>
-                  {format(totalIncome, 'financial')}
-                </PrivacyFilter>
-              </FinancialText>
-            }
+            changeAmount={totalIncome + totalExpenses + totalTransfers}
           />
 
-          <AlignedText
-            style={{ marginBottom: 5, minWidth: 160 }}
-            left={
-              <Block>
-                <Trans>Expenses:</Trans>
-              </Block>
-            }
-            right={
-              <FinancialText style={{ fontWeight: 600 }}>
-                <PrivacyFilter>
-                  {format(totalExpenses, 'financial')}
-                </PrivacyFilter>
-              </FinancialText>
-            }
+          <CashFlowGraph
+            graphData={graphData}
+            isConcise={isConcise}
+            showBalance={showBalance}
           />
+        </ReportPageCard>
 
-          <AlignedText
-            style={{ marginBottom: 5, minWidth: 160 }}
-            left={
-              <Block>
-                <Trans>Transfers:</Trans>
-              </Block>
-            }
-            right={
-              <FinancialText style={{ fontWeight: 600 }}>
-                <PrivacyFilter>
-                  {format(totalTransfers, 'financial')}
-                </PrivacyFilter>
-              </FinancialText>
-            }
-          />
-          <Text style={{ fontWeight: 600 }}>
-            <PrivacyFilter>
-              <Change amount={totalIncome + totalExpenses + totalTransfers} />
-            </PrivacyFilter>
-          </Text>
-        </View>
-
-        <CashFlowGraph
-          graphData={graphData}
-          isConcise={isConcise}
-          showBalance={showBalance}
-        />
-
-        <View
-          style={{
-            marginTop: 30,
-            userSelect: 'none',
-          }}
-        >
+        <ReportPageCard style={{ userSelect: 'none' }}>
           <Trans>
             <Paragraph>
               <strong>How is cash flow calculated?</strong>
             </Paragraph>
-            <Paragraph>
+            <Paragraph isLast>
               Cash flow shows the balance of your budgeted accounts over time,
               and the amount of expenses/income each day or month. Your budgeted
               accounts are considered to be "cash on hand," so this gives you a
               picture of how available money fluctuates.
             </Paragraph>
           </Trans>
-        </View>
-      </View>
+        </ReportPageCard>
+      </ReportPageBody>
     </Page>
   );
 }

@@ -31,13 +31,16 @@ import { debounce } from 'es-toolkit/compat';
 import type { TFunction } from 'i18next';
 import type { SankeyData } from 'recharts/types/chart/Sankey';
 
-import { EditablePageHeaderTitle } from '#components/EditablePageHeaderTitle';
 import { MobileBackButton } from '#components/mobile/MobileBackButton';
 import { MobilePageHeader, Page, PageHeader } from '#components/Page';
 import { SankeyGraph } from '#components/reports/graphs/SankeyGraph';
 import { Header } from '#components/reports/Header';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
+import { ReportPageBody } from '#components/reports/ReportPageBody';
+import { ReportPageCard } from '#components/reports/ReportPageCard';
+import { ReportPageTitle } from '#components/reports/ReportPageTitle';
 import { calculateTimeRange } from '#components/reports/reportRanges';
+import { ReportSegmentedControl } from '#components/reports/ReportSegmentedControl';
 import {
   buildSankeyData,
   createBaseGraphSpreadsheet,
@@ -46,6 +49,7 @@ import {
 } from '#components/reports/spreadsheets/sankey-spreadsheet';
 import type { Graph } from '#components/reports/spreadsheets/sankey-spreadsheet';
 import { useReport } from '#components/reports/useReport';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { fromDateRepr } from '#components/reports/util';
 import { useCategories } from '#hooks/useCategories';
 import { useDashboardWidget } from '#hooks/useDashboardWidget';
@@ -186,6 +190,7 @@ function displayN(n: number, t: TFunction): string {
 }
 
 function TopNSelector({ value, onChange }: TopNSelectorProps) {
+  const bareControlVariant = useReportControlVariant('bare');
   const { t } = useTranslation();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -194,7 +199,7 @@ function TopNSelector({ value, onChange }: TopNSelectorProps) {
     <>
       <Button
         ref={triggerRef}
-        variant="bare"
+        variant={bareControlVariant}
         onPress={() => setIsOpen(true)}
         aria-label={t('Change category limit')}
       >
@@ -230,6 +235,7 @@ type CategorySortSelectorProps = {
 };
 
 function CategorySortSelector({ value, onChange }: CategorySortSelectorProps) {
+  const bareControlVariant = useReportControlVariant('bare');
   const { t } = useTranslation();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -254,7 +260,7 @@ function CategorySortSelector({ value, onChange }: CategorySortSelectorProps) {
     <>
       <Button
         ref={triggerRef}
-        variant="bare"
+        variant={bareControlVariant}
         onPress={() => setIsOpen(true)}
         aria-label={t('Change category sort order')}
       >
@@ -297,6 +303,7 @@ function LayerSelector({
   menuItems,
   onChange,
 }: LayerSelectorProps) {
+  const bareControlVariant = useReportControlVariant('bare');
   const { t } = useTranslation();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -307,7 +314,7 @@ function LayerSelector({
     <>
       <Button
         ref={triggerRef}
-        variant="bare"
+        variant={bareControlVariant}
         onPress={() => setIsOpen(true)}
         aria-label={t('Change layer {{direction}}', {
           direction: translatedDirection,
@@ -342,31 +349,39 @@ type GraphModeSelectorProps = {
 };
 
 function GraphModeSelector({ mode, onChange }: GraphModeSelectorProps) {
+  const { isNarrowWidth } = useResponsive();
+
+  // Mobile keeps the upstream buttons (plan §19.4).
+  if (isNarrowWidth) {
+    return (
+      <SpaceBetween gap={5}>
+        <ModeButton
+          selected={mode === 'spent'}
+          style={{ backgroundColor: 'inherit' }}
+          onSelect={() => onChange('spent')}
+        >
+          <Trans>Spent</Trans>
+        </ModeButton>
+        <ModeButton
+          selected={mode === 'budgeted'}
+          style={{ backgroundColor: 'inherit' }}
+          onSelect={() => onChange('budgeted')}
+        >
+          <Trans>Budgeted</Trans>
+        </ModeButton>
+      </SpaceBetween>
+    );
+  }
+
   return (
-    <SpaceBetween gap={5}>
-      <ModeButton
-        selected={mode === 'spent'}
-        style={{
-          backgroundColor: 'inherit',
-        }}
-        onSelect={() => {
-          onChange('spent');
-        }}
-      >
-        <Trans>Spent</Trans>
-      </ModeButton>
-      <ModeButton
-        selected={mode === 'budgeted'}
-        onSelect={() => {
-          onChange('budgeted');
-        }}
-        style={{
-          backgroundColor: 'inherit',
-        }}
-      >
-        <Trans>Budgeted</Trans>
-      </ModeButton>
-    </SpaceBetween>
+    <ReportSegmentedControl
+      options={[
+        { value: 'spent', label: <Trans>Spent</Trans> },
+        { value: 'budgeted', label: <Trans>Budgeted</Trans> },
+      ]}
+      value={mode}
+      onChange={onChange}
+    />
   );
 }
 
@@ -383,12 +398,17 @@ function OptionsButton({
   groupAccounts,
   onToggleGroupAccounts,
 }: OptionsButtonProps) {
+  const normalControlVariant = useReportControlVariant('normal');
   const { t } = useTranslation();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
-      <Button ref={triggerRef} onPress={() => setIsOpen(true)}>
+      <Button
+        ref={triggerRef}
+        variant={normalControlVariant}
+        onPress={() => setIsOpen(true)}
+      >
         <Trans>Options</Trans>
       </Button>
       <Popover
@@ -424,6 +444,7 @@ type SankeyInnerProps = {
   widget?: SankeyWidget;
 };
 function SankeyInner({ widget }: SankeyInnerProps) {
+  const bareControlVariant = useReportControlVariant('bare');
   const locale = useLocale();
   const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
@@ -790,14 +811,11 @@ function SankeyInner({ widget }: SankeyInnerProps) {
         ) : (
           <PageHeader
             title={
-              widget ? (
-                <EditablePageHeaderTitle
-                  title={title}
-                  onSave={onSaveWidgetName}
-                />
-              ) : (
-                title
-              )
+              <ReportPageTitle
+                title={title}
+                widget={widget}
+                onSave={onSaveWidgetName}
+              />
             }
           />
         )
@@ -822,35 +840,41 @@ function SankeyInner({ widget }: SankeyInnerProps) {
         filterExclude={['date']}
         inlineContent={
           <>
-            <View
-              style={{
-                width: 1,
-                height: 28,
-                backgroundColor: theme.pillBorderDark,
-              }}
-            />
+            {isNarrowWidth && (
+              <View
+                style={{
+                  width: 1,
+                  height: 28,
+                  backgroundColor: theme.pillBorderDark,
+                }}
+              />
+            )}
             <GraphModeSelector mode={graphMode} onChange={setGraphMode} />
-            <View
-              style={{
-                width: 1,
-                height: 28,
-                backgroundColor: theme.pillBorderDark,
-              }}
-            />
+            {isNarrowWidth && (
+              <View
+                style={{
+                  width: 1,
+                  height: 28,
+                  backgroundColor: theme.pillBorderDark,
+                }}
+              />
+            )}
             <TopNSelector value={topNcategories} onChange={settopNcategories} />
             <CategorySortSelector
               value={categorySort}
               onChange={setCategorySort}
             />
-            <View
-              style={{
-                width: 1,
-                height: 28,
-                backgroundColor: theme.pillBorderDark,
-                marginRight: 10,
-                marginLeft: 10,
-              }}
-            />
+            {isNarrowWidth && (
+              <View
+                style={{
+                  width: 1,
+                  height: 28,
+                  backgroundColor: theme.pillBorderDark,
+                  marginRight: 10,
+                  marginLeft: 10,
+                }}
+              />
+            )}
             <SvgLayers style={{ width: 12, height: 12 }} />
             <LayerSelector
               direction="from"
@@ -868,7 +892,7 @@ function SankeyInner({ widget }: SankeyInnerProps) {
               onChange={layer => onChangeLayer('to', layer)}
             />
             <Button
-              variant="bare"
+              variant={bareControlVariant}
               onPress={onResetLayers}
               aria-label={t('Reset layers')}
             >
@@ -891,148 +915,104 @@ function SankeyInner({ widget }: SankeyInnerProps) {
           </Button>
         )}
       </Header>
-      <View
-        style={{
-          backgroundColor: theme.tableBackground,
-          padding: 20,
-          paddingTop: 0,
-          flex: '1 0 auto',
-          overflowY: 'visible',
-        }}
-      >
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            paddingTop: 0,
-            flexGrow: 1,
-          }}
-        >
-          <View
-            style={{
-              flexGrow: 1,
-            }}
-          >
+      <ReportPageBody style={{ overflowY: 'visible' }}>
+        <ReportPageCard style={{ flexGrow: 1 }}>
+          {displayData && displayData.links && displayData.links.length > 0 ? (
             <View
+              ref={containerRef}
               style={{
-                backgroundColor: theme.tableBackground,
-                padding: 20,
-                paddingTop: 0,
-                flex: '1 0 auto',
-                overflowY: 'auto',
+                flexDirection: 'column',
+                flexGrow: 1,
               }}
             >
-              <View
-                style={{
-                  flexDirection: 'column',
-                  flexGrow: 1,
-                  padding: 10,
-                  paddingTop: 10,
-                }}
-              >
-                {displayData &&
-                displayData.links &&
-                displayData.links.length > 0 ? (
-                  <View
-                    ref={containerRef}
-                    style={{
-                      flexDirection: 'column',
-                      flexGrow: 1,
-                    }}
-                  >
-                    <SankeyGraph
-                      style={{ flexGrow: 1 }}
-                      data={displayData}
-                      showPercentages={showPercentages}
-                    />
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      flexGrow: 1,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: theme.pageTextSubdued,
-                    }}
-                  >
-                    <Text style={{ fontSize: 16, textAlign: 'center' }}>
-                      {graphMode === 'budgeted' && (
-                        <Trans>
-                          No data available for this period. Try budgeting
-                          categories or selecting a different period.
-                        </Trans>
-                      )}
-                      {graphMode === 'spent' && (
-                        <Trans>
-                          No data available for this period. Try adding
-                          transactions or selecting a different period.
-                        </Trans>
-                      )}
-                    </Text>
-                  </View>
-                )}
-
-                {ignoredFilterFields.length > 0 && (
-                  <View
-                    style={{
-                      marginTop: 10,
-                      padding: '8px 12px',
-                      backgroundColor: theme.warningBackground,
-                      borderRadius: 4,
-                      color: theme.warningText,
-                    }}
-                  >
-                    <Text style={{ fontSize: 13 }}>
-                      <Trans>
-                        Filters on <strong>{ignoredFilterFieldsList}</strong>{' '}
-                        are ignored in <strong>Budgeted</strong> mode.
-                      </Trans>
-                    </Text>
-                  </View>
-                )}
-
-                {!isNarrowWidth && (
-                  <View style={{ marginTop: 30 }}>
-                    <Trans>
-                      <Paragraph>
-                        <strong>What is a Sankey plot?</strong>
-                      </Paragraph>
-                      <Paragraph>
-                        A Sankey plot visualizes the flow of quantities between
-                        multiple categories, emphasizing the distribution and
-                        proportional relationships of data streams.
-                      </Paragraph>
-                      <Paragraph>
-                        <strong>View options:</strong>
-                      </Paragraph>
-                      <Paragraph>
-                        <ul style={{ marginTop: 0, paddingLeft: 20 }}>
-                          <li style={{ marginBottom: 5 }}>
-                            <strong>Spent:</strong> Displays actual spending by
-                            category from transactions.
-                          </li>
-                          <li style={{ marginBottom: 5 }}>
-                            <strong>Budgeted:</strong> Shows how your budget is
-                            allocated across categories.
-                          </li>
-                        </ul>
-                        <strong>Disclaimer:</strong> A Sankey chart cannot
-                        directly represent negative numbers. In some cases, such
-                        as when funds are reallocated from categories with
-                        negative budgeting (e.g. using savings to cover
-                        overspending), the chart structure may differ from the
-                        main budget overview. As a result, some category totals
-                        and flows in this diagram may not exactly match the
-                        summary figures elsewhere in the app.
-                      </Paragraph>
-                    </Trans>
-                  </View>
-                )}
-              </View>
+              <SankeyGraph
+                style={{ flexGrow: 1 }}
+                data={displayData}
+                showPercentages={showPercentages}
+              />
             </View>
-          </View>
-        </View>
-      </View>
+          ) : (
+            <View
+              style={{
+                flexGrow: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: theme.pageTextSubdued,
+              }}
+            >
+              <Text style={{ fontSize: 16, textAlign: 'center' }}>
+                {graphMode === 'budgeted' && (
+                  <Trans>
+                    No data available for this period. Try budgeting categories
+                    or selecting a different period.
+                  </Trans>
+                )}
+                {graphMode === 'spent' && (
+                  <Trans>
+                    No data available for this period. Try adding transactions
+                    or selecting a different period.
+                  </Trans>
+                )}
+              </Text>
+            </View>
+          )}
+
+          {ignoredFilterFields.length > 0 && (
+            <View
+              style={{
+                marginTop: 10,
+                padding: '8px 12px',
+                backgroundColor: theme.warningBackground,
+                borderRadius: 4,
+                color: theme.warningText,
+              }}
+            >
+              <Text style={{ fontSize: 13 }}>
+                <Trans>
+                  Filters on <strong>{ignoredFilterFieldsList}</strong> are
+                  ignored in <strong>Budgeted</strong> mode.
+                </Trans>
+              </Text>
+            </View>
+          )}
+        </ReportPageCard>
+        {!isNarrowWidth && (
+          <ReportPageCard>
+            <Trans>
+              <Paragraph>
+                <strong>What is a Sankey plot?</strong>
+              </Paragraph>
+              <Paragraph>
+                A Sankey plot visualizes the flow of quantities between multiple
+                categories, emphasizing the distribution and proportional
+                relationships of data streams.
+              </Paragraph>
+              <Paragraph>
+                <strong>View options:</strong>
+              </Paragraph>
+              <Paragraph isLast>
+                <ul style={{ marginTop: 0, paddingLeft: 20 }}>
+                  <li style={{ marginBottom: 5 }}>
+                    <strong>Spent:</strong> Displays actual spending by category
+                    from transactions.
+                  </li>
+                  <li style={{ marginBottom: 5 }}>
+                    <strong>Budgeted:</strong> Shows how your budget is
+                    allocated across categories.
+                  </li>
+                </ul>
+                <strong>Disclaimer:</strong> A Sankey chart cannot directly
+                represent negative numbers. In some cases, such as when funds
+                are reallocated from categories with negative budgeting (e.g.
+                using savings to cover overspending), the chart structure may
+                differ from the main budget overview. As a result, some category
+                totals and flows in this diagram may not exactly match the
+                summary figures elsewhere in the app.
+              </Paragraph>
+            </Trans>
+          </ReportPageCard>
+        )}
+      </ReportPageBody>
     </Page>
   );
 }

@@ -4,8 +4,8 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
 import { Button } from '@actual-app/components/button';
+import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { Select } from '@actual-app/components/select';
-import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import { send } from '@actual-app/core/platform/client/connection';
@@ -31,10 +31,15 @@ import {
 import { Page, PageHeader } from '#components/Page';
 import { PrivacyFilter } from '#components/PrivacyFilter';
 import { Container } from '#components/reports/Container';
+import { DateRange } from '#components/reports/DateRange';
 import { getCustomTick } from '#components/reports/getCustomTick';
 import { computePadding } from '#components/reports/graphs/util/computePadding';
 import { Header } from '#components/reports/Header';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
+import { ReportPageBody } from '#components/reports/ReportPageBody';
+import { ReportPageCard } from '#components/reports/ReportPageCard';
+import { ReportPageCardHeader } from '#components/reports/ReportPageCardHeader';
+import { ReportPageTitle } from '#components/reports/ReportPageTitle';
 import { useAccounts } from '#hooks/useAccounts';
 import { useBalanceForecast } from '#hooks/useBalanceForecast';
 import { useDashboardWidget } from '#hooks/useDashboardWidget';
@@ -75,6 +80,8 @@ type BalanceForecastInnerProps = {
 
 function BalanceForecastInner({ widget }: BalanceForecastInnerProps) {
   const { t } = useTranslation();
+  const { isNarrowWidth } = useResponsive();
+  const title = t('Balance Forecast');
   const format = useFormat();
   const privacyMode = usePrivacyMode();
   const locale = useLocale();
@@ -365,7 +372,17 @@ function BalanceForecastInner({ widget }: BalanceForecastInnerProps) {
 
   return (
     <Page
-      header={<PageHeader title={<Trans>Balance Forecast</Trans>} />}
+      header={
+        <PageHeader
+          title={
+            isNarrowWidth ? (
+              title
+            ) : (
+              <ReportPageTitle title={title} widget={widget} />
+            )
+          }
+        />
+      }
       padding={0}
     >
       {isTrackingBudgetForecast ? (
@@ -415,268 +432,270 @@ function BalanceForecastInner({ widget }: BalanceForecastInnerProps) {
         </Header>
       )}
 
-      <View
-        style={{
-          backgroundColor: theme.tableBackground,
-          padding: 20,
-          paddingTop: 0,
-          flex: '1 0 auto',
-          overflowY: 'auto',
-        }}
-      >
-        {errorMessage ? (
-          <div style={{ color: theme.errorText, marginBottom: 20 }}>
-            {errorMessage}
-          </div>
-        ) : endingPoint ? (
-          <View
-            style={{
-              textAlign: 'right',
-              paddingTop: 20,
-              marginBottom: 20,
-            }}
-          >
-            <View
-              style={{
-                ...styles.largeText,
-                fontWeight: 400,
-                marginBottom: 5,
-                color:
-                  endingPoint.balance < 0 ? theme.errorText : theme.pageText,
-              }}
-            >
-              <PrivacyFilter>
-                {format(endingPoint.balance, 'financial')}
-              </PrivacyFilter>
+      <ReportPageBody>
+        <ReportPageCard>
+          {errorMessage ? (
+            <div style={{ color: theme.errorText, marginBottom: 20 }}>
+              {errorMessage}
+            </div>
+          ) : endingPoint ? (
+            <View style={{ marginBottom: isNarrowWidth ? 20 : 0 }}>
+              <ReportPageCardHeader
+                title={title}
+                subtitle={<DateRange start={start} end={end} isWidget />}
+                total={
+                  <View
+                    style={{
+                      color:
+                        endingPoint.balance < 0
+                          ? theme.errorText
+                          : theme.pageText,
+                    }}
+                  >
+                    <PrivacyFilter>
+                      {format(endingPoint.balance, 'financial')}
+                    </PrivacyFilter>
+                  </View>
+                }
+                summary={
+                  <>
+                    <View style={{ color: theme.pageTextLight }}>
+                      <Trans>Ending Balance</Trans>: {endingPoint.date}
+                    </View>
+                    {lowestPoint && lowestPoint.date !== endingPoint.date ? (
+                      <View
+                        style={{
+                          color: theme.pageTextLight,
+                          fontSize: 12,
+                          marginTop: 4,
+                        }}
+                      >
+                        <Trans>Lowest visible point</Trans>:{' '}
+                        <PrivacyFilter>
+                          {format(lowestPoint.balance, 'financial')}
+                        </PrivacyFilter>{' '}
+                        ({lowestPoint.date})
+                      </View>
+                    ) : null}
+                  </>
+                }
+              />
             </View>
-            <View style={{ color: theme.pageTextLight }}>
-              <Trans>Ending Balance</Trans>: {endingPoint.date}
-            </View>
-            {lowestPoint && lowestPoint.date !== endingPoint.date ? (
-              <View
-                style={{
-                  color: theme.pageTextLight,
-                  fontSize: 12,
-                  marginTop: 4,
-                }}
-              >
-                <Trans>Lowest visible point</Trans>:{' '}
-                <PrivacyFilter>
-                  {format(lowestPoint.balance, 'financial')}
-                </PrivacyFilter>{' '}
-                ({lowestPoint.date})
-              </View>
-            ) : null}
-          </View>
-        ) : null}
+          ) : null}
 
-        <div style={{ flex: 1, minHeight: 300 }}>
-          {errorMessage ? null : chartData.length > 0 ? (
-            <>
-              <Container>
-                {(width, height) => (
-                  <ResponsiveContainer>
-                    <LineChart
-                      width={width}
-                      height={height}
-                      data={chartData}
-                      margin={{
-                        top: 10,
-                        right: 10,
-                        left: 5 + yAxisLeftPadding,
-                        bottom: 10,
-                      }}
-                    >
-                      <defs>
-                        <linearGradient
-                          id="balance-forecast-line-gradient"
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          {zeroCrossingGradientOffset == null ? (
-                            <stop
-                              offset="0%"
-                              stopColor={
-                                hasNegativeBalance
-                                  ? theme.reportsNumberNegative
-                                  : theme.reportsChartFill
-                              }
-                            />
-                          ) : (
-                            <>
-                              <stop
-                                offset={`${zeroCrossingGradientOffset}%`}
-                                stopColor={theme.reportsChartFill}
-                              />
-                              <stop
-                                offset={`${zeroCrossingGradientOffset}%`}
-                                stopColor={theme.reportsNumberNegative}
-                              />
-                            </>
-                          )}
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis
-                        dataKey="date"
-                        tick={{ fill: theme.pageText }}
-                        tickLine={{ stroke: theme.pageText }}
-                        interval={
-                          granularity === 'Daily'
-                            ? Math.ceil(chartData.length / 10)
-                            : 0
-                        }
-                        tickFormatter={value => {
-                          if (granularity === 'Daily') {
-                            return d.format(
-                              monthUtils.parseDate(value),
-                              'MMM d',
-                            );
-                          }
-                          return value;
+          <div style={{ flex: 1, minHeight: 300 }}>
+            {errorMessage ? null : chartData.length > 0 ? (
+              <>
+                <Container>
+                  {(width, height) => (
+                    <ResponsiveContainer>
+                      <LineChart
+                        width={width}
+                        height={height}
+                        data={chartData}
+                        margin={{
+                          top: 10,
+                          right: 10,
+                          left: 5 + yAxisLeftPadding,
+                          bottom: 10,
                         }}
-                      />
-                      <YAxis
-                        domain={['auto', 'auto']}
-                        tickFormatter={formatYTick}
-                        tick={{ fill: theme.pageText }}
-                        tickLine={{ stroke: theme.pageText }}
-                        tickSize={0}
-                      />
-                      <Tooltip
-                        isAnimationActive={false}
-                        content={({ active, payload }) => {
-                          if (active && payload && payload.length) {
-                            return (
-                              <div
-                                style={{
-                                  zIndex: 1000,
-                                  pointerEvents: 'none',
-                                  borderRadius: 2,
-                                  boxShadow: '0 1px 6px rgba(0, 0, 0, .20)',
-                                  backgroundColor: theme.menuBackground,
-                                  color: theme.menuItemText,
-                                  padding: 10,
-                                }}
-                              >
-                                <div style={{ marginBottom: 5 }}>
-                                  <strong>{payload[0].payload.date}</strong>
-                                </div>
-                                <div>
-                                  {format(
-                                    payload[0].value as number,
-                                    'financial',
-                                  )}
-                                </div>
-                              </div>
-                            );
+                      >
+                        <defs>
+                          <linearGradient
+                            id="balance-forecast-line-gradient"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            {zeroCrossingGradientOffset == null ? (
+                              <stop
+                                offset="0%"
+                                stopColor={
+                                  hasNegativeBalance
+                                    ? theme.reportsNumberNegative
+                                    : theme.reportsChartFill
+                                }
+                              />
+                            ) : (
+                              <>
+                                <stop
+                                  offset={`${zeroCrossingGradientOffset}%`}
+                                  stopColor={theme.reportsChartFill}
+                                />
+                                <stop
+                                  offset={`${zeroCrossingGradientOffset}%`}
+                                  stopColor={theme.reportsNumberNegative}
+                                />
+                              </>
+                            )}
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis
+                          dataKey="date"
+                          tick={{ fill: theme.pageText }}
+                          tickLine={{ stroke: theme.pageText }}
+                          interval={
+                            granularity === 'Daily'
+                              ? Math.ceil(chartData.length / 10)
+                              : 0
                           }
-                          return null;
-                        }}
-                      />
-                      {showsTodayReferenceLine && (
-                        <ReferenceLine
-                          x={todayReferenceDate}
-                          stroke={theme.reportsBlue}
-                          strokeDasharray="4 4"
-                          label={{
-                            value: t('Today'),
-                            fill: theme.reportsBlue,
-                            fontSize: 12,
-                            position: 'insideTop',
-                            offset: 8,
+                          tickFormatter={value => {
+                            if (granularity === 'Daily') {
+                              return d.format(
+                                monthUtils.parseDate(value),
+                                'MMM d',
+                              );
+                            }
+                            return value;
                           }}
                         />
-                      )}
-                      {hasNegativeBalance && (
-                        <ReferenceLine y={0} stroke={theme.pageTextSubdued} />
-                      )}
-                      <Line
-                        type="monotone"
-                        dataKey="balance"
-                        stroke="url(#balance-forecast-line-gradient)"
-                        strokeWidth={2}
-                        dot={false}
-                        activeDot={{ r: 6 }}
-                        opacity={isUpdatingForecast ? 0.45 : 1}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                )}
-              </Container>
+                        <YAxis
+                          domain={['auto', 'auto']}
+                          tickFormatter={formatYTick}
+                          tick={{ fill: theme.pageText }}
+                          tickLine={{ stroke: theme.pageText }}
+                          tickSize={0}
+                        />
+                        <Tooltip
+                          isAnimationActive={false}
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              return (
+                                <div
+                                  style={{
+                                    zIndex: 1000,
+                                    pointerEvents: 'none',
+                                    borderRadius: 2,
+                                    boxShadow: '0 1px 6px rgba(0, 0, 0, .20)',
+                                    backgroundColor: theme.menuBackground,
+                                    color: theme.menuItemText,
+                                    padding: 10,
+                                  }}
+                                >
+                                  <div style={{ marginBottom: 5 }}>
+                                    <strong>{payload[0].payload.date}</strong>
+                                  </div>
+                                  <div>
+                                    {format(
+                                      payload[0].value as number,
+                                      'financial',
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        {showsTodayReferenceLine && (
+                          <ReferenceLine
+                            x={todayReferenceDate}
+                            stroke={theme.reportsBlue}
+                            strokeDasharray="4 4"
+                            label={{
+                              value: t('Today'),
+                              fill: theme.reportsBlue,
+                              fontSize: 12,
+                              position: 'insideTop',
+                              offset: 8,
+                            }}
+                          />
+                        )}
+                        {hasNegativeBalance && (
+                          <ReferenceLine y={0} stroke={theme.pageTextSubdued} />
+                        )}
+                        <Line
+                          type="monotone"
+                          dataKey="balance"
+                          stroke="url(#balance-forecast-line-gradient)"
+                          strokeWidth={2}
+                          dot={false}
+                          activeDot={{ r: 6 }}
+                          opacity={isUpdatingForecast ? 0.45 : 1}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  )}
+                </Container>
+                <div
+                  style={{
+                    marginTop: 12,
+                    fontSize: 12,
+                    color: theme.pageTextLight,
+                  }}
+                >
+                  {isTrackingBudgetForecast ? (
+                    <Trans>
+                      Tracking budget forecast uses on-budget balance plus
+                      monthly budgeted income minus budgeted expenses.
+                    </Trans>
+                  ) : scheduledOccurrenceCount === 0 ? (
+                    <Trans>
+                      This range shows posted transactions only; no scheduled
+                      occurrences fall in it.
+                    </Trans>
+                  ) : (
+                    <Trans count={scheduledOccurrenceCount}>
+                      {{ count: scheduledOccurrenceCount }} scheduled
+                      transactions included in this date range
+                    </Trans>
+                  )}
+                  {isUpdatingForecast ? (
+                    <>
+                      {' '}
+                      <Trans>Updating...</Trans>
+                    </>
+                  ) : null}
+                </div>
+              </>
+            ) : (
               <div
                 style={{
-                  marginTop: 12,
-                  fontSize: 12,
-                  color: theme.pageTextLight,
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  display: 'flex',
+                  minHeight: 200,
                 }}
               >
-                {isTrackingBudgetForecast ? (
+                <div style={{ color: theme.pageTextLight }}>
                   <Trans>
-                    Tracking budget forecast uses on-budget balance plus monthly
-                    budgeted income minus budgeted expenses.
+                    No transactions are included in this report. Adjust your
+                    filters, accounts, or date range to see a balance
+                    projection.
                   </Trans>
-                ) : scheduledOccurrenceCount === 0 ? (
-                  <Trans>
-                    This range shows posted transactions only; no scheduled
-                    occurrences fall in it.
-                  </Trans>
-                ) : (
-                  <Trans count={scheduledOccurrenceCount}>
-                    {{ count: scheduledOccurrenceCount }} scheduled transactions
-                    included in this date range
-                  </Trans>
-                )}
-                {isUpdatingForecast ? (
-                  <>
-                    {' '}
-                    <Trans>Updating...</Trans>
-                  </>
-                ) : null}
+                </div>
               </div>
-            </>
-          ) : (
-            <div
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                display: 'flex',
-                minHeight: 200,
-              }}
-            >
-              <div style={{ color: theme.pageTextLight }}>
-                <Trans>
-                  No transactions are included in this report. Adjust your
-                  filters, accounts, or date range to see a balance projection.
-                </Trans>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {!errorMessage && !isTrackingBudgetForecast && (
-          <div
-            style={{ marginTop: 20, fontSize: 12, color: theme.pageTextLight }}
-          >
-            {hasFilters ? (
-              <Trans>
-                This forecast shows the running total of matching posted
-                transactions, plus upcoming scheduled transactions in the
-                future.
-              </Trans>
-            ) : (
-              <Trans>
-                This forecast shows your running balance from posted
-                transactions, plus upcoming scheduled transactions in the
-                future.
-              </Trans>
             )}
           </div>
-        )}
-      </View>
+
+          {!errorMessage && !isTrackingBudgetForecast && (
+            <div
+              style={{
+                marginTop: 20,
+                fontSize: 12,
+                color: theme.pageTextLight,
+              }}
+            >
+              {hasFilters ? (
+                <Trans>
+                  This forecast shows the running total of matching posted
+                  transactions, plus upcoming scheduled transactions in the
+                  future.
+                </Trans>
+              ) : (
+                <Trans>
+                  This forecast shows your running balance from posted
+                  transactions, plus upcoming scheduled transactions in the
+                  future.
+                </Trans>
+              )}
+            </div>
+          )}
+        </ReportPageCard>
+      </ReportPageBody>
     </Page>
   );
 }

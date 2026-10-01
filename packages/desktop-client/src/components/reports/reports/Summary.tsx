@@ -23,7 +23,6 @@ import type {
 } from '@actual-app/core/types/models';
 import { parseISO } from 'date-fns';
 
-import { EditablePageHeaderTitle } from '#components/EditablePageHeaderTitle';
 import { AppliedFilters } from '#components/filters/AppliedFilters';
 import { FilterButton } from '#components/filters/FiltersMenu';
 import { FinancialText } from '#components/FinancialText';
@@ -33,9 +32,13 @@ import { MobilePageHeader, Page, PageHeader } from '#components/Page';
 import { PrivacyFilter } from '#components/PrivacyFilter';
 import { Header } from '#components/reports/Header';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
+import { ReportPageBody } from '#components/reports/ReportPageBody';
+import { ReportPageCard } from '#components/reports/ReportPageCard';
+import { ReportPageTitle } from '#components/reports/ReportPageTitle';
 import { calculateTimeRange } from '#components/reports/reportRanges';
 import { summarySpreadsheet } from '#components/reports/spreadsheets/summary-spreadsheet';
 import { useReport } from '#components/reports/useReport';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { fromDateRepr } from '#components/reports/util';
 import { FieldSelect } from '#components/rules/RuleEditor';
 import { useDashboardWidget } from '#hooks/useDashboardWidget';
@@ -340,14 +343,11 @@ function SummaryInner({ widget }: SummaryInnerProps) {
         ) : (
           <PageHeader
             title={
-              widget ? (
-                <EditablePageHeaderTitle
-                  title={title}
-                  onSave={onSaveWidgetName}
-                />
-              ) : (
-                title
-              )
+              <ReportPageTitle
+                title={title}
+                widget={widget}
+                onSave={onSaveWidgetName}
+              />
             }
           />
         )
@@ -384,7 +384,7 @@ function SummaryInner({ widget }: SummaryInnerProps) {
             justifyContent: 'flex-start',
             alignItems: 'center',
             flexDirection: 'row',
-            padding: 16,
+            padding: isNarrowWidth ? 16 : '0 20px 16px',
           }}
         >
           <span style={{ marginRight: 4 }}>
@@ -435,15 +435,8 @@ function SummaryInner({ widget }: SummaryInnerProps) {
           </View>
         )}
       </View>
-      <View
-        style={{
-          background: theme.pageBackground,
-          padding: 20,
-          paddingTop: 0,
-          flexGrow: 1,
-        }}
-      >
-        <View
+      <ReportPageBody style={{ backgroundColor: theme.pageBackground }}>
+        <ReportPageCard
           style={{
             flexDirection: isNarrowWidth ? 'column' : 'row',
             justifyContent: 'center',
@@ -523,8 +516,8 @@ function SummaryInner({ widget }: SummaryInnerProps) {
               {content.type === 'percentage' ? '%' : ''}
             </PrivacyFilter>
           </View>
-        </View>
-      </View>
+        </ReportPageCard>
+      </ReportPageBody>
     </Page>
   );
 }
@@ -610,6 +603,7 @@ function SumWithRange({
   containerStyle,
   filterObject,
 }: SumWithRangeProps) {
+  const bareControlVariant = useReportControlVariant('bare');
   const { t } = useTranslation();
   const { isNarrowWidth } = useResponsive();
   const sigmaSize = isNarrowWidth ? 34 : 50;
@@ -688,6 +682,7 @@ function SumWithRange({
           compact={false}
           onApply={filterObject.onApply}
           hover={false}
+          variant={bareControlVariant}
         />
       </View>
     </View>

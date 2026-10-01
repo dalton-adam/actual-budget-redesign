@@ -6,7 +6,6 @@ import { AlignedText } from '@actual-app/components/aligned-text';
 import { Block } from '@actual-app/components/block';
 import { Button } from '@actual-app/components/button';
 import { useResponsive } from '@actual-app/components/hooks/useResponsive';
-import { ModeButton } from '@actual-app/components/mode-button';
 import { Paragraph } from '@actual-app/components/paragraph';
 import { Select } from '@actual-app/components/select';
 import { SpaceBetween } from '@actual-app/components/space-between';
@@ -23,7 +22,6 @@ import type {
 } from '@actual-app/core/types/models';
 import * as d from 'date-fns';
 
-import { EditablePageHeaderTitle } from '#components/EditablePageHeaderTitle';
 import { AppliedFilters } from '#components/filters/AppliedFilters';
 import { FilterButton } from '#components/filters/FiltersMenu';
 import { MobileBackButton } from '#components/mobile/MobileBackButton';
@@ -32,7 +30,11 @@ import { PrivacyFilter } from '#components/PrivacyFilter';
 import { SpendingGraph } from '#components/reports/graphs/SpendingGraph';
 import { LegendItem } from '#components/reports/LegendItem';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
+import { ReportPageBody } from '#components/reports/ReportPageBody';
+import { ReportPageCard } from '#components/reports/ReportPageCard';
+import { ReportPageTitle } from '#components/reports/ReportPageTitle';
 import { calculateSpendingReportTimeRange } from '#components/reports/reportRanges';
+import { ReportSegmentedControl } from '#components/reports/ReportSegmentedControl';
 import {
   getSpendingAverageRangeLabel,
   getSpendingAverageRangeOptions,
@@ -277,14 +279,11 @@ function SpendingInternal({ widget }: SpendingInternalProps) {
         ) : (
           <PageHeader
             title={
-              widget ? (
-                <EditablePageHeaderTitle
-                  title={title}
-                  onSave={onSaveWidgetName}
-                />
-              ) : (
-                title
-              )
+              <ReportPageTitle
+                title={title}
+                widget={widget}
+                onSave={onSaveWidgetName}
+              />
             }
           />
         )
@@ -301,22 +300,14 @@ function SpendingInternal({ widget }: SpendingInternalProps) {
         }}
       >
         {!isNarrowWidth && (
-          <SpaceBetween gap={0}>
-            <Button
-              variant={isLive ? 'primary' : 'normal'}
-              onPress={() => setIsLive(state => !state)}
-            >
-              {isLive ? t('Live') : t('Static')}
-            </Button>
-
-            <View
-              style={{
-                width: 1,
-                height: 28,
-                backgroundColor: theme.pillBorderDark,
-                marginRight: 10,
-                marginLeft: 10,
-              }}
+          <SpaceBetween gap={12}>
+            <ReportSegmentedControl
+              options={[
+                { value: 'live', label: t('Live') },
+                { value: 'static', label: t('Static') },
+              ]}
+              value={isLive ? 'live' : 'static'}
+              onChange={value => setIsLive(value === 'live')}
             />
 
             <SpaceBetween gap={5}>
@@ -345,60 +336,14 @@ function SpendingInternal({ widget }: SpendingInternalProps) {
               />
             </SpaceBetween>
 
-            <View
-              style={{
-                width: 1,
-                height: 28,
-                backgroundColor: theme.pillBorderDark,
-                marginRight: 15,
-                marginLeft: 15,
-              }}
-            />
-
-            <SpaceBetween gap={5}>
-              <ModeButton
-                selected={reportMode === 'single-month'}
-                style={{
-                  backgroundColor: 'inherit',
-                }}
-                onSelect={() => {
-                  setReportMode('single-month');
-                }}
-              >
-                <Trans>Single month</Trans>
-              </ModeButton>
-              <ModeButton
-                selected={reportMode === 'budget'}
-                onSelect={() => {
-                  setReportMode('budget');
-                }}
-                style={{
-                  backgroundColor: 'inherit',
-                }}
-              >
-                <Trans>Budgeted</Trans>
-              </ModeButton>
-              <ModeButton
-                selected={reportMode === 'average'}
-                onSelect={() => {
-                  setReportMode('average');
-                }}
-                style={{
-                  backgroundColor: 'inherit',
-                }}
-              >
-                <Trans>Average</Trans>
-              </ModeButton>
-            </SpaceBetween>
-
-            <View
-              style={{
-                width: 1,
-                height: 28,
-                backgroundColor: theme.pillBorderDark,
-                marginRight: 10,
-                marginLeft: 10,
-              }}
+            <ReportSegmentedControl
+              options={[
+                { value: 'single-month', label: <Trans>Single month</Trans> },
+                { value: 'budget', label: <Trans>Budgeted</Trans> },
+                { value: 'average', label: <Trans>Average</Trans> },
+              ]}
+              value={reportMode}
+              onChange={setReportMode}
             />
 
             <View
@@ -413,6 +358,7 @@ function SpendingInternal({ widget }: SpendingInternalProps) {
                 compact={isNarrowWidth}
                 hover={false}
                 exclude={['date']}
+                variant="control"
               />
               <View style={{ flex: 1 }} />
 
@@ -465,223 +411,193 @@ function SpendingInternal({ widget }: SpendingInternalProps) {
           </View>
         )}
       </View>
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          paddingTop: 0,
-          flexGrow: 1,
-        }}
-      >
-        <View
-          style={{
-            flexGrow: 1,
-          }}
+      <ReportPageBody>
+        <ReportPageCard
+          style={{ flexGrow: 1, ...(isNarrowWidth && { padding: 10 }) }}
         >
           <View
             style={{
-              backgroundColor: theme.tableBackground,
-              padding: 20,
-              paddingTop: 0,
-              flex: '1 0 auto',
-              overflowY: 'auto',
+              alignItems: 'center',
+              flexDirection: 'row',
             }}
           >
+            <View>
+              <LegendItem
+                color={theme.reportsGreen}
+                label={monthUtils.format(compare, 'MMM yyyy', locale)}
+                style={{ padding: 0, paddingBottom: 10 }}
+              />
+              <LegendItem
+                color={theme.reportsGray}
+                label={
+                  reportMode === 'single-month'
+                    ? monthUtils.format(compareTo, 'MMM yyyy', locale)
+                    : reportMode === 'budget'
+                      ? t('Budgeted')
+                      : averageRangeLabel
+                }
+                style={{ padding: 0, paddingBottom: 10 }}
+              />
+            </View>
+            <View style={{ flex: 1 }} />
             <View
               style={{
-                flexDirection: 'column',
-                flexGrow: 1,
-                padding: 10,
-                paddingTop: 10,
+                alignItems: 'flex-end',
+                color: theme.pageText,
               }}
             >
-              <View
-                style={{
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                }}
-              >
-                <View>
-                  <LegendItem
-                    color={theme.reportsGreen}
-                    label={monthUtils.format(compare, 'MMM yyyy', locale)}
-                    style={{ padding: 0, paddingBottom: 10 }}
-                  />
-                  <LegendItem
-                    color={theme.reportsGray}
-                    label={
-                      reportMode === 'single-month'
-                        ? monthUtils.format(compareTo, 'MMM yyyy', locale)
-                        : reportMode === 'budget'
-                          ? t('Budgeted')
-                          : averageRangeLabel
-                    }
-                    style={{ padding: 0, paddingBottom: 10 }}
-                  />
-                </View>
-                <View style={{ flex: 1 }} />
-                <View
-                  style={{
-                    alignItems: 'flex-end',
-                    color: theme.pageText,
-                  }}
-                >
-                  <View>
-                    {showCompare && (
-                      <AlignedText
-                        style={{ marginBottom: 5, minWidth: 210 }}
-                        left={
-                          <Block>
-                            {compare === monthUtils.currentMonth()
-                              ? t('Spent {{monthYearFormatted}} MTD', {
-                                  monthYearFormatted: monthUtils.format(
-                                    compare,
-                                    'MMM yyyy',
-                                    locale,
-                                  ),
-                                })
-                              : t('Spent {{monthYearFormatted}}', {
-                                  monthYearFormatted: monthUtils.format(
-                                    compare,
-                                    'MMM yyyy',
-                                    locale,
-                                  ),
-                                })}
-                            :
-                          </Block>
-                        }
-                        right={
-                          <Text style={{ fontWeight: 600 }}>
-                            <PrivacyFilter>
-                              {format(
-                                Math.abs(data.intervalData[todayDay].compare),
-                                'financial',
-                              )}
-                            </PrivacyFilter>
-                          </Text>
-                        }
-                      />
-                    )}
-                    {reportMode === 'single-month' && showCompareTo && (
-                      <AlignedText
-                        style={{ marginBottom: 5, minWidth: 210 }}
-                        left={
-                          <Block>
-                            {compareTo === monthUtils.currentMonth()
-                              ? t('Spent {{monthYearFormatted}} MTD:', {
-                                  monthYearFormatted: monthUtils.format(
-                                    compareTo,
-                                    'MMM yyyy',
-                                    locale,
-                                  ),
-                                })
-                              : t('Spent {{monthYearFormatted}}:', {
-                                  monthYearFormatted: monthUtils.format(
-                                    compareTo,
-                                    'MMM yyyy',
-                                    locale,
-                                  ),
-                                })}
-                          </Block>
-                        }
-                        right={
-                          <Text style={{ fontWeight: 600 }}>
-                            <PrivacyFilter>
-                              {format(
-                                Math.abs(data.intervalData[todayDay].compareTo),
-                                'financial',
-                              )}
-                            </PrivacyFilter>
-                          </Text>
-                        }
-                      />
-                    )}
-                  </View>
-                  {Math.abs(data.intervalData[todayDay].budget) > 0 && (
-                    <AlignedText
-                      style={{ marginBottom: 5, minWidth: 210 }}
-                      left={
-                        <Block>
-                          {compare === monthUtils.currentMonth() ? (
-                            <Trans>Budgeted MTD</Trans>
-                          ) : (
-                            <Trans>Budgeted</Trans>
-                          )}
-                        </Block>
-                      }
-                      right={
-                        <Text style={{ fontWeight: 600 }}>
-                          <PrivacyFilter>
-                            {format(
-                              Math.round(
-                                Math.abs(data.intervalData[todayDay].budget),
+              <View>
+                {showCompare && (
+                  <AlignedText
+                    style={{ marginBottom: 5, minWidth: 210 }}
+                    left={
+                      <Block>
+                        {compare === monthUtils.currentMonth()
+                          ? t('Spent {{monthYearFormatted}} MTD', {
+                              monthYearFormatted: monthUtils.format(
+                                compare,
+                                'MMM yyyy',
+                                locale,
                               ),
-                              'financial',
-                            )}
-                          </PrivacyFilter>
-                        </Text>
-                      }
-                    />
-                  )}
-                  {showAverage && (
-                    <AlignedText
-                      style={{ marginBottom: 5, minWidth: 210 }}
-                      left={
-                        <Block>
-                          {getSpendingAverageSummaryLabel({
-                            averageRange,
-                            isCurrentMonth:
-                              compare === monthUtils.currentMonth(),
-                            t,
-                          })}
-                        </Block>
-                      }
-                      right={
-                        <Text style={{ fontWeight: 600 }}>
-                          <PrivacyFilter>
-                            {format(
-                              Math.abs(data.intervalData[todayDay].average),
-                              'financial',
-                            )}
-                          </PrivacyFilter>
-                        </Text>
-                      }
-                    />
-                  )}
-                </View>
+                            })
+                          : t('Spent {{monthYearFormatted}}', {
+                              monthYearFormatted: monthUtils.format(
+                                compare,
+                                'MMM yyyy',
+                                locale,
+                              ),
+                            })}
+                        :
+                      </Block>
+                    }
+                    right={
+                      <Text style={{ fontWeight: 600 }}>
+                        <PrivacyFilter>
+                          {format(
+                            Math.abs(data.intervalData[todayDay].compare),
+                            'financial',
+                          )}
+                        </PrivacyFilter>
+                      </Text>
+                    }
+                  />
+                )}
+                {reportMode === 'single-month' && showCompareTo && (
+                  <AlignedText
+                    style={{ marginBottom: 5, minWidth: 210 }}
+                    left={
+                      <Block>
+                        {compareTo === monthUtils.currentMonth()
+                          ? t('Spent {{monthYearFormatted}} MTD:', {
+                              monthYearFormatted: monthUtils.format(
+                                compareTo,
+                                'MMM yyyy',
+                                locale,
+                              ),
+                            })
+                          : t('Spent {{monthYearFormatted}}:', {
+                              monthYearFormatted: monthUtils.format(
+                                compareTo,
+                                'MMM yyyy',
+                                locale,
+                              ),
+                            })}
+                      </Block>
+                    }
+                    right={
+                      <Text style={{ fontWeight: 600 }}>
+                        <PrivacyFilter>
+                          {format(
+                            Math.abs(data.intervalData[todayDay].compareTo),
+                            'financial',
+                          )}
+                        </PrivacyFilter>
+                      </Text>
+                    }
+                  />
+                )}
               </View>
-              {data ? (
-                <SpendingGraph
-                  style={{ flexGrow: 1 }}
-                  compact={false}
-                  data={data}
-                  mode={reportMode}
-                  compare={compare}
-                  compareTo={compareTo}
+              {Math.abs(data.intervalData[todayDay].budget) > 0 && (
+                <AlignedText
+                  style={{ marginBottom: 5, minWidth: 210 }}
+                  left={
+                    <Block>
+                      {compare === monthUtils.currentMonth() ? (
+                        <Trans>Budgeted MTD</Trans>
+                      ) : (
+                        <Trans>Budgeted</Trans>
+                      )}
+                    </Block>
+                  }
+                  right={
+                    <Text style={{ fontWeight: 600 }}>
+                      <PrivacyFilter>
+                        {format(
+                          Math.round(
+                            Math.abs(data.intervalData[todayDay].budget),
+                          ),
+                          'financial',
+                        )}
+                      </PrivacyFilter>
+                    </Text>
+                  }
                 />
-              ) : (
-                <LoadingIndicator message={t('Loading report...')} />
               )}
               {showAverage && (
-                <View style={{ marginTop: 30 }}>
-                  <Trans>
-                    <Paragraph>
-                      <strong>
-                        How are "Average" and "Spent Average MTD" calculated?
-                      </strong>
-                    </Paragraph>
-                    <Paragraph>
-                      They are both the average cumulative spending by day for
-                      the selected average range before the selected "compare"
-                      month.
-                    </Paragraph>
-                  </Trans>
-                </View>
+                <AlignedText
+                  style={{ marginBottom: 5, minWidth: 210 }}
+                  left={
+                    <Block>
+                      {getSpendingAverageSummaryLabel({
+                        averageRange,
+                        isCurrentMonth: compare === monthUtils.currentMonth(),
+                        t,
+                      })}
+                    </Block>
+                  }
+                  right={
+                    <Text style={{ fontWeight: 600 }}>
+                      <PrivacyFilter>
+                        {format(
+                          Math.abs(data.intervalData[todayDay].average),
+                          'financial',
+                        )}
+                      </PrivacyFilter>
+                    </Text>
+                  }
+                />
               )}
             </View>
           </View>
-        </View>
-      </View>
+          {data ? (
+            <SpendingGraph
+              style={{ flexGrow: 1 }}
+              compact={false}
+              data={data}
+              mode={reportMode}
+              compare={compare}
+              compareTo={compareTo}
+            />
+          ) : (
+            <LoadingIndicator message={t('Loading report...')} />
+          )}
+        </ReportPageCard>
+        {showAverage && (
+          <ReportPageCard>
+            <Trans>
+              <Paragraph>
+                <strong>
+                  How are "Average" and "Spent Average MTD" calculated?
+                </strong>
+              </Paragraph>
+              <Paragraph isLast>
+                They are both the average cumulative spending by day for the
+                selected average range before the selected "compare" month.
+              </Paragraph>
+            </Trans>
+          </ReportPageCard>
+        )}
+      </ReportPageBody>
     </Page>
   );
 }

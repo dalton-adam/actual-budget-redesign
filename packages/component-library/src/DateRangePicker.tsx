@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import type { ComponentProps } from 'react';
 
 import { Button } from '#Button';
 import { useResponsive } from '#hooks/useResponsive';
@@ -55,6 +56,8 @@ type DateRangePickerProps = {
   formatDayLabel?: (date: string) => string;
   labels: DateRangePickerLabels;
   onChangeDates: (start: string, end: string) => void;
+  /** The trigger button's variant; report pages pass `control`. */
+  triggerVariant?: ComponentProps<typeof Button>['variant'];
 };
 
 // Far-future sentinel: sorts after any real date string.
@@ -80,6 +83,7 @@ export function DateRangePicker({
   formatDayLabel,
   labels,
   onChangeDates,
+  triggerVariant,
 }: DateRangePickerProps) {
   const effectiveMax = maxDate ?? NO_MAX;
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -193,6 +197,7 @@ export function DateRangePicker({
       <Button
         ref={triggerRef}
         data-testid="date-range-picker-trigger"
+        variant={triggerVariant}
         onPress={() => (isOpen ? closeAndCommit() : openPopover())}
       >
         {label}

@@ -30,16 +30,17 @@ import { css } from '@emotion/css';
 import { useDrag } from '@use-gesture/react';
 import { format as formatDate, parseISO } from 'date-fns';
 
-import { EditablePageHeaderTitle } from '#components/EditablePageHeaderTitle';
 import { FinancialText } from '#components/FinancialText';
 import { MobileBackButton } from '#components/mobile/MobileBackButton';
 import { TransactionList as TransactionListMobile } from '#components/mobile/transactions/TransactionList';
 import { MobilePageHeader, Page, PageHeader } from '#components/Page';
 import { PrivacyFilter } from '#components/PrivacyFilter';
+import { REPORT_PAGE_TILE_STYLE } from '#components/reports/constants';
 import { DateRange } from '#components/reports/DateRange';
 import { CalendarGraph } from '#components/reports/graphs/CalendarGraph';
 import { Header } from '#components/reports/Header';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
+import { ReportPageTitle } from '#components/reports/ReportPageTitle';
 import { calculateTimeRange } from '#components/reports/reportRanges';
 import { calendarSpreadsheet } from '#components/reports/spreadsheets/calendar-spreadsheet';
 import type { CalendarDataType } from '#components/reports/spreadsheets/calendar-spreadsheet';
@@ -530,14 +531,11 @@ function CalendarInner({ widget, parameters }: CalendarInnerProps) {
         ) : (
           <PageHeader
             title={
-              widget ? (
-                <EditablePageHeaderTitle
-                  title={title}
-                  onSave={onSaveWidgetName}
-                />
-              ) : (
-                title
-              )
+              <ReportPageTitle
+                title={title}
+                widget={widget}
+                onSave={onSaveWidgetName}
+              />
             }
           />
         )
@@ -803,15 +801,20 @@ function CalendarWithHeader({
   format,
 }: CalendarWithHeaderProps) {
   const { t } = useTranslation();
+  const { isNarrowWidth } = useResponsive();
 
   return (
     <View
       style={{
         minWidth: '300px',
         maxWidth: '300px',
-        padding: 10,
-        borderRadius: 4,
-        backgroundColor: theme.tableBackground,
+        ...(isNarrowWidth
+          ? {
+              padding: 10,
+              borderRadius: 4,
+              backgroundColor: theme.tableBackground,
+            }
+          : REPORT_PAGE_TILE_STYLE),
       }}
       onClick={() =>
         onApplyFilter({
@@ -970,9 +973,13 @@ function CalendarCardHeader({
       <View
         style={{
           width: '200px',
-          borderRadius: 4,
-          backgroundColor: theme.tableBackground,
-          padding: 10,
+          ...(isNarrowWidth
+            ? {
+                borderRadius: 4,
+                backgroundColor: theme.tableBackground,
+                padding: 10,
+              }
+            : REPORT_PAGE_TILE_STYLE),
         }}
       >
         <DateRange start={start} end={end} />

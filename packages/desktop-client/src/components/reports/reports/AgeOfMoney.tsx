@@ -14,7 +14,6 @@ import { SvgCalendar } from '@actual-app/components/icons/v1';
 import { Menu } from '@actual-app/components/menu';
 import { Paragraph } from '@actual-app/components/paragraph';
 import { Popover } from '@actual-app/components/popover';
-import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import { send } from '@actual-app/core/platform/client/connection';
@@ -26,16 +25,21 @@ import type {
 } from '@actual-app/core/types/models';
 import * as d from 'date-fns';
 
-import { EditablePageHeaderTitle } from '#components/EditablePageHeaderTitle';
 import { MobileBackButton } from '#components/mobile/MobileBackButton';
 import { MobilePageHeader, Page, PageHeader } from '#components/Page';
 import { PrivacyFilter } from '#components/PrivacyFilter';
+import { DateRange } from '#components/reports/DateRange';
 import { AgeOfMoneyGraph } from '#components/reports/graphs/AgeOfMoneyGraph';
 import { Header } from '#components/reports/Header';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
+import { ReportPageBody } from '#components/reports/ReportPageBody';
+import { ReportPageCard } from '#components/reports/ReportPageCard';
+import { ReportPageCardHeader } from '#components/reports/ReportPageCardHeader';
+import { ReportPageTitle } from '#components/reports/ReportPageTitle';
 import { calculateTimeRange } from '#components/reports/reportRanges';
 import { createAgeOfMoneySpreadsheet } from '#components/reports/spreadsheets/age-of-money-spreadsheet';
 import { useReport } from '#components/reports/useReport';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { fromDateRepr } from '#components/reports/util';
 import { useDashboardWidget } from '#hooks/useDashboardWidget';
 import { useLocale } from '#hooks/useLocale';
@@ -265,14 +269,11 @@ function AgeOfMoneyInner({ widget }: AgeOfMoneyInnerProps) {
         ) : (
           <PageHeader
             title={
-              widget ? (
-                <EditablePageHeaderTitle
-                  title={title}
-                  onSave={onSaveWidgetName}
-                />
-              ) : (
-                title
-              )
+              <ReportPageTitle
+                title={title}
+                widget={widget}
+                onSave={onSaveWidgetName}
+              />
             }
           />
         )
@@ -309,56 +310,52 @@ function AgeOfMoneyInner({ widget }: AgeOfMoneyInnerProps) {
         )}
       </Header>
 
-      <View
-        style={{
-          backgroundColor: theme.tableBackground,
-          padding: 20,
-          paddingTop: 0,
-          flex: '1 0 auto',
-          overflowY: 'auto',
-        }}
-      >
-        <View
-          style={{
-            textAlign: 'right',
-            paddingTop: 20,
-          }}
-        >
-          <View
-            style={{
-              ...styles.largeText,
-              fontWeight: 400,
-              marginBottom: 5,
-              color: getAgeColor(data.currentAge),
-            }}
-          >
-            <PrivacyFilter>
-              {data.currentAge !== null
-                ? t('{{days}} days', { days: data.currentAge })
-                : t('N/A')}
-            </PrivacyFilter>
-          </View>
-          <View style={{ color: theme.pageTextSubdued }}>
-            {data.trend === 'up'
-              ? t('↑ Improving')
-              : data.trend === 'down'
-                ? t('↓ Declining')
-                : t('→ Stable')}
-          </View>
-          {data.insufficientData && (
-            <View
-              style={{ color: theme.warningText, fontSize: 12, marginTop: 5 }}
-            >
-              {t(
-                'Note: Some expenses could not be matched to income (spending exceeded income in this period)',
-              )}
-            </View>
-          )}
-        </View>
+      <ReportPageBody>
+        <ReportPageCard>
+          <ReportPageCardHeader
+            title={title}
+            subtitle={<DateRange start={start} end={end} isWidget />}
+            total={
+              <View style={{ color: getAgeColor(data.currentAge) }}>
+                <PrivacyFilter>
+                  {data.currentAge !== null
+                    ? t('{{days}} days', { days: data.currentAge })
+                    : t('N/A')}
+                </PrivacyFilter>
+              </View>
+            }
+            summary={
+              <>
+                <View style={{ color: theme.pageTextSubdued }}>
+                  {data.trend === 'up'
+                    ? t('↑ Improving')
+                    : data.trend === 'down'
+                      ? t('↓ Declining')
+                      : t('→ Stable')}
+                </View>
+                {data.insufficientData && (
+                  <View
+                    style={{
+                      color: theme.warningText,
+                      fontSize: 12,
+                      marginTop: 5,
+                      maxWidth: 360,
+                      textAlign: 'right',
+                    }}
+                  >
+                    {t(
+                      'Note: Some expenses could not be matched to income (spending exceeded income in this period)',
+                    )}
+                  </View>
+                )}
+              </>
+            }
+          />
 
-        <AgeOfMoneyGraph data={data.graphData} />
+          <AgeOfMoneyGraph data={data.graphData} />
+        </ReportPageCard>
 
-        <View style={{ marginTop: 30, userSelect: 'none' }}>
+        <ReportPageCard style={{ userSelect: 'none' }}>
           <Paragraph>
             <strong>
               <Trans>What is Age of Money?</Trans>
@@ -385,7 +382,7 @@ function AgeOfMoneyInner({ widget }: AgeOfMoneyInnerProps) {
               <Trans>How is it calculated?</Trans>
             </strong>
           </Paragraph>
-          <Paragraph>
+          <Paragraph isLast>
             <Trans>
               The calculation uses the FIFO (First In, First Out) method: when
               you spend money, it's considered to come from your oldest income
@@ -394,8 +391,8 @@ function AgeOfMoneyInner({ widget }: AgeOfMoneyInnerProps) {
               average age of your last 10 expenses.
             </Trans>
           </Paragraph>
-        </View>
-      </View>
+        </ReportPageCard>
+      </ReportPageBody>
     </Page>
   );
 }
@@ -407,6 +404,7 @@ function GranularitySelector({
   granularity: AgeOfMoneyGranularity;
   onChange: (val: AgeOfMoneyGranularity) => void;
 }) {
+  const bareControlVariant = useReportControlVariant('bare');
   const { t } = useTranslation();
 
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -425,7 +423,7 @@ function GranularitySelector({
     <>
       <Button
         ref={triggerRef}
-        variant="bare"
+        variant={bareControlVariant}
         onPress={() => setIsOpen(true)}
         aria-label={t('Change granularity')}
       >

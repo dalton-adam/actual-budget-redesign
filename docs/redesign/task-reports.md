@@ -1258,3 +1258,60 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   "Isolation check: nothing changed" (verification.md). Every APP-03a
   check is now done.
 - LINT budget-import: **done September 30, 2026.** `EnvelopeBudgetComponents.tsx` and `TrackingBudgetComponents.tsx` now import the month prop types from `#components/budget` instead of `'..'`, clearing the two `absolute-parent-import` oxlint errors; typecheck, oxlint 0 errors, budget tests 86/86.
+- APP-03b: **built September 30, 2026, not yet merged** (branch
+  `redesign/app-03b-report-header`). Screenshots in
+  [verification/app-03b](verification/app-03b/). **Owner decisions before
+  starting:** the Net Worth pattern applies to every report page; the chart
+  card's subline is the date range only (design-decisions §10a).
+  **Change:** new `ReportPageTitle.tsx` (a "Reports · ‹dashboard›" eyebrow
+  from the widget's `dashboard_page_id` and the existing dashboard list, over
+  the name at Display size; "Reports" alone without a saved widget) on all
+  twelve report pages; `EditablePageHeaderTitle.tsx` gains `inputStyle` and
+  shows its pencil on keyboard focus. New `ReportSegmentedControl.tsx`
+  (Tab/Tab Selected on the Nav Track, `aria-pressed`) for Live/Static in
+  `Header.tsx` and Spending, Sankey's Spent/Budgeted and Spending's mode.
+  Date range, Filter, interval, granularity, options, export and Show
+  balance are Control buttons; `DateRangePicker.tsx` gains `triggerVariant`
+  and `FilterButton` (with `FiltersButton.tsx`, `CompactFiltersButton.tsx`)
+  gains `variant`, both defaulting to the upstream look. New
+  `ReportPageBody.tsx`, `ReportPageCard.tsx` and `ReportPageCardHeader.tsx`
+  put the chart in a hairline Surface card without elevation (title and
+  date range left; total at Display size, breakdown and change pill right)
+  and explanations in their own card on Net Worth, Cash Flow, Age of Money,
+  Budget Analysis, Balance Forecast, Crossover, Sankey, Spending and Summary;
+  Calendar's month tiles and totals box become Surface tiles
+  (`REPORT_PAGE_TILE_STYLE`). New `useReportControlVariant.ts` (mapped in
+  `package.json` imports) keeps every control's upstream variant at narrow
+  widths, and the card components render the upstream layout there, so
+  mobile is unchanged (the explanation's last paragraph lost its 15px bottom
+  margin). Formula and Monte Carlo: title only. No handler, query, saved
+  layout, pref, route or string changed. **Checks:** typecheck passes;
+  `oxlint --type-aware` over the 26 changed files 0 errors; format check
+  passes for every changed file; web unit tests 1052 passed, 1 skipped;
+  component library 42/42. WIDE against the dev server (port 3001) with the
+  installed Edge, a scratch config pointing the baseline config there:
+  **74/74**, none skipped. VISUAL at 1440×900 dark for all twelve pages,
+  Net Worth at 1000×700 light (matches shot `56`), mobile 375 (unchanged),
+  keyboard (the segments take the focus ring; `aria-pressed` follows the
+  mode), privacy (total and pill masked). Impeccable detector: one
+  side-tab warning (Crossover's custom-growth indent) and one font-size
+  advisory (Summary's 32px fraction), both upstream lines this task did not
+  touch. **Found in passing (upstream, not changed):** opening Cash Flow,
+  Spending, Calendar, Summary, Crossover or Budget Analysis without a widget
+  id (e.g. `/reports/cash-flow`) spins forever, because they wait on the
+  widget query's `isPending`, which a disabled query never clears; Net
+  Worth, Age of Money, Sankey and Balance Forecast use `isLoading`.
+  **Follow-up (same day):** the divider lines between control groups were
+  dropped on desktop (Spending spaces its groups with a 12px gap; Sankey
+  keeps them only at narrow widths), so at 1440×900 with the accounts pane
+  open only Sankey's reset button still wraps. Built preview
+  (`build:browser`, port 3018, installed Edge): WIDE **74/74**, none
+  skipped. Midnight at 1440×900 on the built preview (Net Worth, Cash Flow,
+  Spending; `--color-navTrack` confirmed `#13101d`): cards, segments and
+  Control buttons read as in dark. Reduced motion, by code: the Control, Tab
+  and Tab Selected variants animate only under `no-preference`, the title
+  pencil is gated the same way, and the new cards have no transitions.
+  Linux VRT: update scoped to `reports.test.ts`, **15 snapshots changed**
+  (Net Worth, Cash Flow and the three forecast tests, three themes each);
+  rerun with `command-bar.test.ts` 19/19 (verification.md).
+  **Open:** custom theme, desktop build.

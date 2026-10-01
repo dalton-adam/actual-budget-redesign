@@ -23,7 +23,6 @@ import type {
 } from '@actual-app/core/types/models';
 
 import { Link } from '#components/common/Link';
-import { EditablePageHeaderTitle } from '#components/EditablePageHeaderTitle';
 import { FinancialText } from '#components/FinancialText';
 import { Checkbox } from '#components/forms';
 import { MobileBackButton } from '#components/mobile/MobileBackButton';
@@ -31,9 +30,13 @@ import { MobilePageHeader, Page, PageHeader } from '#components/Page';
 import { PrivacyFilter } from '#components/PrivacyFilter';
 import { AccountSelector } from '#components/reports/AccountSelector';
 import { CategorySelector } from '#components/reports/CategorySelector';
+import { REPORT_DISPLAY_STYLE } from '#components/reports/constants';
 import { CrossoverGraph } from '#components/reports/graphs/CrossoverGraph';
 import { Header } from '#components/reports/Header';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
+import { ReportPageBody } from '#components/reports/ReportPageBody';
+import { ReportPageCard } from '#components/reports/ReportPageCard';
+import { ReportPageTitle } from '#components/reports/ReportPageTitle';
 import { calculateTimeRange } from '#components/reports/reportRanges';
 import { createCrossoverSpreadsheet } from '#components/reports/spreadsheets/crossover-spreadsheet';
 import type { CrossoverData } from '#components/reports/spreadsheets/crossover-spreadsheet';
@@ -436,14 +439,11 @@ function CrossoverInner({ widget }: CrossoverInnerProps) {
         ) : (
           <PageHeader
             title={
-              widget ? (
-                <EditablePageHeaderTitle
-                  title={title}
-                  onSave={onSaveWidgetName}
-                />
-              ) : (
-                title
-              )
+              <ReportPageTitle
+                title={title}
+                widget={widget}
+                onSave={onSaveWidgetName}
+              />
             }
           />
         )
@@ -1031,25 +1031,42 @@ function CrossoverInner({ widget }: CrossoverInnerProps) {
         )}
 
         {/* Right content */}
-        <View
-          style={{
-            flex: 1,
-          }}
+        <ReportPageBody
+          style={
+            isNarrowWidth
+              ? // Mobile keeps the upstream blocks (plan §19.4).
+                {
+                  flex: 1,
+                  padding: 0,
+                  gap: 10,
+                  backgroundColor: 'transparent',
+                }
+              : { flex: 1, paddingLeft: 10 }
+          }
         >
-          {/* Header stats */}
-          <View
+          {/* Header stats and graph */}
+          <ReportPageCard
             style={{
-              backgroundColor: theme.tableBackground,
-              padding: 20,
-              paddingTop: 10,
-              marginBottom: 10,
+              flex: '1 0 auto',
+              ...(isNarrowWidth && {
+                backgroundColor: theme.tableBackground,
+                padding: 20,
+                paddingTop: 10,
+              }),
             }}
           >
-            <View style={{ textAlign: 'right' }}>
+            <View
+              style={{
+                textAlign: 'right',
+                alignSelf: 'flex-end',
+                marginBottom: isNarrowWidth ? 10 : 12,
+              }}
+            >
               <View
                 style={{
-                  ...styles.largeText,
-                  fontWeight: 400,
+                  ...(isNarrowWidth
+                    ? { ...styles.largeText, fontWeight: 400 }
+                    : REPORT_DISPLAY_STYLE),
                   marginBottom: 8,
                   whiteSpace: 'nowrap',
                 }}
@@ -1103,38 +1120,37 @@ function CrossoverInner({ widget }: CrossoverInnerProps) {
                 </span>
               </View>
             </View>
-          </View>
 
-          {/* Graph area */}
-          <View
-            style={{
-              backgroundColor: theme.tableBackground,
-              flexDirection: 'row',
-              flex: '1 0 auto',
-              minHeight: 400,
-            }}
-          >
             <View
               style={{
-                flex: 1,
-                padding: 10,
-                height: '100%',
+                flexDirection: 'row',
+                flex: '1 0 auto',
+                minHeight: 400,
               }}
             >
-              <CrossoverGraph
-                graphData={displayData.graphData}
-                style={{ height: '100%', flex: 1 }}
-              />
+              <View
+                style={{
+                  flex: 1,
+                  padding: isNarrowWidth ? 10 : 0,
+                  height: '100%',
+                }}
+              >
+                <CrossoverGraph
+                  graphData={displayData.graphData}
+                  style={{ height: '100%', flex: 1 }}
+                />
+              </View>
             </View>
-          </View>
+          </ReportPageCard>
 
           {/* Description */}
-          <View
+          <ReportPageCard
             style={{
-              backgroundColor: theme.tableBackground,
-              marginTop: 10,
-              padding: 20,
               userSelect: 'none',
+              ...(isNarrowWidth && {
+                backgroundColor: theme.tableBackground,
+                padding: 20,
+              }),
             }}
           >
             <Paragraph>
@@ -1142,7 +1158,7 @@ function CrossoverInner({ widget }: CrossoverInnerProps) {
                 <Trans>What is the Crossover Point?</Trans>
               </strong>
             </Paragraph>
-            <Paragraph>
+            <Paragraph isLast>
               <Trans>
                 The crossover point is when your monthly investment income (from
                 selected accounts using the safe withdrawal rate) meets or
@@ -1151,8 +1167,8 @@ function CrossoverInner({ widget }: CrossoverInnerProps) {
                 until the lines cross.
               </Trans>
             </Paragraph>
-          </View>
-        </View>
+          </ReportPageCard>
+        </ReportPageBody>
       </View>
     </Page>
   );

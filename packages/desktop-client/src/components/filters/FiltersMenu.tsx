@@ -575,6 +575,8 @@ type FilterButtonProps<T extends RuleConditionEntity> = {
   exclude?: string[];
   /** If both are provided, `include` acts as the allowlist before `exclude` is applied. */
   include?: string[];
+  /** The trigger button's variant; report pages pass `control`. */
+  variant?: ComponentProps<typeof Button>['variant'];
 };
 
 /**
@@ -604,6 +606,7 @@ export function FilterButton<T extends RuleConditionEntity>({
   hover,
   exclude,
   include,
+  variant,
 }: FilterButtonProps<T>) {
   const { t } = useTranslation();
   const filters = useTransactionFilters();
@@ -751,10 +754,14 @@ export function FilterButton<T extends RuleConditionEntity>({
         >
           {compact ? (
             <CompactFiltersButton
+              variant={variant}
               onPress={() => dispatch({ type: 'select-field' })}
             />
           ) : (
-            <FiltersButton onPress={() => dispatch({ type: 'select-field' })} />
+            <FiltersButton
+              variant={variant}
+              onPress={() => dispatch({ type: 'select-field' })}
+            />
           )}
         </Tooltip>
       </View>

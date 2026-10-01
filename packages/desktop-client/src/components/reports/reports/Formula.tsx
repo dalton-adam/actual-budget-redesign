@@ -13,12 +13,12 @@ import { Toggle } from '@actual-app/components/toggle';
 import { View } from '@actual-app/components/view';
 import type { FormulaWidget } from '@actual-app/core/types/models';
 
-import { EditablePageHeaderTitle } from '#components/EditablePageHeaderTitle';
 import { QueryManager } from '#components/formula/QueryManager';
 import { MobileBackButton } from '#components/mobile/MobileBackButton';
 import { MobilePageHeader, Page, PageHeader } from '#components/Page';
 import { FormulaResult } from '#components/reports/FormulaResult';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
+import { ReportPageTitle } from '#components/reports/ReportPageTitle';
 import { useAccounts } from '#hooks/useAccounts';
 import { useCategories } from '#hooks/useCategories';
 import { useDashboardWidget } from '#hooks/useDashboardWidget';
@@ -246,14 +246,11 @@ function FormulaInner({ widget }: FormulaInnerProps) {
         ) : (
           <PageHeader
             title={
-              widget ? (
-                <EditablePageHeaderTitle
-                  title={title}
-                  onSave={onSaveWidgetName}
-                />
-              ) : (
-                title
-              )
+              <ReportPageTitle
+                title={title}
+                widget={widget}
+                onSave={onSaveWidgetName}
+              />
             }
           />
         )

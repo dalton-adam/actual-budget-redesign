@@ -617,3 +617,31 @@ own server on 127.0.0.1:3001:
 - Quit with `app.quit()` over the inspector: "Isolation check: nothing
   changed" for `%APPDATA%\Actual`, `OneDrive\Documents\Actual` and
   `Documents\Actual`.
+
+## Linux VRT for APP-03b (September 30, 2026)
+
+Against `redesign/app-03b-report-header` (uncommitted APP-03b changes), on
+Windows 11 with the
+[APP-01 setup](#linux-vrt-for-topbar-fix-and-app-01-september-30-2026):
+Docker Desktop 29.8.1, Playwright v1.61.1 image, HTTPS Vite development
+server on port 3021 over the LAN address, checkout mounted at
+`/mnt/host/c/dev/actual-budget-redesign`, one worker, no retries.
+
+1. **Update, scoped to `reports.test.ts`** (`--update-snapshots=changed`):
+   17 passed; **15 snapshots changed**, light, dark and midnight of five
+   tests: `loads net worth graph`, `loads cash flow graph` and the three
+   `balance forecast` tests. No new file, nothing outside those tests. The
+   date range picker test (popover only) and the custom report tests
+   (APP-03c) did not change.
+2. **Review:** each change is APP-03b's report page: the "Reports · Main"
+   eyebrow and Display title, segmented Live/Static, Control buttons, and
+   the chart in a hairline card with the total and change pill, the
+   explanation in its own card. Checked Net Worth light, Cash Flow midnight
+   and the tracking-budget forecast in dark; the forecast's two `Select`
+   dropdowns keep their upstream look.
+3. **Rerun without updating:** `reports.test.ts` and `command-bar.test.ts`,
+   **19 passed**.
+
+Not run: the full suite. The shared components changed here
+(`DateRangePicker`, `FilterButton`) take new optional props whose defaults
+are the old look, so other screens are unaffected by construction.

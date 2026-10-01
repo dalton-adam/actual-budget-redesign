@@ -13,7 +13,6 @@ import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import type { MonteCarloWidget } from '@actual-app/core/types/models';
 
-import { EditablePageHeaderTitle } from '#components/EditablePageHeaderTitle';
 import { FinancialText } from '#components/FinancialText';
 import { LabeledCheckbox } from '#components/forms/LabeledCheckbox';
 import { MobileBackButton } from '#components/mobile/MobileBackButton';
@@ -23,6 +22,7 @@ import { MonteCarloGraph } from '#components/reports/graphs/MonteCarloGraph';
 import type { MonteCarloGraphView } from '#components/reports/graphs/MonteCarloGraphTooltip';
 import { MonteCarloHistogram } from '#components/reports/graphs/MonteCarloHistogram';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
+import { ReportPageTitle } from '#components/reports/ReportPageTitle';
 import { MonteCarloConfiguration } from '#components/reports/reports/monte-carlo/MonteCarloConfiguration';
 import { HISTORICAL_ANNUAL_RETURNS } from '#components/reports/reports/monte-carlo/monteCarloHistoricalReturns';
 import { MonteCarloRunDetailTable } from '#components/reports/reports/monte-carlo/MonteCarloRunDetailTable';
@@ -200,14 +200,11 @@ export function MonteCarlo() {
         ) : (
           <PageHeader
             title={
-              widget ? (
-                <EditablePageHeaderTitle
-                  title={title}
-                  onSave={onSaveWidgetName}
-                />
-              ) : (
-                title
-              )
+              <ReportPageTitle
+                title={title}
+                widget={widget}
+                onSave={onSaveWidgetName}
+              />
             }
           />
         )
