@@ -1,11 +1,20 @@
 import React from 'react';
+import type { ComponentProps } from 'react';
 
 import { Button } from '@actual-app/components/button';
 import { SvgFilter } from '@actual-app/components/icons/v1';
 
-export function CompactFiltersButton({ onPress }: { onPress: () => void }) {
+type CompactFiltersButtonProps = {
+  onPress: () => void;
+  variant?: ComponentProps<typeof Button>['variant'];
+};
+
+export function CompactFiltersButton({
+  onPress,
+  variant = 'bare',
+}: CompactFiltersButtonProps) {
   return (
-    <Button variant="bare" onPress={onPress} style={{ minWidth: 20 }}>
+    <Button variant={variant} onPress={onPress} style={{ minWidth: 20 }}>
       <SvgFilter
         width={15}
         height={15}

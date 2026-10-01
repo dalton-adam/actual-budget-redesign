@@ -4,17 +4,21 @@ import { Button } from '@actual-app/components/button';
 import { SvgPencil1 } from '@actual-app/components/icons/v2';
 import { InitialFocus } from '@actual-app/components/initial-focus';
 import { Input } from '@actual-app/components/input';
+import type { CSSProperties } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
 type EditablePageHeaderTitleProps = {
   title: string;
   onSave: (newValue: string) => void;
+  /** Overrides the input's type, e.g. a report page's Display title. */
+  inputStyle?: CSSProperties;
 };
 
 export function EditablePageHeaderTitle({
   title: initialTitle,
   onSave,
+  inputStyle,
 }: EditablePageHeaderTitleProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(initialTitle);
@@ -47,6 +51,7 @@ export function EditablePageHeaderTitle({
             paddingTop: 2,
             paddingBottom: 2,
             width: Math.max(20, title.length) + 'ch',
+            ...inputStyle,
           }}
         />
       </InitialFocus>
@@ -61,10 +66,13 @@ export function EditablePageHeaderTitle({
         gap: 3,
         '& .hover-visible': {
           opacity: 0,
-          transition: 'opacity .25s',
         },
-        '&:hover .hover-visible': {
+        // Keyboard focus reveals the pencil too, as on the dashboard title.
+        '&:hover .hover-visible, & .hover-visible[data-focus-visible]': {
           opacity: 1,
+        },
+        '@media (prefers-reduced-motion: no-preference)': {
+          '& .hover-visible': { transition: 'opacity .25s' },
         },
       }}
     >

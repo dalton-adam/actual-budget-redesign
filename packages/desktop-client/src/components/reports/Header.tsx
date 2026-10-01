@@ -31,6 +31,8 @@ import {
   getLatestRange,
   getNextRange,
 } from './reportRanges';
+import { ReportSegmentedControl } from './ReportSegmentedControl';
+import { useReportControlVariant } from './useReportControlVariant';
 
 type HeaderProps = {
   start: TimeFrame['start'];
@@ -103,6 +105,18 @@ export function Header({
 }: HeaderProps) {
   const { t } = useTranslation();
   const { isNarrowWidth } = useResponsive();
+  // Upstream had a normal date button and a bare Filter button.
+  const controlVariant = useReportControlVariant('normal');
+  const filterVariant = useReportControlVariant('bare');
+
+  function onChangeMode(newMode: TimeFrame['mode']) {
+    const [newStart, newEnd] = calculateTimeRange({
+      start,
+      end,
+      mode: newMode,
+    });
+    onChangeDates(newStart, newEnd, newMode);
+  }
   const language = useLanguage();
   const dateFormat = useDateFormat() || 'MM/dd/yyyy';
 
@@ -231,23 +245,29 @@ export function Header({
         }}
       >
         <SpaceBetween gap={isNarrowWidth ? 5 : undefined}>
-          {mode && !hideModeToggle && (
-            <Button
-              variant={mode === 'static' ? 'normal' : 'primary'}
-              onPress={() => {
-                const newMode = mode === 'static' ? 'sliding-window' : 'static';
-                const [newStart, newEnd] = calculateTimeRange({
-                  start,
-                  end,
-                  mode: newMode,
-                });
-
-                onChangeDates(newStart, newEnd, newMode);
-              }}
-            >
-              {mode === 'static' ? t('Static') : t('Live')}
-            </Button>
-          )}
+          {mode &&
+            !hideModeToggle &&
+            (isNarrowWidth ? (
+              <Button
+                variant={mode === 'static' ? 'normal' : 'primary'}
+                onPress={() =>
+                  onChangeMode(mode === 'static' ? 'sliding-window' : 'static')
+                }
+              >
+                {mode === 'static' ? t('Static') : t('Live')}
+              </Button>
+            ) : (
+              <ReportSegmentedControl
+                options={[
+                  { value: 'live', label: t('Live') },
+                  { value: 'static', label: t('Static') },
+                ]}
+                value={mode === 'static' ? 'static' : 'live'}
+                onChange={value =>
+                  onChangeMode(value === 'live' ? 'sliding-window' : 'static')
+                }
+              />
+            ))}
 
           <DateRangePicker
             start={start}
@@ -282,6 +302,7 @@ export function Header({
               dateRange: t('Date range'),
             }}
             presets={presets}
+            triggerVariant={controlVariant}
             onChangeDates={(newStart, newEnd) =>
               onChangeDates(newStart, newEnd, 'static')
             }
@@ -290,6 +311,7 @@ export function Header({
             <FilterButton
               compact={isNarrowWidth}
               onApply={onApply}
+              variant={filterVariant}
               hover={false}
               exclude={filterExclude}
               include={filterInclude}

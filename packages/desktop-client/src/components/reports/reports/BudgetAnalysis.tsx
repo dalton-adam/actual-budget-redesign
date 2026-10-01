@@ -22,15 +22,19 @@ import type {
 } from '@actual-app/core/types/models';
 import * as d from 'date-fns';
 
-import { EditablePageHeaderTitle } from '#components/EditablePageHeaderTitle';
 import { FinancialText } from '#components/FinancialText';
 import { MobileBackButton } from '#components/mobile/MobileBackButton';
 import { MobilePageHeader, Page, PageHeader } from '#components/Page';
 import { PrivacyFilter } from '#components/PrivacyFilter';
 import { Change } from '#components/reports/Change';
+import { DateRange } from '#components/reports/DateRange';
 import { BudgetAnalysisGraph } from '#components/reports/graphs/BudgetAnalysisGraph';
 import { Header } from '#components/reports/Header';
 import { LoadingIndicator } from '#components/reports/LoadingIndicator';
+import { ReportPageBody } from '#components/reports/ReportPageBody';
+import { ReportPageCard } from '#components/reports/ReportPageCard';
+import { ReportPageCardHeader } from '#components/reports/ReportPageCardHeader';
+import { ReportPageTitle } from '#components/reports/ReportPageTitle';
 import { calculateTimeRange } from '#components/reports/reportRanges';
 import { buildBudgetAnalysisCsv } from '#components/reports/spreadsheets/budget-analysis-export';
 import {
@@ -38,6 +42,7 @@ import {
   getLastSelectableMonth,
 } from '#components/reports/spreadsheets/budget-analysis-spreadsheet';
 import { useReport } from '#components/reports/useReport';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { fromDateRepr } from '#components/reports/util';
 import { useDashboardWidget } from '#hooks/useDashboardWidget';
 import { useFormat } from '#hooks/useFormat';
@@ -70,13 +75,18 @@ function OptionsButton({
   showHiddenCategories,
   onToggleShowHiddenCategories,
 }: OptionsButtonProps) {
+  const normalControlVariant = useReportControlVariant('normal');
   const { t } = useTranslation();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
-      <Button ref={triggerRef} onPress={() => setIsOpen(true)}>
+      <Button
+        ref={triggerRef}
+        variant={normalControlVariant}
+        onPress={() => setIsOpen(true)}
+      >
         <Trans>Options</Trans>
       </Button>
       <Popover
@@ -143,6 +153,7 @@ type BudgetAnalysisInternalProps = {
 };
 
 function BudgetAnalysisInternal({ widget }: BudgetAnalysisInternalProps) {
+  const bareControlVariant = useReportControlVariant('bare');
   const locale = useLocale();
   const dispatch = useDispatch();
   const { t } = useTranslation();
@@ -393,14 +404,11 @@ function BudgetAnalysisInternal({ widget }: BudgetAnalysisInternalProps) {
         ) : (
           <PageHeader
             title={
-              widget ? (
-                <EditablePageHeaderTitle
-                  title={title}
-                  onSave={onSaveWidgetName}
-                />
-              ) : (
-                title
-              )
+              <ReportPageTitle
+                title={title}
+                widget={widget}
+                onSave={onSaveWidgetName}
+              />
             }
           />
         )
@@ -440,7 +448,7 @@ function BudgetAnalysisInternal({ widget }: BudgetAnalysisInternalProps) {
 
         <Tooltip content={t('Export as CSV')}>
           <Button
-            variant="bare"
+            variant={bareControlVariant}
             onPress={onExportCsv}
             aria-label={t('Export as CSV')}
           >
@@ -454,161 +462,119 @@ function BudgetAnalysisInternal({ widget }: BudgetAnalysisInternalProps) {
           </Button>
         )}
       </Header>
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          paddingTop: 0,
-          flexGrow: 1,
-        }}
-      >
-        <View
-          style={{
-            flexGrow: 1,
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: theme.tableBackground,
-              padding: 20,
-              paddingTop: 0,
-              flex: '1 0 auto',
-              overflowY: 'auto',
-            }}
-          >
-            <View
-              style={{
-                flexDirection: 'column',
-                flexGrow: 1,
-                padding: 10,
-                paddingTop: 10,
-              }}
-            >
-              <View
-                style={{
-                  alignItems: 'flex-end',
-                  flexDirection: 'row',
-                }}
-              >
-                <View style={{ flex: 1 }} />
-                <View
-                  style={{
-                    alignItems: 'flex-end',
-                    color: theme.pageText,
-                  }}
-                >
-                  <View>
-                    {data && (
-                      <>
-                        <AlignedText
-                          style={{ marginBottom: 5, minWidth: 210 }}
-                          left={
-                            <Block>
-                              <Trans>Budgeted:</Trans>
-                            </Block>
-                          }
-                          right={
-                            <FinancialText style={{ fontWeight: 600 }}>
-                              <PrivacyFilter>
-                                {format(data.totalBudgeted, 'financial')}
-                              </PrivacyFilter>
-                            </FinancialText>
-                          }
-                        />
-                        <AlignedText
-                          style={{ marginBottom: 5, minWidth: 210 }}
-                          left={
-                            <Block>
-                              <Trans>Spent:</Trans>
-                            </Block>
-                          }
-                          right={
-                            <FinancialText style={{ fontWeight: 600 }}>
-                              <PrivacyFilter>
-                                {format(data.totalSpent, 'financial')}
-                              </PrivacyFilter>
-                            </FinancialText>
-                          }
-                        />
-                        <AlignedText
-                          style={{ marginBottom: 5, minWidth: 210 }}
-                          left={
-                            <Block>
-                              <Trans>Overspending adj:</Trans>
-                            </Block>
-                          }
-                          right={
-                            <FinancialText style={{ fontWeight: 600 }}>
-                              <PrivacyFilter>
-                                {format(
-                                  data.totalOverspendingAdjustment,
-                                  'financial',
-                                )}
-                              </PrivacyFilter>
-                            </FinancialText>
-                          }
-                        />
-                        <AlignedText
-                          style={{ marginBottom: 5, minWidth: 210 }}
-                          left={
-                            <Block>
-                              <Trans>Ending balance:</Trans>
-                            </Block>
-                          }
-                          right={
-                            <FinancialText style={{ fontWeight: 600 }}>
-                              <PrivacyFilter>
-                                <Change amount={endingBalance} />
-                              </PrivacyFilter>
-                            </FinancialText>
-                          }
-                        />
-                      </>
-                    )}
-                  </View>
+      <ReportPageBody>
+        <ReportPageCard>
+          <ReportPageCardHeader
+            title={title}
+            subtitle={<DateRange start={start} end={end} isWidget />}
+            summary={
+              data && (
+                <View style={{ alignItems: 'flex-end', color: theme.pageText }}>
+                  <AlignedText
+                    style={{ marginBottom: 5, minWidth: 210 }}
+                    left={
+                      <Block>
+                        <Trans>Budgeted:</Trans>
+                      </Block>
+                    }
+                    right={
+                      <FinancialText style={{ fontWeight: 600 }}>
+                        <PrivacyFilter>
+                          {format(data.totalBudgeted, 'financial')}
+                        </PrivacyFilter>
+                      </FinancialText>
+                    }
+                  />
+                  <AlignedText
+                    style={{ marginBottom: 5, minWidth: 210 }}
+                    left={
+                      <Block>
+                        <Trans>Spent:</Trans>
+                      </Block>
+                    }
+                    right={
+                      <FinancialText style={{ fontWeight: 600 }}>
+                        <PrivacyFilter>
+                          {format(data.totalSpent, 'financial')}
+                        </PrivacyFilter>
+                      </FinancialText>
+                    }
+                  />
+                  <AlignedText
+                    style={{ marginBottom: 5, minWidth: 210 }}
+                    left={
+                      <Block>
+                        <Trans>Overspending adj:</Trans>
+                      </Block>
+                    }
+                    right={
+                      <FinancialText style={{ fontWeight: 600 }}>
+                        <PrivacyFilter>
+                          {format(
+                            data.totalOverspendingAdjustment,
+                            'financial',
+                          )}
+                        </PrivacyFilter>
+                      </FinancialText>
+                    }
+                  />
+                  <AlignedText
+                    style={{ marginBottom: 5, minWidth: 210 }}
+                    left={
+                      <Block>
+                        <Trans>Ending balance:</Trans>
+                      </Block>
+                    }
+                    right={
+                      <FinancialText style={{ fontWeight: 600 }}>
+                        <PrivacyFilter>
+                          <Change amount={endingBalance} />
+                        </PrivacyFilter>
+                      </FinancialText>
+                    }
+                  />
                 </View>
-              </View>
-              <BudgetAnalysisGraph
-                style={{ flexGrow: 1 }}
-                data={data}
-                graphType={graphType}
-                showBalance={showBalance}
-                balanceOnly={!showCategories}
-                isConcise={isConcise}
-              />
-              <View style={{ marginTop: 30 }}>
-                <Trans>
-                  <Paragraph>
-                    <strong>Understanding the Chart</strong>
-                    <br />• <strong>Budgeted:</strong> The amount you allocated
-                    each month
-                    <br />• <strong>Spent:</strong> Your actual spending
-                    <br />• <strong>Overspending Adjustment:</strong> Amounts
-                    from categories without rollover that were reset
-                    <br />• <strong>Balance:</strong> Your cumulative budget
-                    performance, starting with any prior balance. Respects
-                    category rollover settings from your budget.
-                  </Paragraph>
-                  <Paragraph>
-                    <strong>Understanding the Budget Summary</strong>
-                    <br />
-                    The balance starts from the month before your selected
-                    period. Budgeted, spent, and overspending adjustments show
-                    totals over the period. Ending balance shows the final
-                    balance at period end. You can filter by categories to track
-                    changes in a specific area.
-                  </Paragraph>
-                  <Paragraph>
-                    Use the <strong>Options</strong> button to switch between
-                    line and bar chart, toggle balance and category series
-                    visibility, and include hidden budget categories.
-                  </Paragraph>
-                </Trans>
-              </View>
-            </View>
-          </View>
-        </View>
-      </View>
+              )
+            }
+          />
+          <BudgetAnalysisGraph
+            style={{ flexGrow: 1 }}
+            data={data}
+            graphType={graphType}
+            showBalance={showBalance}
+            balanceOnly={!showCategories}
+            isConcise={isConcise}
+          />
+        </ReportPageCard>
+        <ReportPageCard>
+          <Trans>
+            <Paragraph>
+              <strong>Understanding the Chart</strong>
+              <br />• <strong>Budgeted:</strong> The amount you allocated each
+              month
+              <br />• <strong>Spent:</strong> Your actual spending
+              <br />• <strong>Overspending Adjustment:</strong> Amounts from
+              categories without rollover that were reset
+              <br />• <strong>Balance:</strong> Your cumulative budget
+              performance, starting with any prior balance. Respects category
+              rollover settings from your budget.
+            </Paragraph>
+            <Paragraph>
+              <strong>Understanding the Budget Summary</strong>
+              <br />
+              The balance starts from the month before your selected period.
+              Budgeted, spent, and overspending adjustments show totals over the
+              period. Ending balance shows the final balance at period end. You
+              can filter by categories to track changes in a specific area.
+            </Paragraph>
+            <Paragraph isLast>
+              Use the <strong>Options</strong> button to switch between line and
+              bar chart, toggle balance and category series visibility, and
+              include hidden budget categories.
+            </Paragraph>
+          </Trans>
+        </ReportPageCard>
+      </ReportPageBody>
     </Page>
   );
 }
