@@ -405,7 +405,11 @@ Regenerate with `node scripts/redesign-prototype-shots.cjs --app-04`
 
 ## APP-05a: Payees proposal (October 1, 2026)
 
-**Status: drawn, awaiting owner review.** Choose **Page → Payees** (or More →
+**Status: approved October 1, 2026.** The owner left the four questions
+below to the implementer, who chose: Category learning settings moves to
+the toolbar (question 1); the quiet Create rule with pills only where rules
+exist (question 2); no header on the rule column (question 3); both dialogs
+wait for APP-06 (question 4). Choose **Page → Payees** (or More →
 Payees). URL parameters: `psel=0|1` (three payees selected), `pmenu=0|1`
 (the selection menu), `punused=0|1` (unused payees only), `pempty=0|1`
 (no match), and for screenshots `pfilter`, `phover`, `prow` (a row's

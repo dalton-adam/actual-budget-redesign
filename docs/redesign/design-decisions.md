@@ -654,6 +654,27 @@ upstream styling of their shared components, and its title stays centred as
 in every upstream modal; the Cancel / Save footer stays in view while the
 dialog scrolls.
 
+## 10c. Payees (APP-05a)
+
+**APP-05a (approved October 1, 2026):** drawn in the prototype (Page →
+Payees; shots `80`–`86`, prototype README). The owner left the open
+questions to the implementer, who chose:
+
+- The selection button, Show unused payees and Category learning settings
+  sit in one toolbar above the table, with the filter at the right, as on
+  Schedules. Category learning settings leaves the bottom of the page.
+- The table is a Surface card with an Eyebrow header, hairline dividers and
+  44px rows (the table's `rowHeight` prop; the shared row-height constant
+  is untouched).
+- Rows with rules show an accent pill ("N associated rules →"); rows
+  without show a quiet "Create rule →" in Secondary text with a hairline
+  border on row hover. Same strings, click and keyboard focus.
+- The rule column has **no header** (no new string).
+- The favourite bookmark takes the accent; the learning-off bulb takes the
+  warning pill colour instead of hard-coded red.
+- The Category Learning dialog and the merge confirmation keep the upstream
+  look until APP-06.
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the

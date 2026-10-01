@@ -48,7 +48,7 @@ Budget header are reference material, not tasks to build.
 | APP-02              | verified    | `f8fcc70d8`              | Linux VRT regenerated (66) and desktop window checked on Windows. E2E test "by payee" changed (SYNC-01 conflict risk).     |
 | APP-03a – d         | verified    | `0a7384ab1`, `ba03773c2` | 03a – d merged; all checks done (03d custom theme, keyboard, privacy, desktop on October 1, 2026).                         |
 | APP-04              | verified    | `f0052659d`              | Linux VRT regenerated (27). Keyboard, privacy, header custom theme and desktop passed (verification.md).                   |
-| APP-05a             | in progress | —                        | Payees drawn (prototype shots `80`–`86`), awaiting owner review. Files traced in the prototype README.                     |
+| APP-05a             | in progress | —                        | Drawn and approved (design-decisions §10c); building. Files traced in the prototype README.                                |
 | APP-05b – d, APP-06 | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                |
 | QA-01, RELEASE-01   | not started | —                        | —                                                                                                                          |
 
@@ -81,8 +81,8 @@ does not claim Claude's prototype is production-ready.
    ~~Then **APP-03a**~~ Merged September 30, 2026. ~~Then **APP-03b**~~ Merged
    October 1, 2026. ~~Then **APP-03c**~~ Merged October 1, 2026. ~~Then **APP-03d**~~
    Merged October 1, 2026. ~~Then **APP-04**~~ Merged
-   October 1, 2026. Then **APP-05a** (Payees; drawn October 1,
-   awaiting review), then APP-05b – d onward, then QA-01 and RELEASE-01.
+   October 1, 2026. Then **APP-05a** (Payees; drawing approved
+   October 1), then APP-05b – d onward, then QA-01 and RELEASE-01.
 
 The review's reasoning is in plan §19.
 
