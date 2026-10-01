@@ -119,10 +119,10 @@ const BUDGETED_SUPPORTED_CONDITION_FIELDS = new Set<
 
 export function CustomReport() {
   const params = useParams();
-  const { data: report, isPending } = useCustomReport(params.id);
+  const { data: report, isLoading } = useCustomReport(params.id);
   const [budgetType = 'envelope'] = useSyncedPref('budgetType');
 
-  if (isPending) {
+  if (isLoading) {
     return <LoadingIndicator />;
   }
 

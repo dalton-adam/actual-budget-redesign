@@ -56,12 +56,12 @@ import { useUpdateDashboardWidgetMutation } from '#reports/mutations';
 
 export function Spending() {
   const params = useParams();
-  const { data: widget, isPending } = useDashboardWidget<SpendingWidget>({
+  const { data: widget, isLoading } = useDashboardWidget<SpendingWidget>({
     id: params.id,
     type: 'spending-card',
   });
 
-  if (isPending) {
+  if (isLoading) {
     return <LoadingIndicator />;
   }
 
