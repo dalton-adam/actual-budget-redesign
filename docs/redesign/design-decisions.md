@@ -586,6 +586,16 @@ approved with these owner answers:
 - Formula: Result, Formula and Appearance cards, with Query Definitions as a
   card on the right (stacked below 1280px).
 
+**As implemented (APP-03c):** five chart segments rather than six (Bar and
+Stacked Bar share one, switching with the mode, as upstream); the Report
+menu and "Unsaved changes" sit at the right of the toolbar, where the
+drawing had Save widget, because the custom report saves through that menu
+and has no Save widget button; the legend lists names only (the report's
+legend carries no amounts); the settings rows keep their colon labels;
+the Calendar list's card has no elevation (`isFlatRegister`), matching the
+other report cards. Crossover's category list gets the same checklist look,
+since it shares `CategorySelector`.
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the

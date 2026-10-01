@@ -645,3 +645,28 @@ server on port 3021 over the LAN address, checkout mounted at
 Not run: the full suite. The shared components changed here
 (`DateRangePicker`, `FilterButton`) take new optional props whose defaults
 are the old look, so other screens are unaffected by construction.
+
+## Linux VRT for APP-03c (October 1, 2026)
+
+Against `redesign/app-03c-editors` (uncommitted APP-03c changes), with the
+[APP-01 setup](#linux-vrt-for-topbar-fix-and-app-01-september-30-2026):
+Docker Desktop 29.8.1, Playwright v1.61.1 image, HTTPS Vite development
+server on port 3021 over the LAN address, checkout mounted at
+`/mnt/host/c/dev/actual-budget-redesign`, one worker, no retries.
+
+1. **Update, scoped to `reports.test.ts`** (`--update-snapshots=changed`):
+   17 passed; **24 snapshots changed**, light, dark and midnight of the eight
+   `custom reports` tests. No new file, nothing outside those tests.
+2. **Review:** each change is APP-03c's custom report: the toolbar's chart
+   segments and Legend/Summary/Labels Control buttons, the settings card, and
+   the chart card with the summary tiles or legend beside the chart (the
+   test viewport is 1280 wide). Checked the legend in light, the summary in
+   midnight and the data table in dark; Legend and Labels are dimmed where
+   the data table disables them.
+3. **Rerun without updating:** `reports.test.ts` and `command-bar.test.ts`,
+   **19 passed**.
+
+Not run: the full suite. `Select`'s `triggerVariant`, the table's
+`isFlatRegister` and `QueryManager`'s `isCard` are new optional props whose
+defaults are the old look. `CategorySelector` also changes Crossover's list,
+which has no screenshot test.

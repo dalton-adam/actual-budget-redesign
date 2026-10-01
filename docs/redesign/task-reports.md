@@ -1315,3 +1315,50 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   (Net Worth, Cash Flow and the three forecast tests, three themes each);
   rerun with `command-bar.test.ts` 19/19 (verification.md).
   **Open:** custom theme, desktop build.
+- APP-03c: **built October 1, 2026** on branch `redesign/app-03c-editors`.
+  Drawing approved the same day (prototype shots `59`–`66`,
+  design-decisions §10a; Monte Carlo split off as APP-03d). Screenshots in
+  [verification/app-03c](verification/app-03c/). **Change:** the custom
+  report editor's toolbar sits above a **settings card** and a **chart
+  card**. `ReportTopbar.tsx`: the chart types are one icon segmented control
+  (`ReportSegmentedControl` gains per-segment titles, disabled segments and
+  an icon-only size), Legend/Summary/Labels are `aria-pressed` Control
+  buttons (names hidden below 1280px), Download Snapshot and Filter are
+  Control buttons, and the saved-report menu (`SaveReport.tsx`) is a
+  "Report" Control button with "Unsaved changes" beside it while modified.
+  `ReportSidebar.tsx` is the settings card: Mode and Live/Static as segmented
+  controls, every `Select` as a full-width Control button (`Select` gains
+  `triggerVariant`, defaulting to the old look). `CategorySelector.tsx` (also
+  used by Crossover) gets even rows, an accent dot per category and a
+  Control "Hide unchecked". `CustomReport.tsx` puts the chart in a Surface
+  card without elevation (`ReportPageCardHeader`: balance type, period,
+  total at Display); `ReportSummary.tsx` becomes two stat tiles (its period
+  moved to the card's subline via `useReportDateRangeText`) and
+  `ReportLegend.tsx` a list of chart-colour rows, beside the chart from
+  1280px and under it below. Calendar: the list is the APP-02 register
+  (`isRegister`) in a flat card (`isFlatRegister`, new: no elevation or page
+  margins); month names sit above their totals; the totals box is two stat
+  tiles; the tile row has the page's 20px margins. Formula: Result, Formula
+  and Appearance cards (font size as a segmented control) and Query
+  Definitions as a card (`QueryManager` gains `isCard`), side by side from
+  1280px. Narrow widths keep every upstream layout. No handler, query,
+  saved report, pref, route or calculation changed. **Deviations from the
+  drawing:** five chart segments, not six (Bar and Stacked Bar share one, as
+  upstream, switching with the mode); the Report menu sits at the right of
+  the toolbar, not in the title row (there is no Save widget there; the
+  custom report saves through that menu); no Save widget button; the legend
+  shows names only (the report's legend has no amounts); row labels keep
+  their colons (no string churn). **New strings:** "Unsaved changes",
+  "Report", "Legend", "Summary", "Labels", "Result", "Appearance", and the
+  accessible names "Graph type", "Mode" and "Font size"; "(modified)" is no
+  longer used. **Checks:** typecheck passes; `oxlint --type-aware` over the
+  changed files 0 errors; format check passes; web unit tests 1052 passed,
+  1 skipped. WIDE against the dev server (port 3001) with the installed
+  Edge: **74/74**, none skipped. VISUAL: dark at 1000×700 and light at
+  1440×900 for the custom report (graph and data table), Calendar and
+  Formula; two layout bugs found at 1000×700 and fixed before commit (the
+  Formula cards overlapped; the stacked summary and legend were clipped, so
+  the chart card now scrolls). Linux VRT: update scoped to `reports.test.ts`,
+  **24 snapshots changed** (the eight custom report tests, three themes
+  each); rerun with `command-bar.test.ts` 19/19 (verification.md).
+  **Open:** custom theme, desktop build (as APP-03b).
