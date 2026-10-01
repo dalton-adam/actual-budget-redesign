@@ -26,6 +26,9 @@ import { useSyncedPref } from '#hooks/useSyncedPref';
 
 import { PayeeRuleCountLabel } from './PayeeRuleCountLabel';
 
+/** Row height on the card (design-decisions §10c). */
+export const PAYEE_ROW_HEIGHT = 44;
+
 type RuleButtonProps = {
   ruleCount: number;
   focused: boolean;
@@ -39,25 +42,45 @@ function RuleButton({ ruleCount, focused, onEdit, onClick }: RuleButtonProps) {
       name="rule-count"
       width="auto"
       focused={focused}
-      style={{ padding: '0 10px' }}
+      style={{ padding: '0 12px 0 10px', justifyContent: 'center' }}
       plain
     >
       <CellButton
+        className="payee-rule-button"
         style={{
-          borderRadius: 4,
-          padding: '3px 6px',
-          backgroundColor: theme.noticeBackground,
-          border: '1px solid ' + theme.noticeBackground,
-          color: theme.noticeTextDark,
+          // An accent pill where rules exist, quiet text otherwise
+          // (design-decisions §10c).
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 6,
+          height: 24,
+          borderRadius: 7,
+          padding: '0 9px',
           fontSize: 12,
+          fontWeight: 600,
+          whiteSpace: 'nowrap',
           cursor: 'pointer',
-          ':hover': { backgroundColor: theme.noticeBackgroundLight },
+          border: '1px solid transparent',
+          ...(ruleCount > 0
+            ? {
+                backgroundColor: theme.selectionBackground,
+                color: theme.buttonPrimaryBackground,
+                ':hover': { borderColor: theme.selectionBorder },
+              }
+            : {
+                color: theme.pageTextSubdued,
+                ':hover': {
+                  backgroundColor: theme.controlBackground,
+                  borderColor: theme.cardHairline,
+                  color: theme.pageText,
+                },
+              }),
         }}
         onEdit={onEdit}
         onSelect={onClick}
       >
-        <PayeeRuleCountLabel count={ruleCount} style={{ paddingRight: 5 }} />
-        <SvgArrowThinRight style={{ width: 8, height: 8 }} />
+        <PayeeRuleCountLabel count={ruleCount} />
+        <SvgArrowThinRight style={{ width: 9, height: 9 }} />
       </CellButton>
     </Cell>
   );
@@ -113,9 +136,8 @@ export const PayeeTableRow = memo(
       return Array.from(new Set(ids));
     }, [payee, selectedItems]);
 
-    const borderColor = selected
-      ? theme.tableBorderSelected
-      : theme.tableBorder;
+    // Hairline dividers on the card (design-decisions §10c).
+    const borderColor = theme.cardHairline;
     const backgroundFocus = hovered || focusedField === 'select';
     const [learnCategories = 'true'] = useSyncedPref('learn-categories');
     const isLearnCategoriesEnabled = String(learnCategories) === 'true';
@@ -170,21 +192,27 @@ export const PayeeTableRow = memo(
     return (
       <Row
         ref={triggerRef}
+        height={PAYEE_ROW_HEIGHT}
         style={{
           alignItems: 'stretch',
           ...style,
           borderColor,
-          backgroundColor: hovered
-            ? theme.tableRowBackgroundHover
-            : selected
-              ? theme.tableRowBackgroundHighlight
-              : backgroundFocus
-                ? theme.tableRowBackgroundHover
-                : theme.tableBackground,
-          ...(selected && {
-            backgroundColor: theme.tableRowBackgroundHighlight,
-            zIndex: 100,
-          }),
+          backgroundColor: selected
+            ? theme.selectionBackground
+            : hovered || backgroundFocus
+              ? theme.tableRowHover
+              : theme.cardBackground,
+          ...(selected && { zIndex: 100 }),
+          '& > div': { borderColor },
+          // The quiet rule button looks like a control button on row hover.
+          ...(hovered &&
+            !ruleCount && {
+              '& .payee-rule-button': {
+                backgroundColor: theme.controlBackground,
+                borderColor: theme.cardHairline,
+                color: theme.pageText,
+              },
+            }),
         }}
         data-focus-key={payee.id}
         onMouseEnter={() => onHover && onHover(payee.id)}
@@ -219,10 +247,16 @@ export const PayeeTableRow = memo(
           {() => {
             return (
               <>
-                {payee.favorite ? <SvgBookmark style={{ width: 10 }} /> : null}
+                {payee.favorite ? (
+                  <SvgBookmark
+                    style={{ width: 10, color: theme.buttonPrimaryBackground }}
+                  />
+                ) : null}
                 {isLearnCategoriesEnabled && !payee.learn_categories && (
                   <Tooltip content={t('Category learning disabled')}>
-                    <SvgLightBulb style={{ color: 'red', width: 10 }} />
+                    <SvgLightBulb
+                      style={{ color: theme.pillWarningText, width: 10 }}
+                    />
                   </Tooltip>
                 )}
               </>
@@ -232,10 +266,9 @@ export const PayeeTableRow = memo(
         <InputCell
           value={(payee.transfer_acct ? t('Transfer: ') : '') + payee.name}
           valueStyle={
-            (!selected &&
-              payee.transfer_acct && { color: theme.pageTextSubdued }) ||
-            (!selected && !payee.transfer_acct && { color: theme.tableText }) ||
-            (selected && { color: theme.tableTextSelected })
+            payee.transfer_acct
+              ? { color: theme.pageTextSubdued }
+              : { color: theme.pageText, fontWeight: 500 }
           }
           exposed={focusedField === 'name'}
           width="flex"
