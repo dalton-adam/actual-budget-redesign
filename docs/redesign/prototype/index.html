@@ -4521,6 +4521,260 @@
         background: rgba(0, 0, 0, 0.05);
         border-radius: 4px;
       }
+      /* APP-06d: loading, error and empty states. .old draws today's look. */
+      .ast-page {
+        flex: 1;
+        min-height: calc(100vh - 120px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        text-align: center;
+      }
+      .ast-spin {
+        width: 20px;
+        height: 20px;
+        color: var(--pageTextSubdued);
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .ast-spin {
+          animation: adlg-spin 0.9s linear infinite;
+        }
+      }
+      .ast-load {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .ast-load .msg {
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--pageTextSubdued);
+      }
+      .ast-load.old {
+        gap: 40px;
+      }
+      .ast-load.old .msg {
+        font-size: 18px;
+        font-weight: 400;
+        color: var(--pageText);
+      }
+      .ast-load.old .ast-spin {
+        width: 25px;
+        height: 25px;
+        color: var(--pageText);
+      }
+      .ast-appload {
+        position: fixed;
+        inset: 0;
+        z-index: 70;
+        background:
+          linear-gradient(
+            150deg,
+            var(--pageBackground),
+            var(--pageBackground) 40%,
+            transparent
+          ),
+          var(--pageBackground);
+        display: flex;
+        justify-content: center;
+        padding-top: 200px;
+      }
+      .ast-err {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 520px;
+      }
+      .ast-err .ico {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--pillNegativeBackground);
+        color: var(--pillNegativeText);
+        margin-bottom: 14px;
+      }
+      .ast-err .ico svg {
+        width: 18px;
+        height: 18px;
+      }
+      .ast-err h2 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.35;
+        color: var(--pageText);
+      }
+      .ast-err pre {
+        margin: 12px 0 0;
+        padding: 10px 12px;
+        max-width: 520px;
+        border-radius: 8px;
+        background: var(--cardInset);
+        color: var(--pageTextSubdued);
+        font:
+          12px/1.45 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Consolas,
+          monospace;
+        white-space: pre-wrap;
+        text-align: left;
+        user-select: text;
+      }
+      .ast-btn {
+        margin-top: 18px;
+        min-height: 30px;
+        padding: 0 12px;
+        border-radius: 9px;
+        border: 1px solid var(--cardBorder);
+        background: var(--controlBackground);
+        color: var(--pageText);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .ast-btn:hover,
+      .ast-btn.hl {
+        background: var(--tableRowHover);
+      }
+      .ast-err.old h2 {
+        font-weight: 500;
+        color: var(--pillNegativeText);
+      }
+      .ast-err.old pre {
+        margin-top: 10px;
+        padding: 0;
+        background: none;
+        color: var(--pillNegativeText);
+        text-align: center;
+      }
+      .ast-err.old .ubtn {
+        margin-top: 15px;
+      }
+      /* Fatal error body inside the APP-06a dialog frame */
+      .adlg.fatal {
+        width: 500px;
+      }
+      .adlg .fatal-stack {
+        margin: 0 0 4px;
+        padding: 10px 12px;
+        max-height: 140px;
+        overflow: auto;
+        border-radius: 8px;
+        background: var(--cardInset);
+        color: var(--pageTextSubdued);
+        font:
+          11.5px/1.5 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Consolas,
+          monospace;
+        white-space: pre;
+      }
+      .adlg .fatal-btns {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .adlg .fatal-btns .tlink {
+        margin-right: auto;
+        border: 0;
+        background: none;
+        padding: 4px 0;
+        font: inherit;
+        font-size: 12.5px;
+        color: var(--pageTextSubdued);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .adlg a.ext {
+        color: var(--pageText);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .adlg.old.fatal p {
+        font-size: 15px;
+        margin-bottom: 15px;
+      }
+      .adlg.old .fatal-old-stack {
+        margin-top: 5px;
+        height: 100px;
+        overflow: auto;
+        white-space: pre;
+      }
+      .adlg.old a.ext {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      /* Empty account register */
+      .ast-first {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 64px 24px 72px;
+        text-align: center;
+      }
+      .ast-first .txt {
+        max-width: 420px;
+        font-size: 13.5px;
+        line-height: 1.5;
+        color: var(--pageTextSubdued);
+      }
+      .ast-first .txt strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--pageText);
+      }
+      .ast-first .ubtn {
+        margin-top: 18px;
+      }
+      .ast-first .foot {
+        margin-top: 14px;
+        font-size: 12px;
+        color: var(--pageTextSubdued);
+      }
+      .ast-first.old {
+        padding: 75px 0 40px;
+        border-top: 1px solid var(--cardBorder);
+      }
+      .ast-first.old .txt {
+        max-width: 550px;
+        font-size: 15px;
+        line-height: 1.4;
+        color: var(--pageText);
+      }
+      .ast-first.old .txt strong {
+        display: inline;
+        margin: 0;
+        font-size: inherit;
+        font-weight: 700;
+      }
+      .ast-first.old .ubtn {
+        margin-top: 20px;
+      }
+      .ast-first.old .foot {
+        margin-top: 20px;
+        font-size: 13px;
+      }
+      .ast-none {
+        padding: 40px 0;
+        text-align: center;
+        font-size: 13px;
+        color: var(--pageTextSubdued);
+      }
+      .ast-none.old {
+        padding: 20px 0 0;
+        font-style: italic;
+        color: var(--pageText);
+      }
       /* Schedule dialog */
       .sdlg-scrim {
         position: fixed;
@@ -5517,6 +5771,11 @@
         mnuhl: params.get('mnuhl') || '',
         // APP-06c: a toast (update, saved, warning, error, stack), today's
         // look for comparison, and the action hovered or close focused.
+        // APP-06d: a loading, error or empty state, today's look for
+        // comparison, and the fatal error's stack shown.
+        sst: params.get('sst') || '',
+        sstold: params.get('sstold') === '1',
+        sststack: params.get('sststack') === '1',
         tst: params.get('tst') || '',
         tstold: params.get('tstold') === '1',
         tsthl: params.get('tsthl') || '',
@@ -7027,6 +7286,81 @@
         }" role="dialog" aria-modal="true">${body}</div></div>`;
       }
 
+      // APP-06d proposal: loading, error and empty states (FatalError.tsx,
+      // FeatureErrorFallback.tsx, reports/LoadingIndicator.tsx,
+      // util/LoadComponent.tsx, AppBackground.tsx and the account register's
+      // two empty states). Strings are upstream; the error text is an example.
+      const astSpin =
+        '<svg class="ast-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9"/></svg>';
+      function astLoad(msg) {
+        return `<div class="ast-load ${state.sstold ? 'old' : ''}" role="status">${
+          msg ? `<div class="msg">${msg}</div>` : ''
+        }${astSpin}</div>`;
+      }
+      // Replaces the page when a route's error boundary or loader shows.
+      function appStatePage() {
+        const old = state.sstold;
+        if (state.sst === 'loading') {
+          return `<main class="main"><div class="ast-page">${astLoad(
+            'Loading reports...',
+          )}</div></main>`;
+        }
+        return `<main class="main"><div class="ast-page"><div class="ast-err ${
+          old ? 'old' : ''
+        }">${
+          old
+            ? ''
+            : '<span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 6v7.5M12 18h.01"/></svg></span>'
+        }<h2>Something went wrong loading this section.</h2>
+          <pre>Cannot read properties of undefined (reading 'balance')</pre>
+          <button class="${old ? 'ubtn' : 'ast-btn'}">Try again</button>
+        </div></div></main>`;
+      }
+      // Fatal and lazy-load errors sit in the APP-06a dialog frame; budget
+      // loading covers the whole window.
+      function appStateOverlay() {
+        const old = state.sstold;
+        if (state.sst === 'appload') {
+          return `<div class="ast-appload">${astLoad('Opening last budget...')}</div>`;
+        }
+        if (state.sst !== 'fatal' && state.sst !== 'lazy') return '';
+        const lazy = state.sst === 'lazy';
+        const stack = `Error: Cannot read properties of undefined (reading 'balance')
+    at AccountHeader (Header.tsx:212:31)
+    at renderWithHooks (react-dom.development.js:15486:18)
+    at updateFunctionComponent (react-dom.development.js:19617:20)
+    at beginWork (react-dom.development.js:21640:16)`;
+        const text = lazy
+          ? '<p>There was a problem loading one of the chunks of the application. Please reload the page and try again. If the issue persists - there might be an issue with either your internet connection and/or the server where the app is hosted.</p>'
+          : '<p>There was an unrecoverable error in the UI. Sorry!</p><p>If this error persists, please get <a class="ext">in touch</a> so it can be investigated.</p>';
+        const title = `<div class="adlg-h"><h1>${lazy ? 'Loading Error' : 'Fatal Error'}</h1></div>`;
+        const body = old
+          ? `${title}${text}<p><button class="ubtn">Restart app</button></p>
+            <div style="font-size:11px"><a style="color:var(--accent)">Show Error</a>${
+              state.sststack
+                ? `<div class="fatal-old-stack">${stack}</div>`
+                : ''
+            }</div>`
+          : `${title}${text}${
+              state.sststack ? `<div class="fatal-stack">${stack}</div>` : ''
+            }<div class="fatal-btns"><button class="tlink">Show Error</button><button class="ubtn primary">Restart app</button></div>`;
+        return `<div class="adlg-scrim ${old ? 'old' : ''}"><div class="adlg fatal ${
+          old ? 'old' : ''
+        }" role="dialog" aria-modal="true">${body}</div></div>`;
+      }
+      // The account register's two empty states (renderEmpty in Account.tsx).
+      function appEmptyRegister() {
+        const old = state.sstold ? 'old' : '';
+        if (state.sst === 'notx') {
+          return `<div class="ast-none ${old}">No transactions</div>`;
+        }
+        return `<div class="ast-first ${old}">
+          <div class="txt"><strong>Let's add your first account.</strong> Accounts hold your transactions, like everyday spending, savings, credit cards, or cash. You can connect to your bank to import transactions automatically, or add them yourself.</div>
+          <button class="ubtn primary">Add account</button>
+          <div class="foot">You can add more accounts at any time from the sidebar.</div>
+        </div>`;
+      }
+
       // APP-06c proposal: toasts (Notifications.tsx). The strings are real
       // upstream notifications; placement, width, the three-deep stack and
       // timing are unchanged.
@@ -7286,6 +7620,32 @@
                   ['hover', 'Button hover'],
                   ['focus', 'Close focus'],
                 ]),
+              ]
+            : []),
+          grp('State', 'sst', [
+            ['', 'Off'],
+            ['fatal', 'Fatal error'],
+            ['lazy', 'Loading error'],
+            ['feature', 'Section error'],
+            ['loading', 'Page loading'],
+            ['appload', 'Budget loading'],
+            ['firstacct', 'First account'],
+            ['notx', 'No transactions'],
+          ]),
+          ...(state.sst
+            ? [
+                grp('State look', 'sstold', [
+                  [false, 'Proposed'],
+                  [true, 'Today'],
+                ]),
+                ...(state.sst === 'fatal' || state.sst === 'lazy'
+                  ? [
+                      grp('Error details', 'sststack', [
+                        [false, 'Hidden'],
+                        [true, 'Shown'],
+                      ]),
+                    ]
+                  : []),
               ]
             : []),
         ];
@@ -7838,7 +8198,11 @@
                 ? `<div class="rcols trow editing"><div></div><div class="cell-edit num">09/27/2026</div><div class="cell-edit" style="color:var(--pageTextFaint)">Payee</div><div class="cell-edit"></div><div class="cell-edit" style="color:var(--accent)">Categorize</div><div class="cell-edit num" style="justify-content:flex-end">0.00</div><div class="cell-edit"></div><div class="col-bal"></div><div><span class="clr u"></span></div></div><div class="newrow-actions"><button class="tbtn">Cancel</button><button class="tbtn primary">Add</button></div>`
                 : ''
             }
-            ${rows.map(txnRow).join('')}
+            ${
+              state.sst === 'firstacct' || state.sst === 'notx'
+                ? appEmptyRegister()
+                : rows.map(txnRow).join('')
+            }
           </div>
         </main>`;
       }
@@ -10178,21 +10542,25 @@
         <div class="page">
           ${L.narrow ? '' : acctRail()}
           ${
-            state.page === 'account'
-              ? accountPage()
-              : state.page === 'reports'
-                ? reportsPage()
-                : state.page === 'schedules'
-                  ? schedulesPage()
-                  : state.page === 'payees'
-                    ? payeesPage()
-                    : state.page === 'rules'
-                      ? rulesPage()
-                      : state.page === 'tags'
-                        ? tagsPage()
-                        : state.page === 'settings'
-                          ? settingsPage()
-                          : `<main class="main">
+            state.sst === 'feature' || state.sst === 'loading'
+              ? appStatePage()
+              : state.page === 'account' ||
+                  state.sst === 'firstacct' ||
+                  state.sst === 'notx'
+                ? accountPage()
+                : state.page === 'reports'
+                  ? reportsPage()
+                  : state.page === 'schedules'
+                    ? schedulesPage()
+                    : state.page === 'payees'
+                      ? payeesPage()
+                      : state.page === 'rules'
+                        ? rulesPage()
+                        : state.page === 'tags'
+                          ? tagsPage()
+                          : state.page === 'settings'
+                            ? settingsPage()
+                            : `<main class="main">
             ${header()}
             ${summary}
             ${ledger(offs)}
@@ -10207,6 +10575,7 @@
       ${state.dlg ? appDialog() : ''}
       ${state.mnu ? appMenu() : ''}
       ${state.tst ? appToast() : ''}
+      ${appStateOverlay()}
       ${controls()}`;
         placeAnchored();
         const ruMenu = document.querySelector('.ru-table .pay-menu');
@@ -10303,6 +10672,14 @@
           else u.searchParams.delete('mnuhl');
         } else {
           for (const k of ['mnu', 'mnuold', 'mnuhl']) u.searchParams.delete(k);
+        }
+        if (state.sst) {
+          u.searchParams.set('sst', state.sst);
+          u.searchParams.set('sstold', state.sstold ? '1' : '0');
+          u.searchParams.set('sststack', state.sststack ? '1' : '0');
+        } else {
+          for (const k of ['sst', 'sstold', 'sststack'])
+            u.searchParams.delete(k);
         }
         if (state.tst) {
           u.searchParams.set('tst', state.tst);
