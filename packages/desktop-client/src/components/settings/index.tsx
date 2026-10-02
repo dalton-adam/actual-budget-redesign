@@ -5,6 +5,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '@actual-app/components/button';
 import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { Input } from '@actual-app/components/input';
+import { StatusPill } from '@actual-app/components/status-pill';
 import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { tokens } from '@actual-app/components/tokens';
@@ -18,7 +19,7 @@ import { closeBudget } from '#budgetfiles/budgetfilesSlice';
 import { Link } from '#components/common/Link';
 import { Checkbox, FormField, FormLabel } from '#components/forms';
 import { MOBILE_NAV_HEIGHT } from '#components/mobile/MobileNavTabs';
-import { Page } from '#components/Page';
+import { Page, PageHeader } from '#components/Page';
 import { useServerVersion } from '#components/ServerContext';
 import { useFeatureFlag } from '#hooks/useFeatureFlag';
 import { useGlobalPref } from '#hooks/useGlobalPref';
@@ -38,7 +39,13 @@ import { LanguageSettings } from './LanguageSettings';
 import { RepairTransactions } from './RepairTransactions';
 import { ResetCache, ResetSync } from './Reset';
 import { ThemeSettings } from './Themes';
-import { AdvancedToggle, Setting } from './UI';
+import {
+  AdvancedToggle,
+  redesignCheckboxStyle,
+  Setting,
+  settingsInsetStyle,
+  useSettingsRedesign,
+} from './UI';
 
 function About() {
   const version = useServerVersion();
@@ -48,6 +55,7 @@ function About() {
       void dispatch(getLatestAppVersion());
     });
   const dispatch = useDispatch();
+  const isRedesign = useSettingsRedesign();
 
   return (
     <Setting>
@@ -60,15 +68,18 @@ function About() {
       <View
         style={{
           flexDirection: 'column',
-          gap: 10,
+          gap: isRedesign ? 8 : 10,
+          ...(isRedesign && settingsInsetStyle),
         }}
         className={css({
           [`@media (min-width: ${tokens.breakpoint_small})`]: {
             display: 'grid',
             gridTemplateRows: '1fr 1fr',
             gridTemplateColumns: '50% 50%',
-            columnGap: '2em',
+            columnGap: isRedesign ? 24 : '2em',
             gridAutoFlow: 'column',
+            alignItems: 'center',
+            justifyItems: 'start',
           },
         })}
         data-vrt-mask
@@ -90,6 +101,14 @@ function About() {
           >
             <Trans>New version available: {versionInfo.latestVersion}</Trans>
           </Link>
+        ) : isRedesign ? (
+          notifyWhenUpdateIsAvailable ? (
+            <StatusPill tone="positive">
+              <Trans>You're up to date!</Trans>
+            </StatusPill>
+          ) : (
+            <Text />
+          )
         ) : (
           <Text style={{ color: theme.noticeText, fontWeight: 600 }}>
             {notifyWhenUpdateIsAvailable ? (
@@ -111,6 +130,7 @@ function About() {
         <Text style={{ display: 'flex' }}>
           <Checkbox
             id="settings-notifyWhenUpdateIsAvailable"
+            style={isRedesign ? redesignCheckboxStyle : undefined}
             checked={notifyWhenUpdateIsAvailable}
             onChange={e =>
               setNotifyWhenUpdateIsAvailablePref(e.currentTarget.checked)
@@ -133,6 +153,7 @@ function AdvancedAbout() {
   const [budgetId] = useMetadataPref('id');
   const [groupId] = useMetadataPref('groupId');
   const { t } = useTranslation();
+  const isRedesign = useSettingsRedesign();
 
   return (
     <Setting>
@@ -144,16 +165,20 @@ function AdvancedAbout() {
           ID is used to access the budget on the server.
         </Trans>
       </Text>
-      <Text>
-        <Trans>
-          <IDName>Budget ID:</IDName> {{ budgetId }}
-        </Trans>
-      </Text>
-      <Text style={{ color: theme.pageText }}>
-        <Trans>
-          <IDName>Sync ID:</IDName> {{ syncId: groupId || t('(none)') }}
-        </Trans>
-      </Text>
+      <View
+        style={isRedesign ? { ...settingsInsetStyle, gap: 6 } : { gap: 10 }}
+      >
+        <Text style={isRedesign ? { color: theme.pageText } : undefined}>
+          <Trans>
+            <IDName>Budget ID:</IDName> {{ budgetId }}
+          </Trans>
+        </Text>
+        <Text style={{ color: theme.pageText }}>
+          <Trans>
+            <IDName>Sync ID:</IDName> {{ syncId: groupId || t('(none)') }}
+          </Trans>
+        </Text>
+      </View>
       {/* low priority todo: eliminate some or all of these, or decide when/if to show them */}
       {/* <Text>
         <IDName>Cloud File ID:</IDName> {prefs.cloudFileId || t('(none)')}
@@ -195,7 +220,21 @@ export function Settings() {
 
   return (
     <Page
-      header={t('Settings')}
+      header={
+        isNarrowWidth ? (
+          t('Settings')
+        ) : (
+          // Display title, as on the other redesigned pages (APP-05d).
+          <PageHeader
+            title={
+              <Text style={settingsTitleStyle}>
+                <Trans>Settings</Trans>
+              </Text>
+            }
+            style={{ marginTop: 6 }}
+          />
+        )
+      }
       style={{
         marginInline: floatingSidebar && !isNarrowWidth ? 'auto' : 0,
       }}
@@ -203,11 +242,12 @@ export function Settings() {
       <View
         data-testid="settings"
         style={{
-          marginTop: 10,
+          marginTop: isNarrowWidth ? 10 : 14,
           flexShrink: 0,
-          maxWidth: 530,
+          // One 720px column of cards (design-decisions §10f).
+          maxWidth: isNarrowWidth ? 530 : 720,
           width: '100%',
-          gap: 30,
+          gap: isNarrowWidth ? 30 : 12,
           paddingBottom: MOBILE_NAV_HEIGHT,
         }}
       >
@@ -255,3 +295,10 @@ export function Settings() {
     </Page>
   );
 }
+
+const settingsTitleStyle = {
+  fontSize: 28,
+  fontWeight: 700,
+  letterSpacing: -0.4,
+  lineHeight: 1.2,
+} as const;

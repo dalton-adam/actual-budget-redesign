@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Trans } from 'react-i18next';
 
+import { Button } from '@actual-app/components/button';
 import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -17,7 +18,12 @@ import { useServerPref } from '#hooks/useServerPref';
 import { useSyncedPref } from '#hooks/useSyncedPref';
 import { useSyncServerStatus } from '#hooks/useSyncServerStatus';
 
-import { Setting } from './UI';
+import {
+  redesignCheckboxStyle,
+  Setting,
+  useSettingsRedesign,
+  useSettingsStatusColors,
+} from './UI';
 
 type FeatureToggleProps = {
   flag: FeatureFlag;
@@ -38,6 +44,8 @@ function FeatureToggle({
 }: FeatureToggleProps) {
   const enabled = useFeatureFlag(flagName);
   const [_, setFlagPref] = useSyncedPref(`flags.${flagName}`);
+  const isRedesign = useSettingsRedesign();
+  const statusColors = useSettingsStatusColors();
 
   return (
     <label style={{ display: 'flex' }}>
@@ -47,6 +55,7 @@ function FeatureToggle({
           setFlagPref(String(!enabled));
         }}
         disabled={disableToggle}
+        style={isRedesign ? redesignCheckboxStyle : undefined}
       />
       <View
         style={{ color: disableToggle ? theme.pageTextSubdued : 'inherit' }}
@@ -63,7 +72,7 @@ function FeatureToggle({
         {disableToggle && (
           <Text
             style={{
-              color: theme.errorText,
+              color: statusColors.negative,
               fontWeight: 500,
             }}
           >
@@ -71,7 +80,7 @@ function FeatureToggle({
           </Text>
         )}
 
-        {note && <Text style={{ color: theme.warningText }}>{note}</Text>}
+        {note && <Text style={{ color: statusColors.warning }}>{note}</Text>}
       </View>
     </label>
   );
@@ -100,6 +109,8 @@ function ServerFeatureToggle({
   const { hasPermission } = useAuth();
   const loginMethod = useLoginMethod();
   const multiuserEnabled = useMultiuserEnabled();
+  const isRedesign = useSettingsRedesign();
+  const statusColors = useSettingsStatusColors();
 
   if (!isUsingServer || isServerOffline) {
     return null;
@@ -122,6 +133,7 @@ function ServerFeatureToggle({
           setEnabled(enabled === 'true' ? 'false' : 'true');
         }}
         disabled={disableToggle}
+        style={isRedesign ? redesignCheckboxStyle : undefined}
       />
       <View
         style={{ color: disableToggle ? theme.pageTextSubdued : 'inherit' }}
@@ -138,7 +150,7 @@ function ServerFeatureToggle({
         {disableToggle && (
           <Text
             style={{
-              color: theme.errorText,
+              color: statusColors.negative,
               fontWeight: 500,
             }}
           >
@@ -152,6 +164,7 @@ function ServerFeatureToggle({
 
 export function ExperimentalFeatures() {
   const [expanded, setExpanded] = useState(false);
+  const isRedesign = useSettingsRedesign();
 
   const goalTemplatesEnabled = useFeatureFlag('goalTemplatesEnabled');
   const goalTemplatesUIEnabled = useFeatureFlag('goalTemplatesUIEnabled');
@@ -254,6 +267,14 @@ export function ExperimentalFeatures() {
               </ServerFeatureToggle>
             )}
           </View>
+        ) : isRedesign ? (
+          <Button
+            variant="control"
+            onPress={() => setExpanded(true)}
+            data-testid="experimental-settings"
+          >
+            <Trans>I understand the risks, show experimental features</Trans>
+          </Button>
         ) : (
           <Link
             variant="text"

@@ -11,7 +11,7 @@ import { Link } from '#components/common/Link';
 import { useGlobalPref } from '#hooks/useGlobalPref';
 import { availableLanguages, setI18NextLanguage } from '#i18n';
 
-import { Setting } from './UI';
+import { redesignSelectStyle, Setting, useSettingsRedesign } from './UI';
 
 const languageDisplayNameOverride: { [key: string]: string } = {
   'pt-BR': 'Português (Brasil)',
@@ -36,6 +36,7 @@ export function LanguageSettings() {
   const { t } = useTranslation();
   const [language, setLanguage] = useGlobalPref('language');
   const isEnabled = !!availableLanguages.length;
+  const isRedesign = useSettingsRedesign();
 
   return (
     <Setting
@@ -52,6 +53,10 @@ export function LanguageSettings() {
             setI18NextLanguage(value);
           }}
           disabled={!isEnabled}
+          {...(isRedesign && {
+            triggerVariant: 'control',
+            style: redesignSelectStyle,
+          })}
         />
       }
     >

@@ -9,10 +9,11 @@ import { resetSync } from '#app/appSlice';
 import { useMetadataPref } from '#hooks/useMetadataPref';
 import { useDispatch } from '#redux';
 
-import { Setting } from './UI';
+import { Setting, useSettingsRedesign } from './UI';
 
 export function ResetCache() {
   const [resetting, setResetting] = useState(false);
+  const isRedesign = useSettingsRedesign();
 
   async function onResetCache() {
     setResetting(true);
@@ -23,7 +24,11 @@ export function ResetCache() {
   return (
     <Setting
       primaryAction={
-        <ButtonWithLoading isLoading={resetting} onPress={onResetCache}>
+        <ButtonWithLoading
+          variant={isRedesign ? 'control' : 'normal'}
+          isLoading={resetting}
+          onPress={onResetCache}
+        >
           <Trans>Reset budget cache</Trans>
         </ButtonWithLoading>
       }
@@ -47,6 +52,7 @@ export function ResetSync() {
   const dispatch = useDispatch();
 
   const [resetting, setResetting] = useState(false);
+  const isRedesign = useSettingsRedesign();
 
   async function onResetSync() {
     setResetting(true);
@@ -58,6 +64,7 @@ export function ResetSync() {
     <Setting
       primaryAction={
         <ButtonWithLoading
+          variant={isRedesign ? 'control' : 'normal'}
           isLoading={resetting}
           isDisabled={!isEnabled}
           onPress={onResetSync}

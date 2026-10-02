@@ -27,7 +27,19 @@ import {
 import type { InstalledTheme } from '#style/customThemes';
 
 import { ThemeInstaller } from './ThemeInstaller';
-import { Column, Setting } from './UI';
+import {
+  Column,
+  redesignSelectStyle,
+  Setting,
+  useSettingsRedesign,
+} from './UI';
+
+const upstreamSelectClassName = css({
+  '&[data-hovered]': {
+    backgroundColor: themeStyle.buttonNormalBackgroundHover,
+  },
+  maxWidth: '100%',
+});
 
 const INSTALL_NEW_VALUE = '__install_new__';
 const INSTALL_CUSTOM_LIGHT = '__install_custom_light__';
@@ -42,6 +54,7 @@ type InstallerState = {
 export function ThemeSettings() {
   const { t } = useTranslation();
   const sidebar = useSidebar();
+  const isRedesign = useSettingsRedesign();
   const [theme, switchTheme] = useTheme();
   const [darkTheme, switchDarkTheme] = usePreferredDarkTheme();
   const [showInstaller, setShowInstaller] = useState<InstallerState>(null);
@@ -229,12 +242,12 @@ export function ThemeSettings() {
                     onChange={handleThemeChange}
                     value={getCurrentValue()}
                     options={buildOptions()}
-                    className={css({
-                      '&[data-hovered]': {
-                        backgroundColor: themeStyle.buttonNormalBackgroundHover,
-                      },
-                      maxWidth: '100%',
-                    })}
+                    {...(isRedesign
+                      ? {
+                          triggerVariant: 'control',
+                          style: redesignSelectStyle,
+                        }
+                      : { className: upstreamSelectClassName })}
                   />
                   {hasCustomCssOverride && (
                     <Button
@@ -265,13 +278,12 @@ export function ThemeSettings() {
                           : 'light'
                       }
                       options={buildLightOptions()}
-                      className={css({
-                        '&[data-hovered]': {
-                          backgroundColor:
-                            themeStyle.buttonNormalBackgroundHover,
-                        },
-                        maxWidth: '100%',
-                      })}
+                      {...(isRedesign
+                        ? {
+                            triggerVariant: 'control',
+                            style: redesignSelectStyle,
+                          }
+                        : { className: upstreamSelectClassName })}
                     />
                   </Column>
                   <Column title={t('Dark theme')}>
@@ -283,13 +295,12 @@ export function ThemeSettings() {
                           : darkTheme
                       }
                       options={buildDarkOptions()}
-                      className={css({
-                        '&[data-hovered]': {
-                          backgroundColor:
-                            themeStyle.buttonNormalBackgroundHover,
-                        },
-                        maxWidth: '100%',
-                      })}
+                      {...(isRedesign
+                        ? {
+                            triggerVariant: 'control',
+                            style: redesignSelectStyle,
+                          }
+                        : { className: upstreamSelectClassName })}
                     />
                   </Column>
                 </>

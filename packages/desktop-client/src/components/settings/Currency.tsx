@@ -11,10 +11,17 @@ import { css } from '@emotion/css';
 import { Checkbox } from '#components/forms';
 import { useSyncedPref } from '#hooks/useSyncedPref';
 
-import { Column, Setting } from './UI';
+import {
+  Column,
+  redesignCheckboxStyle,
+  redesignSelectStyle,
+  Setting,
+  useSettingsRedesign,
+} from './UI';
 
 export function CurrencySettings() {
   const { t } = useTranslation();
+  const isRedesign = useSettingsRedesign();
 
   const currencyTranslations = useMemo(
     () =>
@@ -151,8 +158,15 @@ export function CurrencySettings() {
                 value={selectedCurrencyCode}
                 onChange={handleCurrencyChange}
                 options={currencyOptions}
-                className={selectButtonClassName}
-                style={{ width: '100%' }}
+                {...(isRedesign
+                  ? {
+                      triggerVariant: 'control',
+                      style: { ...redesignSelectStyle, width: '100%' },
+                    }
+                  : {
+                      className: selectButtonClassName,
+                      style: { width: '100%' },
+                    })}
               />
             </Column>
 
@@ -166,8 +180,15 @@ export function CurrencySettings() {
                 value={symbolPosition || 'before'}
                 onChange={value => setSymbolPositionPref(value)}
                 options={symbolPositionOptions.map(f => [f.value, f.label])}
-                className={selectButtonClassName}
-                style={{ width: '100%' }}
+                {...(isRedesign
+                  ? {
+                      triggerVariant: 'control',
+                      style: { ...redesignSelectStyle, width: '100%' },
+                    }
+                  : {
+                      className: selectButtonClassName,
+                      style: { width: '100%' },
+                    })}
                 disabled={selectedCurrencyCode === ''}
               />
             </Column>
@@ -184,6 +205,7 @@ export function CurrencySettings() {
             >
               <Checkbox
                 id="settings-spaceEnabled"
+                style={isRedesign ? redesignCheckboxStyle : undefined}
                 checked={spaceEnabled === 'true'}
                 onChange={e =>
                   setSpaceEnabledPref(e.target.checked ? 'true' : 'false')
