@@ -713,7 +713,11 @@ Regenerate with `node scripts/redesign-prototype-shots.cjs --app-05d`
 
 ## APP-06a: shared dialog frame proposal (October 1, 2026)
 
-**Status: drawn October 1, 2026, awaiting owner review.** Choose any page,
+**Status: approved October 1, 2026.** The owner approved the popover
+shadow (question 1) and left the other three to the implementer, who chose
+the drawn option for each: left-aligned Headline title (question 2), the
+`scrim` backdrop (question 3) and upstream buttons inside dialogs for now
+(question 4). Choose any page,
 then **App dialog** in the prototype controls (Confirm, Close account, New
 group, Loading); **Frame → Today** draws today's frame over the same
 contents for comparison. URL parameters: `dlg=confirm|close|group|loading`,

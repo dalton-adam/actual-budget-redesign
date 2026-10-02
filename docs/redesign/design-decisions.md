@@ -742,6 +742,30 @@ questions to the implementer, who chose the drawn option for each:
 - Below the narrow breakpoint the page keeps the upstream look (mobile is
   deferred, plan §19.4).
 
+## 10g. Dialog frame (APP-06a)
+
+**APP-06a (approved October 1, 2026):** drawn in the prototype (App dialog;
+shots `108`–`114`, prototype README). The owner approved the popover shadow
+for dialogs and left the other questions to the implementer, who chose the
+drawn option for each:
+
+- Every desktop dialog's frame (`common/Modal.tsx`) is a Surface card:
+  `cardBackground`, Card Hairline border, 18px radius, 18px 22px 20px
+  padding.
+- Dialogs take the **Popover** shadow (`popoverShadow`). This adds dialogs
+  to the approved depth list (DESIGN.md Shadow Vocabulary).
+- The backdrop is the `scrim` role with no blur.
+- The title is a left-aligned Headline (18px/700) on one line with the
+  close button; `leftContent` sits before it.
+- The close button is a 30px icon button (9px radius, Secondary icon, Row
+  Hover wash on hover, 2px focus ring).
+- `ModalButtons` sits 20px below the content. The buttons inside dialogs
+  stay the upstream normal and primary buttons in 06a; APP-06e may move
+  them to the Control style.
+- The loading cover takes `cardBackground` and the card's radius.
+- Below the narrow breakpoint every dialog keeps the upstream frame
+  (mobile is deferred, plan §19.4).
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the
@@ -774,4 +798,5 @@ Confirm or change these before the named task starts; until then the
 | Sep 28, 2026 | DETAIL-02: third stat tile "From previous month" confirmed (§5, §11 item 1); the panel lists posted transactions only                                    | Owner confirmation in the DETAIL-02 session                                                                                      |
 | Sep 29, 2026 | DETAIL-04: pace chart for past and future months as §7.2 (§11 item 2); goal box contents (§5 item 4)                                                     | Owner confirmation in the DETAIL-04 session                                                                                      |
 | Sep 29, 2026 | APP-01: account hero as drawn (§10, §11 item 5); balance toggle kept; bank-sync error moves into the hero                                                | Owner answers in the APP-01 session                                                                                              |
+| Oct 1, 2026  | APP-06a: dialogs take the popover shadow (added to the approved depth list); other questions left to the implementer (§10g)                              | Owner answers in the APP-06a session                                                                                             |
 | Sep 30, 2026 | APP-02: register as drawn (§10, §11 item 5); dividers instead of stripes; payee initial in the category accent; square tags in the register only         | Owner answers in the APP-02 session                                                                                              |
