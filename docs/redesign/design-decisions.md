@@ -719,6 +719,29 @@ for each question:
 - "No Tags" stays centred in the card, not italic, and still shows only
   when there are no tags at all.
 
+## 10f. Settings (APP-05d)
+
+**APP-05d (approved October 1, 2026):** drawn in the prototype (Page →
+Settings; shots `101`–`107`, prototype README). The owner left the open
+questions to the implementer, who chose the drawn option for each:
+
+- One 720px column at the page's left margin under the 28px bold title.
+- Each setting is a Surface card **without** elevation (hairline, 18px
+  radius, 18px 20px padding), 12px apart. The explanation is Secondary
+  text with the bold lead term in Page Text.
+- Controls sit under a hairline divider inside the card, in a row that
+  wraps. Select labels are Eyebrow text; selects, buttons and checkboxes
+  take the redesign Control and checkbox look; disabled is 45% opacity.
+- No section headings: the cards keep today's order and no new strings are
+  added.
+- "Show advanced settings" and "I understand the risks, show experimental
+  features" become Control buttons; "Advanced Settings" is a Headline.
+- About's version lines and the IDs sit on Card Inset; "You're up to
+  date!" is a positive pill. Status text uses the pill text colours.
+- The custom-theme installer keeps the upstream look until APP-06.
+- Below the narrow breakpoint the page keeps the upstream look (mobile is
+  deferred, plan §19.4).
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the

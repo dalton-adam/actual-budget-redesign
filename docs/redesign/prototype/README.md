@@ -625,7 +625,10 @@ Regenerate with `node scripts/redesign-prototype-shots.cjs --app-05c`
 
 ## APP-05d: Settings proposal (October 1, 2026)
 
-**Status: drawn, awaiting owner review.** Choose **Page → Settings** (or
+**Status: approved October 1, 2026.** The owner left the four questions
+to the implementer, who chose the drawn option for each: the 720px column
+(question 1), controls under a hairline (question 2), no section headings
+(question 3) and Control buttons for the reveals (question 4). Choose **Page → Settings** (or
 More → Settings). URL parameters: `sadv=0|1` (advanced settings shown and
 scrolled to), `sexp=0|1` (experimental features listed), `sauto=0|1` (theme
 follows the system, so the Light and Dark theme menus show), `sserver=0|1`
