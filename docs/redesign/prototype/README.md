@@ -935,3 +935,82 @@ Questions for the owner:
 
 Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06c`
 (`PW_CHANNEL=msedge` uses the installed Edge).
+
+## APP-06d: loading, error and empty states proposal (October 2, 2026)
+
+**Status: proposed, awaiting owner approval.** Choose any page, then
+**State** in the prototype controls (Fatal error, Loading error, Section
+error, Page loading, Budget loading, First account, No transactions);
+**State look → Today** draws today's version with the same text; **Error
+details** shows the fatal error's stack. URL parameters:
+`sst=fatal|lazy|feature|loading|appload|firstacct|notx`, `sstold=0|1`,
+`sststack=0|1`. Strings are upstream; the error message and stack are
+examples. "Today" is an approximation in the prototype's palette, not a
+screenshot of the app. The first-account drawing sits under a sample account
+header; in the app it shows on All accounts when there are no accounts.
+
+Source traced for the brief (the backlog's list, rebuilt October 2):
+
+- `C/FatalError.tsx`: the app-level error dialog (`App.tsx`), inside the
+  APP-06a frame, not dismissable. Three bodies (UI error, lazy-load error,
+  app-init failures such as IndexedDB or `SharedArrayBuffer`), a "Restart
+  app" button, and a "Show Error" link that reveals the stack. Covered by
+  `FatalError.test.tsx`.
+- `C/FeatureErrorFallback.tsx`: the error boundary fallback for every route
+  in `FinancesApp.tsx`, the budget table, the account page, rules, reports
+  and the dialog body in `Modal.tsx`. Red title, red monospace message, "Try
+  again".
+- Loading: `C/reports/LoadingIndicator.tsx` (reports, account balance
+  graph), the identical copy inside `C/util/LoadComponent.tsx` (lazy routes)
+  and `C/AppBackground.tsx` (budget open/close/download text over the
+  background). 18px message, 25px spinner.
+- Empty: `C/accounts/AccountEmptyMessage.tsx` (no accounts yet) and the
+  register's italic "No transactions" in `C/accounts/Account.tsx`. Other
+  desktop lists already use the APP-04/05 empty line (13px Secondary, 40px
+  padding).
+
+What the drawing proposes (presentation only, desktop only; narrow widths
+keep upstream as in 06a – c):
+
+| Surface           | Today                                                                                                 | Proposed                                                                                                                                                                                                              |
+| ----------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fatal error body  | 15px text; normal "Restart app" button in its own line; 11px purple "Show Error" link; unstyled stack | Dialog body text (14px, Page Text); a button row with "Show Error" (12.5px Secondary, underlined) on the left and "Restart app" as primary on the right; stack on Card Inset, 8px radius, monospace, scrolls at 140px |
+| Fatal error links | Accent                                                                                                | Page Text, underlined (as toasts)                                                                                                                                                                                     |
+| Section error     | Red 15px title, red monospace message, normal button                                                  | 40px round "!" in the negative pill tone; 15px/600 Page Text title; message on Card Inset, 8px radius, Secondary; "Try again" as a control button (as the toast action)                                               |
+| Loading           | 18px Page Text message, 25px spinner, 40px gap                                                        | 13.5px/500 Secondary message, 20px Secondary spinner, 12px gap; same fade-in delay                                                                                                                                    |
+| Budget loading    | Same as loading, over the app background                                                              | Same as the proposed loading; slide-in unchanged                                                                                                                                                                      |
+| First account     | 15px Page Text, bold first sentence inline, table border                                              | First sentence on its own line, 16px/600 Page Text; body 13.5px Secondary, 420px wide; footer 12px Secondary; no extra border                                                                                         |
+| No transactions   | Italic Page Text, 20px from the header                                                                | The shared empty line: 13px Secondary, 40px padding, not italic                                                                                                                                                       |
+
+Unchanged by design: every string, the dialog frame (06a), which errors show
+which body, the `SharedArrayBuffer` override flow, `role`s, handlers ("Restart
+app", "Try again", "Add account"), the loading fade-in delay and the budget
+loading slide.
+
+Questions for the owner:
+
+1. **Section error tone:** a neutral title with a red icon (drawn, as toasts),
+   or keep red text?
+2. **Fatal error buttons:** "Restart app" as the primary button at the right
+   of a button row, with "Show Error" at the left (drawn), or keep today's
+   stacked layout?
+
+| File                                                   | Shows                                               |
+| ------------------------------------------------------ | --------------------------------------------------- |
+| `shots/131-state-fatal-light-wide-details.png`         | Fatal error with the stack shown, light             |
+| `shots/132-state-fatal-today-light-wide-details.png`   | The same dialog today                               |
+| `shots/133-state-lazy-dark-1000.png`                   | Loading error, dark, 1000×700                       |
+| `shots/134-state-section-error-dark-wide.png`          | Section error replacing the Budget page, dark       |
+| `shots/135-state-section-error-today-dark-wide.png`    | The same today                                      |
+| `shots/136-state-page-loading-midnight-1000.png`       | "Loading reports...", midnight, 1000×700            |
+| `shots/137-state-page-loading-today-midnight-1000.png` | The same today                                      |
+| `shots/138-state-budget-loading-light-wide.png`        | "Opening last budget..." over the background, light |
+| `shots/139-state-budget-loading-today-light-wide.png`  | The same today                                      |
+| `shots/140-state-first-account-light-wide.png`         | The first-account empty state, light                |
+| `shots/141-state-first-account-today-light-wide.png`   | The same today                                      |
+| `shots/142-state-no-transactions-dark-wide.png`        | The empty register line, dark                       |
+| `shots/143-state-no-transactions-today-dark-wide.png`  | The same today                                      |
+| `shots/144-state-section-error-custom-theme-wide.png`  | Section error, custom theme                         |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06d`
+(`PW_CHANNEL=msedge` uses the installed Edge).
