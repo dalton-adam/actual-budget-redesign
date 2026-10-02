@@ -25,7 +25,12 @@ export const TagEditor = ({ tag, ref }: TagEditorProps) => {
         updateTag({ tag: { ...tag, color: color.toString('hex') } });
       }}
     >
-      <Button variant="bare" className={getTagCSS(tag.tag)} ref={ref}>
+      {/* The register's square tag shape (design-decisions §10e). */}
+      <Button
+        variant="bare"
+        className={getTagCSS(tag.tag, { square: true })}
+        ref={ref}
+      >
         {formattedTag}
       </Button>
     </ColorPicker>

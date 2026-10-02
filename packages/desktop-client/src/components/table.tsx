@@ -834,6 +834,9 @@ type SelectedItemsButtonProps<Name extends string> = {
   name: ((count: number) => string) | string;
   items: MenuItem<Name>[];
   onSelect: (name: Name, items: string[]) => void;
+  /** `control`: a toolbar control button with the chevron after the label
+   * (APP-05c). Defaults to the bare green button. */
+  variant?: 'bare' | 'control';
 };
 
 export function SelectedItemsButton<Name extends string>({
@@ -841,6 +844,7 @@ export function SelectedItemsButton<Name extends string>({
   name,
   items,
   onSelect,
+  variant = 'bare',
 }: SelectedItemsButtonProps<Name>) {
   const selectedItems = useSelectedItems();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -855,20 +859,33 @@ export function SelectedItemsButton<Name extends string>({
 
   return (
     <View style={{ flexShrink: 0 }}>
-      <Button
-        ref={triggerRef}
-        variant="bare"
-        style={{ color: theme.pageTextPositive }}
-        onPress={() => setMenuOpen(true)}
-        data-testid={id + '-select-button'}
-      >
-        <SvgExpandArrow
-          width={8}
-          height={8}
-          style={{ marginRight: 5, color: theme.pageText }}
-        />
-        {buttonLabel}
-      </Button>
+      {variant === 'control' ? (
+        <Button
+          ref={triggerRef}
+          variant="control"
+          style={{ gap: 6 }}
+          onPress={() => setMenuOpen(true)}
+          data-testid={id + '-select-button'}
+        >
+          {buttonLabel}
+          <SvgExpandArrow width={8} height={8} />
+        </Button>
+      ) : (
+        <Button
+          ref={triggerRef}
+          variant="bare"
+          style={{ color: theme.pageTextPositive }}
+          onPress={() => setMenuOpen(true)}
+          data-testid={id + '-select-button'}
+        >
+          <SvgExpandArrow
+            width={8}
+            height={8}
+            style={{ marginRight: 5, color: theme.pageText }}
+          />
+          {buttonLabel}
+        </Button>
+      )}
 
       <Popover
         triggerRef={triggerRef}

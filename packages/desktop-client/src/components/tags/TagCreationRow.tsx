@@ -5,6 +5,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '@actual-app/components/button';
 import { ColorPicker } from '@actual-app/components/color-picker';
 import { SpaceBetween } from '@actual-app/components/space-between';
+import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import type { TagEntity } from '@actual-app/core/types/models';
@@ -85,6 +86,18 @@ export const TagCreationRow = ({ onClose, tags }: TagCreationRowProps) => {
 
   const isInitialMount = useInitialMount();
 
+  // The inputs as 30px fields on the Card Inset block (design-decisions §10e).
+  const fieldStyle = (isFocused: boolean) => ({
+    height: 30,
+    alignSelf: 'center',
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: theme.controlBackground,
+    border: '1px solid ' + theme.cardHairline,
+    // While editing, the input draws its own focus border.
+    ...(isFocused && { borderColor: 'transparent' }),
+  });
+
   useEffect(() => {
     if (isInitialMount) {
       tableNavigator.onEdit('new-tag', 'tag');
@@ -94,8 +107,10 @@ export const TagCreationRow = ({ onClose, tags }: TagCreationRowProps) => {
   return (
     <View
       style={{
-        paddingBottom: 1,
-        backgroundColor: theme.tableBackground,
+        // One Card Inset block at the top of the card (design-decisions §10e).
+        padding: '6px 0',
+        backgroundColor: theme.cardInset,
+        borderBottom: '1px solid ' + theme.cardHairline,
       }}
       data-testid="new-tag"
       {...tableNavigator.getNavigatorProps({
@@ -103,14 +118,13 @@ export const TagCreationRow = ({ onClose, tags }: TagCreationRowProps) => {
       })}
     >
       <Row
-        height={34}
+        height={42}
         style={{
-          padding: '0px 20px',
+          padding: '0px 14px 0 50px',
           width: '100%',
-          backgroundColor: theme.tableBackground,
-          gap: 5,
+          backgroundColor: theme.cardInset,
+          gap: 12,
         }}
-        collapsed
       >
         <InputCell
           width={250}
@@ -118,10 +132,9 @@ export const TagCreationRow = ({ onClose, tags }: TagCreationRowProps) => {
           textAlign="flex"
           exposed={tableNavigator.focusedField === 'tag'}
           onExpose={name => tableNavigator.onEdit('new-tag', name)}
+          style={fieldStyle(tableNavigator.focusedField === 'tag')}
           value={tag || t('New tag')}
-          valueStyle={
-            tag ? {} : { fontStyle: 'italic', color: theme.tableTextLight }
-          }
+          valueStyle={tag ? {} : { color: theme.pageTextFaint }}
           inputProps={{
             value: tag || '',
             onChange: e => setTag(e.target.value.replace(/\s/g, '')),
@@ -137,12 +150,9 @@ export const TagCreationRow = ({ onClose, tags }: TagCreationRowProps) => {
           textAlign="flex"
           exposed={tableNavigator.focusedField === 'description'}
           onExpose={name => tableNavigator.onEdit('new-tag', name)}
+          style={fieldStyle(tableNavigator.focusedField === 'description')}
           value={description || t('Tag description')}
-          valueStyle={
-            description
-              ? {}
-              : { fontStyle: 'italic', color: theme.tableTextLight }
-          }
+          valueStyle={description ? {} : { color: theme.pageTextFaint }}
           inputProps={{
             value: description || '',
             onUpdate: setDescription,
@@ -154,16 +164,17 @@ export const TagCreationRow = ({ onClose, tags }: TagCreationRowProps) => {
       <Row
         height="auto"
         style={{
-          padding: '6px 20px',
+          padding: '6px 14px 6px 55px',
           width: '100%',
-          backgroundColor: theme.tableBackground,
+          backgroundColor: theme.cardInset,
           gap: 10,
           alignItems: 'center',
-          borderBottom: '1px solid ' + theme.tableBorderHover,
+          fontSize: 13,
         }}
-        collapsed
       >
-        <Trans>Choose Color:</Trans>
+        <Text style={{ color: theme.pageTextSecondary }}>
+          <Trans>Choose Color:</Trans>
+        </Text>
         <ColorPicker
           value={color ?? undefined}
           onChange={color => setColor(color.toString('hex'))}
@@ -171,7 +182,7 @@ export const TagCreationRow = ({ onClose, tags }: TagCreationRowProps) => {
           <Button
             ref={colorButtonRef}
             variant="bare"
-            className={getTagCSS('', { color })}
+            className={getTagCSS('', { color, square: true })}
           >
             #{tag}
           </Button>
@@ -185,8 +196,8 @@ export const TagCreationRow = ({ onClose, tags }: TagCreationRowProps) => {
           }}
         >
           <Button
-            variant="normal"
-            style={{ padding: '4px 10px' }}
+            variant="control"
+            style={{ minHeight: 30, borderRadius: 9 }}
             onPress={onClose}
             data-testid="close-button"
             ref={cancelButtonRef}
@@ -195,7 +206,7 @@ export const TagCreationRow = ({ onClose, tags }: TagCreationRowProps) => {
           </Button>
           <Button
             variant="primary"
-            style={{ padding: '4px 10px' }}
+            style={{ minHeight: 30, borderRadius: 9 }}
             onPress={onAddTag}
             data-testid="add-button"
             isDisabled={!isTagValid()}

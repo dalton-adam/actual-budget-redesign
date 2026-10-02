@@ -26,11 +26,13 @@ export function TagsMenuButton() {
     <View>
       <Button
         ref={triggerRef}
-        variant="bare"
+        variant="control"
         aria-label={t('Menu')}
+        // A 34px icon control button in the toolbar (design-decisions §10e).
+        style={{ width: 34, height: 34, padding: 0, flexShrink: 0 }}
         onClick={() => setOpen(true)}
       >
-        <SvgDotsHorizontalTriple width={17} height={17} />
+        <SvgDotsHorizontalTriple width={15} height={15} />
       </Button>
       <Popover
         triggerRef={triggerRef}

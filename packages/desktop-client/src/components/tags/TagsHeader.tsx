@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { theme } from '@actual-app/components/theme';
+
 import { Cell, SelectCell, TableHeader } from '#components/table';
 import { useSelectedDispatch, useSelectedItems } from '#hooks/useSelected';
 
@@ -10,7 +12,19 @@ export function TagsHeader() {
   const dispatchSelected = useSelectedDispatch();
 
   return (
-    <TableHeader>
+    <TableHeader
+      height={38}
+      style={{
+        // Eyebrow header on the card (design-decisions §10e).
+        color: theme.pageTextFaint,
+        fontSize: 11,
+        fontWeight: 650,
+        textTransform: 'uppercase',
+        letterSpacing: '0.07em',
+        backgroundColor: theme.cardBackground,
+        '& > div': { borderColor: theme.cardHairline },
+      }}
+    >
       <SelectCell
         exposed
         focused={false}

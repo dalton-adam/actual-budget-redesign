@@ -67,6 +67,7 @@ export function SelectedTagsButton({ onRename }: SelectedTagsButtonProps) {
   return (
     <SelectedItemsButton<Actions>
       id="selected-tags"
+      variant="control"
       name={c => `${c} Tags`}
       items={[
         ...(isSingleSelection
