@@ -49,7 +49,8 @@ Budget header are reference material, not tasks to build.
 | APP-03a – d         | verified    | `0a7384ab1`, `ba03773c2` | 03a – d merged; all checks done (03d custom theme, keyboard, privacy, desktop on October 1, 2026).                             |
 | APP-04              | verified    | `f0052659d`              | Linux VRT regenerated (27). Keyboard, privacy, header custom theme and desktop passed (verification.md).                       |
 | APP-05a             | verified    | `3623d9384`, `bfa623bba` | Linux VRT regenerated (6). Custom theme, keyboard and desktop passed; rule button fill and focus ring fixed (verification.md). |
-| APP-05b – d, APP-06 | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                    |
+| APP-05b             | in progress | —                        | Rules drawn (prototype shots `87`–`92`), awaiting owner review. Files traced in the prototype README.                          |
+| APP-05c – d, APP-06 | not started | —                        | File lists must be rebuilt from source before each starts (see rule below).                                                    |
 | QA-01, RELEASE-01   | not started | —                        | —                                                                                                                              |
 
 States follow plan §16: not started, ready, in progress, review, verified,
@@ -81,7 +82,8 @@ does not claim Claude's prototype is production-ready.
    ~~Then **APP-03a**~~ Merged September 30, 2026. ~~Then **APP-03b**~~ Merged
    October 1, 2026. ~~Then **APP-03c**~~ Merged October 1, 2026. ~~Then **APP-03d**~~
    Merged October 1, 2026. ~~Then **APP-04**~~ Merged
-   October 1, 2026. ~~Then **APP-05a**~~ Merged October 1, 2026. Then **APP-05b** (Rules) onward, then QA-01 and RELEASE-01.
+   October 1, 2026. ~~Then **APP-05a**~~ Merged October 1, 2026. Then **APP-05b** (Rules; drawn October 1,
+   awaiting review), then APP-05c – d onward, then QA-01 and RELEASE-01.
 
 The review's reasoning is in plan §19.
 
