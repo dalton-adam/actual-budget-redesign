@@ -4,6 +4,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { Button } from '@actual-app/components/button';
+import { SvgAdd } from '@actual-app/components/icons/v1';
 import { SpaceBetween } from '@actual-app/components/space-between';
 import { styles } from '@actual-app/components/styles';
 import { Text } from '@actual-app/components/text';
@@ -291,50 +292,116 @@ export function ManageRules({
     setHoveredRule(id);
   };
 
+  const intro = (
+    <Text>
+      <Trans>Rules are always run in the order that you see them.</Trans>{' '}
+      <Link
+        variant="external"
+        to="https://actualbudget.org/docs/budgeting/rules/"
+        linkColor="muted"
+      >
+        <Trans>Learn more</Trans>
+      </Link>
+    </Text>
+  );
+
+  const search = (
+    <Search
+      placeholder={t('Filter rules...')}
+      value={filter}
+      onChange={onSearchChange}
+    />
+  );
+
+  const deleteSelectedButton = selectedInst.items.size > 0 && (
+    <Button
+      variant={isModal ? 'normal' : 'control'}
+      style={isModal ? undefined : { flexShrink: 0 }}
+      onPress={onDeleteSelected}
+    >
+      <Trans count={selectedInst.items.size}>
+        Delete {{ count: selectedInst.items.size }} rules
+      </Trans>
+    </Button>
+  );
+
   return (
     <SelectedProvider instance={selectedInst}>
       <View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: isModal ? '0 13px 15px' : '0 0 15px',
-            flexShrink: 0,
-          }}
-        >
+        {isModal ? (
           <View
             style={{
-              color: theme.pageTextLight,
               flexDirection: 'row',
               alignItems: 'center',
-              width: '50%',
+              padding: '0 13px 15px',
+              flexShrink: 0,
             }}
           >
-            <Text>
-              <Trans>
-                Rules are always run in the order that you see them.
-              </Trans>{' '}
-              <Link
-                variant="external"
-                to="https://actualbudget.org/docs/budgeting/rules/"
-                linkColor="muted"
-              >
-                <Trans>Learn more</Trans>
-              </Link>
-            </Text>
+            <View
+              style={{
+                color: theme.pageTextLight,
+                flexDirection: 'row',
+                alignItems: 'center',
+                width: '50%',
+              }}
+            >
+              {intro}
+            </View>
+            <View style={{ flex: 1 }} />
+            {search}
           </View>
-          <View style={{ flex: 1 }} />
-          <Search
-            placeholder={t('Filter rules...')}
-            value={filter}
-            onChange={onSearchChange}
-          />
-        </View>
-        <View style={styles.tableContainer}>
+        ) : (
+          <>
+            {/* Intro under the title, one toolbar above the table
+                (design-decisions §10d). */}
+            <View
+              style={{
+                color: theme.pageTextSecondary,
+                fontSize: 13,
+                marginTop: 4,
+                flexShrink: 0,
+              }}
+            >
+              {intro}
+            </View>
+            <SpaceBetween
+              gap={8}
+              wrap={false}
+              style={{ margin: '14px 0', flexShrink: 0 }}
+            >
+              <Button
+                variant="primary"
+                onPress={onCreateRule}
+                style={{
+                  gap: 6,
+                  borderRadius: 9,
+                  minHeight: 30,
+                  flexShrink: 0,
+                }}
+              >
+                <SvgAdd width={10} height={10} />
+                <Trans>Create new rule</Trans>
+              </Button>
+              {deleteSelectedButton}
+              <View style={{ flex: 1 }} />
+              {search}
+            </SpaceBetween>
+          </>
+        )}
+        <View
+          style={{
+            ...styles.tableContainer,
+            // One Surface card with hairlines (design-decisions §10d).
+            ...styles.surfaceCard,
+            overflow: 'hidden',
+            marginInline: isModal ? 13 : 0,
+            marginBottom: isModal ? 0 : 20,
+          }}
+        >
           <RulesHeader />
           <InfiniteScrollWrapper loadMore={loadMore}>
             {filteredRules.length === 0 ? (
-              <EmptyMessage text={t('No rules')} style={{ marginTop: 15 }} />
+              <EmptyMessage text={t('No rules')} />
             ) : (
               <RulesList
                 rules={filteredRules}
@@ -347,42 +414,36 @@ export function ManageRules({
             )}
           </InfiniteScrollWrapper>
         </View>
-        <View
-          style={{
-            paddingBlock: 15,
-            paddingInline: isModal ? 13 : 0,
-            borderTop: isModal && '1px solid ' + theme.pillBorder,
-            flexShrink: 0,
-          }}
-        >
-          <SpaceBetween gap={10} style={{ justifyContent: 'flex-end' }}>
-            {selectedInst.items.size > 0 && (
-              <Button onPress={onDeleteSelected}>
-                <Trans count={selectedInst.items.size}>
-                  Delete {{ count: selectedInst.items.size }} rules
-                </Trans>
+        {isModal && (
+          <View
+            style={{
+              paddingBlock: 15,
+              paddingInline: 13,
+              borderTop: '1px solid ' + theme.pillBorder,
+              flexShrink: 0,
+            }}
+          >
+            <SpaceBetween gap={10} style={{ justifyContent: 'flex-end' }}>
+              {deleteSelectedButton}
+              <Button variant="primary" onPress={onCreateRule}>
+                <Trans>Create new rule</Trans>
               </Button>
-            )}
-            <Button variant="primary" onPress={onCreateRule}>
-              <Trans>Create new rule</Trans>
-            </Button>
-          </SpaceBetween>
-        </View>
+            </SpaceBetween>
+          </View>
+        )}
       </View>
     </SelectedProvider>
   );
 }
 
-function EmptyMessage({ text, style }) {
+function EmptyMessage({ text }) {
   return (
     <View
       style={{
         textAlign: 'center',
-        color: theme.pageTextSubdued,
-        fontStyle: 'italic',
+        color: theme.pageTextSecondary,
         fontSize: 13,
-        marginTop: 5,
-        style,
+        padding: '40px 0',
       }}
     >
       {text}

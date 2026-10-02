@@ -5,7 +5,6 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '@actual-app/components/button';
 import { SvgRightArrow2 } from '@actual-app/components/icons/v0';
 import { SpaceBetween } from '@actual-app/components/space-between';
-import { styles } from '@actual-app/components/styles';
 import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -22,6 +21,9 @@ import {
 
 import { ActionExpression } from './ActionExpression';
 import { ConditionExpression } from './ConditionExpression';
+
+/** Stage column width, shared with the header (design-decisions §10d). */
+export const RULE_STAGE_WIDTH = 58;
 
 type RuleRowProps = {
   rule: RuleEntity;
@@ -42,8 +44,8 @@ export const RuleRow = memo(
     onDeleteRule,
   }: RuleRowProps) => {
     const dispatchSelected = useSelectedDispatch();
-    const borderColor = selected ? theme.tableBorderSelected : 'none';
-    const backgroundFocus = hovered;
+    // Hairline dividers on the card (design-decisions §10d).
+    const borderColor = theme.cardHairline;
 
     const actionSplits = groupActionsBySplitIndex(rule.actions);
     const hasSplits = actionSplits.length > 1;
@@ -77,13 +79,15 @@ export const RuleRow = memo(
         height="auto"
         style={{
           fontSize: 13,
+          minHeight: 44,
           zIndex: selected ? 101 : 'auto',
           borderColor,
           backgroundColor: selected
-            ? theme.tableRowBackgroundHighlight
-            : backgroundFocus
-              ? theme.tableRowBackgroundHover
-              : theme.tableBackground,
+            ? theme.selectionBackground
+            : hovered
+              ? theme.tableRowHover
+              : theme.cardBackground,
+          '& > div': { borderColor },
         }}
         collapsed
         onMouseEnter={() => onHover && onHover(rule.id)}
@@ -102,16 +106,26 @@ export const RuleRow = memo(
           selected={selected}
         />
 
-        <Cell name="stage" width={50} plain style={{ color: theme.tableText }}>
+        <Cell
+          name="stage"
+          width={RULE_STAGE_WIDTH}
+          plain
+          style={{ color: theme.tableText, justifyContent: 'center' }}
+        >
           {rule.stage && (
             <View
               style={{
+                // Neutral stage pill (design-decisions §10d).
                 alignSelf: 'flex-start',
-                margin: 5,
-                backgroundColor: theme.pillBackgroundSelected,
-                color: theme.pillTextSelected,
-                borderRadius: 4,
-                padding: '3px 5px',
+                marginLeft: 5,
+                height: 22,
+                justifyContent: 'center',
+                backgroundColor: theme.pillNeutralBackground,
+                color: theme.pillNeutralText,
+                borderRadius: 6,
+                padding: '0 8px',
+                fontSize: 12,
+                fontWeight: 600,
               }}
             >
               {translateRuleStage(rule.stage)}
@@ -119,8 +133,8 @@ export const RuleRow = memo(
           )}
         </Cell>
 
-        <Field width="flex" style={{ padding: '15px 0' }} truncate={false}>
-          <SpaceBetween style={{ alignItems: 'center' }}>
+        <Field width="flex" style={{ padding: '10px 0' }} truncate={false}>
+          <SpaceBetween style={{ alignItems: 'center' }} gap={12}>
             <View
               style={{ flex: 1, alignItems: 'flex-start' }}
               data-testid="conditions"
@@ -128,20 +142,21 @@ export const RuleRow = memo(
               {rule.conditions.map((cond, i) => (
                 <ConditionExpression
                   key={i}
+                  isCard
                   field={cond.field}
                   op={cond.op}
                   inline
                   value={cond.value}
                   options={cond.options}
                   prefix={i > 0 ? friendlyOp(rule.conditionsOp) : null}
-                  style={i !== 0 && { marginTop: 3 }}
+                  style={i !== 0 && { marginTop: 4 }}
                 />
               ))}
             </View>
 
             <Text>
               <SvgRightArrow2
-                style={{ width: 12, height: 12, color: theme.tableText }}
+                style={{ width: 12, height: 12, color: theme.pageTextFaint }}
               />
             </Text>
 
@@ -158,17 +173,21 @@ export const RuleRow = memo(
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'flex-start',
-                        marginTop: i > 0 ? 3 : 0,
-                        padding: '5px',
-                        borderColor: theme.tableBorder,
+                        marginTop: i > 0 ? 6 : 0,
+                        padding: 8,
+                        borderColor: theme.cardHairline,
                         borderWidth: '1px',
-                        borderRadius: '5px',
+                        borderRadius: 10,
                       }}
                     >
                       <Text
                         style={{
-                          ...styles.smallText,
-                          color: theme.pageTextLight,
+                          // Eyebrow split label (design-decisions §10d).
+                          color: theme.pageTextFaint,
+                          fontSize: 11,
+                          fontWeight: 650,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.07em',
                           marginBottom: 6,
                         }}
                       >
@@ -177,8 +196,9 @@ export const RuleRow = memo(
                       {split.actions.map((action, j) => (
                         <ActionExpression
                           key={j}
+                          isCard
                           {...action}
-                          style={j !== 0 && { marginTop: 3 }}
+                          style={j !== 0 && { marginTop: 4 }}
                         />
                       ))}
                     </View>
@@ -186,16 +206,17 @@ export const RuleRow = memo(
                 : rule.actions.map((action, i) => (
                     <ActionExpression
                       key={i}
+                      isCard
                       {...action}
-                      style={i !== 0 && { marginTop: 3 }}
+                      style={i !== 0 && { marginTop: 4 }}
                     />
                   ))}
             </View>
           </SpaceBetween>
         </Field>
 
-        <Cell name="edit" plain style={{ padding: '0 15px', paddingLeft: 5 }}>
-          <Button onPress={() => onEditRule(rule)}>
+        <Cell name="edit" plain style={{ padding: '0 14px', paddingLeft: 12 }}>
+          <Button variant="control" onPress={() => onEditRule(rule)}>
             <Trans>Edit</Trans>
           </Button>
         </Cell>

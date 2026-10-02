@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AnimatedLoading } from '@actual-app/components/icons/AnimatedLoading';
@@ -14,9 +15,10 @@ import { Value } from './Value';
 
 type ScheduleValueProps = {
   value: ScheduleEntity['id'];
+  style?: CSSProperties;
 };
 
-export function ScheduleValue({ value }: ScheduleValueProps) {
+export function ScheduleValue({ value, style }: ScheduleValueProps) {
   const { t } = useTranslation();
   const { data: byId = {} } = usePayeesById();
   const schedulesQuery = useMemo(() => q('schedules').select('*'), []);
@@ -35,5 +37,5 @@ export function ScheduleValue({ value }: ScheduleValueProps) {
     ? describeSchedule(schedule, byId[schedule._payee])
     : t('(deleted)');
 
-  return <Value value={display} field="notes" valueIsRaw />;
+  return <Value value={display} field="notes" valueIsRaw style={style} />;
 }

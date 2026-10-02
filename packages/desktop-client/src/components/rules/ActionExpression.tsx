@@ -17,6 +17,11 @@ import type {
 
 import { friendlyOp, getAllocationMethods, mapField } from '#util/rule';
 
+import {
+  ruleChipCardStyle,
+  ruleChipFieldStyle,
+  ruleChipValueStyle,
+} from './ConditionExpression';
 import { ScheduleValue } from './ScheduleValue';
 import { Value } from './Value';
 
@@ -24,9 +29,21 @@ const valueStyle = {
   color: theme.pillTextHighlighted,
 };
 
-type ActionExpressionProps = RuleActionEntity & {
-  style?: CSSProperties;
+type ChipProps = {
+  /** Opt-in desktop Rules list chip look (design-decisions §10d). */
+  isCard?: boolean;
 };
+
+function chipTextStyles(isCard: boolean | undefined) {
+  return isCard
+    ? { field: ruleChipFieldStyle, value: ruleChipValueStyle }
+    : { field: valueStyle, value: valueStyle };
+}
+
+type ActionExpressionProps = RuleActionEntity &
+  ChipProps & {
+    style?: CSSProperties;
+  };
 
 export function ActionExpression({ style, ...props }: ActionExpressionProps) {
   return (
@@ -41,6 +58,7 @@ export function ActionExpression({ style, ...props }: ActionExpressionProps) {
         whiteSpace: 'nowrap',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
+        ...(props.isCard && ruleChipCardStyle),
         ...style,
       }}
     >
@@ -66,25 +84,27 @@ function SetActionExpression({
   field,
   value,
   options,
-}: SetRuleActionEntity) {
+  isCard,
+}: SetRuleActionEntity & ChipProps) {
   const { t } = useTranslation();
+  const text = chipTextStyles(isCard);
   return (
     <>
       <Text>{friendlyOp(op)}</Text>{' '}
-      <Text style={valueStyle}>{mapField(field, options)}</Text>{' '}
+      <Text style={text.field}>{mapField(field, options)}</Text>{' '}
       <Text>{t('to ')}</Text>
       {options?.formula ? (
         <>
           <Text>{t('formula ')}</Text>
-          <Text style={valueStyle}>{options.formula}</Text>
+          <Text style={text.value}>{options.formula}</Text>
         </>
       ) : options?.template ? (
         <>
           <Text>{t('template ')}</Text>
-          <Text style={valueStyle}>{options.template}</Text>
+          <Text style={text.value}>{options.template}</Text>
         </>
       ) : (
-        <Value style={valueStyle} value={value} field={field} />
+        <Value style={text.value} value={value} field={field} />
       )}
     </>
   );
@@ -94,8 +114,10 @@ function SetSplitAmountActionExpression({
   op,
   value,
   options,
-}: SetSplitAmountRuleActionEntity) {
+  isCard,
+}: SetSplitAmountRuleActionEntity & ChipProps) {
   const { t } = useTranslation();
+  const text = chipTextStyles(isCard);
   const method = options?.method;
   if (!method) {
     return null;
@@ -104,17 +126,17 @@ function SetSplitAmountActionExpression({
   return (
     <>
       <Text>{friendlyOp(op)}</Text>{' '}
-      <Text style={valueStyle}>{getAllocationMethods()[method]}</Text>
+      <Text style={text.field}>{getAllocationMethods()[method]}</Text>
       {method !== 'remainder' && ': '}
       {options?.method === 'formula' ? (
         <>
           <Text>{t('formula ')}</Text>
-          <Text style={valueStyle}>{options.formula}</Text>
+          <Text style={text.value}>{options.formula}</Text>
         </>
       ) : method === 'fixed-amount' ? (
-        <Value style={valueStyle} value={value} field="amount" />
+        <Value style={text.value} value={value} field="amount" />
       ) : method === 'fixed-percent' ? (
-        <Text style={valueStyle}>{value}%</Text>
+        <Text style={text.value}>{value}%</Text>
       ) : null}
     </>
   );
@@ -123,10 +145,15 @@ function SetSplitAmountActionExpression({
 function LinkScheduleActionExpression({
   op,
   value,
-}: LinkScheduleRuleActionEntity) {
+  isCard,
+}: LinkScheduleRuleActionEntity & ChipProps) {
   return (
     <>
-      <Text>{friendlyOp(op)}</Text> <ScheduleValue value={value} />
+      <Text>{friendlyOp(op)}</Text>{' '}
+      <ScheduleValue
+        value={value}
+        style={isCard ? ruleChipValueStyle : undefined}
+      />
     </>
   );
 }
@@ -134,20 +161,25 @@ function LinkScheduleActionExpression({
 function PrependNoteActionExpression({
   op,
   value,
-}: PrependNoteRuleActionEntity) {
+  isCard,
+}: PrependNoteRuleActionEntity & ChipProps) {
   return (
     <>
       <Text>{friendlyOp(op)}</Text>{' '}
-      <Value style={valueStyle} value={value} field="notes" />
+      <Value style={chipTextStyles(isCard).value} value={value} field="notes" />
     </>
   );
 }
 
-function AppendNoteActionExpression({ op, value }: AppendNoteRuleActionEntity) {
+function AppendNoteActionExpression({
+  op,
+  value,
+  isCard,
+}: AppendNoteRuleActionEntity & ChipProps) {
   return (
     <>
       <Text>{friendlyOp(op)}</Text>{' '}
-      <Value style={valueStyle} value={value} field="notes" />
+      <Value style={chipTextStyles(isCard).value} value={value} field="notes" />
     </>
   );
 }
