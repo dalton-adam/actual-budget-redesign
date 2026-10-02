@@ -791,3 +791,22 @@ Screenshots in [verification/app-05a](verification/app-05a/).
 - Quit with `app.quit()` over the inspector: "Isolation check: nothing
   changed" for `%APPDATA%\Actual`, `OneDrive\Documents\Actual` and
   `Documents\Actual`.
+
+## APP-05b, APP-05c and APP-05d catch-up checks (October 1, 2026)
+
+Against `redesign/main` after the APP-05d merge (`fe09ebd78`), Vite
+development server on port 3031 (another session held 3001 and 3021),
+installed Edge driven by Playwright, demo budget. Screenshots in
+[verification/app-05-catchup/](verification/app-05-catchup/) (Settings with
+advanced settings and the experimental list open, so the shots show the
+lower half of the page).
+
+| Check                    | Result                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Settings Linux VRT (05d) | `running-vrts` recipe (Playwright v1.61.1 image, checkout mounted at `/mnt/host/c/dev/actual-budget-redesign`, HTTPS dev server on 3032 over the LAN address), scoped to `settings.test.ts`: **3 snapshots changed** (page visuals, light, dark, midnight; `08ea741bb`). Re-run without updates with `settings.mobile.test.ts`: **3/3**, so the mobile snapshots did not change.            |
+| Built-in themes          | Settings, Rules and Tags in light, dark and midnight at 1440×900 and 1000×700 (18 views): every text, background and border colour is a theme role, except the Tags page's tag pills (each tag's own colour, by design).                                                                                                                                                                    |
+| Custom theme             | QA-00 method: every v26.9.0 `--color-*` role (226), resolved in the base theme and hue-rotated 150°, no redesign roles, installed as `installedCustomLightTheme` with base dark and base light; the theme validator accepted both. Settings, Rules and Tags at 1440×900 and 1000×700: **0 misses in 12 views** (the tag pills again excepted). Text readable in every shot; no page errors. |
+| Keyboard                 | Tab walk at 1440×900. Settings (advanced and experimental open): 37 stops, every one with the 2px ring. Rules and Tags: every button has a ring; the filter box shows upstream's 1px ring on its wrapper. The shared table's container (`data-testid="table"`, `tabIndex={0}`, upstream and unchanged) takes focus with no visible ring on both pages; left for APP-06.                     |
+| Privacy (05b)            | Rules at 1440×900 and 1000×700 with privacy on: rule amounts stay visible. v26.9.0 does the same (no privacy filter in `rules/`), so this is upstream behaviour, not a regression. Tags and Settings show no amounts.                                                                                                                                                                       |
+| 1000×700 (05b, 05c)      | Both pages fit: toolbar on one line, table card with its header, no horizontal scroll.                                                                                                                                                                                                                                                                                                      |
+| Desktop build            | **Not run.** `scripts/redesign-electron.mjs` needs port 3001 for its renderer, held by another session's dev server.                                                                                                                                                                                                                                                                        |

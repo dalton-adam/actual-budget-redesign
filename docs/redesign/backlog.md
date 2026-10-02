@@ -49,9 +49,9 @@ Budget header are reference material, not tasks to build.
 | APP-03a – d        | verified    | `0a7384ab1`, `ba03773c2` | 03a – d merged; all checks done (03d custom theme, keyboard, privacy, desktop on October 1, 2026).                             |
 | APP-04             | verified    | `f0052659d`              | Linux VRT regenerated (27). Keyboard, privacy, header custom theme and desktop passed (verification.md).                       |
 | APP-05a            | verified    | `3623d9384`, `bfa623bba` | Linux VRT regenerated (6). Custom theme, keyboard and desktop passed; rule button fill and focus ring fixed (verification.md). |
-| APP-05b            | verified    | `3cbc474b6`              | Linux VRT regenerated (6). Custom theme, keyboard, privacy, 1000×700 and desktop not yet run (task-reports.md).                |
-| APP-05c            | verified    | `51cfe0733`, `07d3214fa` | New Tags E2E (11) and Linux VRT (9). Custom theme, 1000×700, keyboard and desktop not yet run (task-reports.md).               |
-| APP-05d            | verified    | `a1f4d90b6`              | Settings Linux VRT (3) stale, not regenerated. Light, midnight, custom theme, keyboard and desktop not yet run.                |
+| APP-05b            | verified    | `3cbc474b6`              | Linux VRT regenerated (6). Custom theme, keyboard, privacy, 1000×700 passed (verification.md); desktop not run.                |
+| APP-05c            | verified    | `51cfe0733`, `07d3214fa` | New Tags E2E (11) and Linux VRT (9). Custom theme, 1000×700, keyboard passed (verification.md); desktop not run.               |
+| APP-05d            | verified    | `a1f4d90b6`, `08ea741bb` | Linux VRT regenerated (3). Themes, custom theme, keyboard passed (verification.md); desktop not run.                           |
 | APP-06             | not started | —                        | File list must be rebuilt from source before it starts (see rule below).                                                       |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                              |
 
