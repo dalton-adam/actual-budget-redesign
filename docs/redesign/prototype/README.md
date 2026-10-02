@@ -1015,3 +1015,108 @@ Questions for the owner:
 
 Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06d`
 (`PW_CHANNEL=msedge` uses the installed Edge).
+
+## APP-06e: dialogs with their own layouts proposal (October 2, 2026)
+
+**Status: drawn for approval.** Choose any page, then **Own-layout dialog**
+in the prototype controls (Rule, Rule with splits, Category Learning,
+Confirm Merge, Merge unused, Found Schedules, Link schedule); **Dialog look
+→ Today** draws today's contents in today's frame. URL parameters:
+`odlg=rule|rulesplit|learn|merge|unused|discover|link`, `odlgold=0|1`.
+Strings are upstream; rows are fictional. "Today" is an approximation in the
+prototype's palette, not a screenshot of the app.
+
+Source traced for the brief (the backlog's list, rebuilt October 2):
+
+- `C/modals/EditRuleModal.tsx` wraps `C/rules/RuleEditor.tsx` (900px wide,
+  80vh). The editor is also used full-screen by
+  `C/mobile/rules/MobileRuleEditPage.tsx`, so its restyle must be opt-in from
+  the desktop dialog (as APP-05b did for rule rows). It draws the stage
+  buttons (`StageButton`, bare with `pillBackgroundSelected`), the
+  conditions and actions as `styles.editorPill` rows (pill background, 4px
+  radius) with green (`pageTextPositive`) field selects, small − / +
+  buttons, split groups in a 1px `tableBorder` box with "Apply to all" /
+  "Split N" small text, upstream "Add condition", "Add action" and split
+  buttons, the matching transactions (`SimpleTransactionsTable`, its own
+  border) with "Apply actions (n)", and Delete / Cancel / Save. `FieldSelect`
+  and `OpSelect` are also imported by the filter menu, the Summary report
+  and the schedule form, so any colour change is passed in, not changed at
+  the source.
+- `C/payees/CategoryLearning.tsx`: two paragraphs, a purple "Learn more" link
+  and a left-aligned toggle button.
+- `C/modals/ConfirmPayeesMergeModal.tsx`: payees in 6px `tableBorder` boxes,
+  a 20px arrow, the target on `tableRowBackgroundHighlight`, an `Information`
+  alert, Cancel / Merge. No close button (unchanged).
+- **Added on rebuild:** `C/modals/MergeUnusedPayeesModal.tsx`, the other
+  payee merge dialog (shown after renaming a payee to an existing one): no
+  title, payee names in green, an `Information` alert, a centred checkbox,
+  and Merge / Merge and edit rule / Do nothing, primary first.
+- `C/schedules/DiscoverSchedules.tsx` (Found Schedules, 850×650): two
+  paragraphs, an upstream table (43px rows, `tableBorder`), "Create
+  schedules".
+- `C/schedules/ScheduleLink.tsx` (Link schedule, 800px): one row with the
+  sentence, the search and "Create New", then `SchedulesTable` in `minimal`
+  mode without the APP-04 card look (`isCard`).
+- Already done elsewhere: the schedule dialog (APP-04), the payee rules
+  dialog (`ManageRulesModal`, APP-05b), the frame (APP-06a).
+
+What the drawing proposes (presentation only, desktop only; narrow widths
+and the mobile rule page keep upstream):
+
+| Surface                    | Today                                                        | Proposed                                                                                                                                      |
+| -------------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dialog buttons (all six)   | Upstream normal / primary, 4px radius                        | Control buttons (30px, 9px radius, 13px/600; primary in the accent), as the toast action and "Try again"                                      |
+| Rule: stage                | Bare buttons, selected on `pillBackgroundSelected`           | A segmented control (as the schedule dialog's Linked / Find matching); info icon Faint                                                        |
+| Rule: sections             | Stage row, a bordered scroll area, the table, the buttons    | Hairline-separated sections; the footer (Delete left, Cancel / Save right) stays in view, as in the schedule dialog                           |
+| Rule: lead lines           | 13px Page Text; "all/any" a green bare select                | 13.5px/600 Page Text; "all/any" a small control select                                                                                        |
+| Rule: condition and action | `editorPill` row: pill background, green field, 4px radius   | Card Inset row, Card Hairline, 10px radius, 44px min; field 600 Page Text, operator Secondary, value a 30px control input (as the rule chips) |
+| Rule: − / +                | Small icons, 7px padding                                     | 28px icon buttons, Secondary icon, Row Hover on hover, focus ring                                                                             |
+| Rule: splits               | 1px `tableBorder` box, 5px radius, "Split 1" small text      | Hairline box, 12px radius, Eyebrow label ("APPLY TO ALL", "SPLIT 1"), 24px delete icon button                                                 |
+| Rule: transactions         | Secondary sentence, bordered table, 6px top corners          | Same sentence; table in a hairline card (12px radius) with Eyebrow headers                                                                    |
+| Category Learning          | 13px Page Text, purple link, button under the text           | 13.5px Secondary text with the bold term in Page Text; link Page Text, underlined; button at the right of a button row                        |
+| Confirm Merge              | Separate 6px boxes, 20px arrow, highlighted target, alert    | One hairline list (12px radius); 18px Faint arrow; target on the selection tint with the selection border, 600; note as Secondary text + icon |
+| Merge unused               | Green payee names, alert, centred checkbox, primary first    | Names 600 Page Text; note as Secondary text + icon; checkbox start-aligned; "Do nothing" left, Merge primary at the right                     |
+| Found Schedules            | Upstream table, fixed 650px height                           | Hairline card table, Eyebrow headers, 44px rows, payee 600, account Secondary, selection tint; height fits the rows up to 650px               |
+| Link schedule              | Sentence, search and "Create New" on one row; upstream table | Sentence on its own line (Secondary); search left, "Create New" (primary, plus) right; table takes the APP-04 card look (`isCard`)            |
+
+Unchanged by design: every string, field and operator list, handler,
+validation and error text, focus (`InitialFocus`, `focusButton`), test ids
+(`editor-row`, `condition-list`, `action-split-list`, `add-split-transactions`,
+`field-select`, `conditions-op`), accessible names ("Delete entry", "Add
+entry", "Delete split"), the stage tooltip, which buttons show when, and the
+mobile rule page.
+
+Questions for the owner:
+
+1. **Dialog buttons:** move these dialogs' buttons to the Control style
+   (drawn), or keep upstream buttons until a pass covers every dialog?
+   (APP-06a left this to 06e; the schedule dialog kept upstream buttons.)
+2. **Rule field colour:** field names in Page Text 600, matching the rule
+   chips on the Rules page (drawn), or keep the green field selects?
+3. **Merge unused button order:** "Do nothing" at the left and Merge
+   (primary) at the right like the other dialogs (drawn), or keep upstream's
+   primary-first order?
+4. **Scope:** include `MergeUnusedPayeesModal` in 06e (drawn; found on
+   rebuild), or leave it upstream?
+
+| File                                                    | Shows                                                 |
+| ------------------------------------------------------- | ----------------------------------------------------- |
+| `shots/145-dialog-rule-light-wide.png`                  | The rule editor, light                                |
+| `shots/146-dialog-rule-today-light-wide.png`            | The same rule today                                   |
+| `shots/147-dialog-rule-splits-dark-wide.png`            | A rule with split actions, dark                       |
+| `shots/148-dialog-rule-splits-today-dark-wide.png`      | The same today                                        |
+| `shots/149-dialog-learning-midnight-1000.png`           | Category Learning, midnight, 1000×700                 |
+| `shots/150-dialog-learning-today-midnight-1000.png`     | The same today                                        |
+| `shots/151-dialog-merge-light-wide.png`                 | Confirm Merge, light                                  |
+| `shots/152-dialog-merge-today-light-wide.png`           | The same today                                        |
+| `shots/153-dialog-merge-unused-dark-wide.png`           | Merge unused payees, dark                             |
+| `shots/154-dialog-merge-unused-today-dark-wide.png`     | The same today                                        |
+| `shots/155-dialog-found-schedules-light-wide.png`       | Found Schedules with two selected, light              |
+| `shots/156-dialog-found-schedules-today-light-wide.png` | The same today                                        |
+| `shots/157-dialog-link-schedule-dark-wide.png`          | Link schedule over the register, search focused, dark |
+| `shots/158-dialog-link-schedule-today-dark-wide.png`    | The same today                                        |
+| `shots/159-dialog-rule-custom-theme-wide.png`           | The rule editor, custom theme                         |
+| `shots/160-dialog-rule-midnight-1000.png`               | The rule editor, midnight, 1000×700                   |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06e`
+(`PW_CHANNEL=msedge` uses the installed Edge).

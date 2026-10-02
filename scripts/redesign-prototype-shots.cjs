@@ -1,7 +1,7 @@
 // Screenshots of the static redesign prototype (docs/redesign/prototype).
 // Usage: node scripts/redesign-prototype-shots.cjs [--design-01 | --app-03 | --app-03c | --app-03d | --app-04 |
 //   --app-05a | --app-05b | --app-05c | --app-05d | --app-06a | --app-06b | --app-06c |
-//   --app-06d]
+//   --app-06d | --app-06e]
 // Default: the DESIGN-02 set (18+). --design-01 regenerates 01-17 from the
 // current prototype with the fixture and row height they were taken with.
 // --app-03 takes the Reports proposal (51+); --app-03c the custom report,
@@ -9,7 +9,8 @@
 // --app-04 Schedules (73+); --app-05a Payees (80+); --app-05b Rules (87+);
 // --app-05c Tags (93+); --app-05d Settings (101+); --app-06a the shared
 // dialog frame (108+); --app-06b menus and popovers (115+); --app-06c
-// toasts (123+); --app-06d loading, error and empty states (131+).
+// toasts (123+); --app-06d loading, error and empty states (131+);
+// --app-06e dialogs with their own layouts (145+).
 const { chromium } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
@@ -498,37 +499,108 @@ const app05d = [
   ],
 ];
 
+const app06e = [
+  ['145-dialog-rule-light-wide', W, H, `${ru}&theme=light&odlg=rule`],
+  [
+    '146-dialog-rule-today-light-wide',
+    W,
+    H,
+    `${ru}&theme=light&odlg=rule&odlgold=1`,
+  ],
+  ['147-dialog-rule-splits-dark-wide', W, H, `${ru}&theme=dark&odlg=rulesplit`],
+  [
+    '148-dialog-rule-splits-today-dark-wide',
+    W,
+    H,
+    `${ru}&theme=dark&odlg=rulesplit&odlgold=1`,
+  ],
+  [
+    '149-dialog-learning-midnight-1000',
+    w,
+    h,
+    `${py}&theme=midnight&pane=collapsed&odlg=learn`,
+  ],
+  [
+    '150-dialog-learning-today-midnight-1000',
+    w,
+    h,
+    `${py}&theme=midnight&pane=collapsed&odlg=learn&odlgold=1`,
+  ],
+  ['151-dialog-merge-light-wide', W, H, `${py}&theme=light&odlg=merge`],
+  [
+    '152-dialog-merge-today-light-wide',
+    W,
+    H,
+    `${py}&theme=light&odlg=merge&odlgold=1`,
+  ],
+  ['153-dialog-merge-unused-dark-wide', W, H, `${py}&theme=dark&odlg=unused`],
+  [
+    '154-dialog-merge-unused-today-dark-wide',
+    W,
+    H,
+    `${py}&theme=dark&odlg=unused&odlgold=1`,
+  ],
+  [
+    '155-dialog-found-schedules-light-wide',
+    W,
+    H,
+    `${sc}&theme=light&odlg=discover`,
+  ],
+  [
+    '156-dialog-found-schedules-today-light-wide',
+    W,
+    H,
+    `${sc}&theme=light&odlg=discover&odlgold=1`,
+  ],
+  ['157-dialog-link-schedule-dark-wide', W, H, `${ac}&theme=dark&odlg=link`],
+  [
+    '158-dialog-link-schedule-today-dark-wide',
+    W,
+    H,
+    `${ac}&theme=dark&odlg=link&odlgold=1`,
+  ],
+  ['159-dialog-rule-custom-theme-wide', W, H, `${ru}&theme=custom&odlg=rule`],
+  [
+    '160-dialog-rule-midnight-1000',
+    w,
+    h,
+    `${ru}&theme=midnight&pane=collapsed&odlg=rule`,
+  ],
+];
+
 (async () => {
   const dir = path.resolve('docs/redesign/prototype');
   const out = path.join(dir, 'shots');
   fs.mkdirSync(out, { recursive: true });
   const shots = process.argv.includes('--design-01')
     ? design01
-    : process.argv.includes('--app-06d')
-      ? app06d
-      : process.argv.includes('--app-06c')
-        ? app06c
-        : process.argv.includes('--app-06b')
-          ? app06b
-          : process.argv.includes('--app-06a')
-            ? app06a
-            : process.argv.includes('--app-05d')
-              ? app05d
-              : process.argv.includes('--app-05c')
-                ? app05c
-                : process.argv.includes('--app-05b')
-                  ? app05b
-                  : process.argv.includes('--app-05a')
-                    ? app05a
-                    : process.argv.includes('--app-04')
-                      ? app04
-                      : process.argv.includes('--app-03d')
-                        ? app03d
-                        : process.argv.includes('--app-03c')
-                          ? app03c
-                          : process.argv.includes('--app-03')
-                            ? app03
-                            : design02;
+    : process.argv.includes('--app-06e')
+      ? app06e
+      : process.argv.includes('--app-06d')
+        ? app06d
+        : process.argv.includes('--app-06c')
+          ? app06c
+          : process.argv.includes('--app-06b')
+            ? app06b
+            : process.argv.includes('--app-06a')
+              ? app06a
+              : process.argv.includes('--app-05d')
+                ? app05d
+                : process.argv.includes('--app-05c')
+                  ? app05c
+                  : process.argv.includes('--app-05b')
+                    ? app05b
+                    : process.argv.includes('--app-05a')
+                      ? app05a
+                      : process.argv.includes('--app-04')
+                        ? app04
+                        : process.argv.includes('--app-03d')
+                          ? app03d
+                          : process.argv.includes('--app-03c')
+                            ? app03c
+                            : process.argv.includes('--app-03')
+                              ? app03
+                              : design02;
   // PW_CHANNEL=msedge uses an installed browser instead of Playwright's.
   const b = await chromium.launch(
     process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {},
