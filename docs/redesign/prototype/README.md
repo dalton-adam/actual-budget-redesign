@@ -472,3 +472,76 @@ Questions for the owner:
 
 Regenerate with `node scripts/redesign-prototype-shots.cjs --app-05a`
 (`PW_CHANNEL=msedge` uses the installed Edge).
+
+## APP-05b: Rules proposal (October 1, 2026)
+
+**Status: approved October 1, 2026.** The owner left the four questions
+below to the implementer, who chose: Create new rule moves to the toolbar
+(question 1); the desktop chips are restyled through an opt-in prop (question
+2); the payee rules dialog gets the new rows and chips but keeps its own
+layout and footer (question 3); the rule editor waits for APP-06 (question 4).
+Choose **Page → Rules** (or More →
+Rules). URL parameters: `rusel=0|1` (two rules selected), `ruempty=0|1` (no
+match), and for screenshots `rufilter`, `ruhover`, `rumenu` (a row's context
+menu).
+
+Source traced for the brief: the page is `C/ManageRulesPage.tsx` (the `Page`
+and its header). The intro sentence, filter, table container, empty state and
+the Delete / Create new rule footer are in `C/ManageRules.tsx`, which the
+payee rules dialog (`C/modals/ManageRulesModal.tsx`, `isModal`) shares. The
+header row is `C/rules/RulesHeader.tsx`, the list `C/rules/RulesList.tsx`,
+each row with its stage pill, split groups, Edit button and context menu
+`C/rules/RuleRow.tsx`. The condition and action chips
+(`C/rules/ConditionExpression.tsx`, `C/rules/ActionExpression.tsx`) are shared
+with the mobile rules list (`C/mobile/rules/RulesListItem.tsx`), and
+`C/rules/Value.tsx` with the filter chips (`C/filters/FilterExpression.tsx`),
+so any change to them is an opt-in prop the desktop rows pass. The rule
+editor (`C/rules/RuleEditor.tsx`) is a dialog. E2E: `e2e/rules.test.ts` with
+`e2e/page-models/rules-page.ts` (finds the filter by `Filter rules...`, the
+button by its name `Create new rule`, rows by the `table` and `row` test ids
+and their chips as direct children of `conditions` and `actions`).
+
+What the drawing proposes (each item is presentation only):
+
+| Surface      | Today                                                                | Proposed                                                                                                                                                             |
+| ------------ | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page title   | Regular-weight page header; intro sentence beside the filter         | The 28px bold title; the intro sentence and Learn more under it in Secondary text                                                                                    |
+| Toolbar      | Filter top right; Delete N rules and Create new rule below the table | One toolbar above the table: Create new rule (primary, plus icon, label kept at every width), Delete N rules beside it while rules are selected, filter at the right |
+| Table        | `tableContainer`, sentence-case header, 15px row padding             | A Surface card with an Eyebrow header (Stage, Rule), hairline dividers, rows at least 44px with 10px padding; selected rows on the selection tint                    |
+| Stage        | Purple selected-pill                                                 | Neutral pill (22px, radius 6)                                                                                                                                        |
+| Chips        | `pillBackgroundLight` chips; field and value both purple             | Card Inset chips with a hairline; the field in text colour 600, the operator Secondary, the value in the accent 600, "and" Faint; amounts tabular                    |
+| Arrow        | Text colour                                                          | Faint                                                                                                                                                                |
+| Split groups | Thin bordered box, small Secondary label                             | Hairline box, radius 10, Eyebrow label ("Apply to all", "Split 1")                                                                                                   |
+| Edit         | Bare button                                                          | Small control button (30px)                                                                                                                                          |
+| Menus        | Row context menu (Edit, Delete unless linked to a schedule)          | Unchanged content; already the popover look                                                                                                                          |
+| Empty        | Italic "No rules"                                                    | Same string, centred in the card, not italic                                                                                                                         |
+
+Unchanged by design: every handler (create, edit, delete one, delete
+selected and its schedule-linked warning), rule order, the filter's matching,
+loading 100 then 50 more on scroll, select all and range select, hiding
+completed schedules' rules, the strings, and mobile.
+
+Questions for the owner:
+
+1. **Create new rule in the toolbar** (drawn), or keep it with Delete below
+   the table?
+2. **Chips:** restyle the desktop chips as drawn (opt-in, mobile and filter
+   chips untouched), or keep upstream's chips and change only the page around
+   them?
+3. **Payee rules dialog** (opened from a payee's rule button, same
+   `ManageRules`): give it the card table and chips too but keep its footer
+   (default), or leave the whole dialog for APP-06?
+4. The **rule editor** dialog: leave it for APP-06 (the default, as APP-04
+   and APP-05a did), or restyle it here?
+
+| File                                        | Shows                                             |
+| ------------------------------------------- | ------------------------------------------------- |
+| `shots/87-rules-dark-wide.png`              | Rules, dark, 1440×900, a row hovered              |
+| `shots/88-rules-light-1000.png`             | Light, 1000×700, pane collapsed                   |
+| `shots/89-rules-midnight-wide-selected.png` | Two rules selected, Delete 2 rules, midnight      |
+| `shots/90-rules-custom-theme-wide.png`      | Custom theme through the fallback layer           |
+| `shots/91-rules-row-menu-dark-1000.png`     | A schedule-linked rule's context menu (Edit only) |
+| `shots/92-rules-no-match-light-wide.png`    | No matching rules                                 |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-05b`
+(`PW_CHANNEL=msedge` uses the installed Edge).

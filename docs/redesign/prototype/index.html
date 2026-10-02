@@ -8,12 +8,14 @@
   DESIGN-01/02 prototype: fictional data only, no connection to Actual's code.
   Open with a local file URL after `yarn install` (fonts load from node_modules).
   URL params: layout=a|b, header=cards|trend, theme=light|dark|midnight|custom,
-  panel=0|1, privacy=0|1, controls=0|1, page=budget|account|reports|schedules|payees
+  panel=0|1, privacy=0|1, controls=0|1, page=budget|account|reports|schedules|payees|rules
   APP-03: rview=dash|networth|custom|calendar|formula, redit=0|1, whover=<widget id>
   APP-04 (page=schedules): sdlg=<schedule id>|add, stx=linked|matched, scompleted=0|1,
   sempty=0|1, sfilter=<text>, shover=<id>, smenu=<id>, ssel=0|1
   APP-05a (page=payees): psel=0|1, pmenu=0|1, punused=0|1, pempty=0|1, pfilter=<text>,
   phover=<id>, prow=<id> (row context menu)
+  APP-05b (page=rules): rusel=0|1, ruempty=0|1, rufilter=<text>, ruhover=<id>,
+  rumenu=<id> (row context menu)
   APP-03c: rgraph=table|bar|stacked|line|area|donut, rlegend=0|1, rsummary=0|1, rlabels=0|1
   DESIGN-02: data=basic|states|many, density=50|44|38, rta=pos|zero|neg,
   when=past|current|future, cat=<category id>, pm=<panel month>, hover=<id>, edit=<id>:<month>,
@@ -4361,6 +4363,147 @@
         font-size: 11.5px;
         color: var(--pageTextSubdued);
       }
+      /* APP-05b: Rules page */
+      .ru-main {
+        overflow: hidden;
+      }
+      .ru-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+      .ru-intro {
+        font-size: 13px;
+        color: var(--pageTextSubdued);
+      }
+      .ru-intro a {
+        color: var(--pageTextSubdued);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .ru-table {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .ru-table .rhead {
+        border-radius: 18px 18px 0 0;
+        flex-shrink: 0;
+      }
+      .rucols {
+        display: grid;
+        grid-template-columns: 34px 58px minmax(0, 1fr) 18px minmax(
+            0,
+            1fr
+          ) auto;
+        align-items: center;
+        column-gap: 12px;
+        padding: 0 14px 0 10px;
+      }
+      .rurow {
+        min-height: 44px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        flex-shrink: 0;
+        border-bottom: 1px solid var(--cardBorder);
+        font-size: 13px;
+      }
+      .rurow:hover,
+      .rurow.hover {
+        background: var(--tableRowHover);
+      }
+      .rurow.selected {
+        background: var(--selectionBackground);
+      }
+      .rurow .cb {
+        opacity: 0;
+      }
+      .rurow.hover .cb,
+      .rurow:hover .cb,
+      .rurow.selected .cb,
+      .ru-table.has-sel .rurow .cb {
+        opacity: 1;
+      }
+      .ru-stage {
+        display: inline-flex;
+        align-items: center;
+        height: 22px;
+        padding: 0 8px;
+        border-radius: 6px;
+        background: var(--pillNeutralBackground);
+        color: var(--pillNeutralText);
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .ru-stack {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        min-width: 0;
+      }
+      .ru-chip {
+        max-width: 100%;
+        display: block;
+        padding: 3px 8px;
+        border-radius: 7px;
+        background: var(--cardInset);
+        border: 1px solid var(--cardBorder);
+        color: var(--pageTextSubdued);
+        font-size: 12.5px;
+        line-height: 17px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ru-chip .pre {
+        color: var(--pageTextFaint);
+      }
+      .ru-chip .f {
+        color: var(--pageText);
+        font-weight: 600;
+      }
+      .ru-chip .v {
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .ru-arrow {
+        display: inline-flex;
+        color: var(--pageTextFaint);
+      }
+      .ru-arrow svg {
+        width: 12px;
+        height: 12px;
+      }
+      .ru-split {
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 8px;
+        border: 1px solid var(--cardBorder);
+        border-radius: 10px;
+      }
+      .ru-split .lbl {
+        font-size: 11px;
+        font-weight: 650;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--pageTextFaint);
+        margin-bottom: 2px;
+      }
+      .ru-empty {
+        flex: 1;
+        display: grid;
+        place-items: center;
+        color: var(--pageTextSubdued);
+        font-size: 13px;
+        padding: 40px 0;
+      }
     </style>
   </head>
   <body>
@@ -4430,6 +4573,13 @@
         pfilter: params.get('pfilter') || '',
         phover: params.get('phover') || '',
         prow: params.get('prow') || '',
+        // APP-05b: two rules selected, empty list, search text, hovered row,
+        // row context menu.
+        rusel: params.get('rusel') === '1',
+        ruempty: params.get('ruempty') === '1',
+        rufilter: params.get('rufilter') || '',
+        ruhover: params.get('ruhover') || '',
+        rumenu: params.get('rumenu') || '',
         // Accounts pane: open or collapsed (device-local). Default: open at
         // 1280px and wider, collapsed below.
         pane:
@@ -4784,6 +4934,7 @@
               reports: 'reports',
               schedules: 'schedules',
               payees: 'more',
+              rules: 'more',
             }[state.page] || 'budget') === key
               ? 'on'
               : ''
@@ -4882,7 +5033,7 @@
         }" ${inDrawer ? '' : 'id="pop-more" role="menu"'} style="left:${
           inDrawer ? 0 : 440
         }px">
-      <button class="item" data-set="page" data-val="payees"><span class="ico">${I.payees}</span>Payees</button>${it(I.rules, 'Rules')}${it(
+      <button class="item" data-set="page" data-val="payees"><span class="ico">${I.payees}</span>Payees</button><button class="item" data-set="page" data-val="rules"><span class="ico">${I.rules}</span>Rules</button>${it(
         I.bank,
         'Bank Sync',
         '<span class="amt muted">if enabled</span>',
@@ -5967,6 +6118,7 @@
             ['reports', 'Reports'],
             ['schedules', 'Schedules'],
             ['payees', 'Payees'],
+            ['rules', 'Rules'],
           ]),
           grp('Theme', 'theme', [
             ['light', 'Light'],
@@ -6071,12 +6223,23 @@
             [true, 'No match'],
           ]),
         ];
+        const rul = [
+          grp('Selection', 'rusel', [
+            [false, 'None'],
+            [true, 'Two'],
+          ]),
+          grp('List', 'ruempty', [
+            [false, 'Fixture'],
+            [true, 'No match'],
+          ]),
+        ];
         const pageGroups = {
           budget,
           account: acct,
           reports,
           schedules: sched,
           payees: pay,
+          rules: rul,
         }[state.page];
         return `<div class="proto" aria-label="Prototype controls">
       ${[...common, ...pageGroups, pin].join('')}
@@ -8171,6 +8334,213 @@
           ${menu}
         </main>`;
       }
+      // APP-05b proposal: Rules page (fictional data). Each condition is
+      // [field, op, value, isAmount]; each action [verb, field, joiner,
+      // value] or [verb, value]. splits: "Apply to all" then Split 1, 2... as
+      // Actual groups split actions. sched = linked to a schedule (no Delete).
+      const rules = [
+        {
+          id: 'u1',
+          stage: 'Pre',
+          c: [['imported payee', 'contains', 'AMZN MKTP']],
+          a: [['set', 'payee', 'to', 'Online Store']],
+        },
+        {
+          id: 'u2',
+          c: [['payee', 'is', 'Grocery Mart']],
+          a: [['set', 'category', 'to', 'Groceries']],
+        },
+        {
+          id: 'u3',
+          c: [['payee', 'is one of', '[Northside Cafe, Corner Bakery]']],
+          a: [['set', 'category', 'to', 'Eating Out']],
+        },
+        {
+          id: 'u4',
+          sched: true,
+          c: [
+            ['payee', 'is', 'Landlord Co'],
+            ['account', 'is', 'Everyday Checking'],
+            ['date', 'is', 'Every month on the 1st'],
+            ['amount', 'is approx', '-1,450.00', true],
+          ],
+          a: [['link schedule', 'Landlord Co (2026-01-01)']],
+        },
+        {
+          id: 'u5',
+          c: [['payee', 'is', 'Fast Internet']],
+          a: [
+            ['set', 'category', 'to', 'Internet'],
+            ['append to notes', '"monthly plan"'],
+          ],
+        },
+        {
+          id: 'u6',
+          c: [
+            ['payee', 'is', 'Acme Corp'],
+            ['amount', 'is', '2,400.00', true],
+          ],
+          splits: [
+            ['Apply to all', [['set', 'notes', 'to', 'Paycheck']]],
+            [
+              'Split 1',
+              [
+                ['allocate', 'a fixed percent', ':', '20%'],
+                ['set', 'category', 'to', 'Savings'],
+              ],
+            ],
+            [
+              'Split 2',
+              [
+                ['allocate', 'an equal portion of the remainder'],
+                ['set', 'category', 'to', 'Salary'],
+              ],
+            ],
+          ],
+        },
+        {
+          id: 'u7',
+          c: [
+            ['category', 'is', 'Subscriptions'],
+            ['amount', 'is between', '-20.00 and -5.00', true],
+          ],
+          a: [['prepend to notes', '"Still used? "']],
+        },
+        {
+          id: 'u8',
+          c: [
+            [
+              'imported payee',
+              'matches',
+              '^SQ \\*(.*) (NEW YORK|BROOKLYN|QUEENS|JERSEY CITY) [0-9]{4,}$',
+            ],
+          ],
+          a: [
+            [
+              'set',
+              'payee name',
+              'to template',
+              '{{regexReplace imported_payee "^SQ \\*" ""}} (Square merchant, city stripped)',
+            ],
+          ],
+        },
+        {
+          id: 'u9',
+          stage: 'Post',
+          c: [['notes', 'contains', 'reimbursable']],
+          a: [['set', 'category', 'to', 'Work Expenses']],
+        },
+        {
+          id: 'u10',
+          c: [['payee', 'is', 'SafeDrive Insurance']],
+          a: [['set', 'category', 'to', 'Insurance']],
+        },
+      ];
+      const ruSelIds = ['u2', 'u3'];
+
+      function ruCond([f, op, v, isAmt], i) {
+        const all = `${i ? 'and ' : ''}${f} ${op} ${v}`;
+        return `<span class="ru-chip" title="${esc(all)}">${
+          i ? '<span class="pre">and </span>' : ''
+        }<span class="f">${esc(f)}</span> ${esc(op)} <span class="v ${
+          isAmt ? 'num' : ''
+        }">${esc(v)}</span></span>`;
+      }
+      function ruAct(a) {
+        const [verb, f, join, v] = a;
+        const value =
+          v === undefined
+            ? ''
+            : `${join === ':' ? ':' : ' ' + esc(join)} <span class="v ${
+                /^[-0-9]/.test(v) ? 'num' : ''
+              }">${esc(v)}</span>`;
+        return `<span class="ru-chip" title="${esc(a.join(' '))}">${esc(verb)} ${
+          a.length === 2
+            ? `<span class="v">${esc(f)}</span>`
+            : `<span class="f">${esc(f)}</span>${value}`
+        }</span>`;
+      }
+
+      function ruRow(r) {
+        const sel = state.rusel && ruSelIds.includes(r.id);
+        const acts = r.splits
+          ? r.splits
+              .map(
+                ([l, as]) =>
+                  `<div class="ru-split"><div class="lbl">${l}</div>${as
+                    .map(ruAct)
+                    .join('')}</div>`,
+              )
+              .join('')
+          : r.a.map(ruAct).join('');
+        return `<div class="rucols rurow ${sel ? 'selected' : ''} ${
+          state.ruhover === r.id ? 'hover' : ''
+        }" role="row" data-id="${r.id}">
+          <div><span class="cb ${sel ? 'on' : ''}">${sel ? check : ''}</span></div>
+          <div>${r.stage ? `<span class="ru-stage">${r.stage}</span>` : ''}</div>
+          <div class="ru-stack">${r.c.map(ruCond).join('')}</div>
+          <div class="ru-arrow">${PI.arrow}</div>
+          <div class="ru-stack">${acts}</div>
+          <div><button class="tbtn sm">Edit</button></div>
+        </div>`;
+      }
+
+      function rulesPage() {
+        const q = state.rufilter.toLowerCase();
+        const text = r =>
+          [
+            r.stage || '',
+            ...r.c.flat(),
+            ...(r.splits ? r.splits.flatMap(s => s[1].flat()) : r.a.flat()),
+          ]
+            .join(' ')
+            .toLowerCase();
+        const list = state.ruempty
+          ? []
+          : rules.filter(r => !q || text(r).includes(q));
+        const nSel = state.rusel ? ruSelIds.length : 0;
+        const menuFor = list.find(r => r.id === state.rumenu);
+        const body = list.length
+          ? list.map(ruRow).join('')
+          : `<div class="ru-empty">No rules</div>`;
+        return `<main class="main ru-main">
+          <div class="head ru-head"><h1>Rules</h1>
+            <div class="ru-intro">Rules are always run in the order that you see them. <a>Learn more</a></div>
+          </div>
+          <div class="toolbar">
+            <button class="tbtn primary">${I.plus}<span>Create new rule</span></button>
+            ${
+              nSel
+                ? `<button class="tbtn">Delete <span class="num">${nSel}</span> rules</button>`
+                : ''
+            }
+            <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>${
+              q
+                ? `<span style="color:var(--pageText)">${esc(state.rufilter)}</span>`
+                : 'Filter rules...'
+            }</div>
+          </div>
+          <div class="card ru-table ${nSel ? 'has-sel' : ''}" role="table" aria-label="Rules">
+            <div class="rucols rhead" role="row"><div><span class="cb ${
+              nSel ? 'on' : ''
+            }" style="opacity:1">${
+              nSel
+                ? '<svg width="9" height="9" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M5 12h14"/></svg>'
+                : ''
+            }</span></div><div>Stage</div><div style="grid-column:3 / 6">Rule</div><div></div></div>
+            ${body}
+            ${
+              menuFor
+                ? `<div class="pay-menu" role="menu" style="left:300px;width:180px"><div class="mi hl" role="menuitem">Edit</div>${
+                    menuFor.sched
+                      ? ''
+                      : '<div class="mi" role="menuitem">Delete</div>'
+                  }</div>`
+                : ''
+            }
+          </div>
+        </main>`;
+      }
       let totB = 0,
         totS = 0;
       function render() {
@@ -8209,7 +8579,9 @@
                   ? schedulesPage()
                   : state.page === 'payees'
                     ? payeesPage()
-                    : `<main class="main">
+                    : state.page === 'rules'
+                      ? rulesPage()
+                      : `<main class="main">
             ${header()}
             ${summary}
             ${ledger(offs)}
@@ -8223,6 +8595,12 @@
       ${anchoredMenu()}
       ${controls()}`;
         placeAnchored();
+        const ruMenu = document.querySelector('.ru-table .pay-menu');
+        const ruMenuRow = document.querySelector(
+          `.rurow[data-id="${state.rumenu}"]`,
+        );
+        if (ruMenu && ruMenuRow)
+          ruMenu.style.top = ruMenuRow.offsetTop + 34 + 'px';
         const lw = document.querySelector('.ledger-wrap, .register');
         if (lw) {
           lw.scrollTop = prevScroll;
@@ -8275,6 +8653,10 @@
         }
         if (state.page === 'payees') {
           for (const k of ['psel', 'pmenu', 'punused', 'pempty'])
+            u.searchParams.set(k, state[k] ? '1' : '0');
+        }
+        if (state.page === 'rules') {
+          for (const k of ['rusel', 'ruempty'])
             u.searchParams.set(k, state[k] ? '1' : '0');
         }
         if (state.rview === 'montecarlo') {
