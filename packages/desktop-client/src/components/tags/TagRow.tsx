@@ -3,6 +3,7 @@ import type { KeyboardEvent } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { SvgArrowThinRight } from '@actual-app/components/icons/v1';
+import { styles } from '@actual-app/components/styles';
 import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import type { TagEntity } from '@actual-app/core/types/models';
@@ -28,6 +29,9 @@ import {
 
 import { TagEditor } from './TagEditor';
 
+/** Row height on the card (design-decisions §10e). */
+export const TAG_ROW_HEIGHT = 44;
+
 type TagRowProps = {
   tag: TagEntity;
   hovered?: boolean;
@@ -42,7 +46,8 @@ export const TagRow = memo(
     const dispatchSelected = useSelectedDispatch();
     const selectedIds = useSelectedItems();
     const selected = selectedIds.has(tag.id);
-    const borderColor = selected ? theme.tableBorderSelected : 'none';
+    // Hairline dividers on the card (design-decisions §10e).
+    const borderColor = theme.cardHairline;
 
     const colorButtonRef = useRef(null);
     useProperFocus(colorButtonRef, focusedField === 'color');
@@ -134,13 +139,24 @@ export const TagRow = memo(
       <Row
         ref={triggerRef}
         data-test-id={tag.id}
+        height={TAG_ROW_HEIGHT}
         style={{
           borderColor,
           backgroundColor: selected
-            ? theme.tableRowBackgroundHighlight
+            ? theme.selectionBackground
             : hovered
-              ? theme.tableRowBackgroundHover
-              : theme.tableBackground,
+              ? theme.tableRowHover
+              : theme.cardBackground,
+          '& > div': { borderColor },
+          // The quiet View Transactions button looks like a control button
+          // on row hover.
+          ...(hovered && {
+            '& .tag-view-transactions': {
+              backgroundColor: theme.controlBackground,
+              borderColor: theme.cardHairline,
+              color: theme.pageText,
+            },
+          }),
         }}
         collapsed
         onMouseEnter={() => onHover(tag.id)}
@@ -172,7 +188,16 @@ export const TagRow = memo(
             }}
           />
         ) : (
-          <Cell width={250} plain style={{ padding: '5px', display: 'block' }}>
+          <Cell
+            width={250}
+            plain
+            style={{
+              padding: '0 5px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+            }}
+          >
             <TagEditor tag={tag} ref={colorButtonRef} />
           </Cell>
         )}
@@ -186,8 +211,7 @@ export const TagRow = memo(
           value={tag.description || t('No description')}
           valueStyle={{
             opacity: tag.hidden ? 0.5 : undefined,
-            fontStyle: !tag.description ? 'italic' : undefined,
-            color: !tag.description ? theme.tableTextLight : undefined,
+            color: !tag.description ? theme.pageTextFaint : theme.pageText,
           }}
           inputProps={{
             value: tag.description || '',
@@ -196,25 +220,45 @@ export const TagRow = memo(
           }}
         />
 
-        <Cell width="auto" style={{ padding: '0 10px' }} plain>
+        <Cell
+          width="auto"
+          style={{ padding: '0 12px 0 10px', justifyContent: 'center' }}
+          plain
+        >
           <CellButton
+            className="tag-view-transactions"
             style={{
-              borderRadius: 4,
-              padding: '3px 6px',
-              backgroundColor: theme.noticeBackground,
-              border: '1px solid ' + theme.noticeBackground,
-              color: theme.noticeTextDark,
+              // Quiet text with a hairline on row hover
+              // (design-decisions §10e).
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              height: 24,
+              borderRadius: 7,
+              padding: '0 9px',
               fontSize: 12,
+              fontWeight: 600,
+              whiteSpace: 'nowrap',
               cursor: 'pointer',
+              border: '1px solid transparent',
+              // CellButton's default fill would show in some themes.
+              backgroundColor: 'transparent',
+              color: theme.pageTextSubdued,
               opacity: tag.hidden ? 0.5 : undefined,
-              ':hover': { backgroundColor: theme.noticeBackgroundLight },
+              ':hover': {
+                backgroundColor: theme.controlBackground,
+                borderColor: theme.cardHairline,
+                color: theme.pageText,
+              },
+              // The redesign focus ring instead of CellButton's faint shadow.
+              ':focus': { ...styles.focusRing, boxShadow: 'none' },
             }}
             onSelect={onShowActivity}
           >
-            <Text style={{ paddingRight: 5 }}>
+            <Text>
               <Trans>View Transactions</Trans>
             </Text>
-            <SvgArrowThinRight style={{ width: 8, height: 8 }} />
+            <SvgArrowThinRight style={{ width: 9, height: 9 }} />
           </CellButton>
         </Cell>
       </Row>

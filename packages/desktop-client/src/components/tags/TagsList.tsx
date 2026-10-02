@@ -6,7 +6,7 @@ import type { TagEntity } from '@actual-app/core/types/models';
 import { Table } from '#components/table';
 import type { TableNavigator } from '#components/table';
 
-import { TagRow } from './TagRow';
+import { TAG_ROW_HEIGHT, TagRow } from './TagRow';
 
 type TagsListProps = {
   navigator: TableNavigator<TagEntity>;
@@ -25,7 +25,10 @@ export function TagsList({
     <Table
       navigator={navigator}
       items={tags}
-      backgroundColor={theme.tableBackground}
+      // 44px rows on the card (design-decisions §10e); the shared
+      // ROW_HEIGHT stays as it is.
+      rowHeight={TAG_ROW_HEIGHT}
+      backgroundColor={theme.cardBackground}
       renderItem={({ item: tag, focusedField, onEdit }) => {
         const hovered = hoveredTag === tag.id;
 
