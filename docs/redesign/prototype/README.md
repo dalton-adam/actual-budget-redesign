@@ -1123,3 +1123,90 @@ Questions for the owner:
 
 Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06e`
 (`PW_CHANNEL=msedge` uses the installed Edge).
+
+## APP-06f: accessibility leftovers proposal (October 2, 2026)
+
+**Status: drawn for approval.** On **Settings**, choose **Theme installer**
+(Open, Loading, Error, No catalog) and **Installer look → Today**; on
+**Payees**, **Rules** or **Tags**, choose **Table focus → Keyboard**. URL
+parameters: `sinst=open|loading|error|nocat`, `sinstold=0|1`,
+`tblfocus=0|1`. Strings are upstream; catalog names, owners and colours are
+fictional. "Today" is an approximation in the prototype's palette.
+
+Source traced for the brief (the backlog's list, rebuilt October 2):
+
+- **Table container** (`C/table.tsx`, `Table`): the outer `View` takes
+  `tabIndex={0}` and the keyboard navigator, with `outline: 'none'`, so a
+  Tab stop on it shows nothing (verification.md, Schedules and Payees
+  keyboard). Used by Payees, Rules, Tags, Schedules, Found Schedules,
+  Link schedule, the linked-accounts dialog, the user directory and the
+  rule editor's transactions table; the register uses its own table.
+- **`CellButton`** (`C/table.tsx`): a focusable `div` with no role, so
+  screen readers don't announce it as a button (found in APP-05c). Space
+  and `x` select on key down; Enter moves down a row (kept). Users: Tags'
+  View Transactions, Payees' rule button, the register's cleared status,
+  split toggle and parent payee, and `SelectCell`'s checkbox (Payees,
+  Rules, user directory). The cleared status and `SelectCell` are
+  icon-only, so they have no accessible name either.
+- **Custom-theme installer** (`C/settings/ThemeInstaller.tsx`, opened from
+  the Themes setting by choosing a custom theme): a `tableBackground` box
+  with a `tableBorder` border and 8px radius; 14px/600 title and a bare
+  "Close"; subdued "Choose from catalog:"; a 300px virtualised grid of
+  square tiles three to a row (2px `tableBorder`, 6px radius; active in
+  the primary colour on `tableRowBackgroundHover`; error on
+  `errorBackground`; a loading cover); "Additional CSS overrides:", a
+  textarea and a normal "Apply"; red error text. APP-05d left it upstream.
+
+What the drawing proposes (presentation and semantics only, desktop only):
+
+| Surface             | Today                                             | Proposed                                                                                                                                                                                         |
+| ------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Table container     | No focus sign                                     | On keyboard focus only (`:focus-visible`), a 2px Selection Border ring drawn inside the table's edge, following its radius                                                                       |
+| `CellButton`        | `div`, no role                                    | `role="button"`, `aria-disabled` when disabled; no visual change                                                                                                                                 |
+| `SelectCell`        | `div`, no role, no name                           | `role="checkbox"` with `aria-checked`; no visual change                                                                                                                                          |
+| Icon-only cells     | No name                                           | The cleared status and selection checkboxes get a name (see question 2)                                                                                                                          |
+| Installer panel     | Table box, 8px radius, border                     | Card Inset panel (12px radius, no border) under the Themes controls; title 13.5px/600                                                                                                            |
+| Installer labels    | Subdued 13px                                      | Eyebrow ("CHOOSE FROM CATALOG:", "ADDITIONAL CSS OVERRIDES:"); strings unchanged, case is CSS                                                                                                    |
+| Close, Apply        | Bare "Close", normal "Apply"                      | Control buttons (30px, 9px radius, 13px/600)                                                                                                                                                     |
+| Catalog tiles       | 2px border, 6px radius; active in the primary hue | Surface tile with hairline, 12px radius; name 600 Page Text, "by" Secondary, Source Page Text underlined; Row Hover on hover; active on the selection tint with the selection border; focus ring |
+| Tile error, loading | `errorBackground`; overlay                        | Negative pill tint and border; Scrim cover with the APP-06a spinner                                                                                                                              |
+| CSS box             | Upstream input, 4px radius                        | Control input look (9px radius, hairline), monospace 12px                                                                                                                                        |
+| Error text          | 12px red                                          | 12.5px negative pill text with an alert icon (also the catalog error)                                                                                                                            |
+
+Unchanged by design: every string, the catalog fetch, install and
+validation, the virtualised grid and its three-per-row sizing, the tile
+`aria-label`s, the textarea's accessible name, Enter moving down a row in
+tables, and narrow widths (the installer is gated with the Settings
+redesign, as `Themes.tsx` already is).
+
+Questions for the owner:
+
+1. **Selection checkbox role:** give `SelectCell` the checkbox role with
+   its checked state (drawn as the proposal), or the button role like
+   every other `CellButton`?
+2. **Names for icon-only cells:** add accessible names to the register's
+   cleared status (its status: "Cleared", "Uncleared", "Reconciled"…) and
+   the selection checkboxes, reusing existing translated strings where
+   they exist and adding new ones otherwise (proposed), or leave them
+   unnamed in 06f?
+3. **Table focus ring:** ring on keyboard focus only, drawn inside the edge
+   (drawn), or outside the edge like other controls (`styles.focusRing`,
+   which some parents would clip)?
+4. **Installer panel:** Card Inset panel inside the Themes card (drawn), or
+   a hairline-divided section with no fill?
+
+| File                                                | Shows                                                                  |
+| --------------------------------------------------- | ---------------------------------------------------------------------- |
+| `shots/161-installer-light-wide.png`                | The installer, Paper Mint active, Linen hovered, Meadow focused, light |
+| `shots/162-installer-today-light-wide.png`          | The same today                                                         |
+| `shots/163-installer-loading-dark-wide.png`         | A tile loading, dark                                                   |
+| `shots/164-installer-error-midnight-wide.png`       | A tile that failed and its message, midnight                           |
+| `shots/165-installer-error-today-midnight-wide.png` | The same today                                                         |
+| `shots/166-installer-no-catalog-dark-1000.png`      | Catalog failed to load, dark, 1000×700                                 |
+| `shots/167-installer-custom-theme-wide.png`         | The installer, custom theme                                            |
+| `shots/168-table-focus-payees-light-wide.png`       | Payees table focused from the keyboard, light                          |
+| `shots/169-table-focus-tags-dark-1000.png`          | Tags table focused, dark, 1000×700                                     |
+| `shots/170-table-focus-rules-midnight-wide.png`     | Rules table focused, midnight                                          |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06f`
+(`PW_CHANNEL=msedge` uses the installed Edge).
