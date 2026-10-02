@@ -1837,3 +1837,58 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   narrow widths in the app (the narrow branches are upstream code), the
   `SharedArrayBuffer` and IndexedDB bodies in the app (unit tests only), and
   the desktop build.
+- APP-06e: branch `redesign/app-06e-dialogs`, code `5b1929c01`. Drawing
+  `6e1684bc8` (prototype shots `145`–`160`); the owner approved it on
+  October 2, 2026, choosing the drawn option for all four questions
+  (Control buttons, Page Text field names, "Do nothing" at the left,
+  `MergeUnusedPayeesModal` included; design-decisions §10k). The file list
+  was rebuilt from source first: `RuleEditor` is also the mobile rule page,
+  so its look is opt-in (`isDialog`); `FieldSelect` / `OpSelect` are shared
+  with the filter menu, the Summary report and the schedule form, so their
+  dialog colours come from a context the editor sets; the rule dialog's
+  transactions table is `SimpleTransactionsTable` (shared with the schedule
+  dialog, so its card look is an `isCard` prop); and
+  `MergeUnusedPayeesModal` was still upstream. **Change (desktop, not
+  `isNarrowWidth`):** the rule editor's stage is a segmented control
+  (`tab` / `tabSelected`); its sections are split by `cardHairline`; lead
+  lines 13.5px/600 Page Text; condition and action rows are Card Inset with
+  a hairline (10px radius, 44px min), field names Page Text 600 and
+  operators Secondary; − / + and the split delete are icon buttons with the
+  Row Hover wash; split groups are hairline boxes with Eyebrow labels; the
+  transactions table is a hairline card with Eyebrow headers and 44px rows.
+  Category Learning: Secondary text, the link Page Text underlined, the
+  button at the right. Confirm Merge: one hairline list, a Faint arrow, the
+  target on the selection tint; the note is `Information` without its box.
+  Merge unused: Page Text 600 names, the same note, the checkbox
+  start-aligned, "Do nothing" at the left and Merge (still the initial
+  focus, via `autoFocus`) at the right. Found Schedules: Secondary
+  paragraphs, a hairline card table (Eyebrow headers, 44px rows, payee 600,
+  account Secondary, selection tint), the dialog fitting its rows up to
+  650px. Link schedule: the sentence on its own line, the search at the
+  left, "Create New" at the right, and the APP-04 card table without
+  elevation. Buttons in all six are `control` / `primary` in one 30px,
+  9px-radius shape (`common/dialogStyles.ts`, registered in the package
+  import map). Not drawn as shown (§10k "As implemented"): no "to" in
+  action rows (new string), inputs keep their components' look, dividers
+  sit inside the padding, and the rule dialog has no Delete (upstream never
+  passed one). Found while checking and fixed in the same commit: the
+  lead lines inherited the modal's `pageTextLight`; the "Apply to all"
+  header printed a stray "0" (`splitIndex && …`, also on mobile); the
+  footer was pushed out of the 80vh dialog by the card table until the
+  table could shrink; and Found Schedules collapsed its table while loading
+  until it had a real flex basis. No string, handler, test id or accessible
+  name changed. `DESIGN.md` adds a Dialogs With Their Own Layouts entry.
+  **Checks:** typecheck passes; oxlint over the changed files: one upstream
+  warning in untouched lines; oxfmt applied; web unit tests **1052 passed,
+  1 skipped**. E2E against the dev server with the installed Edge (scratch
+  config, not committed): the APP-06b set **121/121**. VISUAL (scratch
+  Playwright script, demo budget, dialogs pushed through
+  `window.__actionsForMenu.pushModal`): all seven dialog states in light and
+  dark at 1440×900 and midnight at 1000×700, including a rule with split
+  actions. Linux VRT (Docker, Playwright v1.61.1, checkout at
+  `/mnt/host/c/dev/actual-budget-redesign`, HTTPS dev server over the LAN
+  address, one worker, no retries): full run **186/186**, no snapshot
+  changed (no screenshot test shows these dialogs open). **Not run:** custom
+  theme in the app (drawn only), keyboard focus through the rule editor,
+  the formula and templating toggles, narrow widths in the app (the narrow
+  branches are upstream code), and the desktop build.
