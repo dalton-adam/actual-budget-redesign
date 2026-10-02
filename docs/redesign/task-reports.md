@@ -1751,3 +1751,40 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   re-run without updates **7/7**. No mobile snapshot changed. **Not run:**
   custom theme in the app, 1000×700, light and midnight in the dev server,
   and the desktop build.
+- APP-06c: branch `redesign/app-06c-toasts`, code `d638c6265`. Drawing
+  `b559d6458` (prototype shots `123`–`130`); the owner approved it on
+  October 2, 2026, choosing the drawn option for all three questions
+  (popover shadow, neutral card with a status icon, a check for `message`;
+  design-decisions §10i). **Change:** on desktop (not `isNarrowWidth`) a
+  toast in `Notifications.tsx` is a Surface card (`cardBackground`,
+  `cardHairline` border, 12px radius, `popoverShadow`, 13px text) with a
+  24px round status icon in the type's pill tone (check, "!", ×) instead of
+  the tinted card and 3px top stripe; the title is 13.5px/600 Page Text, the
+  message Secondary text; the action is a `control` button and the close
+  button a 28px icon button with the Row Hover wash and focus ring; `pre`
+  text sits on Card Inset; the loading cover is Surface White. Found while
+  checking the real app and fixed in the same commit: external links set
+  their colour inline, so the drawn Page Text links need a link style passed
+  through `compileMessage`, and its paragraphs were centred (`SpaceBetween`
+  defaults to `align="center"`), so desktop start-aligns them. Below the
+  narrow breakpoint the toast is unchanged (including its purple links,
+  which upstream's `currentColor` rule never overrode). No text, type,
+  handler, timing, placement, stack, swipe or accessible name changed.
+  `DESIGN.md` adds a Toasts entry and adds toasts to the Popover shadow.
+  **Checks:** typecheck passes; oxlint over the file 0 findings; oxfmt
+  applied; web unit tests **1052 passed, 1 skipped**. E2E against the dev
+  server with the installed Edge (scratch config, not committed): the APP-06b
+  set (accounts, transactions, budget, help-menu, reports, schedules,
+  payees, rules, settings, command-bar, tags, onboarding, nav-02,
+  detail-01 – 04, bud-01, tour, bank-sync) **121/121**. Impeccable detector
+  over `Notifications.tsx`: no findings. VISUAL (scratch Playwright script,
+  demo budget, toasts dispatched through `window.__actionsForMenu`): the
+  update prompt (light, 1440×900), the out-of-sync warning with a link and
+  button (dark, 1440×900), an error with `pre` text (midnight, 1000×700), a
+  three-toast stack (light) and the warning at 390px (upstream look kept).
+  Linux VRT (Docker, Playwright v1.61.1, checkout at
+  `/mnt/host/c/dev/actual-budget-redesign`, HTTPS dev server over the LAN
+  address, one worker, no retries): full run **186/186**, no snapshot
+  changed (no screenshot test shows a toast). **Not run:** custom theme in
+  the app (drawn only), keyboard focus on the close button in the app, the
+  button loading state, and the desktop build.

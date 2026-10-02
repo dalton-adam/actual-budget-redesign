@@ -269,7 +269,7 @@ This is a hybrid of hairlines and soft lift. Structure comes first from hairline
 
 - **Card elevation** (`cardElevation`: `0 1px 2px rgba(15,15,30,.04), 0 10px 28px rgba(15,15,30,.05)` in light): surface cards — the summary cards, the details panel, and the account hero and balance chart cards (approved with design-decisions §10).
 - **Active tab** (`navActiveShadow`: `0 1px 3px rgba(15,15,30,.12)`): the selected pill tab lifting out of its track.
-- **Popover** (`popoverShadow`: `0 16px 40px rgba(15,15,30,.16), 0 2px 6px rgba(15,15,30,.06)`): menus, popovers, the Ready to Assign breakdown and desktop dialogs (APP-06a).
+- **Popover** (`popoverShadow`: `0 16px 40px rgba(15,15,30,.16), 0 2px 6px rgba(15,15,30,.06)`): menus, popovers, the Ready to Assign breakdown, desktop dialogs (APP-06a) and desktop toasts (APP-06c).
 - **Hero glow** (`heroGlow` / `heroGlowNegative`): a soft positive or negative wash behind the Ready to Assign card. It is absent at zero.
 - **Page glow** (`pageGlow`: a 7% purple radial gradient at the top left): approved and defined in all three themes, but not applied anywhere yet. Whichever task applies it must check text contrast over it in every theme.
 - **Scrim** (`scrim`): behind the details-panel overlay below 900px and behind desktop dialogs.
@@ -354,6 +354,10 @@ Every desktop dialog (APP-06a, the shared `Modal` frame) is a Surface card with 
 ### Menus and Popovers
 
 Every desktop popover (APP-06b, the shared `Popover` frame) is a Surface card with the Popover shadow: Card Hairline border, 12px radius. Menus (`Menu`) sit 6px inside it. Rows are at least 32px tall with 0 10px padding, an 8px radius and 13px text; hover is the Row Hover wash, and a row reached with the arrow keys also takes the focus ring, inset 2px. Section labels are Eyebrows (11px/600, uppercase, 0.06em, Faint). Dividers are Card Hairline with a 6px 4px margin. Keyboard shortcuts sit at the right in an 18px key cap (Card Inset, 5px radius, 11px/600 Secondary). Toggles in menus are the upstream `Toggle`. Popover contents (date picker, autocomplete rows, notes, forms) keep their own layout; the autocomplete keeps its own background. Tooltips keep the upstream look. Below the narrow breakpoint menus and popovers keep the upstream frame.
+
+### Toasts
+
+Every desktop toast (APP-06c, `Notifications`) is a Surface card with the Popover shadow: Card Hairline border, 12px radius, 14px 44px 14px 14px padding, 13px text. The status is a 24px round icon in the type's pill tone (a check for messages, "!" for warnings, × for errors) and the card itself stays neutral; there is no coloured stripe. The title is 13.5px/600 Page Text, the message Secondary text, and links Page Text underlined. The action is a Control button; the close button is a 28px icon button with the Row Hover wash and the focus ring; `pre` text sits on Card Inset. Placement, the three-deep stack, timing and swipe-to-dismiss are upstream's. Below the narrow breakpoint toasts keep the upstream look.
 
 ### Account Hero
 

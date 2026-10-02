@@ -8,6 +8,7 @@ import { Button, ButtonWithLoading } from '@actual-app/components/button';
 import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { AnimatedLoading } from '@actual-app/components/icons/AnimatedLoading';
 import { SvgDelete } from '@actual-app/components/icons/v0';
+import { SvgCheckmark } from '@actual-app/components/icons/v1';
 import { SpaceBetween } from '@actual-app/components/space-between';
 import { styles } from '@actual-app/components/styles';
 import { Text } from '@actual-app/components/text';
@@ -35,9 +36,16 @@ function compileMessage(
   actions: Record<string, () => void>,
   setLoading: (arg: SetStateAction<boolean>) => void,
   onRemove?: () => void,
+  // Redesign (design-decisions §10i): desktop links in Page Text.
+  linkStyle?: CSSProperties,
 ) {
   return (
-    <SpaceBetween direction="vertical" gap={10}>
+    <SpaceBetween
+      direction="vertical"
+      gap={10}
+      // Desktop toasts start-align short messages (design-decisions §10i).
+      align={linkStyle ? 'start' : undefined}
+    >
       {message.split(/\n\n/).map((paragraph, idx) => {
         const parts = paragraph.split(/(\[[^\]]*\]\([^)]*\))/g);
 
@@ -54,6 +62,7 @@ function compileMessage(
                     <Link
                       variant="text"
                       key={idx}
+                      style={linkStyle}
                       onClick={async e => {
                         e.preventDefault();
                         if (actions[actionName]) {
@@ -71,11 +80,15 @@ function compileMessage(
                 return (
                   <Link
                     variant="external"
-                    linkColor="purple"
+                    linkColor={linkStyle ? 'muted' : 'purple'}
                     key={idx}
                     to={match[2]}
                   >
-                    {match[1]}
+                    {linkStyle ? (
+                      <Text style={linkStyle}>{match[1]}</Text>
+                    ) : (
+                      match[1]
+                    )}
                   </Link>
                 );
               }
@@ -126,6 +139,7 @@ function Notification({
   });
   useEffect(() => connected(), []);
 
+  const { isNarrowWidth } = useResponsive();
   const positive = type === 'message';
   const error = type === 'error';
 
@@ -136,11 +150,17 @@ function Notification({
         messageActions ?? {},
         setOverlayLoading,
         onRemove,
+        isNarrowWidth
+          ? undefined
+          : {
+              color: theme.pageText,
+              textDecoration: 'underline',
+              textUnderlineOffset: 2,
+            },
       ),
-    [message, messageActions, onRemove, setOverlayLoading],
+    [message, messageActions, onRemove, setOverlayLoading, isNarrowWidth],
   );
 
-  const { isNarrowWidth } = useResponsive();
   const narrowStyle: CSSProperties = isNarrowWidth
     ? { minHeight: styles.mobileMinHeight }
     : {};
@@ -212,139 +232,283 @@ function Notification({
         ),
         opacity: spring.opacity,
         pointerEvents: isInteractive ? 'auto' : 'none',
-        color: positive
-          ? theme.noticeText
-          : error
-            ? theme.errorTextDark
-            : theme.warningTextDark,
+        color: !isNarrowWidth
+          ? theme.pageTextSecondary
+          : positive
+            ? theme.noticeText
+            : error
+              ? theme.errorTextDark
+              : theme.warningTextDark,
         // Prevents scrolling conflicts
         touchAction: isInteractive ? 'none' : 'auto',
       }}
       {...(isInteractive ? swipeHandlers : {})}
     >
-      <View
-        style={{
-          position: 'relative',
-          padding: '14px 14px',
-          paddingRight: 40,
-          borderRadius: 8,
-          ...styles.mediumText,
-          backgroundColor: positive
-            ? theme.noticeBackgroundLight
-            : error
-              ? theme.errorBackground
-              : theme.warningBackground,
-          borderTop: `3px solid ${
-            positive
-              ? theme.noticeBorder
-              : error
-                ? theme.errorBorder
-                : theme.warningBorder
-          }`,
-          ...styles.shadowLarge,
-          maxWidth: 550,
-          '& a': { color: 'currentColor' },
-        }}
-      >
-        {/* Close button in top right corner */}
-        <Button
-          variant="bare"
-          aria-label={t('Close')}
+      {!isNarrowWidth ? (
+        // Redesign (design-decisions §10i): a Surface card with the popover
+        // shadow; the status is a round icon in its pill tone. Mobile keeps
+        // the upstream toast.
+        <View
           style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            padding: 8,
-            color: 'currentColor',
-            opacity: 0.7,
+            position: 'relative',
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            gap: 12,
+            padding: '14px 44px 14px 14px',
+            borderRadius: 12,
+            border: `1px solid ${theme.cardHairline}`,
+            backgroundColor: theme.cardBackground,
+            boxShadow: theme.popoverShadow,
+            ...styles.smallText,
+            maxWidth: 550,
           }}
-          onPress={onRemove}
         >
-          <SvgDelete style={{ width: 10, height: 10 }} />
-        </Button>
-
-        {/* Content and action button layout */}
-        <SpaceBetween
-          direction="vertical"
-          gap={10}
-          style={{ alignItems: 'flex-start' }}
-        >
-          {title && (
-            <View
-              style={{
-                ...styles.mediumText,
-                fontWeight: 700,
-                paddingRight: 20,
-              }}
-            >
-              {title}
-            </View>
-          )}
-
-          {/* Message and button on same row */}
-          <SpaceBetween
-            wrap={false}
-            gap={10}
-            style={{ width: '100%', alignItems: 'flex-start' }}
+          <View
+            aria-hidden
+            style={{
+              flexShrink: 0,
+              width: 24,
+              height: 24,
+              marginTop: -2,
+              borderRadius: '50%',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: positive
+                ? theme.pillPositiveBackground
+                : error
+                  ? theme.pillNegativeBackground
+                  : theme.pillWarningBackground,
+              color: positive
+                ? theme.pillPositiveText
+                : error
+                  ? theme.pillNegativeText
+                  : theme.pillWarningText,
+            }}
           >
-            <View style={{ flex: 1, minWidth: 0 }}>{processedMessage}</View>
-            {button && (
-              <ButtonWithLoading
-                variant="bare"
-                isLoading={loading}
-                onPress={async () => {
-                  setLoading(true);
-                  await button.action();
-                  onRemove();
-                  setLoading(false);
-                }}
-                className={css({
-                  backgroundColor: 'transparent',
-                  border: `1px solid ${
-                    positive
-                      ? theme.noticeBorder
-                      : error
-                        ? theme.errorBorder
-                        : theme.warningBorder
-                  }`,
-                  color: 'currentColor',
-                  ...styles.mediumText,
-                  flexShrink: 0,
-                  '&[data-hovered], &[data-pressed]': {
-                    backgroundColor: positive
-                      ? theme.noticeBackground
-                      : error
-                        ? theme.errorBackground
-                        : theme.warningBackground,
-                  },
-                  ...narrowStyle,
-                })}
-              >
-                {button.title}
-              </ButtonWithLoading>
+            {positive ? (
+              <SvgCheckmark style={{ width: 11, height: 11 }} />
+            ) : error ? (
+              <SvgDelete style={{ width: 9, height: 9 }} />
+            ) : (
+              <Text style={{ fontSize: 13, fontWeight: 800, lineHeight: 1 }}>
+                !
+              </Text>
             )}
-          </SpaceBetween>
+          </View>
 
-          {pre
-            ? pre.split('\n\n').map((text, idx) => (
-                <View
-                  key={idx}
-                  style={{
-                    whiteSpace: 'pre-wrap',
-                    fontFamily: 'monospace',
-                    fontSize: 12,
-                    backgroundColor: 'rgba(0, 0, 0, .05)',
-                    padding: 10,
-                    borderRadius: 4,
-                    width: '100%',
+          <Button
+            variant="control"
+            aria-label={t('Close')}
+            className={css({
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              width: 28,
+              height: 28,
+              minWidth: 28,
+              minHeight: 28,
+              padding: 0,
+              borderRadius: 8,
+              backgroundColor: 'transparent',
+              borderColor: 'transparent',
+              color: theme.pageTextSecondary,
+              '&[data-hovered]': {
+                backgroundColor: theme.tableRowHover,
+                color: theme.pageText,
+              },
+            })}
+            onPress={onRemove}
+          >
+            <SvgDelete style={{ width: 10, height: 10 }} />
+          </Button>
+
+          <SpaceBetween
+            direction="vertical"
+            gap={6}
+            style={{ flex: 1, minWidth: 0, alignItems: 'flex-start' }}
+          >
+            {title && (
+              <View
+                style={{
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                  lineHeight: 1.3,
+                  color: theme.pageText,
+                }}
+              >
+                {title}
+              </View>
+            )}
+
+            <SpaceBetween
+              wrap={false}
+              gap={12}
+              style={{ width: '100%', alignItems: 'flex-start' }}
+            >
+              <View style={{ flex: 1, minWidth: 0 }}>{processedMessage}</View>
+              {button && (
+                <ButtonWithLoading
+                  variant="control"
+                  isLoading={loading}
+                  onPress={async () => {
+                    setLoading(true);
+                    await button.action();
+                    onRemove();
+                    setLoading(false);
                   }}
+                  className={css({ padding: '0 12px', fontWeight: 600 })}
                 >
-                  {text}
-                </View>
-              ))
-            : null}
-        </SpaceBetween>
-      </View>
+                  {button.title}
+                </ButtonWithLoading>
+              )}
+            </SpaceBetween>
+
+            {pre
+              ? pre.split('\n\n').map((text, idx) => (
+                  <View
+                    key={idx}
+                    style={{
+                      whiteSpace: 'pre-wrap',
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      color: theme.pageText,
+                      backgroundColor: theme.cardInset,
+                      padding: 10,
+                      borderRadius: 8,
+                      width: '100%',
+                    }}
+                  >
+                    {text}
+                  </View>
+                ))
+              : null}
+          </SpaceBetween>
+        </View>
+      ) : (
+        <View
+          style={{
+            position: 'relative',
+            padding: '14px 14px',
+            paddingRight: 40,
+            borderRadius: 8,
+            ...styles.mediumText,
+            backgroundColor: positive
+              ? theme.noticeBackgroundLight
+              : error
+                ? theme.errorBackground
+                : theme.warningBackground,
+            borderTop: `3px solid ${
+              positive
+                ? theme.noticeBorder
+                : error
+                  ? theme.errorBorder
+                  : theme.warningBorder
+            }`,
+            ...styles.shadowLarge,
+            maxWidth: 550,
+            '& a': { color: 'currentColor' },
+          }}
+        >
+          {/* Close button in top right corner */}
+          <Button
+            variant="bare"
+            aria-label={t('Close')}
+            style={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              padding: 8,
+              color: 'currentColor',
+              opacity: 0.7,
+            }}
+            onPress={onRemove}
+          >
+            <SvgDelete style={{ width: 10, height: 10 }} />
+          </Button>
+
+          {/* Content and action button layout */}
+          <SpaceBetween
+            direction="vertical"
+            gap={10}
+            style={{ alignItems: 'flex-start' }}
+          >
+            {title && (
+              <View
+                style={{
+                  ...styles.mediumText,
+                  fontWeight: 700,
+                  paddingRight: 20,
+                }}
+              >
+                {title}
+              </View>
+            )}
+
+            {/* Message and button on same row */}
+            <SpaceBetween
+              wrap={false}
+              gap={10}
+              style={{ width: '100%', alignItems: 'flex-start' }}
+            >
+              <View style={{ flex: 1, minWidth: 0 }}>{processedMessage}</View>
+              {button && (
+                <ButtonWithLoading
+                  variant="bare"
+                  isLoading={loading}
+                  onPress={async () => {
+                    setLoading(true);
+                    await button.action();
+                    onRemove();
+                    setLoading(false);
+                  }}
+                  className={css({
+                    backgroundColor: 'transparent',
+                    border: `1px solid ${
+                      positive
+                        ? theme.noticeBorder
+                        : error
+                          ? theme.errorBorder
+                          : theme.warningBorder
+                    }`,
+                    color: 'currentColor',
+                    ...styles.mediumText,
+                    flexShrink: 0,
+                    '&[data-hovered], &[data-pressed]': {
+                      backgroundColor: positive
+                        ? theme.noticeBackground
+                        : error
+                          ? theme.errorBackground
+                          : theme.warningBackground,
+                    },
+                    ...narrowStyle,
+                  })}
+                >
+                  {button.title}
+                </ButtonWithLoading>
+              )}
+            </SpaceBetween>
+
+            {pre
+              ? pre.split('\n\n').map((text, idx) => (
+                  <View
+                    key={idx}
+                    style={{
+                      whiteSpace: 'pre-wrap',
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      backgroundColor: 'rgba(0, 0, 0, .05)',
+                      padding: 10,
+                      borderRadius: 4,
+                      width: '100%',
+                    }}
+                  >
+                    {text}
+                  </View>
+                ))
+              : null}
+          </SpaceBetween>
+        </View>
+      )}
       {overlayLoading && (
         <View
           style={{
@@ -353,7 +517,10 @@ function Notification({
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: theme.tableBackground,
+            backgroundColor: isNarrowWidth
+              ? theme.tableBackground
+              : theme.cardBackground,
+            borderRadius: isNarrowWidth ? undefined : 12,
             alignItems: 'center',
             justifyContent: 'center',
           }}

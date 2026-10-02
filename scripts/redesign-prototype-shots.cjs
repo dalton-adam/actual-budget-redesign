@@ -1,13 +1,14 @@
 // Screenshots of the static redesign prototype (docs/redesign/prototype).
 // Usage: node scripts/redesign-prototype-shots.cjs [--design-01 | --app-03 | --app-03c | --app-03d | --app-04 |
-//   --app-05a | --app-05b | --app-05c | --app-05d | --app-06a | --app-06b]
+//   --app-05a | --app-05b | --app-05c | --app-05d | --app-06a | --app-06b | --app-06c]
 // Default: the DESIGN-02 set (18+). --design-01 regenerates 01-17 from the
 // current prototype with the fixture and row height they were taken with.
 // --app-03 takes the Reports proposal (51+); --app-03c the custom report,
 // Calendar and Formula proposal (59+); --app-03d Monte Carlo (67+);
 // --app-04 Schedules (73+); --app-05a Payees (80+); --app-05b Rules (87+);
 // --app-05c Tags (93+); --app-05d Settings (101+); --app-06a the shared
-// dialog frame (108+); --app-06b menus and popovers (115+).
+// dialog frame (108+); --app-06b menus and popovers (115+); --app-06c
+// toasts (123+).
 const { chromium } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
@@ -360,6 +361,41 @@ const app06b = [
   ],
   ['122-menu-select-custom-theme-wide', W, H, `${ac}&theme=custom&mnu=select`],
 ];
+const app06c = [
+  ['123-toast-update-light-wide', W, H, `${dl}&theme=light&tst=update`],
+  [
+    '124-toast-update-today-light-wide',
+    W,
+    H,
+    `${dl}&theme=light&tst=update&tstold=1`,
+  ],
+  ['125-toast-warning-dark-wide', W, H, `${ac}&theme=dark&tst=warning`],
+  [
+    '126-toast-warning-today-dark-wide',
+    W,
+    H,
+    `${ac}&theme=dark&tst=warning&tstold=1`,
+  ],
+  [
+    '127-toast-error-midnight-1000',
+    w,
+    h,
+    `${dl}&theme=midnight&pane=collapsed&tst=error`,
+  ],
+  [
+    '128-toast-error-today-midnight-1000',
+    w,
+    h,
+    `${dl}&theme=midnight&pane=collapsed&tst=error&tstold=1`,
+  ],
+  ['129-toast-stack-light-wide', W, H, `${dl}&theme=light&tst=stack`],
+  [
+    '130-toast-saved-custom-theme-wide-focus',
+    W,
+    H,
+    `${ac}&theme=custom&tst=saved&tsthl=focus`,
+  ],
+];
 const app05d = [
   ['101-settings-dark-wide', W, H, `${st}&theme=dark`],
   ['102-settings-light-1000', w, h, `${st}&theme=light&pane=collapsed`],
@@ -391,27 +427,29 @@ const app05d = [
   fs.mkdirSync(out, { recursive: true });
   const shots = process.argv.includes('--design-01')
     ? design01
-    : process.argv.includes('--app-06b')
-      ? app06b
-      : process.argv.includes('--app-06a')
-        ? app06a
-        : process.argv.includes('--app-05d')
-          ? app05d
-          : process.argv.includes('--app-05c')
-            ? app05c
-            : process.argv.includes('--app-05b')
-              ? app05b
-              : process.argv.includes('--app-05a')
-                ? app05a
-                : process.argv.includes('--app-04')
-                  ? app04
-                  : process.argv.includes('--app-03d')
-                    ? app03d
-                    : process.argv.includes('--app-03c')
-                      ? app03c
-                      : process.argv.includes('--app-03')
-                        ? app03
-                        : design02;
+    : process.argv.includes('--app-06c')
+      ? app06c
+      : process.argv.includes('--app-06b')
+        ? app06b
+        : process.argv.includes('--app-06a')
+          ? app06a
+          : process.argv.includes('--app-05d')
+            ? app05d
+            : process.argv.includes('--app-05c')
+              ? app05c
+              : process.argv.includes('--app-05b')
+                ? app05b
+                : process.argv.includes('--app-05a')
+                  ? app05a
+                  : process.argv.includes('--app-04')
+                    ? app04
+                    : process.argv.includes('--app-03d')
+                      ? app03d
+                      : process.argv.includes('--app-03c')
+                        ? app03c
+                        : process.argv.includes('--app-03')
+                          ? app03
+                          : design02;
   // PW_CHANNEL=msedge uses an installed browser instead of Playwright's.
   const b = await chromium.launch(
     process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {},

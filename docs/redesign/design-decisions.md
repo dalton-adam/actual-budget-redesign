@@ -786,6 +786,30 @@ all four questions:
 - Below the narrow breakpoint every menu and popover keeps the upstream
   frame (mobile is deferred, plan §19.4).
 
+## 10i. Toasts (APP-06c)
+
+**APP-06c (approved October 2, 2026):** drawn in the prototype (Toast;
+shots `123`–`130`, prototype README). The owner chose the drawn option for
+all three questions:
+
+- Every desktop toast (`Notifications.tsx`) is a Surface card:
+  `cardBackground`, Card Hairline border, **12px** radius, 14px 44px 14px
+  14px padding, 13px text.
+- Toasts take the **Popover** shadow (`popoverShadow`). This adds toasts to
+  the approved depth list (DESIGN.md Shadow Vocabulary).
+- The status is a **24px round icon** in the type's pill tone: a check for
+  `message`, "!" for `warning`, × for `error`. The card stays neutral, and
+  the 3px coloured top border goes. Every `message` toast takes the check.
+- The title is 13.5px/600 Page Text; the message is Secondary text, start
+  aligned; links (external and `#action`) are Page Text, underlined.
+- The action button is a Control button (13px/600); the close button is a
+  28px icon button with no fill or border, the Row Hover wash on hover and
+  the focus ring. `pre` text sits on Card Inset with an 8px radius. The
+  loading cover is Surface White with the card's radius.
+- Placement, width, the three-deep stack, timing and swipe-to-dismiss are
+  unchanged. Below the narrow breakpoint toasts keep the upstream look
+  (mobile is deferred, plan §19.4).
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the
@@ -820,4 +844,5 @@ Confirm or change these before the named task starts; until then the
 | Sep 29, 2026 | APP-01: account hero as drawn (§10, §11 item 5); balance toggle kept; bank-sync error moves into the hero                                                | Owner answers in the APP-01 session                                                                                              |
 | Oct 1, 2026  | APP-06a: dialogs take the popover shadow (added to the approved depth list); other questions left to the implementer (§10g)                              | Owner answers in the APP-06a session                                                                                             |
 | Oct 2, 2026  | APP-06b: menus and popovers take a 12px card frame, Row Hover rows, key caps; tooltips unchanged (§10h)                                                  | Owner answers in the APP-06b session                                                                                             |
+| Oct 2, 2026  | APP-06c: toasts take a neutral card with the popover shadow (added to the approved depth list) and a status icon; check for `message` (§10i)             | Owner answers in the APP-06c session                                                                                             |
 | Sep 30, 2026 | APP-02: register as drawn (§10, §11 item 5); dividers instead of stripes; payee initial in the category accent; square tags in the register only         | Owner answers in the APP-02 session                                                                                              |
