@@ -793,7 +793,9 @@ Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06a`
 
 ## APP-06b: menus and popovers proposal (October 2, 2026)
 
-**Status: drawn, awaiting owner review.** Choose any page, then **Menu** in
+**Status: approved October 2, 2026.** The owner chose the drawn option for
+all four questions (12px radius, Row Hover wash, key caps, tooltips left
+for later). Choose any page, then **Menu** in
 the prototype controls (Selection, Help, Toggles, Date picker); **Menu
 frame → Today** draws today's frame over the same contents; **First row**
 shows the hover and keyboard-focus states. URL parameters:
@@ -821,19 +823,19 @@ says otherwise.
 
 What the drawing proposes (presentation only):
 
-| Surface         | Today                                                | Proposed                                                                                   |
-| --------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Popover frame   | `tooltipBackground`, 2px `tooltipBorder`, 4px radius | `cardBackground`, 1px `cardBorder`, 12px radius (as the NAV-01 menus and Schedules ⋯ menu) |
-| Elevation       | `shadowLarge`                                        | `popoverShadow` (already approved for menus and popovers)                                  |
-| Menu padding    | none                                                 | 6px inside the frame, so row hovers sit inset                                              |
-| Rows            | 10px padding, square, `menuItemBackgroundHover`      | 32px min height, 0 10px padding, 8px radius, 13px, Row Hover wash (`tableRowHover`)        |
-| Keyboard focus  | hover colour only                                    | the shared 2px focus ring, inset (`outlineOffset: -2`)                                     |
-| Section labels  | 11px uppercase, `menuItemTextHeader`, 3px 9px        | Eyebrow: 11px/600 uppercase, 0.06em tracking, 10px 10px 4px                                |
-| Dividers        | `menuBorder`, 3px 0                                  | `cardBorder`, 6px 4px                                                                      |
-| Keybindings     | 10px text, `menuKeybindingText`                      | an 18px key cap: `cardInset`, 5px radius, 11px/600 Secondary text                          |
-| Toggles         | upstream `Toggle`                                    | unchanged                                                                                  |
-| Content         | per popover (date picker, notes, forms)              | unchanged; only the frame around it changes                                                |
-| Narrow / mobile | upstream                                             | unchanged                                                                                  |
+| Surface         | Today                                                | Proposed                                                                                    |
+| --------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Popover frame   | `tooltipBackground`, 2px `tooltipBorder`, 4px radius | `cardBackground`, 1px Card Hairline, 12px radius (as the NAV-01 menus and Schedules ⋯ menu) |
+| Elevation       | `shadowLarge`                                        | `popoverShadow` (already approved for menus and popovers)                                   |
+| Menu padding    | none                                                 | 6px inside the frame, so row hovers sit inset                                               |
+| Rows            | 10px padding, square, `menuItemBackgroundHover`      | 32px min height, 0 10px padding, 8px radius, 13px, Row Hover wash (`tableRowHover`)         |
+| Keyboard focus  | hover colour only                                    | the shared 2px focus ring, inset (`outlineOffset: -2`)                                      |
+| Section labels  | 11px uppercase, `menuItemTextHeader`, 3px 9px        | Eyebrow: 11px/600 uppercase, 0.06em tracking, 10px 10px 4px                                 |
+| Dividers        | `menuBorder`, 3px 0                                  | Card Hairline, 6px 4px                                                                      |
+| Keybindings     | 10px text, `menuKeybindingText`                      | an 18px key cap: `cardInset`, 5px radius, 11px/600 Secondary text                           |
+| Toggles         | upstream `Toggle`                                    | unchanged                                                                                   |
+| Content         | per popover (date picker, notes, forms)              | unchanged; only the frame around it changes                                                 |
+| Narrow / mobile | upstream                                             | unchanged                                                                                   |
 
 Unchanged by design: items, strings, order, handlers, `role="menu"` and
 arrow-key / Enter navigation, placement, offsets, `isNonModal`, widths that

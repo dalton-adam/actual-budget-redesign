@@ -766,6 +766,26 @@ drawn option for each:
 - Below the narrow breakpoint every dialog keeps the upstream frame
   (mobile is deferred, plan §19.4).
 
+## 10h. Menus and popovers (APP-06b)
+
+**APP-06b (approved October 2, 2026):** drawn in the prototype (Menu;
+shots `115`–`122`, prototype README). The owner chose the drawn option for
+all four questions:
+
+- Every desktop popover's frame (`Popover.tsx`) is a Surface card:
+  `cardBackground`, Card Hairline border, **12px** radius, `popoverShadow`
+  (already approved for menus and popovers).
+- Menu rows (`Menu.tsx`): 6px inset, 32px min height, 8px radius, 13px;
+  hover is the **Row Hover wash** (`tableRowHover`), and a row reached with
+  the arrow keys also shows the inset focus ring. The Accounts and More
+  menus (NAV-01) move to the same hover and divider.
+- Section labels are Eyebrows; dividers are Card Hairline.
+- Keyboard shortcuts are a small **key cap** (Card Inset, 5px radius,
+  11px/600 Secondary).
+- **Tooltips** keep the upstream look for now.
+- Below the narrow breakpoint every menu and popover keeps the upstream
+  frame (mobile is deferred, plan §19.4).
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the
@@ -799,4 +819,5 @@ Confirm or change these before the named task starts; until then the
 | Sep 29, 2026 | DETAIL-04: pace chart for past and future months as §7.2 (§11 item 2); goal box contents (§5 item 4)                                                     | Owner confirmation in the DETAIL-04 session                                                                                      |
 | Sep 29, 2026 | APP-01: account hero as drawn (§10, §11 item 5); balance toggle kept; bank-sync error moves into the hero                                                | Owner answers in the APP-01 session                                                                                              |
 | Oct 1, 2026  | APP-06a: dialogs take the popover shadow (added to the approved depth list); other questions left to the implementer (§10g)                              | Owner answers in the APP-06a session                                                                                             |
+| Oct 2, 2026  | APP-06b: menus and popovers take a 12px card frame, Row Hover rows, key caps; tooltips unchanged (§10h)                                                  | Owner answers in the APP-06b session                                                                                             |
 | Sep 30, 2026 | APP-02: register as drawn (§10, §11 item 5); dividers instead of stripes; payee initial in the category accent; square tags in the register only         | Owner answers in the APP-02 session                                                                                              |

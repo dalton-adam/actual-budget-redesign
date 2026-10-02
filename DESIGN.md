@@ -323,7 +323,7 @@ Calm and tactile: redesign variants are opt-in, so existing variants and screens
 
 - **Top bar:** segmented pill tabs (Budget, Accounts ▾, Reports, Schedules, More ▾), then utility controls on the right.
 - **Accounts pane:** a collapsible list with On/Off budget totals, sync-status dots and balances. Collapsed, it is a 56px rail of initials and status dots. An account keeps one initial unless another account in the rail shares it; those take the first letters of two words (or the first two letters), then the letter plus position ("H1", "H2"). The full name stays the chip's accessible name and tooltip.
-- **Menus:** Eyebrow group labels (0.06em tracking).
+- **Menus:** Eyebrow group labels (0.06em tracking); rows and frame as in Menus and Popovers.
 
 ### Signature Component: The Envelope Table
 
@@ -350,6 +350,10 @@ The Settings page (APP-05d) is one 720px column at the page's left margin under 
 ### Dialogs
 
 Every desktop dialog (APP-06a, the shared `Modal` frame) is a Surface card with the Popover shadow: Card Hairline border, 18px radius, 18px 22px 20px padding, over the `scrim` without blur. The title is a left-aligned Headline on one line with the close button, a 30px icon button with no fill or border that takes the Row Hover wash on hover and the focus ring. `ModalButtons` sits 20px below the content; the buttons inside dialogs are still the upstream normal and primary buttons. The loading cover is Surface White with the card's radius. Each dialog's own contents keep their layout. Below the narrow breakpoint every dialog keeps the upstream frame (mobile is deferred).
+
+### Menus and Popovers
+
+Every desktop popover (APP-06b, the shared `Popover` frame) is a Surface card with the Popover shadow: Card Hairline border, 12px radius. Menus (`Menu`) sit 6px inside it. Rows are at least 32px tall with 0 10px padding, an 8px radius and 13px text; hover is the Row Hover wash, and a row reached with the arrow keys also takes the focus ring, inset 2px. Section labels are Eyebrows (11px/600, uppercase, 0.06em, Faint). Dividers are Card Hairline with a 6px 4px margin. Keyboard shortcuts sit at the right in an 18px key cap (Card Inset, 5px radius, 11px/600 Secondary). Toggles in menus are the upstream `Toggle`. Popover contents (date picker, autocomplete rows, notes, forms) keep their own layout; the autocomplete keeps its own background. Tooltips keep the upstream look. Below the narrow breakpoint menus and popovers keep the upstream frame.
 
 ### Account Hero
 

@@ -53,7 +53,7 @@ Budget header are reference material, not tasks to build.
 | APP-05c            | verified    | `51cfe0733`, `07d3214fa` | New Tags E2E (11) and Linux VRT (9). Custom theme, 1000×700, keyboard passed (verification.md); desktop not run.               |
 | APP-05d            | verified    | `a1f4d90b6`, `08ea741bb` | Linux VRT regenerated (3). Themes, custom theme, keyboard passed (verification.md); desktop not run.                           |
 | APP-06a            | verified    | `8d0244c25`, `b31f33d66` | Linux VRT regenerated (27). E2E 121/121; custom theme, 1000×700 and desktop not run (task-reports.md).                         |
-| APP-06b            | in progress | —                        | Drawn October 2, 2026 (prototype shots `115`–`122`, prototype README); awaiting owner review.                                  |
+| APP-06b            | verified    | `a8b1b6ee8`, `e16964ccb` | Linux VRT regenerated (51). E2E 121/121; custom theme, 1000×700 and desktop not run.                                           |
 | APP-06c – f        | not started | —                        | Split October 1, 2026 (below). Each file list is rebuilt from source before it starts.                                         |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                              |
 
@@ -89,7 +89,7 @@ does not claim Claude's prototype is production-ready.
    October 1, 2026. ~~Then **APP-05a**~~ Merged October 1, 2026. ~~Then **APP-05b**~~ Merged October 1, 2026. ~~Then **APP-05c**~~ Merged
    October 1, 2026. ~~Then **APP-05d**~~ Merged
    October 1, 2026. Then **APP-06** (split into 06a – f; ~~06a~~ merged October 1;
-   06b next), then QA-01 and RELEASE-01.
+   06c next), then QA-01 and RELEASE-01.
 
 The review's reasoning is in plan §19.
 
