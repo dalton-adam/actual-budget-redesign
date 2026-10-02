@@ -545,3 +545,76 @@ Questions for the owner:
 
 Regenerate with `node scripts/redesign-prototype-shots.cjs --app-05b`
 (`PW_CHANNEL=msedge` uses the installed Edge).
+
+## APP-05c: Tags proposal (October 1, 2026)
+
+**Status: drawn, awaiting owner review.** Choose **Page → Tags** (or More →
+Tags). URL parameters: `tsel=0|1` (three tags selected), `tmenu=0|1` (the
+selection menu), `tdots=0|1` (the page menu), `tadd=0|1` (the new-tag row),
+`thidden=0|1` (hidden tags shown), `tempty=0|1` (no tags), and for
+screenshots `tfilter`, `thover`, `trow` (a row's context menu).
+
+Source traced for the brief: the page is `C/tags/ManageTagsPage.tsx` (the
+`Page` and its header). The intro sentence, Add New, the filter, the
+selection button, the page menu button, table container and empty state are
+in `C/tags/ManageTags.tsx`. The header row is `C/tags/TagsHeader.tsx`, the
+list `C/tags/TagsList.tsx` (the shared `Table`; row height is a prop, so no
+shared constant changes), each row with its description cell, View
+Transactions button and context menu `C/tags/TagRow.tsx`, the coloured tag
+button that opens the colour picker `C/tags/TagEditor.tsx`, the new-tag row
+`C/tags/TagCreationRow.tsx`, the selection menu `C/tags/SelectedTagsButton.tsx`
+(through the shared `SelectedItemsButton` in `C/table.tsx`, which renders
+nothing until a tag is selected) and the page menu `C/tags/TagsMenuButton.tsx`.
+The tag colours come from `hooks/useTagCSS.ts`, shared with the register and
+notes, so any shape change there is an option the tags page passes. None of
+these components is used outside the page. Tests: `C/tags/ManageTags.test.tsx`
+(UNIT; finds the row by its `data-test-id`, the new-tag row by `new-tag`, and
+the Add and Cancel buttons by `add-button` and `close-button`). There is no
+Tags E2E file and no Tags VRT.
+
+What the drawing proposes (each item is presentation only):
+
+| Surface           | Today                                                                               | Proposed                                                                                                                                                                    |
+| ----------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page title        | Regular-weight page header; intro sentence above the toolbar                        | The 28px bold title; the intro sentence under it in Secondary text, as on Rules                                                                                             |
+| Toolbar           | Bare "Add New" at the left; filter, selection button and `…` menu at the right      | Add New as the primary button with a plus icon; "N Tags" beside it as a control button while tags are selected; filter, then `…` as a 34px icon control button at the right |
+| Table             | `tableContainer`, sentence-case header, 32px rows                                   | A Surface card with an Eyebrow header (Tag, Description), hairline dividers, 44px rows; selected rows on the selection tint                                                 |
+| Tag               | The tag's colour on a round pill (radius 16)                                        | Same colours and black/white text rule; the square shape the register uses (radius 4), so a tag looks the same on both pages                                                |
+| Description       | Italic "No description" in light table text                                         | Same string in Faint, not italic; long text truncates                                                                                                                       |
+| Hidden tags       | Tag and description at half opacity                                                 | Unchanged                                                                                                                                                                   |
+| View Transactions | Green notice button on every row                                                    | Quiet Secondary text with the arrow, a hairline border on row hover (as Payees' Create rule). Same string, click and focus                                                  |
+| New-tag row       | Two plain rows: inputs, then "Choose Color:", Cancel, Add                           | One Card Inset block at the top of the card: the two inputs as 30px fields, the colour preview, Cancel and Add (primary) as small buttons                                   |
+| Menus             | Selection menu (Rename, Delete, Hide, Unhide with keys), `…` menu, row context menu | Unchanged content; they already follow the popover look                                                                                                                     |
+| Empty             | Italic "No Tags"                                                                    | Same string, centred in the card, not italic                                                                                                                                |
+
+Unchanged by design: every handler (create, rename, recolour, describe,
+delete, hide, unhide, show hidden, discover, view transactions), the
+filter's matching, sort order, select all and range select, the R/D/H/U
+shortcuts, keyboard navigation between cells, the strings, and mobile.
+
+Questions for the owner:
+
+1. **Toolbar order:** Add New and the selection button at the left, filter
+   and `…` at the right (drawn), or keep today's order with the selection
+   button beside the filter?
+2. **Tag shape:** the register's square pill (drawn), or keep today's round
+   pill on this page?
+3. **View Transactions:** quiet text that shows a border on row hover
+   (drawn), or a pill on every row?
+4. **No match:** today a filter that matches nothing leaves the card empty
+   ("No Tags" shows only when there are no tags at all). Show "No Tags" in
+   that case too (a small behaviour change), or keep it (default)?
+
+| File                                       | Shows                                         |
+| ------------------------------------------ | --------------------------------------------- |
+| `shots/93-tags-dark-wide.png`              | Tags, dark, 1440×900, a row hovered           |
+| `shots/94-tags-light-1000.png`             | Light, 1000×700, pane collapsed               |
+| `shots/95-tags-midnight-wide-selected.png` | Three tags selected, selection menu, midnight |
+| `shots/96-tags-custom-theme-wide.png`      | Custom theme through the fallback layer       |
+| `shots/97-tags-new-tag-dark-1000.png`      | Adding a tag                                  |
+| `shots/98-tags-hidden-menu-light-wide.png` | Hidden tags shown, the `…` menu open          |
+| `shots/99-tags-row-menu-dark-1000.png`     | A row's context menu                          |
+| `shots/100-tags-empty-light-wide.png`      | No tags                                       |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-05c`
+(`PW_CHANNEL=msedge` uses the installed Edge).

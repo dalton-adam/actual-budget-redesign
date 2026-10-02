@@ -8,7 +8,7 @@
   DESIGN-01/02 prototype: fictional data only, no connection to Actual's code.
   Open with a local file URL after `yarn install` (fonts load from node_modules).
   URL params: layout=a|b, header=cards|trend, theme=light|dark|midnight|custom,
-  panel=0|1, privacy=0|1, controls=0|1, page=budget|account|reports|schedules|payees|rules
+  panel=0|1, privacy=0|1, controls=0|1, page=budget|account|reports|schedules|payees|rules|tags
   APP-03: rview=dash|networth|custom|calendar|formula, redit=0|1, whover=<widget id>
   APP-04 (page=schedules): sdlg=<schedule id>|add, stx=linked|matched, scompleted=0|1,
   sempty=0|1, sfilter=<text>, shover=<id>, smenu=<id>, ssel=0|1
@@ -16,6 +16,8 @@
   phover=<id>, prow=<id> (row context menu)
   APP-05b (page=rules): rusel=0|1, ruempty=0|1, rufilter=<text>, ruhover=<id>,
   rumenu=<id> (row context menu)
+  APP-05c (page=tags): tsel=0|1, tmenu=0|1, tdots=0|1, tadd=0|1, thidden=0|1, tempty=0|1,
+  tfilter=<text>, thover=<id>, trow=<id> (row context menu)
   APP-03c: rgraph=table|bar|stacked|line|area|donut, rlegend=0|1, rsummary=0|1, rlabels=0|1
   DESIGN-02: data=basic|states|many, density=50|44|38, rta=pos|zero|neg,
   when=past|current|future, cat=<category id>, pm=<panel month>, hover=<id>, edit=<id>:<month>,
@@ -4395,10 +4397,9 @@
       }
       .rucols {
         display: grid;
-        grid-template-columns: 34px 58px minmax(0, 1fr) 18px minmax(
-            0,
-            1fr
-          ) auto;
+        grid-template-columns:
+          34px 58px minmax(0, 1fr) 18px minmax(0, 1fr)
+          auto;
         align-items: center;
         column-gap: 12px;
         padding: 0 14px 0 10px;
@@ -4504,6 +4505,161 @@
         font-size: 13px;
         padding: 40px 0;
       }
+      /* APP-05c: Tags page */
+      .tg-table {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .tg-table .rhead {
+        border-radius: 18px 18px 0 0;
+        flex-shrink: 0;
+      }
+      .tgcols {
+        display: grid;
+        grid-template-columns: 34px 220px minmax(0, 1fr) auto;
+        align-items: center;
+        column-gap: 12px;
+        padding: 0 14px 0 10px;
+      }
+      .tgrow {
+        height: 44px;
+        flex-shrink: 0;
+        border-bottom: 1px solid var(--cardBorder);
+        font-size: 13px;
+      }
+      .tgrow:hover,
+      .tgrow.hover {
+        background: var(--tableRowHover);
+      }
+      .tgrow.selected {
+        background: var(--selectionBackground);
+      }
+      .tgrow .cb {
+        opacity: 0;
+      }
+      .tgrow.hover .cb,
+      .tgrow:hover .cb,
+      .tgrow.selected .cb,
+      .tg-table.has-sel .tgrow .cb {
+        opacity: 1;
+      }
+      .tg-pill {
+        display: inline-block;
+        max-width: 100%;
+        padding: 3px 7px;
+        border-radius: 4px;
+        font-size: 12.5px;
+        font-weight: 600;
+        line-height: 17px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+        color: #fff;
+      }
+      .tg-pill.dark-text {
+        color: #000;
+      }
+      .tg-pill.def {
+        background: #e4d4ff;
+        color: #000;
+      }
+      [data-theme='dark'] .tg-pill.def {
+        background: #690cb0;
+        color: #f2ebfe;
+      }
+      [data-theme='midnight'] .tg-pill.def {
+        background: #580a94;
+        color: #f2ebfe;
+      }
+      .tgrow.hidden-tag .tg-pill,
+      .tgrow.hidden-tag .tg-desc {
+        opacity: 0.5;
+      }
+      .tg-desc {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .tg-desc.none {
+        color: var(--pageTextFaint);
+      }
+      .tg-view {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 24px;
+        padding: 0 9px;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        color: var(--pageTextSubdued);
+        border: 1px solid transparent;
+      }
+      .tg-view svg {
+        width: 10px;
+        height: 10px;
+      }
+      .tgrow:hover .tg-view,
+      .tgrow.hover .tg-view {
+        border-color: var(--cardBorder);
+        color: var(--pageText);
+      }
+      .tg-new {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px 14px 12px 56px;
+        background: var(--cardInset);
+        border-bottom: 1px solid var(--cardBorder);
+        font-size: 13px;
+      }
+      .tg-new .fields {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        column-gap: 12px;
+      }
+      .tg-new .fld-in {
+        height: 30px;
+        display: flex;
+        align-items: center;
+        padding: 0 9px;
+        border-radius: 8px;
+        background: var(--controlBackground);
+        border: 1px solid var(--cardBorder);
+        color: var(--pageTextFaint);
+      }
+      .tg-new .fld-in.focus {
+        border: 1.5px solid var(--selectionBorder);
+        color: var(--pageText);
+      }
+      .tg-new .tg-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .tg-new .tg-bar .lbl {
+        color: var(--pageTextSubdued);
+      }
+      .tg-new .tg-bar .end {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+      }
+      .tg-empty {
+        flex: 1;
+        display: grid;
+        place-items: center;
+        color: var(--pageTextSubdued);
+        font-size: 13px;
+        padding: 40px 0;
+      }
     </style>
   </head>
   <body>
@@ -4580,6 +4736,18 @@
         rufilter: params.get('rufilter') || '',
         ruhover: params.get('ruhover') || '',
         rumenu: params.get('rumenu') || '',
+        // APP-05c: three tags selected, the selection menu, the page menu,
+        // the new-tag row, hidden tags shown, no tags at all, search text,
+        // hovered row, row context menu.
+        tsel: params.get('tsel') === '1',
+        tmenu: params.get('tmenu') === '1',
+        tdots: params.get('tdots') === '1',
+        tadd: params.get('tadd') === '1',
+        thidden: params.get('thidden') === '1',
+        tempty: params.get('tempty') === '1',
+        tfilter: params.get('tfilter') || '',
+        thover: params.get('thover') || '',
+        trow: params.get('trow') || '',
         // Accounts pane: open or collapsed (device-local). Default: open at
         // 1280px and wider, collapsed below.
         pane:
@@ -4935,6 +5103,7 @@
               schedules: 'schedules',
               payees: 'more',
               rules: 'more',
+              tags: 'more',
             }[state.page] || 'budget') === key
               ? 'on'
               : ''
@@ -5037,7 +5206,7 @@
         I.bank,
         'Bank Sync',
         '<span class="amt muted">if enabled</span>',
-      )}${it(I.tag, 'Tags')}
+      )}<button class="item" data-set="page" data-val="tags"><span class="ico">${I.tag}</span>Tags</button>
       <hr>${it(I.gear, 'Settings')}
     </div>`;
       }
@@ -6119,6 +6288,7 @@
             ['schedules', 'Schedules'],
             ['payees', 'Payees'],
             ['rules', 'Rules'],
+            ['tags', 'Tags'],
           ]),
           grp('Theme', 'theme', [
             ['light', 'Light'],
@@ -6233,6 +6403,28 @@
             [true, 'No match'],
           ]),
         ];
+        const tg = [
+          grp('Selection', 'tsel', [
+            [false, 'None'],
+            [true, 'Three'],
+          ]),
+          grp('Menu', 'tmenu', [
+            [false, 'Closed'],
+            [true, 'Open'],
+          ]),
+          grp('New tag', 'tadd', [
+            [false, 'Off'],
+            [true, 'On'],
+          ]),
+          grp('Hidden', 'thidden', [
+            [false, 'Hidden'],
+            [true, 'Shown'],
+          ]),
+          grp('List', 'tempty', [
+            [false, 'Fixture'],
+            [true, 'No tags'],
+          ]),
+        ];
         const pageGroups = {
           budget,
           account: acct,
@@ -6240,6 +6432,7 @@
           schedules: sched,
           payees: pay,
           rules: rul,
+          tags: tg,
         }[state.page];
         return `<div class="proto" aria-label="Prototype controls">
       ${[...common, ...pageGroups, pin].join('')}
@@ -8541,6 +8734,180 @@
           </div>
         </main>`;
       }
+      // APP-05c proposal: Tags page (fictional data). c = the tag's own
+      // colour (null = the theme's default tag colour), d = description,
+      // hidden = hidden tag (listed only while hidden tags are shown).
+      const tagsFixture = [
+        { id: 't1', n: 'car', c: '#4a5568', d: 'Fuel, parking, repairs' },
+        { id: 't2', n: 'dining', c: null, d: '' },
+        { id: 't3', n: 'gift', c: '#d69e2e', d: 'Birthdays and holidays' },
+        {
+          id: 't4',
+          n: 'groceries',
+          c: '#2f855a',
+          d: 'Weekly shop and markets',
+        },
+        { id: 't5', n: 'home', c: '#6b46c1', d: 'Repairs and furnishings' },
+        {
+          id: 't6',
+          n: 'home-renovation-kitchen-and-bathroom-2026',
+          c: '#975a16',
+          d: 'Contractor deposits, fixtures, tiles and the permit fees for the kitchen and both bathrooms',
+        },
+        { id: 't7', n: 'kids', c: '#3182ce', d: '' },
+        {
+          id: 't8',
+          n: 'old-car',
+          c: '#718096',
+          d: 'Before the trade-in',
+          hidden: true,
+        },
+        {
+          id: 't9',
+          n: 'reimbursable',
+          c: '#e53e3e',
+          d: 'Claim back from work',
+        },
+        {
+          id: 't10',
+          n: 'subscriptions',
+          c: '#c05621',
+          d: 'Streaming and software',
+        },
+        { id: 't11', n: 'tax-deductible', c: null, d: 'Keep receipts' },
+        { id: 't12', n: 'vacation-2025', c: '#2b6cb0', d: '', hidden: true },
+        { id: 't13', n: 'wedding', c: '#f6ad55', d: 'Cousin in June' },
+      ];
+      const tgSelIds = ['t2', 't7', 't11'];
+
+      // The tag's own colour with black or white text by brightness, as
+      // useTagCSS picks it; no colour uses the theme's default tag colour.
+      function tgPill(t) {
+        if (!t.c)
+          return `<span class="tg-pill def" title="#${esc(t.n)}">#${esc(
+            t.n,
+          )}</span>`;
+        const r = parseInt(t.c.slice(1, 3), 16),
+          g = parseInt(t.c.slice(3, 5), 16),
+          b = parseInt(t.c.slice(5, 7), 16);
+        const light = (r * 299 + g * 587 + b * 114) / 1000 >= 125;
+        return `<span class="tg-pill ${
+          light ? 'dark-text' : ''
+        }" style="background:${t.c}" title="#${esc(t.n)}">#${esc(t.n)}</span>`;
+      }
+
+      function tgRow(t) {
+        const sel = state.tsel && tgSelIds.includes(t.id);
+        return `<div class="tgcols tgrow ${sel ? 'selected' : ''} ${
+          state.thover === t.id ? 'hover' : ''
+        } ${t.hidden ? 'hidden-tag' : ''}" role="row" data-id="${t.id}">
+          <div><span class="cb ${sel ? 'on' : ''}">${sel ? check : ''}</span></div>
+          <div style="min-width:0">${tgPill(t)}</div>
+          <div class="tg-desc ${t.d ? '' : 'none'}" title="${esc(t.d)}">${
+            t.d ? esc(t.d) : 'No description'
+          }</div>
+          <div><button class="tg-view">View Transactions${PI.arrow}</button></div>
+        </div>`;
+      }
+
+      function tagsPage() {
+        const q = state.tfilter.toLowerCase();
+        const visible = tagsFixture.filter(t => state.thidden || !t.hidden);
+        const list = state.tempty
+          ? []
+          : visible.filter(t => !q || t.n.toLowerCase().includes(q));
+        const nSel = state.tsel ? tgSelIds.length : 0;
+        const mi = (icon, l, key, hl) =>
+          `<div class="mi ${
+            hl ? 'hl' : ''
+          }" role="menuitem">${icon}<span style="flex:1">${l}</span>${
+            key
+              ? `<span style="color:var(--pageTextFaint);font-size:12px">${key}</span>`
+              : ''
+          }</div>`;
+        const selMenu =
+          state.tmenu && nSel
+            ? `<div class="pay-menu tg-sel-menu" role="menu" style="width:200px">${mi(
+                '',
+                'Delete',
+                'D',
+                true,
+              )}${mi('', 'Hide', 'H')}${mi('', 'Unhide', 'U')}</div>`
+            : '';
+        const dotsMenu = state.tdots
+          ? `<div class="pay-menu tg-dots-menu" role="menu" style="width:230px">${mi(
+              state.thidden ? I.eyeOff : I.eye,
+              state.thidden ? "Don't show hidden tags" : 'Show hidden tags',
+              '',
+              true,
+            )}${mi(
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+              'Discover new tags',
+            )}</div>`
+          : '';
+        const rowMenuFor = list.find(t => t.id === state.trow);
+        const newRow = state.tadd
+          ? `<div class="tg-new" data-testid="new-tag">
+              <div class="fields"><div class="fld-in focus">travel</div><div class="fld-in">Tag description</div></div>
+              <div class="tg-bar"><span class="lbl">Choose Color:</span><span class="tg-pill def">#travel</span>
+                <div class="end"><button class="tbtn sm">Cancel</button><button class="tbtn sm primary">Add</button></div>
+              </div>
+            </div>`
+          : '';
+        const body = state.tempty
+          ? `<div class="tg-empty">No Tags</div>`
+          : list.map(tgRow).join('');
+        return `<main class="main ru-main" style="position:relative">
+          <div class="head ru-head"><h1>Tags</h1>
+            <div class="ru-intro">User defined tags with color and description.</div>
+          </div>
+          <div class="toolbar">
+            <button class="tbtn primary">${I.plus}<span>Add New</span></button>
+            ${
+              nSel
+                ? `<button class="tbtn" data-tg="sel" aria-haspopup="menu" aria-expanded="${
+                    state.tmenu && nSel ? 'true' : 'false'
+                  }"><span><span class="num">${nSel}</span> Tags</span><span class="chev">${I.chevD}</span></button>`
+                : ''
+            }
+            <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>${
+              q
+                ? `<span style="color:var(--pageText)">${esc(state.tfilter)}</span>`
+                : 'Filter tags...'
+            }</div>
+            <button class="tbtn ico" data-tg="dots" aria-label="Menu" aria-haspopup="menu" aria-expanded="${
+              state.tdots
+            }">${I.dots}</button>
+          </div>
+          <div class="card tg-table ${
+            nSel ? 'has-sel' : ''
+          }" role="table" aria-label="Tags">
+            <div class="tgcols rhead" role="row"><div><span class="cb ${
+              nSel ? 'on' : ''
+            }" style="opacity:1">${
+              nSel
+                ? '<svg width="9" height="9" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M5 12h14"/></svg>'
+                : ''
+            }</span></div><div>Tag</div><div>Description</div><div></div></div>
+            ${newRow}
+            ${body}
+            ${
+              rowMenuFor
+                ? `<div class="pay-menu" role="menu" style="left:180px;width:180px">${mi(
+                    '',
+                    'Rename',
+                    '',
+                    true,
+                  )}${mi('', 'Delete')}${mi(
+                    '',
+                    rowMenuFor.hidden ? 'Unhide' : 'Hide',
+                  )}</div>`
+                : ''
+            }
+          </div>
+          ${selMenu}${dotsMenu}
+        </main>`;
+      }
       let totB = 0,
         totS = 0;
       function render() {
@@ -8581,7 +8948,9 @@
                     ? payeesPage()
                     : state.page === 'rules'
                       ? rulesPage()
-                      : `<main class="main">
+                      : state.page === 'tags'
+                        ? tagsPage()
+                        : `<main class="main">
             ${header()}
             ${summary}
             ${ledger(offs)}
@@ -8601,6 +8970,28 @@
         );
         if (ruMenu && ruMenuRow)
           ruMenu.style.top = ruMenuRow.offsetTop + 34 + 'px';
+        const tgRowMenu = document.querySelector('.tg-table .pay-menu');
+        const tgMenuRow = document.querySelector(
+          `.tgrow[data-id="${state.trow}"]`,
+        );
+        if (tgRowMenu && tgMenuRow)
+          tgRowMenu.style.top = tgMenuRow.offsetTop + 34 + 'px';
+        // Tags menus open under their toolbar buttons, right-aligned.
+        for (const [menuSel, btnSel] of [
+          ['.tg-sel-menu', '[data-tg="sel"]'],
+          ['.tg-dots-menu', '[data-tg="dots"]'],
+        ]) {
+          const m = document.querySelector(menuSel);
+          const btn = document.querySelector(btnSel);
+          if (!m || !btn) continue;
+          const host = m.offsetParent.getBoundingClientRect();
+          const r = btn.getBoundingClientRect();
+          m.style.top = r.bottom - host.top + 6 + 'px';
+          m.style.left =
+            (menuSel === '.tg-sel-menu'
+              ? r.left - host.left
+              : r.right - host.left - m.offsetWidth) + 'px';
+        }
         const lw = document.querySelector('.ledger-wrap, .register');
         if (lw) {
           lw.scrollTop = prevScroll;
@@ -8657,6 +9048,17 @@
         }
         if (state.page === 'rules') {
           for (const k of ['rusel', 'ruempty'])
+            u.searchParams.set(k, state[k] ? '1' : '0');
+        }
+        if (state.page === 'tags') {
+          for (const k of [
+            'tsel',
+            'tmenu',
+            'tdots',
+            'tadd',
+            'thidden',
+            'tempty',
+          ])
             u.searchParams.set(k, state[k] ? '1' : '0');
         }
         if (state.rview === 'montecarlo') {
