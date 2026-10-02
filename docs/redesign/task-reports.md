@@ -1542,3 +1542,47 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   custom themes, and its focus sign was a faint shadow (now the redesign
   focus ring). E2E 14/14 and Linux VRT 5/5 (unchanged) after the fix. Every
   APP-05a check is now done.
+
+- APP-05b: **merged October 1, 2026** into `redesign/main` (branch
+  `redesign/app-05b-rules`, code `6ce3a014a`, merge `3cbc474b6`). Drawing
+  approved the same day (prototype shots `87`–`92`; the owner left the four
+  questions to the implementer: Create new rule in the toolbar, desktop chips
+  restyled through an opt-in prop, the payee rules dialog takes the new rows
+  but keeps its layout and footer, the rule editor waits for APP-06;
+  design-decisions §10d). **Change:** `ManageRulesPage.tsx` gives the page
+  the Display title. `ManageRules.tsx` (page only) puts the intro sentence
+  under the title in Secondary text and one toolbar above the table: Create
+  new rule (primary, plus icon), Delete N rules (`control`) while rules are
+  selected, filter at the right; the footer leaves the page. The dialog
+  (`isModal`) keeps its intro, filter and Delete / Create footer. Both get
+  one Surface card table; "No rules" is centred in Secondary text, not
+  italic. `rules/RulesHeader.tsx` is an Eyebrow header; `rules/RuleRow.tsx`
+  has hairline dividers, rows at least 44px with 10px padding, `tableRowHover`
+  hover and the selection tint, a neutral stage pill (58px column, shared
+  with the header), a Faint arrow, split groups as hairline boxes with an
+  Eyebrow label, and a `control` Edit button. `rules/ConditionExpression.tsx`
+  and `rules/ActionExpression.tsx` take an opt-in `isCard` (Card Inset chip
+  with a hairline, field in text colour 600, operator in Secondary, value in
+  `pillTextHighlighted` 600, "and" Faint), passed only by `RuleRow`; the
+  mobile list keeps upstream's chips. `rules/ScheduleValue.tsx` passes an
+  optional `style` to `Value`. **Deviations from the drawing:** values use
+  `pillTextHighlighted`, not the accent (`buttonPrimaryBackground` is 3.3:1
+  on the dark chip); the checkbox keeps the shared `SelectCell` look; the
+  intro and empty state use `pageTextSecondary` (DESIGN.md: light
+  `pageTextSubdued` fails contrast). No handler, query, filter matching,
+  rule order, pref, route or string changed; `Value.tsx` (shared with the
+  filter chips) is untouched. **Checks:** typecheck passes; oxlint over the
+  changed files 0 errors (type-aware in the commit hook); oxfmt applied; web
+  unit tests **1052 passed, 1 skipped**. E2E against the `build:browser`
+  preview (port 3018) with the installed Edge (a local Playwright config,
+  not committed): rules, rules.mobile, payees, schedules and transactions
+  **30/30**. Linux VRT (Playwright v1.61.1 Docker image, HTTPS dev server on
+  3021 over the LAN address, checkout mounted at its `/mnt/host` path): **6
+  snapshots changed**, the Rules page before and after creating a rule
+  (light, dark, midnight); the split-rule shots did not change; the re-run
+  without updates, with rules.mobile and payees, passed 13/13. Impeccable
+  detector over the seven changed files: no findings. VISUAL in the dev
+  server (test budget): light and dark at 1440×900, row hover, selection
+  with Delete 1 rules, and the payee rules dialog in dark. **Not run:**
+  custom theme, keyboard walk-through, privacy mode (amount values keep
+  `FinancialText`, unchanged), 1000×700 and the desktop build.
