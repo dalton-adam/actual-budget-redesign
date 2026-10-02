@@ -55,7 +55,7 @@ Budget header are reference material, not tasks to build.
 | APP-06a            | verified    | `8d0244c25`, `b31f33d66` | Linux VRT regenerated (27). E2E 121/121; custom theme, 1000×700 and desktop not run (task-reports.md).                                            |
 | APP-06b            | verified    | `102c85b33`, `e16964ccb` | Linux VRT regenerated (51). E2E 121/121; custom theme, 1000×700 and desktop not run (task-reports.md).                                            |
 | APP-06c            | verified    | `5660d77ba`, `d638c6265` | Linux VRT 186/186, no snapshot changed. E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md).                                |
-| APP-06d            | verified    | `cb1c20101`              | Linux VRT 186/186 after regenerating 3 (date filter's empty register). E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md). |
+| APP-06d            | verified    | `1d2e3cda2`, `cb1c20101` | Linux VRT 186/186 after regenerating 3 (date filter's empty register). E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md). |
 | APP-06e – f        | not started | —                        | Split October 1, 2026 (below). Each file list is rebuilt from source before it starts.                                                            |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                                                 |
 
