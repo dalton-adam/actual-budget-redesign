@@ -548,7 +548,11 @@ Regenerate with `node scripts/redesign-prototype-shots.cjs --app-05b`
 
 ## APP-05c: Tags proposal (October 1, 2026)
 
-**Status: drawn, awaiting owner review.** Choose **Page → Tags** (or More →
+**Status: approved October 1, 2026.** The owner chose the drawn option
+for all four questions: Add New and the selection button at the left, the
+filter and `…` at the right (question 1); the register's square tag shape
+(question 2); quiet View Transactions (question 3); a filter with no match
+keeps today's empty card (question 4). Choose **Page → Tags** (or More →
 Tags). URL parameters: `tsel=0|1` (three tags selected), `tmenu=0|1` (the
 selection menu), `tdots=0|1` (the page menu), `tadd=0|1` (the new-tag row),
 `thidden=0|1` (hidden tags shown), `tempty=0|1` (no tags), and for

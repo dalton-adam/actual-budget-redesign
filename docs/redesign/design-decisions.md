@@ -697,6 +697,28 @@ questions to the implementer, who chose:
   its own header, intro, filter and footer layout.
 - The rule editor keeps the upstream look until APP-06.
 
+## 10e. Tags (APP-05c)
+
+**APP-05c (approved October 1, 2026):** drawn in the prototype (Page →
+Tags; shots `93`–`100`, prototype README). The owner chose the drawn option
+for each question:
+
+- Add New (primary, plus icon) and, while tags are selected, the "N Tags"
+  selection button sit at the left of one toolbar; the filter and the `…`
+  menu (a 34px icon control button) at the right. The intro sentence sits
+  under the title in Secondary text.
+- The table is a Surface card with an Eyebrow header (Tag, Description),
+  hairline dividers and 44px rows; selected rows on the selection tint.
+- Tags keep their own colours and the black/white text rule but take the
+  register's square shape (radius 4).
+- An empty description reads "No description" in Faint, not italic.
+- View Transactions is quiet Secondary text with the arrow, gaining a
+  hairline border on row hover.
+- The new-tag row is one Card Inset block: 30px fields, the colour preview,
+  small Cancel and primary Add buttons.
+- "No Tags" stays centred in the card, not italic, and still shows only
+  when there are no tags at all.
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the
