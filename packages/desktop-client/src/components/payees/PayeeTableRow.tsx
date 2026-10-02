@@ -8,6 +8,7 @@ import {
   SvgBookmark,
   SvgLightBulb,
 } from '@actual-app/components/icons/v1';
+import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { Tooltip } from '@actual-app/components/tooltip';
 import type { PayeeEntity } from '@actual-app/core/types/models';
@@ -61,6 +62,8 @@ function RuleButton({ ruleCount, focused, onEdit, onClick }: RuleButtonProps) {
           whiteSpace: 'nowrap',
           cursor: 'pointer',
           border: '1px solid transparent',
+          // The redesign focus ring instead of CellButton's faint shadow.
+          ':focus': { ...styles.focusRing, boxShadow: 'none' },
           ...(ruleCount > 0
             ? {
                 backgroundColor: theme.selectionBackground,
@@ -68,6 +71,8 @@ function RuleButton({ ruleCount, focused, onEdit, onClick }: RuleButtonProps) {
                 ':hover': { borderColor: theme.selectionBorder },
               }
             : {
+                // CellButton's default fill would show in some themes.
+                backgroundColor: 'transparent',
                 color: theme.pageTextSubdued,
                 ':hover': {
                   backgroundColor: theme.controlBackground,
