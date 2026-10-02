@@ -874,6 +874,19 @@ option for all four questions:
   unchanged. Below the narrow breakpoint the dialogs keep upstream (mobile
   is deferred, plan §19.4).
 
+**As implemented (APP-06e):** the action rows add no "to" between the field
+and the value (the drawing showed one; that would be a new string); the
+value inputs, pickers and the formula and templating toggles keep their
+shared components' look, as in the APP-04 schedule dialog; the hairline
+dividers sit inside the dialog's padding rather than running edge to edge,
+as in the schedule dialog; the rule dialog has no Delete button (the
+dialog never passed one upstream); and the "Apply to all" header no longer
+prints a stray "0" (upstream rendered `splitIndex && …` with index 0). The
+look is opt-in: `RuleEditor`'s `isDialog` prop and `SimpleTransactionsTable`'s
+`isCard` prop, so the mobile rule page and the schedule dialog's
+transactions table are unchanged. Shared values live in
+`common/dialogStyles.ts`.
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the

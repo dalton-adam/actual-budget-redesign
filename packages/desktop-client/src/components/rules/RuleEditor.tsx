@@ -1,5 +1,12 @@
 // @ts-strict-ignore
-import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
@@ -44,6 +51,13 @@ import { css } from '@emotion/css';
 import { v4 as uuidv4 } from 'uuid';
 
 import { TagMultiAutocomplete } from '#components/autocomplete/TagMultiAutocomplete';
+import {
+  dialogButtonStyle,
+  dialogEyebrowStyle,
+  dialogIconButtonStyle,
+  dialogPrimaryButtonStyle,
+  dialogTableCardStyle,
+} from '#components/common/dialogStyles';
 import { FinancialText } from '#components/FinancialText';
 import { StatusBadge } from '#components/schedules/StatusBadge';
 import { SimpleTransactionsTable } from '#components/transactions/SimpleTransactionsTable';
@@ -62,6 +76,24 @@ import { disableUndo, enableUndo } from '#undo';
 import { friendlyOp, getAllocationMethods, mapField } from '#util/rule';
 
 import { FormulaActionEditor } from './FormulaActionEditor';
+
+/**
+ * The desktop rule dialog's look (design-decisions §10k, APP-06e). The mobile
+ * rule page, and the filter menu, Summary report and schedule form that
+ * import `FieldSelect` and `OpSelect`, keep upstream's.
+ */
+const RuleDialogContext = createContext(false);
+
+/** A condition or action row in the dialog: Card Inset with a hairline. */
+const dialogEditorStyle = {
+  backgroundColor: theme.cardInset,
+  border: `1px solid ${theme.cardHairline}`,
+  borderRadius: 10,
+  minHeight: 44,
+  padding: '6px 6px 6px 12px',
+  justifyContent: 'center',
+  fontSize: 13,
+} as const;
 
 function updateValue(array, value, update) {
   return array.map(v => (v === value ? update() : v));
@@ -109,6 +141,9 @@ export function FieldSelect<T extends string>({
   value,
   onChange,
 }: FieldSelectProps<T>) {
+  const isDialog = useContext(RuleDialogContext);
+  // Page Text 600 in the dialog, as the rule chips (design-decisions §10k).
+  const color = isDialog ? theme.pageText : theme.pageTextPositive;
   return (
     <View style={style} data-testid="field-select">
       <Select
@@ -117,8 +152,9 @@ export function FieldSelect<T extends string>({
         value={value}
         onChange={onChange}
         className={css({
-          color: theme.pageTextPositive,
-          '&[data-hovered]': { color: theme.pageTextPositive },
+          color,
+          '&[data-hovered]': { color },
+          ...(isDialog && { fontWeight: 600 }),
         })}
       />
     </View>
@@ -142,6 +178,7 @@ export function OpSelect<T extends string>({
   formatOp = friendlyOp,
   onChange,
 }: OpSelectProps<T>) {
+  const isDialog = useContext(RuleDialogContext);
   const opOptions = useMemo(() => {
     const options = ops
       // We don't support the `contains`, `doesNotContain`, `matches` operators
@@ -176,7 +213,7 @@ export function OpSelect<T extends string>({
         options={opOptions}
         value={value}
         onChange={value => onChange('op', value)}
-        style={style}
+        style={isDialog ? { color: theme.pageTextSecondary, ...style } : style}
       />
     </View>
   );
@@ -194,9 +231,14 @@ function SplitAmountMethodSelect({
   value,
   onChange,
 }: SplitAmountMethodSelectProps) {
+  const isDialog = useContext(RuleDialogContext);
   return (
     <View
-      style={{ color: theme.pageTextPositive, ...style }}
+      style={{
+        color: theme.pageTextPositive,
+        ...(isDialog && { color: theme.pageText, fontWeight: 600 }),
+        ...style,
+      }}
       data-testid="field-select"
     >
       <Select
@@ -211,13 +253,15 @@ function SplitAmountMethodSelect({
 
 function EditorButtons({ onAdd, onDelete }) {
   const { t } = useTranslation();
+  const isDialog = useContext(RuleDialogContext);
   return (
     <>
       {onDelete && (
         <Button
-          variant="bare"
+          variant={isDialog ? 'control' : 'bare'}
           onPress={onDelete}
-          style={{ padding: 7 }}
+          style={isDialog ? undefined : { padding: 7 }}
+          className={isDialog ? css(dialogIconButtonStyle) : undefined}
           aria-label={t('Delete entry')}
         >
           <SvgSubtract style={{ width: 8, height: 8, color: 'inherit' }} />
@@ -225,9 +269,10 @@ function EditorButtons({ onAdd, onDelete }) {
       )}
       {onAdd && (
         <Button
-          variant="bare"
+          variant={isDialog ? 'control' : 'bare'}
           onPress={onAdd}
-          style={{ padding: 7 }}
+          style={isDialog ? undefined : { padding: 7 }}
+          className={isDialog ? css(dialogIconButtonStyle) : undefined}
           aria-label={t('Add entry')}
         >
           <SvgAdd style={{ width: 10, height: 10, color: 'inherit' }} />
@@ -253,9 +298,10 @@ function FieldError({ type }) {
 }
 
 function Editor({ error, style, children }) {
+  const isDialog = useContext(RuleDialogContext);
   return (
     <View style={style} data-testid="editor-row">
-      <SpaceBetween gap={5} style={{ alignItems: 'center' }}>
+      <SpaceBetween gap={isDialog ? 8 : 5} style={{ alignItems: 'center' }}>
         {children}
       </SpaceBetween>
       {error && <FieldError type={error} />}
@@ -497,6 +543,7 @@ function ActionEditor({
     options,
   } = action;
 
+  const isDialog = useContext(RuleDialogContext);
   const templated = options?.template !== undefined;
   const hasFormula = options?.formula !== undefined;
 
@@ -630,6 +677,10 @@ function ActionEditor({
               padding: '5px 10px',
               lineHeight: '1em',
               flexShrink: 0,
+              ...(isDialog && {
+                paddingLeft: 0,
+                color: theme.pageTextSecondary,
+              }),
             }}
           >
             {t('allocate')}
@@ -700,6 +751,11 @@ function ActionEditor({
             style={{
               padding: '5px 10px',
               color: theme.pageTextPositive,
+              ...(isDialog && {
+                paddingLeft: 0,
+                color: theme.pageText,
+                fontWeight: 600,
+              }),
             }}
           >
             {friendlyOp(op)}
@@ -752,6 +808,7 @@ function ActionEditor({
 }
 
 function StageInfo() {
+  const isDialog = useContext(RuleDialogContext);
   return (
     <View style={{ position: 'relative', marginLeft: 5 }}>
       <Tooltip
@@ -772,7 +829,11 @@ function StageInfo() {
         }}
       >
         <SvgInformationOutline
-          style={{ width: 11, height: 11, color: theme.pageTextLight }}
+          style={{
+            width: 11,
+            height: 11,
+            color: isDialog ? theme.pageTextFaint : theme.pageTextLight,
+          }}
         />
       </Tooltip>
     </View>
@@ -791,6 +852,20 @@ function StageButton({
   style,
   onSelect,
 }: StageButtonProps) {
+  const isDialog = useContext(RuleDialogContext);
+  if (isDialog) {
+    // A segment of the stage control (design-decisions §10k).
+    return (
+      <Button
+        variant={selected ? 'tabSelected' : 'tab'}
+        aria-pressed={selected}
+        style={{ minHeight: 26, padding: '0 12px', ...style }}
+        onPress={onSelect}
+      >
+        {children}
+      </Button>
+    );
+  }
   return (
     <Button
       variant="bare"
@@ -820,6 +895,7 @@ function ConditionsList({
   isSchedule,
   onChangeConditions,
 }) {
+  const isDialog = useContext(RuleDialogContext);
   function addCondition(index) {
     if (conditionFields && conditionFields.length > 0) {
       conditionFields.forEach(field => {
@@ -956,7 +1032,12 @@ function ConditionsList({
   }
 
   return conditions.length === 0 ? (
-    <Button style={{ alignSelf: 'flex-start' }} onPress={addInitialCondition}>
+    <Button
+      variant={isDialog ? 'control' : 'normal'}
+      style={{ alignSelf: 'flex-start' }}
+      className={isDialog ? css(dialogButtonStyle) : undefined}
+      onPress={addInitialCondition}
+    >
       <Trans>Add condition</Trans>
     </Button>
   ) : (
@@ -1023,6 +1104,8 @@ type RuleEditorProps = {
   onSave?: (rule: RuleEntity) => void;
   onCancel?: () => void;
   onDelete?: () => void;
+  /** The desktop dialog's look (design-decisions §10k); off on mobile. */
+  isDialog?: boolean;
   style?: CSSProperties;
 };
 
@@ -1031,9 +1114,12 @@ export function RuleEditor({
   onSave: originalOnSave,
   onDelete,
   onCancel,
+  isDialog = false,
   style,
 }: RuleEditorProps) {
   const { t } = useTranslation();
+  const { isNarrowWidth } = useResponsive();
+  const isCard = isDialog && !isNarrowWidth;
   const [conditions, setConditions] = useState(
     defaultRule.conditions.map(parse).map(c => ({ ...c, inputKey: uuidv4() })),
   );
@@ -1329,265 +1415,402 @@ export function RuleEditor({
   // Enable editing existing split rules even if the feature has since been disabled.
   const showSplitButton = actionSplits.length > 0;
 
+  const editorStyle = isCard ? dialogEditorStyle : styles.editorPill;
+  const buttonVariant = isCard ? 'control' : 'normal';
+  const buttonClassName = isCard ? css(dialogButtonStyle) : undefined;
+  const leadStyle = isCard
+    ? {
+        marginBottom: 10,
+        fontSize: 13.5,
+        fontWeight: 600,
+        color: theme.pageText,
+      }
+    : { marginBottom: 15 };
+
+  const stageButtons = (
+    <>
+      <StageButton
+        selected={stage === 'pre'}
+        onSelect={() => onChangeStage('pre')}
+      >
+        <Trans>Pre</Trans>
+      </StageButton>
+      <StageButton
+        selected={stage === null}
+        onSelect={() => onChangeStage(null)}
+      >
+        <Trans>Default</Trans>
+      </StageButton>
+      <StageButton
+        selected={stage === 'post'}
+        onSelect={() => onChangeStage('post')}
+      >
+        <Trans>Post</Trans>
+      </StageButton>
+    </>
+  );
+
   return (
-    <View style={style}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginBottom: 15,
-          padding: '0 20px',
-        }}
-      >
-        <Text style={{ marginRight: 15 }}>
-          <Trans>Stage of rule:</Trans>
-        </Text>
-
-        <SpaceBetween gap={5} style={{ alignItems: 'center' }}>
-          <StageButton
-            selected={stage === 'pre'}
-            onSelect={() => onChangeStage('pre')}
-          >
-            <Trans>Pre</Trans>
-          </StageButton>
-          <StageButton
-            selected={stage === null}
-            onSelect={() => onChangeStage(null)}
-          >
-            <Trans>Default</Trans>
-          </StageButton>
-          <StageButton
-            selected={stage === 'post'}
-            onSelect={() => onChangeStage('post')}
-          >
-            <Trans>Post</Trans>
-          </StageButton>
-
-          <StageInfo />
-        </SpaceBetween>
-      </View>
-
-      <View
-        innerRef={scrollableEl}
-        style={{
-          borderBottom: '1px solid ' + theme.tableBorder,
-          padding: '0 20px 20px 20px',
-          overflow: 'auto',
-          maxHeight: 'calc(100% - 300px)',
-          minHeight: 100,
-          position: 'relative',
-          zIndex: 2,
-        }}
-      >
-        <View style={{ flexShrink: 0 }}>
-          <View style={{ marginBottom: 30 }}>
-            <Text style={{ marginBottom: 15 }}>
-              <Trans>
-                If{' '}
-                <FieldSelect
-                  data-testid="conditions-op"
-                  style={{ display: 'inline-flex' }}
-                  fields={[
-                    ['and', t('all')],
-                    ['or', t('any')],
-                  ]}
-                  value={conditionsOp}
-                  onChange={onChangeConditionsOp}
-                />
-                {{ allOrAny: '' }} of these conditions match:
-              </Trans>
-            </Text>
-
-            <ConditionsList
-              conditionsOp={conditionsOp}
-              conditions={conditions}
-              editorStyle={styles.editorPill}
-              isSchedule={isSchedule}
-              onChangeConditions={conds => setConditions(conds)}
-            />
-          </View>
-
-          <Text style={{ marginBottom: 15 }}>
-            <Trans>Then apply these actions:</Trans>
-          </Text>
-          <View style={{ flex: 1 }}>
-            {actionSplits.length === 0 && (
-              <Button
-                style={{ alignSelf: 'flex-start' }}
-                onPress={addInitialAction}
-              >
-                <Trans>Add action</Trans>
-              </Button>
-            )}
-            <SpaceBetween
-              direction="vertical"
-              gap={10}
-              data-testid="action-split-list"
-            >
-              {actionSplits.map(({ id, actions }, splitIndex) => (
-                <View
-                  key={id}
-                  style={{ width: '100%' }}
-                  nativeStyle={
-                    actionSplits.length > 1
-                      ? {
-                          borderColor: theme.tableBorder,
-                          borderWidth: '1px',
-                          borderRadius: '5px',
-                          padding: '5px',
-                        }
-                      : {}
-                  }
-                >
-                  {actionSplits.length > 1 && (
-                    <SpaceBetween
-                      gap={5}
-                      style={{ justifyContent: 'space-between' }}
-                    >
-                      <Text
-                        style={{
-                          ...styles.smallText,
-                          marginBottom: '10px',
-                        }}
-                      >
-                        {splitIndex === 0
-                          ? t('Apply to all')
-                          : `${t('Split')} ${splitIndex}`}
-                      </Text>
-                      {splitIndex && (
-                        <Button
-                          variant="bare"
-                          onPress={() => onRemoveSplit(splitIndex)}
-                          style={{
-                            width: 20,
-                            height: 20,
-                          }}
-                          aria-label={t('Delete split')}
-                        >
-                          <SvgDelete
-                            style={{
-                              width: 8,
-                              height: 8,
-                              color: 'inherit',
-                            }}
-                          />
-                        </Button>
-                      )}
-                    </SpaceBetween>
-                  )}
-                  <SpaceBetween
-                    direction="vertical"
-                    gap={10}
-                    data-testid="action-list"
-                  >
-                    {actions.map((action, actionIndex) => (
-                      <View key={actionIndex} style={{ width: '100%' }}>
-                        <ActionEditor
-                          action={action}
-                          editorStyle={styles.editorPill}
-                          onChange={(name, value, extraOptions) =>
-                            onChangeAction(action, name, value, extraOptions)
-                          }
-                          onDelete={() => onRemoveAction(action)}
-                          onAdd={() =>
-                            addActionToSplitAfterIndex(splitIndex, actionIndex)
-                          }
-                        />
-                      </View>
-                    ))}
-                  </SpaceBetween>
-
-                  {actions.length === 0 && (
-                    <Button
-                      style={{ alignSelf: 'flex-start', marginTop: 5 }}
-                      onPress={() => addActionToSplitAfterIndex(splitIndex, -1)}
-                    >
-                      <Trans>Add action</Trans>
-                    </Button>
-                  )}
-                </View>
-              ))}
-            </SpaceBetween>
-            {showSplitButton && (
-              <Button
-                style={{ alignSelf: 'flex-start', marginTop: 15 }}
-                onPress={() => {
-                  addActionToSplitAfterIndex(actionSplits.length, -1);
-                }}
-                data-testid="add-split-transactions"
-              >
-                {actionSplits.length > 1
-                  ? t('Add another split')
-                  : t('Split into multiple transactions')}
-              </Button>
-            )}
-          </View>
-        </View>
-      </View>
-
-      <SelectedProvider instance={selectedInst}>
+    <RuleDialogContext.Provider value={isCard}>
+      <View style={style}>
         <View
           style={{
-            padding: '20px',
-            flex: 1,
-            position: 'relative',
-            zIndex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 15,
+            padding: '0 20px',
+            ...(isCard && {
+              padding: 0,
+              marginBottom: 14,
+              color: theme.pageTextSecondary,
+            }),
           }}
         >
-          <SpaceBetween
-            gap={5}
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'nowrap',
-              justifyContent: 'space-between',
-              marginBottom: 12,
-            }}
-          >
-            <Text style={{ color: theme.pageTextLight, marginBottom: 0 }}>
-              <Trans>This rule applies to these transactions:</Trans>
-            </Text>
+          <Text style={{ marginRight: isCard ? 10 : 15 }}>
+            <Trans>Stage of rule:</Trans>
+          </Text>
 
-            <Button
-              isDisabled={selectedInst.items.size === 0}
-              onPress={onApply}
-            >
-              <Trans>Apply actions</Trans> ({selectedInst.items.size})
-            </Button>
-          </SpaceBetween>
-
-          {/* @ts-expect-error fix this */}
-          <SimpleTransactionsTable
-            transactions={transactions}
-            fields={getTransactionFields(conditions, getActions(actionSplits))}
-            style={{
-              border: '1px solid ' + theme.tableBorder,
-              borderRadius: '6px 6px 0 0',
-            }}
-          />
-
-          <SpaceBetween
-            style={{
-              marginTop: 20,
-              justifyContent: onDelete ? 'space-between' : 'flex-end',
-            }}
-          >
-            {onDelete && (
-              <Button onPress={onDelete}>
-                <Trans>Delete</Trans>
-              </Button>
+          <SpaceBetween gap={5} style={{ alignItems: 'center' }}>
+            {isCard ? (
+              // The stage as a segmented control (design-decisions §10k).
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 2,
+                  padding: 2,
+                  borderRadius: 11,
+                  backgroundColor: theme.navTrack,
+                }}
+              >
+                {stageButtons}
+              </View>
+            ) : (
+              stageButtons
             )}
 
-            <SpaceBetween>
-              <Button onPress={onCancel}>
-                <Trans>Cancel</Trans>
-              </Button>
-              <Button variant="primary" onPress={onSave}>
-                <Trans>Save</Trans>
-              </Button>
-            </SpaceBetween>
+            <StageInfo />
           </SpaceBetween>
         </View>
-      </SelectedProvider>
-    </View>
+
+        <View
+          innerRef={scrollableEl}
+          style={{
+            borderBottom: '1px solid ' + theme.tableBorder,
+            padding: '0 20px 20px 20px',
+            overflow: 'auto',
+            maxHeight: 'calc(100% - 300px)',
+            minHeight: 100,
+            position: 'relative',
+            zIndex: 2,
+            // Hairline-separated sections (design-decisions §10k).
+            ...(isCard && {
+              borderTop: '1px solid ' + theme.cardHairline,
+              borderBottomColor: theme.cardHairline,
+              padding: '14px 0 18px',
+            }),
+          }}
+        >
+          <View style={{ flexShrink: 0 }}>
+            <View style={{ marginBottom: isCard ? 18 : 30 }}>
+              <Text style={leadStyle}>
+                <Trans>
+                  If{' '}
+                  <FieldSelect
+                    data-testid="conditions-op"
+                    style={{
+                      display: 'inline-flex',
+                      // A small control select in the dialog.
+                      ...(isCard && {
+                        margin: '0 2px',
+                        padding: '0 2px',
+                        borderRadius: 7,
+                        border: '1px solid ' + theme.cardHairline,
+                        backgroundColor: theme.controlBackground,
+                      }),
+                    }}
+                    fields={[
+                      ['and', t('all')],
+                      ['or', t('any')],
+                    ]}
+                    value={conditionsOp}
+                    onChange={onChangeConditionsOp}
+                  />
+                  {{ allOrAny: '' }} of these conditions match:
+                </Trans>
+              </Text>
+
+              <ConditionsList
+                conditionsOp={conditionsOp}
+                conditions={conditions}
+                editorStyle={editorStyle}
+                isSchedule={isSchedule}
+                onChangeConditions={conds => setConditions(conds)}
+              />
+            </View>
+
+            <Text style={leadStyle}>
+              <Trans>Then apply these actions:</Trans>
+            </Text>
+            <View style={{ flex: 1 }}>
+              {actionSplits.length === 0 && (
+                <Button
+                  variant={buttonVariant}
+                  className={buttonClassName}
+                  style={{ alignSelf: 'flex-start' }}
+                  onPress={addInitialAction}
+                >
+                  <Trans>Add action</Trans>
+                </Button>
+              )}
+              <SpaceBetween
+                direction="vertical"
+                gap={10}
+                data-testid="action-split-list"
+              >
+                {actionSplits.map(({ id, actions }, splitIndex) => (
+                  <View
+                    key={id}
+                    style={{ width: '100%' }}
+                    nativeStyle={
+                      actionSplits.length > 1
+                        ? isCard
+                          ? {
+                              borderColor: theme.cardHairline,
+                              borderWidth: '1px',
+                              borderRadius: '12px',
+                              padding: '10px',
+                            }
+                          : {
+                              borderColor: theme.tableBorder,
+                              borderWidth: '1px',
+                              borderRadius: '5px',
+                              padding: '5px',
+                            }
+                        : {}
+                    }
+                  >
+                    {actionSplits.length > 1 && (
+                      <SpaceBetween
+                        gap={5}
+                        style={{
+                          justifyContent: 'space-between',
+                          ...(isCard && {
+                            alignItems: 'center',
+                            minHeight: 24,
+                            marginBottom: 8,
+                          }),
+                        }}
+                      >
+                        <Text
+                          style={
+                            isCard
+                              ? { ...dialogEyebrowStyle, paddingLeft: 2 }
+                              : {
+                                  ...styles.smallText,
+                                  marginBottom: '10px',
+                                }
+                          }
+                        >
+                          {splitIndex === 0
+                            ? t('Apply to all')
+                            : `${t('Split')} ${splitIndex}`}
+                        </Text>
+                        {splitIndex > 0 && (
+                          <Button
+                            variant={isCard ? 'control' : 'bare'}
+                            onPress={() => onRemoveSplit(splitIndex)}
+                            style={
+                              isCard
+                                ? undefined
+                                : {
+                                    width: 20,
+                                    height: 20,
+                                  }
+                            }
+                            className={
+                              isCard
+                                ? css({
+                                    ...dialogIconButtonStyle,
+                                    width: 24,
+                                    height: 24,
+                                    minWidth: 24,
+                                    minHeight: 24,
+                                  })
+                                : undefined
+                            }
+                            aria-label={t('Delete split')}
+                          >
+                            <SvgDelete
+                              style={{
+                                width: 8,
+                                height: 8,
+                                color: 'inherit',
+                              }}
+                            />
+                          </Button>
+                        )}
+                      </SpaceBetween>
+                    )}
+                    <SpaceBetween
+                      direction="vertical"
+                      gap={isCard ? 6 : 10}
+                      data-testid="action-list"
+                    >
+                      {actions.map((action, actionIndex) => (
+                        <View key={actionIndex} style={{ width: '100%' }}>
+                          <ActionEditor
+                            action={action}
+                            editorStyle={editorStyle}
+                            onChange={(name, value, extraOptions) =>
+                              onChangeAction(action, name, value, extraOptions)
+                            }
+                            onDelete={() => onRemoveAction(action)}
+                            onAdd={() =>
+                              addActionToSplitAfterIndex(
+                                splitIndex,
+                                actionIndex,
+                              )
+                            }
+                          />
+                        </View>
+                      ))}
+                    </SpaceBetween>
+
+                    {actions.length === 0 && (
+                      <Button
+                        variant={buttonVariant}
+                        className={buttonClassName}
+                        style={{ alignSelf: 'flex-start', marginTop: 5 }}
+                        onPress={() =>
+                          addActionToSplitAfterIndex(splitIndex, -1)
+                        }
+                      >
+                        <Trans>Add action</Trans>
+                      </Button>
+                    )}
+                  </View>
+                ))}
+              </SpaceBetween>
+              {showSplitButton && (
+                <Button
+                  variant={buttonVariant}
+                  className={buttonClassName}
+                  style={{ alignSelf: 'flex-start', marginTop: 15 }}
+                  onPress={() => {
+                    addActionToSplitAfterIndex(actionSplits.length, -1);
+                  }}
+                  data-testid="add-split-transactions"
+                >
+                  {actionSplits.length > 1
+                    ? t('Add another split')
+                    : t('Split into multiple transactions')}
+                </Button>
+              )}
+            </View>
+          </View>
+        </View>
+
+        <SelectedProvider instance={selectedInst}>
+          <View
+            style={{
+              padding: '20px',
+              flex: 1,
+              position: 'relative',
+              zIndex: 1,
+              ...(isCard && { padding: '14px 0 0', minHeight: 0 }),
+            }}
+          >
+            <SpaceBetween
+              gap={5}
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'nowrap',
+                justifyContent: 'space-between',
+                marginBottom: 12,
+                ...(isCard && { alignItems: 'center', marginBottom: 10 }),
+              }}
+            >
+              <Text
+                style={{
+                  color: isCard ? theme.pageTextSecondary : theme.pageTextLight,
+                  marginBottom: 0,
+                }}
+              >
+                <Trans>This rule applies to these transactions:</Trans>
+              </Text>
+
+              <Button
+                variant={buttonVariant}
+                className={buttonClassName}
+                isDisabled={selectedInst.items.size === 0}
+                onPress={onApply}
+              >
+                <Trans>Apply actions</Trans> ({selectedInst.items.size})
+              </Button>
+            </SpaceBetween>
+
+            {/* @ts-expect-error fix this */}
+            <SimpleTransactionsTable
+              transactions={transactions}
+              fields={getTransactionFields(
+                conditions,
+                getActions(actionSplits),
+              )}
+              isCard={isCard}
+              style={
+                isCard
+                  ? dialogTableCardStyle
+                  : {
+                      border: '1px solid ' + theme.tableBorder,
+                      borderRadius: '6px 6px 0 0',
+                    }
+              }
+            />
+
+            <SpaceBetween
+              style={{
+                marginTop: 20,
+                justifyContent: onDelete ? 'space-between' : 'flex-end',
+                // The footer stays in view under a hairline, as in the
+                // schedule dialog (design-decisions §10k).
+                ...(isCard && {
+                  marginTop: 16,
+                  paddingTop: 14,
+                  borderTop: '1px solid ' + theme.cardHairline,
+                }),
+              }}
+            >
+              {onDelete && (
+                <Button
+                  variant={buttonVariant}
+                  className={buttonClassName}
+                  onPress={onDelete}
+                >
+                  <Trans>Delete</Trans>
+                </Button>
+              )}
+
+              <SpaceBetween gap={isCard ? 8 : undefined}>
+                <Button
+                  variant={buttonVariant}
+                  className={buttonClassName}
+                  onPress={onCancel}
+                >
+                  <Trans>Cancel</Trans>
+                </Button>
+                <Button
+                  variant="primary"
+                  className={isCard ? css(dialogPrimaryButtonStyle) : undefined}
+                  onPress={onSave}
+                >
+                  <Trans>Save</Trans>
+                </Button>
+              </SpaceBetween>
+            </SpaceBetween>
+          </View>
+        </SelectedProvider>
+      </View>
+    </RuleDialogContext.Provider>
   );
 }

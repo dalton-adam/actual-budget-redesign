@@ -4,6 +4,7 @@ import { Trans, useTranslation } from 'react-i18next';
 
 import { SvgArrowsSynchronize } from '@actual-app/components/icons/v2';
 import { theme } from '@actual-app/components/theme';
+import { View } from '@actual-app/components/view';
 import * as monthUtils from '@actual-app/core/shared/months';
 import type { TransactionEntity } from '@actual-app/core/types/models';
 import {
@@ -12,8 +13,16 @@ import {
   parseISO,
 } from 'date-fns';
 
+import { dialogEyebrowStyle } from '#components/common/dialogStyles';
 import { FinancialText } from '#components/FinancialText';
-import { Cell, Field, Row, SelectCell, Table } from '#components/table';
+import {
+  Cell,
+  Field,
+  Row,
+  SelectCell,
+  Table,
+  TableHeader,
+} from '#components/table';
 import { DisplayId } from '#components/util/DisplayId';
 import { useAccount } from '#hooks/useAccount';
 import { useCategory } from '#hooks/useCategory';
@@ -44,6 +53,7 @@ type TransactionRowProps = {
   selected: boolean;
   format: (value: unknown, type: FormatType) => string;
   index: number;
+  isCard: boolean;
 };
 
 function TransactionRow({
@@ -52,6 +62,7 @@ function TransactionRow({
   selected,
   format,
   index,
+  isCard,
 }: TransactionRowProps) {
   const { t } = useTranslation();
 
@@ -62,6 +73,7 @@ function TransactionRow({
 
   return (
     <Row
+      height={isCard ? CARD_ROW_HEIGHT : undefined}
       style={{
         color: theme.tableText,
         backgroundColor: selected
@@ -69,6 +81,13 @@ function TransactionRow({
           : index % 2 === 0
             ? theme.tableBackground
             : theme.tableRowBackgroundAlternate,
+        // Hairline rows on the card, no stripes (design-decisions §10k).
+        ...(isCard && {
+          backgroundColor: selected
+            ? theme.selectionBackground
+            : theme.cardBackground,
+          '& > div': { borderColor: theme.cardHairline },
+        }),
       }}
     >
       <SelectCell
@@ -169,13 +188,22 @@ type SimpleTransactionsTableProps = {
   transactions: readonly TransactionEntity[];
   renderEmpty: ReactNode;
   fields?: string[];
+  /**
+   * The rule dialog's card look (design-decisions §10k, APP-06e): Eyebrow
+   * headers, 44px hairline rows. `style` then frames the card.
+   */
+  isCard?: boolean;
   style?: CSSProperties;
 };
+
+/** Row height of the card look. */
+const CARD_ROW_HEIGHT = 44;
 
 export function SimpleTransactionsTable({
   transactions,
   renderEmpty,
   fields = ['date', 'payee', 'amount'],
+  isCard = false,
   style,
 }: SimpleTransactionsTableProps) {
   const format = useFormat();
@@ -197,11 +225,106 @@ export function SimpleTransactionsTable({
           selected={selectedItems && selectedItems.has(item.id)}
           format={format}
           index={index}
+          isCard={isCard}
         />
       );
     },
-    [memoFields, selectedItems, format],
+    [memoFields, selectedItems, format, isCard],
   );
+
+  const headerFieldStyle = isCard ? dialogEyebrowStyle : undefined;
+  const headers = (
+    <>
+      <SelectCell
+        exposed
+        focused={false}
+        selected={selectedItems.size > 0}
+        width={20}
+        onSelect={e =>
+          dispatchSelected({
+            type: 'select-all',
+            isRangeSelect: e.shiftKey,
+          })
+        }
+      />
+      {fields.map((field, i) => {
+        switch (field) {
+          case 'date':
+            return (
+              <Field key={i} width={100} style={headerFieldStyle}>
+                <Trans>Date</Trans>
+              </Field>
+            );
+          case 'imported_payee':
+            return (
+              <Field key={i} width="flex" style={headerFieldStyle}>
+                <Trans>Imported payee</Trans>
+              </Field>
+            );
+          case 'payee':
+            return (
+              <Field key={i} width="flex" style={headerFieldStyle}>
+                <Trans>Payee</Trans>
+              </Field>
+            );
+          case 'category':
+            return (
+              <Field key={i} width="flex" style={headerFieldStyle}>
+                <Trans>Category</Trans>
+              </Field>
+            );
+          case 'account':
+            return (
+              <Field key={i} width="flex" style={headerFieldStyle}>
+                <Trans>Account</Trans>
+              </Field>
+            );
+          case 'notes':
+            return (
+              <Field key={i} width="flex" style={headerFieldStyle}>
+                <Trans>Notes</Trans>
+              </Field>
+            );
+          case 'amount':
+            return (
+              <Field
+                key={i}
+                width={75}
+                style={{ ...headerFieldStyle, textAlign: 'right' }}
+              >
+                <Trans>Amount</Trans>
+              </Field>
+            );
+          default:
+            return null;
+        }
+      })}
+    </>
+  );
+
+  if (isCard) {
+    return (
+      <View style={{ flex: 1, minHeight: 0, ...style }}>
+        <TableHeader
+          height={38}
+          style={{
+            backgroundColor: theme.cardBackground,
+            '& > div': { borderTopWidth: 0, borderColor: theme.cardHairline },
+          }}
+        >
+          {headers}
+        </TableHeader>
+        <Table
+          style={{ flex: 1, backgroundColor: 'transparent' }}
+          rowHeight={CARD_ROW_HEIGHT}
+          backgroundColor={theme.cardBackground}
+          items={serializedTransactions}
+          renderEmpty={renderEmpty}
+          renderItem={renderItem}
+        />
+      </View>
+    );
+  }
 
   return (
     <Table
@@ -209,70 +332,7 @@ export function SimpleTransactionsTable({
       backgroundColor={theme.tableBackground}
       items={serializedTransactions}
       renderEmpty={renderEmpty}
-      headers={
-        <>
-          <SelectCell
-            exposed
-            focused={false}
-            selected={selectedItems.size > 0}
-            width={20}
-            onSelect={e =>
-              dispatchSelected({
-                type: 'select-all',
-                isRangeSelect: e.shiftKey,
-              })
-            }
-          />
-          {fields.map((field, i) => {
-            switch (field) {
-              case 'date':
-                return (
-                  <Field key={i} width={100}>
-                    <Trans>Date</Trans>
-                  </Field>
-                );
-              case 'imported_payee':
-                return (
-                  <Field key={i} width="flex">
-                    <Trans>Imported payee</Trans>
-                  </Field>
-                );
-              case 'payee':
-                return (
-                  <Field key={i} width="flex">
-                    <Trans>Payee</Trans>
-                  </Field>
-                );
-              case 'category':
-                return (
-                  <Field key={i} width="flex">
-                    <Trans>Category</Trans>
-                  </Field>
-                );
-              case 'account':
-                return (
-                  <Field key={i} width="flex">
-                    <Trans>Account</Trans>
-                  </Field>
-                );
-              case 'notes':
-                return (
-                  <Field key={i} width="flex">
-                    <Trans>Notes</Trans>
-                  </Field>
-                );
-              case 'amount':
-                return (
-                  <Field key={i} width={75} style={{ textAlign: 'right' }}>
-                    <Trans>Amount</Trans>
-                  </Field>
-                );
-              default:
-                return null;
-            }
-          })}
-        </>
-      }
+      headers={headers}
       renderItem={renderItem}
     />
   );
