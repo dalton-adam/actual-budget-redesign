@@ -1705,3 +1705,14 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   dialog in the new frame, with Back and the title on one row; Escape
   closes it and focus returns to Help; at 375×812 the mobile budget menu
   keeps the upstream frame.
+  Linux VRT (`running-vrts` recipe: Playwright v1.61.1 image, checkout
+  mounted at its `/mnt/host` path, HTTPS dev server over the LAN address,
+  one worker, no retries): full run without updates **180 passed, 6
+  failed** (186 tests); every failure was a screenshot mismatch on a dialog:
+  Close Account, the bulk-edit date dialog, the CSV import dialog (two
+  tests), the keyboard shortcuts dialog and the column manager. Update
+  scoped to those six (`--update-snapshots=changed`): **27 snapshots
+  changed** (`b31f33d66`), each reviewed as the new frame only; re-run
+  without updates **6/6**. No mobile snapshot changed. **Not run:** custom
+  theme in the app, 1000×700, light and midnight in the dev server, and the
+  desktop build.
