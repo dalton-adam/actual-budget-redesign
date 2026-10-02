@@ -17,7 +17,7 @@ export const menuRowStyle: CSSProperties = {
   textDecoration: 'none',
   cursor: 'pointer',
   userSelect: 'none',
-  ':hover': { backgroundColor: theme.menuItemBackgroundHover },
+  ':hover': { backgroundColor: theme.tableRowHover },
   ':focus-visible': { ...styles.focusRing, outlineOffset: -2 },
 };
 
@@ -38,12 +38,12 @@ export const menuSectionLabelStyle: CSSProperties = {
 export const menuDividerStyle: CSSProperties = {
   height: 1,
   margin: '6px 4px',
-  backgroundColor: theme.menuBorder,
+  backgroundColor: theme.cardHairline,
   flexShrink: 0,
 };
 
+// The frame (card, hairline, 12px radius, popover shadow) comes from the
+// shared Popover; the panel only adds its inset.
 export const menuPanelStyle: CSSProperties = {
-  ...styles.popover,
   padding: 6,
-  borderRadius: 12,
 };

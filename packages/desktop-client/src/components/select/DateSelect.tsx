@@ -33,7 +33,6 @@ import {
 } from '@actual-app/components/icons/v1';
 import { Input } from '@actual-app/components/input';
 import { Popover } from '@actual-app/components/popover';
-import { styles } from '@actual-app/components/styles';
 import type { CSSProperties } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -455,7 +454,6 @@ function DateSelectDesktop({
         isOpen={open}
         isNonModal
         onOpenChange={() => setOpen(false)}
-        style={styles.popover}
         data-testid="date-select-tooltip"
       >
         {content}

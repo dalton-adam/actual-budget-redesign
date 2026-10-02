@@ -4,7 +4,9 @@ import { Popover as ReactAriaPopover } from 'react-aria-components';
 
 import { css } from '@emotion/css';
 
+import { useResponsive } from './hooks/useResponsive';
 import { styles } from './styles';
+import { theme } from './theme';
 
 type PopoverProps = ComponentProps<typeof ReactAriaPopover>;
 
@@ -14,6 +16,7 @@ export const Popover = ({
   ...props
 }: PopoverProps) => {
   const ref = useRef<HTMLElement>(null);
+  const { isNarrowWidth } = useResponsive();
 
   const handleFocus = useCallback(
     (e: FocusEvent) => {
@@ -44,6 +47,14 @@ export const Popover = ({
         ...styles.lightScrollbar,
         padding: 0,
         userSelect: 'none',
+        ...(!isNarrowWidth && {
+          borderWidth: 1,
+          borderColor: theme.cardHairline,
+          borderRadius: 12,
+          backgroundColor: theme.cardBackground,
+          color: theme.pageText,
+          boxShadow: theme.popoverShadow,
+        }),
         ...style,
       })}
       shouldCloseOnInteractOutside={element => {
