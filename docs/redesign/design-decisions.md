@@ -675,6 +675,28 @@ questions to the implementer, who chose:
 - The Category Learning dialog and the merge confirmation keep the upstream
   look until APP-06.
 
+## 10d. Rules (APP-05b)
+
+**APP-05b (approved October 1, 2026):** drawn in the prototype (Page →
+Rules; shots `87`–`92`, prototype README). The owner left the open
+questions to the implementer, who chose:
+
+- Create new rule (primary, plus icon, label at every width) and, while
+  rules are selected, Delete N rules sit in one toolbar above the table with
+  the filter at the right. The intro sentence sits under the title in
+  Secondary text. The footer leaves the page.
+- The table is a Surface card with an Eyebrow header, hairline dividers and
+  rows at least 44px; selected rows on the selection tint. The stage is a
+  neutral pill.
+- Condition and action chips on the desktop rows: Card Inset with a
+  hairline, the field in text colour 600, the operator Secondary, the value
+  in the accent 600, "and" Faint. This is an opt-in prop, so the mobile list
+  and the filter chips keep upstream's look. Split groups are hairline boxes
+  with an Eyebrow label.
+- The payee rules dialog (same list) gets the new rows and chips but keeps
+  its own header, intro, filter and footer layout.
+- The rule editor keeps the upstream look until APP-06.
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the

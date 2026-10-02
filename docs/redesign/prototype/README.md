@@ -475,7 +475,12 @@ Regenerate with `node scripts/redesign-prototype-shots.cjs --app-05a`
 
 ## APP-05b: Rules proposal (October 1, 2026)
 
-**Status: drawn, awaiting owner review.** Choose **Page → Rules** (or More →
+**Status: approved October 1, 2026.** The owner left the four questions
+below to the implementer, who chose: Create new rule moves to the toolbar
+(question 1); the desktop chips are restyled through an opt-in prop (question
+2); the payee rules dialog gets the new rows and chips but keeps its own
+layout and footer (question 3); the rule editor waits for APP-06 (question 4).
+Choose **Page → Rules** (or More →
 Rules). URL parameters: `rusel=0|1` (two rules selected), `ruempty=0|1` (no
 match), and for screenshots `rufilter`, `ruhover`, `rumenu` (a row's context
 menu).
