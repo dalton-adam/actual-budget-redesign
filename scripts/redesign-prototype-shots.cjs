@@ -1,12 +1,13 @@
 // Screenshots of the static redesign prototype (docs/redesign/prototype).
 // Usage: node scripts/redesign-prototype-shots.cjs [--design-01 | --app-03 | --app-03c | --app-03d | --app-04 |
-//   --app-05a | --app-05b | --app-05c | --app-05d]
+//   --app-05a | --app-05b | --app-05c | --app-05d | --app-06a]
 // Default: the DESIGN-02 set (18+). --design-01 regenerates 01-17 from the
 // current prototype with the fixture and row height they were taken with.
 // --app-03 takes the Reports proposal (51+); --app-03c the custom report,
 // Calendar and Formula proposal (59+); --app-03d Monte Carlo (67+);
 // --app-04 Schedules (73+); --app-05a Payees (80+); --app-05b Rules (87+);
-// --app-05c Tags (93+); --app-05d Settings (101+).
+// --app-05c Tags (93+); --app-05d Settings (101+); --app-06a the shared
+// dialog frame (108+).
 const { chromium } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
@@ -288,6 +289,36 @@ const app05c = [
 ];
 
 const st = 'page=settings';
+const dl = 'data=basic&density=44&page=budget';
+const app06a = [
+  ['108-dialog-close-dark-wide', W, H, `${dl}&theme=dark&dlg=close`],
+  [
+    '109-dialog-close-today-dark-wide',
+    W,
+    H,
+    `${dl}&theme=dark&dlg=close&dlgold=1`,
+  ],
+  [
+    '110-dialog-confirm-light-1000',
+    w,
+    h,
+    'data=basic&page=account&theme=light&pane=collapsed&dlg=confirm',
+  ],
+  [
+    '111-dialog-confirm-today-light-1000',
+    w,
+    h,
+    'data=basic&page=account&theme=light&pane=collapsed&dlg=confirm&dlgold=1',
+  ],
+  [
+    '112-dialog-group-midnight-wide-focus',
+    W,
+    H,
+    `${dl}&theme=midnight&dlg=group&dlgx=focus`,
+  ],
+  ['113-dialog-loading-light-wide', W, H, `${dl}&theme=light&dlg=loading`],
+  ['114-dialog-close-custom-theme-wide', W, H, `${dl}&theme=custom&dlg=close`],
+];
 const app05d = [
   ['101-settings-dark-wide', W, H, `${st}&theme=dark`],
   ['102-settings-light-1000', w, h, `${st}&theme=light&pane=collapsed`],
@@ -319,23 +350,25 @@ const app05d = [
   fs.mkdirSync(out, { recursive: true });
   const shots = process.argv.includes('--design-01')
     ? design01
-    : process.argv.includes('--app-05d')
-      ? app05d
-      : process.argv.includes('--app-05c')
-        ? app05c
-        : process.argv.includes('--app-05b')
-          ? app05b
-          : process.argv.includes('--app-05a')
-            ? app05a
-            : process.argv.includes('--app-04')
-              ? app04
-              : process.argv.includes('--app-03d')
-                ? app03d
-                : process.argv.includes('--app-03c')
-                  ? app03c
-                  : process.argv.includes('--app-03')
-                    ? app03
-                    : design02;
+    : process.argv.includes('--app-06a')
+      ? app06a
+      : process.argv.includes('--app-05d')
+        ? app05d
+        : process.argv.includes('--app-05c')
+          ? app05c
+          : process.argv.includes('--app-05b')
+            ? app05b
+            : process.argv.includes('--app-05a')
+              ? app05a
+              : process.argv.includes('--app-04')
+                ? app04
+                : process.argv.includes('--app-03d')
+                  ? app03d
+                  : process.argv.includes('--app-03c')
+                    ? app03c
+                    : process.argv.includes('--app-03')
+                      ? app03
+                      : design02;
   // PW_CHANNEL=msedge uses an installed browser instead of Playwright's.
   const b = await chromium.launch(
     process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {},

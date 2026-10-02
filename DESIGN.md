@@ -269,10 +269,10 @@ This is a hybrid of hairlines and soft lift. Structure comes first from hairline
 
 - **Card elevation** (`cardElevation`: `0 1px 2px rgba(15,15,30,.04), 0 10px 28px rgba(15,15,30,.05)` in light): surface cards — the summary cards, the details panel, and the account hero and balance chart cards (approved with design-decisions §10).
 - **Active tab** (`navActiveShadow`: `0 1px 3px rgba(15,15,30,.12)`): the selected pill tab lifting out of its track.
-- **Popover** (`popoverShadow`: `0 16px 40px rgba(15,15,30,.16), 0 2px 6px rgba(15,15,30,.06)`): menus, popovers and the Ready to Assign breakdown.
+- **Popover** (`popoverShadow`: `0 16px 40px rgba(15,15,30,.16), 0 2px 6px rgba(15,15,30,.06)`): menus, popovers, the Ready to Assign breakdown and desktop dialogs (APP-06a).
 - **Hero glow** (`heroGlow` / `heroGlowNegative`): a soft positive or negative wash behind the Ready to Assign card. It is absent at zero.
 - **Page glow** (`pageGlow`: a 7% purple radial gradient at the top left): approved and defined in all three themes, but not applied anywhere yet. Whichever task applies it must check text contrast over it in every theme.
-- **Scrim** (`scrim`): behind the details-panel overlay below 900px.
+- **Scrim** (`scrim`): behind the details-panel overlay below 900px and behind desktop dialogs.
 
 ### Named Rules
 
@@ -346,6 +346,10 @@ The custom report editor (APP-03c) puts its toolbar above two cards. The chart c
 ### Settings Page
 
 The Settings page (APP-05d) is one 720px column at the page's left margin under the Display title. Each setting is a Surface card **without** elevation (18px 20px padding, 12px apart): the explanation in Secondary text with its bold lead term in Page Text, then the controls under a Card Hairline divider. Select labels are Eyebrow text; selects are Control buttons at least 32px tall and 170px wide; actions are Control buttons; checkboxes keep the shared checkbox with 5px corners and a Faint border. The version lines and IDs sit on Card Inset (10px radius); "You're up to date!" is a positive status pill; status text uses the pill text roles. "Show advanced settings" and the experimental-features reveal are Control buttons, and "Advanced Settings" is a Headline. Below the narrow breakpoint the page keeps the upstream look (mobile is deferred).
+
+### Dialogs
+
+Every desktop dialog (APP-06a, the shared `Modal` frame) is a Surface card with the Popover shadow: Card Hairline border, 18px radius, 18px 22px 20px padding, over the `scrim` without blur. The title is a left-aligned Headline on one line with the close button, a 30px icon button with no fill or border that takes the Row Hover wash on hover and the focus ring. `ModalButtons` sits 20px below the content; the buttons inside dialogs are still the upstream normal and primary buttons. The loading cover is Surface White with the card's radius. Each dialog's own contents keep their layout. Below the narrow breakpoint every dialog keeps the upstream frame (mobile is deferred).
 
 ### Account Hero
 

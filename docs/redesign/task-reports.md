@@ -1673,3 +1673,46 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   `e2e/settings.test.ts` (3 snapshots, now stale; the mobile ones should be
   unchanged), light, midnight and custom theme in the app, 1440×900,
   keyboard walk-through and the desktop build.
+- APP-06 split (October 1, 2026): rebuilt from source and split into 06a – f
+  (backlog "APP-06 split"); the owner approved the split and chose 06a
+  first.
+- APP-06a: branch `redesign/app-06a-dialogs`, code `2a0bf2494`. Drawing
+  approved the same day (prototype shots `108`–`114`; the owner approved the
+  popover shadow and left the title, backdrop and buttons questions to the
+  implementer, who chose the drawn option for each; design-decisions §10g).
+  **Change:** `common/Modal.tsx` only. On desktop (not `isNarrowWidth`) the
+  overlay is the `scrim` role without blur; the container is a Surface card
+  (`cardBackground`, `cardHairline` border, 18px radius, 18px 22px 20px
+  padding) with `popoverShadow`; the loading cover takes `cardBackground`,
+  the card's radius and a Secondary spinner. `ModalHeader` becomes one flex
+  row (`leftContent`, the title, `rightContent`) with a 12px bottom margin;
+  `ModalTitle` is a left-aligned Headline (18px/700, −0.3px; shrink-to-fit
+  tops out at 18px; the editing input matches); `ModalCloseButton` is the
+  `control` button with a transparent fill and border, 30px, Secondary icon,
+  the Row Hover wash on hover and the shared focus ring; `ModalButtons` sits
+  20px below the content. Below the narrow breakpoint every piece keeps the
+  upstream frame. No handler, string, test id, accessible name, focus logic,
+  hotkey scope or animation changed; the contents of every dialog are
+  untouched. `DESIGN.md` adds dialogs to the Popover and Scrim entries and a
+  Dialogs component entry. **Checks:** typecheck passes; oxlint over
+  `Modal.tsx` 0 errors; oxfmt applied; web unit tests **1052 passed, 1
+  skipped**. E2E against the dev server with the installed Edge (scratch
+  config, not committed): accounts, payees, rules, schedules, settings,
+  command-bar and help-menu **33/33**; budget, transactions, onboarding,
+  tags, bank-sync, bud-01, detail-01 – 04, nav-02, tour and reports
+  **88/88**. Impeccable detector over `Modal.tsx`: no findings. VISUAL in
+  the dev server (demo budget, dark, 1440×900): the keyboard shortcuts
+  dialog in the new frame, with Back and the title on one row; Escape
+  closes it and focus returns to Help; at 375×812 the mobile budget menu
+  keeps the upstream frame.
+  Linux VRT (`running-vrts` recipe: Playwright v1.61.1 image, checkout
+  mounted at its `/mnt/host` path, HTTPS dev server over the LAN address,
+  one worker, no retries): full run without updates **180 passed, 6
+  failed** (186 tests); every failure was a screenshot mismatch on a dialog:
+  Close Account, the bulk-edit date dialog, the CSV import dialog (two
+  tests), the keyboard shortcuts dialog and the column manager. Update
+  scoped to those six (`--update-snapshots=changed`): **27 snapshots
+  changed** (`b31f33d66`), each reviewed as the new frame only; re-run
+  without updates **6/6**. No mobile snapshot changed. **Not run:** custom
+  theme in the app, 1000×700, light and midnight in the dev server, and the
+  desktop build.

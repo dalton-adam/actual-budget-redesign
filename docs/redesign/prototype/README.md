@@ -710,3 +710,83 @@ Questions for the owner:
 
 Regenerate with `node scripts/redesign-prototype-shots.cjs --app-05d`
 (`PW_CHANNEL=msedge` uses the installed Edge).
+
+## APP-06a: shared dialog frame proposal (October 1, 2026)
+
+**Status: approved October 1, 2026.** The owner approved the popover
+shadow (question 1) and left the other three to the implementer, who chose
+the drawn option for each: left-aligned Headline title (question 2), the
+`scrim` backdrop (question 3) and upstream buttons inside dialogs for now
+(question 4). Choose any page,
+then **App dialog** in the prototype controls (Confirm, Close account, New
+group, Loading); **Frame → Today** draws today's frame over the same
+contents for comparison. URL parameters: `dlg=confirm|close|group|loading`,
+`dlgold=0|1`, `dlgx=hover|focus` (the close button's state). The "Today"
+frame is an approximation in the prototype's palette, not a screenshot of
+the app.
+
+Source traced for the brief: every desktop and mobile dialog renders inside
+`Modal` in `C/common/Modal.tsx` (react-aria `ModalOverlay` / `Modal` /
+`Dialog`): the backdrop (`blur(1px) brightness(0.9)`, or 40% black when
+narrow), the container (`modalBackground`, 6px radius, 10px padding,
+`shadowLarge`, min width 512px, max 90vw and 90% of the viewport height),
+the `isLoading` cover (`pageBackground` with `AnimatedLoading`) and the open
+animation. The same file holds `ModalHeader` (a 60px `h1` row with the title
+centred and `leftContent` / `rightContent` absolutely placed), `ModalTitle`
+(25px/700, optionally editable or shrink-to-fit), `ModalCloseButton` (a bare
+button with a 10px ✕) and `ModalButtons` (a row with a 30px top margin). 80
+files use `ModalHeader` and 12 use `ModalButtons`; most dialogs lay out their
+own Cancel / confirm buttons with the shared `Button`. The mobile menus
+(`EnvelopeBudgetMenuModal`, `AccountMenuModal`, the autocomplete modals and
+others) use the same frame, so the restyle must be gated on `isNarrowWidth`
+to keep mobile on the upstream look (plan §19.4). No unit test covers the
+frame; E2E page models find dialogs by `data-testid="<name>-modal"` and by
+role and accessible name (`Close`), which stay. Dialogs appear in many VRT
+files (accounts, transactions, schedules, payees, rules, budget, onboarding),
+so 06a will change snapshots across several suites.
+
+What the drawing proposes (frame only; each item is presentation only):
+
+| Surface         | Today                                                  | Proposed                                                                                         |
+| --------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| Backdrop        | `blur(1px) brightness(0.9)`                            | The `scrim` role (already behind the details-panel overlay), no blur                             |
+| Container       | `modalBackground`, 6px radius, no border, 10px padding | Surface card: `cardBackground`, Card Hairline border, 18px radius, 18px 22px 20px padding        |
+| Elevation       | `shadowLarge` (hard-coded black)                       | `popoverShadow`, as menus and popovers (needs owner approval: the Approved-Depth-Only Rule)      |
+| Title           | 25px/700, centred in a 60px row                        | Headline (18px/700, −0.3px), left-aligned, one line with ellipsis; `leftContent` sits before it  |
+| Close button    | Bare button, 10px ✕                                    | 30px icon button, 9px radius, Secondary icon, Row Hover wash on hover, 2px focus ring            |
+| Button row      | `ModalButtons` 30px above                              | 20px above; the buttons themselves unchanged                                                     |
+| Loading cover   | `pageBackground`, square corners over a rounded box    | `cardBackground` with the card's radius; spinner in Secondary; spins only without reduced motion |
+| Contents        | Per dialog                                             | Unchanged: text, fields, upstream buttons and each dialog's own layout                           |
+| Narrow / mobile | Upstream                                               | Unchanged                                                                                        |
+
+Unchanged by design: every dialog's contents, strings, handlers, focus
+management (`InitialFocus`, `focusButton`), Escape and click-outside
+closing, the hotkey scope, `data-testid`s, accessible names, the modal stack
+and the open animation's timing. The rule editor, Category Learning, the
+payee merge confirmation and the Find / link schedules dialogs get the new
+frame here but keep their inner layouts until APP-06e.
+
+Questions for the owner:
+
+1. **Elevation:** give dialogs the popover shadow (drawn), or a hairline
+   only? (Dialogs are not on the approved depth list yet.)
+2. **Title:** left-aligned Headline beside the close button (drawn), or
+   keep the title centred at a smaller size?
+3. **Backdrop:** the `scrim` dim without blur (drawn), or keep today's blur
+   and brightness?
+4. **Buttons inside dialogs:** keep the upstream normal / primary buttons in
+   06a (drawn; the frame alone changes 80 files' look), or also move dialog
+   buttons to the Control style later, in APP-06e?
+
+| File                                             | Shows                                                 |
+| ------------------------------------------------ | ----------------------------------------------------- |
+| `shots/108-dialog-close-dark-wide.png`           | Close Account with a transfer error, dark, 1440×900   |
+| `shots/109-dialog-close-today-dark-wide.png`     | The same dialog in today's frame                      |
+| `shots/110-dialog-confirm-light-1000.png`        | Confirm Delete over the register, light, 1000×700     |
+| `shots/111-dialog-confirm-today-light-1000.png`  | The same dialog in today's frame                      |
+| `shots/112-dialog-group-midnight-wide-focus.png` | New Category Group, close button focused, midnight    |
+| `shots/113-dialog-loading-light-wide.png`        | The loading cover (Close Account while saving), light |
+| `shots/114-dialog-close-custom-theme-wide.png`   | Close Account in the custom theme                     |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06a`
+(`PW_CHANNEL=msedge` uses the installed Edge).

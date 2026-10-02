@@ -3955,6 +3955,205 @@
       .sch-menu div:first-child {
         background: var(--tableRowHover);
       }
+      /* APP-06a: the shared dialog frame (common/Modal.tsx). .old draws
+         today's frame for comparison. */
+      .adlg-scrim {
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--scrim);
+      }
+      .adlg-scrim.old {
+        background: transparent;
+        backdrop-filter: blur(1px) brightness(0.9);
+      }
+      .adlg {
+        position: relative;
+        min-width: 512px;
+        max-width: 90vw;
+        max-height: 90vh;
+        overflow: auto;
+        background: var(--cardBackground);
+        border: 1px solid var(--cardBorder);
+        border-radius: 18px;
+        box-shadow: var(--popoverShadow);
+        padding: 18px 22px 20px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--pageText);
+      }
+      .adlg.wide {
+        width: 30vw;
+      }
+      .adlg-h {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 32px;
+        margin-bottom: 12px;
+      }
+      .adlg-h h1 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        line-height: 1.25;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .adlg-x {
+        margin-left: auto;
+        width: 30px;
+        height: 30px;
+        flex: none;
+        display: grid;
+        place-items: center;
+        border-radius: 9px;
+        border: 0;
+        background: transparent;
+        color: var(--pageTextSubdued);
+      }
+      .adlg-x:hover,
+      .adlg-x.hover {
+        background: var(--tableRowHover);
+        color: var(--pageText);
+      }
+      .adlg-x.focus {
+        outline: 2px solid var(--selectionBorder);
+        outline-offset: 2px;
+      }
+      .adlg p {
+        margin: 0 0 12px;
+      }
+      .adlg .small {
+        font-size: 12px;
+        margin-bottom: 12px;
+      }
+      .adlg .small a {
+        color: var(--pillNegativeText);
+        text-decoration: underline;
+      }
+      .adlg .ferr {
+        color: var(--pillNegativeText);
+        font-size: 13px;
+        margin: 6px 0 12px;
+      }
+      .adlg-btns {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .adlg-btns.center {
+        justify-content: center;
+        margin-top: 10px;
+      }
+      /* Upstream Button (normal / primary), unchanged by 06a */
+      .ubtn {
+        padding: 5px 10px;
+        border-radius: 4px;
+        border: 1px solid var(--cardBorder);
+        background: var(--controlBackground);
+        color: var(--pageText);
+        font-size: 13px;
+        font-weight: 400;
+      }
+      .ubtn.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      [data-theme='dark'] .ubtn.primary,
+      [data-theme='midnight'] .ubtn.primary {
+        color: #16101f;
+      }
+      .ubtn.tall {
+        height: 40px;
+        padding: 0 16px;
+      }
+      .uin {
+        height: 30px;
+        border-radius: 4px;
+        border: 1px solid var(--cardBorder);
+        background: var(--controlBackground);
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        color: var(--pageTextFaint);
+        font-size: 13px;
+      }
+      .uin.err {
+        border-color: var(--pillNegativeText);
+      }
+      .adlg-load {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: var(--cardBackground);
+        border-radius: inherit;
+        color: var(--pageTextSubdued);
+      }
+      .adlg-load svg {
+        width: 22px;
+        height: 22px;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .adlg-load svg {
+          animation: adlg-spin 0.9s linear infinite;
+        }
+      }
+      @keyframes adlg-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      /* Today's frame */
+      .adlg.old {
+        border: 0;
+        border-radius: 6px;
+        box-shadow:
+          0 15px 30px 0 rgba(0, 0, 0, 0.11),
+          0 5px 15px 0 rgba(0, 0, 0, 0.08);
+        padding: 10px;
+      }
+      .adlg.old .adlg-h {
+        position: relative;
+        justify-content: center;
+        height: 60px;
+        margin: 0;
+      }
+      .adlg.old .adlg-h h1 {
+        font-size: 25px;
+        letter-spacing: 0;
+        text-align: center;
+        width: calc(100% - 60px);
+      }
+      .adlg.old .adlg-x {
+        position: absolute;
+        right: 0;
+        width: 30px;
+        border-radius: 4px;
+      }
+      .adlg.old .adlg-x svg {
+        width: 10px;
+        height: 10px;
+      }
+      .adlg.old .adlg-btns {
+        margin-top: 30px;
+      }
+      .adlg.old .adlg-btns.center {
+        margin-top: 10px;
+      }
+      .adlg.old .adlg-load {
+        border-radius: 6px;
+        background: var(--pageBackground);
+      }
       /* Schedule dialog */
       .sdlg-scrim {
         position: fixed;
@@ -4939,6 +5138,11 @@
         sauto: params.get('sauto') === '1',
         sserver: params.get('sserver') === '1',
         stmenu: params.get('stmenu') || '',
+        // APP-06a: a dialog over any page (confirm, close, group, loading),
+        // today's frame for comparison, and the close button's state.
+        dlg: params.get('dlg') || '',
+        dlgold: params.get('dlgold') === '1',
+        dlgx: params.get('dlgx') || '',
         // Accounts pane: open or collapsed (device-local). Default: open at
         // 1280px and wider, collapsed below.
         pane:
@@ -6400,6 +6604,52 @@
         }
         return '';
       }
+      // APP-06a proposal: the shared dialog frame (common/Modal.tsx). The
+      // contents are four real dialogs with their upstream strings and
+      // upstream buttons; only the frame (scrim, card, header, close button,
+      // button spacing, loading cover) is proposed.
+      function appDialog() {
+        const old = state.dlgold;
+        const x = `<button class="adlg-x ${
+          state.dlgx === 'hover'
+            ? 'hover'
+            : state.dlgx === 'focus'
+              ? 'focus'
+              : ''
+        }" data-set="dlg" data-val="" aria-label="Close">${
+          old
+            ? '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M11.4 10l5.3-5.3-1.4-1.4L10 8.6 4.7 3.3 3.3 4.7 8.6 10l-5.3 5.3 1.4 1.4 5.3-5.3 5.3 5.3 1.4-1.4z"/></svg>'
+            : I.x
+        }</button>`;
+        const head = t => `<div class="adlg-h"><h1>${t}</h1>${x}</div>`;
+        const spinner =
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-9-9"/></svg>';
+        let body;
+        let cls = '';
+        if (state.dlg === 'confirm') {
+          body = `${head('Confirm Delete')}
+            <p>Are you sure you want to delete these 3 transactions?</p>
+            <div class="adlg-btns" style="margin-top:0"><button class="ubtn">Cancel</button><button class="ubtn primary">Delete</button></div>`;
+        } else if (state.dlg === 'close' || state.dlg === 'loading') {
+          cls = 'wide';
+          body = `${head('Close Account')}
+            <p>Are you sure you want to close <strong>Savings</strong>? This account has transactions so we can't permanently delete it.</p>
+            <p>This account has a balance of <strong class="num">6,800.00</strong>. To close this account, select a different account to transfer this balance to:</p>
+            <div class="uin err">Select account...</div>
+            <div class="ferr">Transfer is required</div>
+            <div class="small">You can also <a>force close</a> the account which will delete it and all its transactions permanently. Doing so may change your budget unexpectedly since money in it may vanish.</div>
+            <div class="adlg-btns" style="margin-top:0"><button class="ubtn">Cancel</button><button class="ubtn primary">Close Account</button></div>
+            ${state.dlg === 'loading' ? `<div class="adlg-load" role="status" aria-label="Loading">${spinner}</div>` : ''}`;
+        } else {
+          body = `${head('New Category Group')}
+            <div class="uin">Category group name</div>
+            <div class="adlg-btns center"><button class="ubtn primary tall">Add</button></div>`;
+        }
+        return `<div class="adlg-scrim ${old ? 'old' : ''}"><div class="adlg ${cls} ${
+          old ? 'old' : ''
+        }" role="dialog" aria-modal="true">${body}</div></div>`;
+      }
+
       function anchoredMenu() {
         const body = menuBody();
         return body
@@ -6472,6 +6722,23 @@
                 }" data-set="${key}" data-val="${v}">${l}</button>`,
             )
             .join('')}</div>`;
+        const dialog = [
+          grp('App dialog', 'dlg', [
+            ['', 'Off'],
+            ['confirm', 'Confirm'],
+            ['close', 'Close account'],
+            ['group', 'New group'],
+            ['loading', 'Loading'],
+          ]),
+          ...(state.dlg
+            ? [
+                grp('Frame', 'dlgold', [
+                  [false, 'Proposed'],
+                  [true, 'Today'],
+                ]),
+              ]
+            : []),
+        ];
         const common = [
           grp('Page', 'page', [
             ['budget', 'Budget'],
@@ -6647,7 +6914,7 @@
           settings: stg,
         }[state.page];
         return `<div class="proto" aria-label="Prototype controls">
-      ${[...common, ...pageGroups, pin].join('')}
+      ${[...common, ...pageGroups, pin, ...dialog].join('')}
       <div class="grp"><button data-reload title="Reload with the fixture's original amounts">Reset</button></div>
     </div>`;
       }
@@ -9387,6 +9654,7 @@
       </div>
       ${drawer()}
       ${anchoredMenu()}
+      ${state.dlg ? appDialog() : ''}
       ${controls()}`;
         placeAnchored();
         const ruMenu = document.querySelector('.ru-table .pay-menu');
@@ -9470,6 +9738,12 @@
         u.searchParams.set('recon', state.recon);
         u.searchParams.set('rview', state.rview);
         u.searchParams.set('redit', state.redit ? '1' : '0');
+        if (state.dlg) {
+          u.searchParams.set('dlg', state.dlg);
+          u.searchParams.set('dlgold', state.dlgold ? '1' : '0');
+        } else {
+          for (const k of ['dlg', 'dlgold', 'dlgx']) u.searchParams.delete(k);
+        }
         if (state.rview === 'custom') {
           u.searchParams.set('rgraph', state.rgraph);
           for (const k of ['rlegend', 'rsummary', 'rlabels'])

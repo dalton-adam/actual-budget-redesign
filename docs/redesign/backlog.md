@@ -52,7 +52,8 @@ Budget header are reference material, not tasks to build.
 | APP-05b            | verified    | `3cbc474b6`              | Linux VRT regenerated (6). Custom theme, keyboard, privacy, 1000×700 passed (verification.md); desktop not run.                |
 | APP-05c            | verified    | `51cfe0733`, `07d3214fa` | New Tags E2E (11) and Linux VRT (9). Custom theme, 1000×700, keyboard passed (verification.md); desktop not run.               |
 | APP-05d            | verified    | `a1f4d90b6`, `08ea741bb` | Linux VRT regenerated (3). Themes, custom theme, keyboard passed (verification.md); desktop not run.                           |
-| APP-06             | not started | —                        | File list must be rebuilt from source before it starts (see rule below).                                                       |
+| APP-06a            | review      | `2a0bf2494`, `b31f33d66` | Linux VRT regenerated (27). E2E 121/121; custom theme, 1000×700 and desktop not run (task-reports.md).                         |
+| APP-06b – f        | not started | —                        | Split October 1, 2026 (below). Each file list is rebuilt from source before it starts.                                         |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                              |
 
 States follow plan §16: not started, ready, in progress, review, verified,
@@ -86,9 +87,27 @@ does not claim Claude's prototype is production-ready.
    Merged October 1, 2026. ~~Then **APP-04**~~ Merged
    October 1, 2026. ~~Then **APP-05a**~~ Merged October 1, 2026. ~~Then **APP-05b**~~ Merged October 1, 2026. ~~Then **APP-05c**~~ Merged
    October 1, 2026. ~~Then **APP-05d**~~ Merged
-   October 1, 2026. Then **APP-06**, then QA-01 and RELEASE-01.
+   October 1, 2026. Then **APP-06** (split into 06a – f; 06a drawing approved
+   October 1), then QA-01 and RELEASE-01.
 
 The review's reasoning is in plan §19.
+
+### APP-06 split (owner-approved October 1, 2026)
+
+Rebuilt from source on October 1, 2026: the shared dialog frame, menus,
+popovers, toasts and the error screens are all still upstream, and earlier
+tasks left a set of dialogs and small accessibility gaps for APP-06. One
+surface per sub-task, each drawn for approval first. 06a goes first because
+06e's dialogs sit inside its frame.
+
+| ID      | Surface                                                                                                       | Main files                                                                                                                                           |
+| ------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| APP-06a | Shared dialog frame: backdrop, card, title, close button, button row, loading cover. Desktop only             | `C/common/Modal.tsx`                                                                                                                                 |
+| APP-06b | Menus and popovers                                                                                            | `L/Menu.tsx`, `L/Popover.tsx`, `C/ContextMenu.tsx`                                                                                                   |
+| APP-06c | Toasts                                                                                                        | `C/Notifications.tsx`                                                                                                                                |
+| APP-06d | Loading, error and empty states                                                                               | `C/FatalError.tsx`, `C/FeatureErrorFallback.tsx`, `C/reports/LoadingIndicator.tsx`                                                                   |
+| APP-06e | Dialogs with their own layouts: rule editor, Category Learning, payee merge, Find schedules and link-schedule | `C/modals/EditRuleModal.tsx`, the `C/rules/` editor, `C/payees/CategoryLearning.tsx`, `C/modals/ConfirmPayeesMergeModal.tsx`, `C/schedules/` dialogs |
+| APP-06f | Accessibility leftovers: shared table container focus ring, `CellButton` button role, custom-theme installer  | `C/table.tsx`, `C/settings/ThemeInstaller.tsx`                                                                                                       |
 
 ### Open owner decisions
 

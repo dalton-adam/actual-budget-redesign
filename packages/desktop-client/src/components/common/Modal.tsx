@@ -94,7 +94,8 @@ export const Modal = ({
                 backgroundColor: 'rgba(0, 0, 0, 0.4)',
               }
             : {
-                backdropFilter: 'blur(1px) brightness(0.9)',
+                // Redesign (design-decisions §10g): the scrim, no blur.
+                backgroundColor: theme.scrim,
               }),
           ...style,
         }}
@@ -142,6 +143,15 @@ export const Modal = ({
                     },
                     overflowY: 'auto',
                     ...styles.shadowLarge,
+                    // Redesign (design-decisions §10g): a Surface card with
+                    // the popover shadow. Mobile keeps the upstream frame.
+                    ...(!isNarrowWidth && {
+                      padding: '18px 22px 20px',
+                      borderRadius: 18,
+                      border: `1px solid ${theme.cardHairline}`,
+                      backgroundColor: theme.cardBackground,
+                      boxShadow: theme.popoverShadow,
+                    }),
                     ...containerProps?.style,
                   }}
                 >
@@ -160,7 +170,10 @@ export const Modal = ({
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        backgroundColor: theme.pageBackground,
+                        backgroundColor: isNarrowWidth
+                          ? theme.pageBackground
+                          : theme.cardBackground,
+                        borderRadius: isNarrowWidth ? undefined : 18,
                         alignItems: 'center',
                         justifyContent: 'center',
                         zIndex: 1000,
@@ -168,7 +181,9 @@ export const Modal = ({
                     >
                       <AnimatedLoading
                         style={{ width: 20, height: 20 }}
-                        color={theme.pageText}
+                        color={
+                          isNarrowWidth ? theme.pageText : theme.pageTextSubdued
+                        }
                       />
                     </View>
                   )}
@@ -275,6 +290,7 @@ export const ModalButtons = ({
   focusButton = false,
   children,
 }: ModalButtonsProps) => {
+  const { isNarrowWidth } = useResponsive();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -294,7 +310,7 @@ export const ModalButtons = ({
       innerRef={containerRef}
       style={{
         flexDirection: 'row',
-        marginTop: 30,
+        marginTop: isNarrowWidth ? 30 : 20,
         ...style,
       }}
     >
@@ -319,6 +335,41 @@ export function ModalHeader({
   rightContent,
 }: ModalHeaderProps) {
   const { t } = useTranslation();
+  const { isNarrowWidth } = useResponsive();
+
+  if (!isNarrowWidth) {
+    // Redesign (design-decisions §10g): one row with the title on the left
+    // and the close button at the right.
+    return (
+      <h1
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 10,
+          minHeight: 32,
+          flex: 'none',
+          margin: '0 0 12px',
+          padding: 0,
+        }}
+      >
+        {leftContent}
+        <View style={{ flex: 1, minWidth: 0 }}>
+          {showLogo && (
+            <SvgLogo aria-label={t('Modal logo')} width={30} height={30} />
+          )}
+          {title &&
+            (typeof title === 'string' || typeof title === 'number' ? (
+              <ModalTitle title={`${title}`} />
+            ) : (
+              title
+            ))}
+        </View>
+        {rightContent}
+      </h1>
+    );
+  }
+
   return (
     <h1
       style={{
@@ -421,15 +472,24 @@ export function ModalTitle({
     }
   }, [isEditing]);
 
+  const { isNarrowWidth } = useResponsive();
   const style = getStyle?.(isEditing);
+  // Redesign (design-decisions §10g): a left-aligned Headline on desktop.
+  const titleStyle: CSSProperties = isNarrowWidth
+    ? { fontSize: 25, fontWeight: 700, textAlign: 'center' }
+    : {
+        fontSize: 18,
+        fontWeight: 700,
+        letterSpacing: '-0.3px',
+        lineHeight: 1.25,
+        textAlign: 'left',
+      };
 
   return isEditing ? (
     <Input
       ref={inputRef}
       style={{
-        fontSize: 25,
-        fontWeight: 700,
-        textAlign: 'center',
+        ...titleStyle,
         ...style,
       }}
       defaultValue={title}
@@ -443,7 +503,7 @@ export function ModalTitle({
     <View
       style={{
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: isNarrowWidth ? 'center' : 'flex-start',
         alignItems: 'center',
       }}
     >
@@ -451,12 +511,10 @@ export function ModalTitle({
         <AutoTextSize
           as={Text}
           minFontSizePx={15}
-          maxFontSizePx={25}
+          maxFontSizePx={isNarrowWidth ? 25 : 18}
           onClick={onTitleClick}
           style={{
-            fontSize: 25,
-            fontWeight: 700,
-            textAlign: 'center',
+            ...titleStyle,
             ...(isEditable && styles.underlinedText),
             ...style,
           }}
@@ -467,9 +525,7 @@ export function ModalTitle({
         <TextOneLine
           onClick={onTitleClick}
           style={{
-            fontSize: 25,
-            fontWeight: 700,
-            textAlign: 'center',
+            ...titleStyle,
             ...(isEditable && styles.underlinedText),
             ...style,
           }}
@@ -488,11 +544,30 @@ type ModalCloseButtonProps = {
 
 export function ModalCloseButton({ onPress, style }: ModalCloseButtonProps) {
   const { t } = useTranslation();
+  const { isNarrowWidth } = useResponsive();
   return (
     <Button
-      variant="bare"
+      variant={isNarrowWidth ? 'bare' : 'control'}
       onPress={onPress}
-      style={{ padding: '10px 10px' }}
+      style={isNarrowWidth ? { padding: '10px 10px' } : undefined}
+      className={
+        isNarrowWidth
+          ? undefined
+          : // Redesign (design-decisions §10g): a 30px icon button with the
+            // Control hover wash and focus ring, but no fill or border.
+            css({
+              width: 30,
+              height: 30,
+              padding: 0,
+              backgroundColor: 'transparent',
+              borderColor: 'transparent',
+              color: theme.pageTextSubdued,
+              '&[data-hovered]': {
+                backgroundColor: theme.tableRowHover,
+                color: theme.pageText,
+              },
+            })
+      }
       aria-label={t('Close')}
     >
       <SvgDelete width={10} style={style} />
