@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { ComponentType } from 'react';
 
 import { Block } from '@actual-app/components/block';
+import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { AnimatedLoading } from '@actual-app/components/icons/AnimatedLoading';
 import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
@@ -28,6 +29,7 @@ function LoadComponentInner<K extends string>({
 }: LoadComponentProps<K>) {
   const [Component, setComponent] = useState<ProplessComponent | null>(null);
   const [error, setError] = useState<Error | null>(null);
+  const { isNarrowWidth } = useResponsive();
 
   useEffect(() => {
     let isUnmounted = false;
@@ -68,16 +70,31 @@ function LoadComponentInner<K extends string>({
       <View
         style={{
           flex: 1,
-          gap: 20,
+          gap: isNarrowWidth ? 20 : 12,
           justifyContent: 'center',
           alignItems: 'center',
           ...styles.delayedFadeIn,
         }}
       >
         {message && (
-          <Block style={{ marginBottom: 20, fontSize: 18 }}>{message}</Block>
+          <Block
+            style={
+              isNarrowWidth
+                ? { marginBottom: 20, fontSize: 18 }
+                : {
+                    fontSize: 13.5,
+                    fontWeight: 500,
+                    color: theme.pageTextSecondary,
+                  }
+            }
+          >
+            {message}
+          </Block>
         )}
-        <AnimatedLoading width={25} color={theme.pageTextDark} />
+        <AnimatedLoading
+          width={isNarrowWidth ? 25 : 20}
+          color={isNarrowWidth ? theme.pageTextDark : theme.pageTextSecondary}
+        />
       </View>
     );
   }

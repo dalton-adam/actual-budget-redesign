@@ -1949,10 +1949,10 @@ class AccountInternal extends PureComponent<
                     ) : !loading ? (
                       <View
                         style={{
-                          color: theme.tableText,
-                          marginTop: 20,
+                          padding: '40px 0',
                           textAlign: 'center',
-                          fontStyle: 'italic',
+                          fontSize: 13,
+                          color: theme.pageTextSecondary,
                         }}
                       >
                         <Trans>No transactions</Trans>

@@ -2,6 +2,7 @@ import React from 'react';
 import { animated, useTransition } from 'react-spring';
 
 import { Block } from '@actual-app/components/block';
+import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { AnimatedLoading } from '@actual-app/components/icons/AnimatedLoading';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -16,6 +17,7 @@ type AppBackgroundProps = {
 };
 
 export function AppBackground({ isLoading }: AppBackgroundProps) {
+  const { isNarrowWidth } = useResponsive();
   const loadingText = useSelector(state => state.app.loadingText);
   const showLoading = isLoading || loadingText !== null;
   const transitions = useTransition(loadingText, {
@@ -43,10 +45,24 @@ export function AppBackground({ isLoading }: AppBackgroundProps) {
                 alignItems: 'center',
               })}
             >
-              <Block style={{ marginBottom: 20, fontSize: 18 }}>
+              <Block
+                style={
+                  isNarrowWidth
+                    ? { marginBottom: 20, fontSize: 18 }
+                    : {
+                        marginBottom: 12,
+                        fontSize: 13.5,
+                        fontWeight: 500,
+                        color: theme.pageTextSecondary,
+                      }
+                }
+              >
                 {loadingText}
               </Block>
-              <AnimatedLoading width={25} color={theme.pageText} />
+              <AnimatedLoading
+                width={isNarrowWidth ? 25 : 20}
+                color={isNarrowWidth ? theme.pageText : theme.pageTextSecondary}
+              />
             </View>
           </animated.div>
         ))}

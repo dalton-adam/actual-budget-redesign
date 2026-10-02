@@ -4,16 +4,20 @@ import { Trans, useTranslation } from 'react-i18next';
 
 import { Block } from '@actual-app/components/block';
 import { Button } from '@actual-app/components/button';
+import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { Paragraph } from '@actual-app/components/paragraph';
 import { SpaceBetween } from '@actual-app/components/space-between';
+import type { CSSProperties } from '@actual-app/components/styles';
 import { Text } from '@actual-app/components/text';
+import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import { LazyLoadFailedError } from '@actual-app/core/shared/errors';
+import { css } from '@emotion/css';
 
 import { useModalState } from '#hooks/useModalState';
 
 import { Link } from './common/Link';
-import { Modal, ModalHeader } from './common/Modal';
+import { Modal, ModalButtons, ModalHeader } from './common/Modal';
 import { Checkbox } from './forms';
 
 type AppError = Error & {
@@ -27,11 +31,25 @@ type FatalErrorProps = {
   error: unknown;
 };
 
+// Desktop bodies use the dialog's own text size; narrow keeps upstream.
+function useBodyStyle(): CSSProperties {
+  const { isNarrowWidth } = useResponsive();
+  return isNarrowWidth
+    ? { paddingBottom: 15, lineHeight: '1.5em', fontSize: 15 }
+    : { lineHeight: 1.5 };
+}
+
+const desktopLinkClassName = css({
+  textDecoration: 'underline',
+  textUnderlineOffset: 2,
+});
+
 type RenderSimpleProps = {
   error: Error | AppError;
 };
 
 function RenderSimple({ error }: RenderSimpleProps) {
+  const bodyStyle = useBodyStyle();
   let msg: ReactNode;
 
   if ('IDBFailure' in error && error.IDBFailure) {
@@ -90,29 +108,16 @@ function RenderSimple({ error }: RenderSimpleProps) {
   }
 
   return (
-    <SpaceBetween
-      direction="vertical"
-      style={{
-        paddingBottom: 15,
-        lineHeight: '1.5em',
-        fontSize: 15,
-      }}
-    >
+    <SpaceBetween direction="vertical" style={bodyStyle}>
       <Text>{msg}</Text>
     </SpaceBetween>
   );
 }
 
 function RenderLazyLoadError() {
+  const bodyStyle = useBodyStyle();
   return (
-    <SpaceBetween
-      direction="vertical"
-      style={{
-        paddingBottom: 15,
-        lineHeight: '1.5em',
-        fontSize: 15,
-      }}
-    >
+    <SpaceBetween direction="vertical" style={bodyStyle}>
       <Text>
         <Trans>
           There was a problem loading one of the chunks of the application.
@@ -126,15 +131,21 @@ function RenderLazyLoadError() {
 }
 
 function RenderUIError() {
+  const { isNarrowWidth } = useResponsive();
   return (
     <>
       <Paragraph>
         <Trans>There was an unrecoverable error in the UI. Sorry!</Trans>
       </Paragraph>
-      <Paragraph>
+      <Paragraph isLast={!isNarrowWidth}>
         <Trans>
           If this error persists, please get{' '}
-          <Link variant="external" to="https://actualbudget.org/contact">
+          <Link
+            variant="external"
+            to="https://actualbudget.org/contact"
+            linkColor={isNarrowWidth ? undefined : 'muted'}
+            className={isNarrowWidth ? undefined : desktopLinkClassName}
+          >
             in touch
           </Link>{' '}
           so it can be investigated.
@@ -193,6 +204,7 @@ function SharedArrayBufferOverride() {
 
 export function FatalError({ error: rawError }: FatalErrorProps) {
   const { t } = useTranslation();
+  const { isNarrowWidth } = useResponsive();
 
   const { modalStack } = useModalState();
   const lastModal = modalStack[modalStack.length - 1];
@@ -229,27 +241,81 @@ export function FatalError({ error: rawError }: FatalErrorProps) {
           <RenderUIError />
         )}
 
-        <Paragraph>
-          <Button onPress={() => window.Actual.relaunch()}>
-            <Trans>Restart app</Trans>
-          </Button>
-        </Paragraph>
-        <Paragraph isLast style={{ fontSize: 11 }}>
-          <Link variant="text" onClick={() => setShowError(state => !state)}>
-            <Trans>Show Error</Trans>
-          </Link>
-          {showError && (
-            <Block
-              style={{
-                marginTop: 5,
-                height: 100,
-                overflow: 'auto',
-              }}
+        {!isNarrowWidth ? (
+          <>
+            {showError && (
+              <Block
+                style={{
+                  marginTop: 12,
+                  padding: '10px 12px',
+                  maxHeight: 140,
+                  overflow: 'auto',
+                  borderRadius: 8,
+                  backgroundColor: theme.cardInset,
+                  color: theme.pageTextSecondary,
+                  fontFamily: 'monospace',
+                  fontSize: 11.5,
+                  lineHeight: 1.5,
+                  whiteSpace: 'pre',
+                  userSelect: 'text',
+                }}
+              >
+                {error.stack}
+              </Block>
+            )}
+            <ModalButtons
+              leftContent={
+                <Button
+                  variant="bare"
+                  onPress={() => setShowError(state => !state)}
+                  style={{
+                    padding: '4px 0',
+                    fontSize: 12.5,
+                    color: theme.pageTextSecondary,
+                    textDecoration: 'underline',
+                    textUnderlineOffset: 2,
+                  }}
+                >
+                  <Trans>Show Error</Trans>
+                </Button>
+              }
             >
-              {error.stack}
-            </Block>
-          )}
-        </Paragraph>
+              <Button
+                variant="primary"
+                onPress={() => window.Actual.relaunch()}
+              >
+                <Trans>Restart app</Trans>
+              </Button>
+            </ModalButtons>
+          </>
+        ) : (
+          <>
+            <Paragraph>
+              <Button onPress={() => window.Actual.relaunch()}>
+                <Trans>Restart app</Trans>
+              </Button>
+            </Paragraph>
+            <Paragraph isLast style={{ fontSize: 11 }}>
+              <Link
+                variant="text"
+                onClick={() => setShowError(state => !state)}
+              >
+                <Trans>Show Error</Trans>
+              </Link>
+              {showError && (
+                <Block
+                  style={{
+                    marginTop: 5,
+                    height: 100,
+                    overflow: 'auto',
+                  }}
+                >
+                  {error.stack}
+                </Block>
+              )}
+            </Paragraph>
+          </>
+        )}
       </View>
     </Modal>
   );
