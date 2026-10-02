@@ -1638,3 +1638,38 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   Found while writing them: View Transactions is the shared `CellButton`, a
   plain `div` with no button role, so screen readers don't announce it as a
   button (upstream; left for APP-06).
+- APP-05d: **merged October 1, 2026** into `redesign/main` (branch
+  `redesign/app-05d-settings`, code `a1f4d90b6`). Drawing approved the same
+  day (prototype shots `101`–`107`; the owner left the four questions to
+  the implementer, who chose the drawn option for each; design-decisions
+  §10f). **Change:** everything is gated on `useSettingsRedesign()` (not
+  narrow width) in `settings/UI.tsx`, so the mobile Settings screen keeps
+  the upstream look. `settings/UI.tsx`: `Setting` is a Surface card without
+  elevation, Secondary text with Page Text bold terms, controls under a
+  hairline; `Column` labels are Eyebrow; `AdvancedToggle` is a Control
+  button with a chevron (same `data-testid`) and a Headline heading; new
+  shared helpers for the status colours, select and checkbox styles and the
+  Card Inset panel. `settings/index.tsx`: Display title, 720px column with
+  12px gaps, About's version lines on Card Inset with "You're up to date!"
+  as a positive `StatusPill`, the IDs on Card Inset. `Themes.tsx`,
+  `Format.tsx`, `Currency.tsx`, `LanguageSettings.tsx`: selects pass the
+  existing `triggerVariant="control"` at 32px. `AuthSettings.tsx`,
+  `Encryption.tsx`, `BudgetTypeSettings.tsx`, `Export.tsx`, `Reset.tsx`,
+  `RepairTransactions.tsx`: Control buttons and pill text status colours.
+  `Experimental.tsx`: the reveal is a Control button (same `data-testid`),
+  checkboxes and status colours as above. `DESIGN.md` gains a Settings Page
+  entry. No handler, preference, string, test id, block order or condition
+  changed; the theme installer is untouched (APP-06). **Checks:** typecheck
+  passes; oxlint over the changed files 0 errors; oxfmt applied; web unit
+  tests **1052 passed, 1 skipped** (settings 32/32). E2E against the dev
+  server (port 3031) with the installed Edge: settings and
+  settings.mobile **3/3**; reports "balance forecast" **3/3** and
+  budget-automations.mobile **1/1** (both enable experimental features
+  through the new buttons). Impeccable detector over the changed files: no
+  findings. VISUAL in the dev server (demo budget, dark, ~800px wide):
+  cards, eyebrow labels, control selects, About pill, advanced settings and
+  the experimental list match the drawing; 375×812 keeps the upstream mobile
+  screen; no console errors. **Not run:** the Linux VRT for
+  `e2e/settings.test.ts` (3 snapshots, now stale; the mobile ones should be
+  unchanged), light, midnight and custom theme in the app, 1440×900,
+  keyboard walk-through and the desktop build.

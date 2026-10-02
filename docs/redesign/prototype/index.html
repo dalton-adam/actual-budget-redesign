@@ -18,6 +18,9 @@
   rumenu=<id> (row context menu)
   APP-05c (page=tags): tsel=0|1, tmenu=0|1, tdots=0|1, tadd=0|1, thidden=0|1, tempty=0|1,
   tfilter=<text>, thover=<id>, trow=<id> (row context menu)
+  APP-05d (page=settings): sadv=0|1 (advanced shown, scrolled to), sexp=0|1 (experimental
+  features listed), sauto=0|1 (theme follows the system), sserver=0|1 (a sync server),
+  stmenu=theme (the theme menu open)
   APP-03c: rgraph=table|bar|stacked|line|area|donut, rlegend=0|1, rsummary=0|1, rlabels=0|1
   DESIGN-02: data=basic|states|many, density=50|44|38, rta=pos|zero|neg,
   when=past|current|future, cat=<category id>, pm=<panel month>, hover=<id>, edit=<id>:<month>,
@@ -4660,6 +4663,187 @@
         font-size: 13px;
         padding: 40px 0;
       }
+      /* APP-05d: Settings page */
+      .st-main {
+        overflow: auto;
+        gap: 0;
+      }
+      .st-col {
+        width: 100%;
+        max-width: 720px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-bottom: 28px;
+      }
+      .st-col .ru-head {
+        margin-bottom: 4px;
+      }
+      .st-card {
+        background: var(--cardBackground);
+        border: 1px solid var(--cardBorder);
+        border-radius: 18px;
+        padding: 18px 20px;
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--pageTextSubdued);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .st-card strong {
+        color: var(--pageText);
+        font-weight: 600;
+      }
+      .st-card p {
+        margin: 0;
+      }
+      .st-card ul {
+        margin: 0;
+        padding-left: 1.4em;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .st-card a,
+      .st-link {
+        color: var(--accent);
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .st-card code {
+        font-size: 12px;
+        padding: 1px 5px;
+        border-radius: 5px;
+        background: var(--cardInset);
+        color: var(--pageText);
+      }
+      .st-act {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 14px 18px;
+        margin-top: 4px;
+        padding-top: 14px;
+        border-top: 1px solid var(--cardBorder);
+      }
+      .st-act.col {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .st-fld {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+      }
+      .st-fld.grow {
+        flex: 1 1 180px;
+      }
+      .st-fld > .ey,
+      .st-ey {
+        font-size: 11px;
+        font-weight: 650;
+        color: var(--pageTextFaint);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        line-height: 1.3;
+      }
+      .st-sel {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        height: 32px;
+        min-width: 170px;
+        padding: 0 10px 0 12px;
+        border-radius: 9px;
+        border: 1px solid var(--cardBorder);
+        background: var(--controlBackground);
+        color: var(--pageText);
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .st-sel .chev {
+        color: var(--pageTextSubdued);
+        display: inline-flex;
+      }
+      .st-sel.open {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      .st-card .ckl {
+        color: var(--pageText);
+        line-height: 1.3;
+      }
+      .st-card .ckl .cb {
+        margin-left: 0;
+        flex-shrink: 0;
+      }
+      .st-card .tbtn.sm:disabled,
+      .st-card .tbtn.sm.dis {
+        opacity: 0.45;
+      }
+      .st-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 24px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: var(--cardInset);
+      }
+      .st-meta .v {
+        color: var(--pageText);
+        font-weight: 600;
+        font-feature-settings: 'tnum', 'ss01', 'ss04';
+      }
+      .st-id {
+        font-feature-settings: 'tnum';
+        color: var(--pageText);
+        word-break: break-all;
+      }
+      .st-on {
+        justify-self: start;
+        align-self: center;
+      }
+      .st-warn {
+        color: var(--pillWarningText);
+      }
+      .st-err {
+        color: var(--pillNegativeText);
+      }
+      .st-adv-head {
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        color: var(--pageText);
+        margin: 14px 0 2px;
+      }
+      .st-flags {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .st-flags .sub {
+        padding-left: 23px;
+      }
+      .st-flags .fb {
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 12.5px;
+      }
+      .st-flags .st-note {
+        display: block;
+        color: var(--pillWarningText);
+        font-size: 12.5px;
+        padding-left: 23px;
+      }
+      .st-menu {
+        position: absolute;
+        z-index: 30;
+        width: 230px;
+      }
     </style>
   </head>
   <body>
@@ -4748,6 +4932,13 @@
         tfilter: params.get('tfilter') || '',
         thover: params.get('thover') || '',
         trow: params.get('trow') || '',
+        // APP-05d: advanced settings shown, experimental features listed,
+        // theme following the system, a sync server, the theme menu open.
+        sadv: params.get('sadv') === '1',
+        sexp: params.get('sexp') === '1',
+        sauto: params.get('sauto') === '1',
+        sserver: params.get('sserver') === '1',
+        stmenu: params.get('stmenu') || '',
         // Accounts pane: open or collapsed (device-local). Default: open at
         // 1280px and wider, collapsed below.
         pane:
@@ -5104,6 +5295,7 @@
               payees: 'more',
               rules: 'more',
               tags: 'more',
+              settings: 'more',
             }[state.page] || 'budget') === key
               ? 'on'
               : ''
@@ -5207,7 +5399,7 @@
         'Bank Sync',
         '<span class="amt muted">if enabled</span>',
       )}<button class="item" data-set="page" data-val="tags"><span class="ico">${I.tag}</span>Tags</button>
-      <hr>${it(I.gear, 'Settings')}
+      <hr><button class="item" data-set="page" data-val="settings"><span class="ico">${I.gear}</span>Settings</button>
     </div>`;
       }
 
@@ -6289,6 +6481,7 @@
             ['payees', 'Payees'],
             ['rules', 'Rules'],
             ['tags', 'Tags'],
+            ['settings', 'Settings'],
           ]),
           grp('Theme', 'theme', [
             ['light', 'Light'],
@@ -6425,6 +6618,24 @@
             [true, 'No tags'],
           ]),
         ];
+        const stg = [
+          grp('Advanced', 'sadv', [
+            [false, 'Hidden'],
+            [true, 'Shown'],
+          ]),
+          grp('Experimental', 'sexp', [
+            [false, 'Hidden'],
+            [true, 'Listed'],
+          ]),
+          grp('Theme pref', 'sauto', [
+            [false, 'Fixed'],
+            [true, 'System'],
+          ]),
+          grp('Server', 'sserver', [
+            [false, 'None'],
+            [true, 'Connected'],
+          ]),
+        ];
         const pageGroups = {
           budget,
           account: acct,
@@ -6433,6 +6644,7 @@
           payees: pay,
           rules: rul,
           tags: tg,
+          settings: stg,
         }[state.page];
         return `<div class="proto" aria-label="Prototype controls">
       ${[...common, ...pageGroups, pin].join('')}
@@ -8908,6 +9120,217 @@
           ${selMenu}${dotsMenu}
         </main>`;
       }
+      // APP-05d proposal: Settings page. Strings are the app's own; the
+      // budget and its IDs are fictional.
+      function settingsPage() {
+        const sel = (v, open) =>
+          `<button class="st-sel ${open ? 'open' : ''}" aria-haspopup="listbox"${
+            open ? ' data-st="theme"' : ''
+          }><span>${v}</span><span class="chev">${I.chevD}</span></button>`;
+        const fld = (label, v, open = false) =>
+          `<div class="st-fld"><span class="ey">${label}</span>${sel(v, open)}</div>`;
+        const cb = (label, on) =>
+          `<label class="ckl"><span class="cb ${on ? 'on' : ''}">${
+            on
+              ? '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>'
+              : ''
+          }</span>${label}</label>`;
+        const btn = (l, dis) =>
+          `<button class="tbtn sm ${dis ? 'dis' : ''}" ${
+            dis ? 'aria-disabled="true"' : ''
+          }>${l}</button>`;
+        const learn = '<a href="#">Learn more</a>';
+        const themeName = {
+          light: 'Light',
+          dark: 'Dark',
+          midnight: 'Midnight',
+          custom: 'Nord Frost',
+        }[state.theme];
+        const themeMenu =
+          state.stmenu === 'theme'
+            ? `<div class="pay-menu st-menu" role="listbox">${[
+                'Light',
+                'Dark',
+                'Midnight',
+                'System default',
+              ]
+                .concat(state.theme === 'custom' ? ['Nord Frost'] : [])
+                .map(
+                  l =>
+                    `<div class="mi ${l === themeName ? 'hl' : ''}" role="option">${l}</div>`,
+                )
+                .join(
+                  '',
+                )}<div style="height:1px;background:var(--cardBorder);margin:5px 4px"></div><div class="mi" role="option">Custom theme</div></div>`
+            : '';
+
+        const about = `<section class="st-card">
+          <p><strong>Actual</strong> is a super fast privacy-focused app for managing your finances.</p>
+          <div class="st-meta">
+            <span>Client version: <span class="v">v26.9.0</span></span>
+            <span>Server version: <span class="v">${state.sserver ? 'v26.9.0' : 'N/A'}</span></span>
+            <span class="pill pos st-on" style="font-size:12px;padding:3px 9px">You're up to date!</span>
+            <a class="st-link" href="#">Release Notes</a>
+          </div>
+          ${cb('Display a notification when updates are available', true)}
+        </section>`;
+
+        const themes = `<section class="st-card" style="position:relative">
+          <p><strong>Themes</strong> change the user interface colors.</p>
+          <div class="st-act">
+            ${
+              state.sauto
+                ? fld('Theme', 'System default') +
+                  fld('Light theme', 'Light') +
+                  fld(
+                    'Dark theme',
+                    state.theme === 'midnight' ? 'Midnight' : 'Dark',
+                  )
+                : fld('Theme', themeName, state.stmenu === 'theme')
+            }
+          </div>
+          ${themeMenu}
+        </section>`;
+
+        const format = `<section class="st-card">
+          <p><strong>Formatting</strong> does not affect how budget data is stored, and can be changed at any time.</p>
+          <div class="st-act">
+            ${fld('Numbers', '1,000.33')}
+            ${fld('Dates', 'MM/DD/YYYY')}
+            ${fld('First day of the week', 'Sunday')}
+            <div style="flex-basis:100%">${cb('Hide decimal places', false)}</div>
+          </div>
+        </section>`;
+
+        const lang = `<section class="st-card">
+          <p><strong>Language</strong> is the display language of all text. Please note that no warranty is provided for the accuracy or completeness of non-English translations. If you encounter a translation error, feel free to make a suggestion on <a href="#">Weblate</a>.</p>
+          <div class="st-act">${sel('System default')}</div>
+        </section>`;
+
+        const auth = state.sserver
+          ? `<section class="st-card">
+          <p><strong>Authentication method</strong> modifies how users log in to the system.</p>
+          <div class="st-act col">
+            <span>OpenID is <strong>disabled</strong></span>
+            ${btn('Start using OpenID')}
+            <span style="font-size:12.5px">OpenID is required to enable multi-user mode.</span>
+          </div>
+        </section>`
+          : '';
+
+        const enc = state.sserver
+          ? `<section class="st-card">
+          <p><strong>End-to-end encryption</strong> is not enabled. Any data on the server is still protected by the server password, but it's not end-to-end encrypted which means the server owners have the ability to read it. If you want, you can use an additional password to encrypt your data on the server. ${learn}</p>
+          <div class="st-act">${btn('Enable encryption')}</div>
+        </section>`
+          : `<section class="st-card">
+          <p><strong>End-to-end encryption</strong> is not available when running without a server. Budget files are always kept unencrypted locally, and encryption is only applied when sending data to a server. ${learn}</p>
+          <div class="st-act">${btn('Enable encryption', true)}</div>
+        </section>`;
+
+        const budgetType = `<section class="st-card">
+          <p><strong>Envelope budgeting</strong> (recommended) digitally mimics physical envelope budgeting system by allocating funds into virtual envelopes for different expenses. It helps track spending and ensure you don't overspend in any category. ${learn}</p>
+          <p>With <strong>tracking budgeting</strong>, category balances reset each month, and funds are managed using a "Saved" metric instead of "To Be Budgeted." Income is forecasted to plan future spending, rather than relying on current available funds. ${learn}</p>
+          <div class="st-act">${btn('Switch to tracking budgeting')}</div>
+        </section>`;
+
+        const exportCard = `<section class="st-card">
+          <p><strong>Export</strong> your data as a zip file containing <code>db.sqlite</code> and <code>metadata.json</code> files. It can be imported into another Actual instance by closing an open file (if any), then clicking the "Import file" button, then choosing "Actual."</p>
+          <div class="st-act">${btn('Export data')}</div>
+        </section>`;
+
+        // [label, on, sub-feature, feedback link, note]
+        const flags = [
+          ['Goal templates', true],
+          ['Subfeature: Budget automations UI', false, true, true],
+          [
+            'Rule action templating',
+            false,
+            false,
+            true,
+            'Deprecated: this feature will be removed in a future release. Use Excel formula mode (Rule formulae) instead.',
+          ],
+          [
+            'Excel formula mode (Formula cards & Rule formulas)',
+            false,
+            false,
+            true,
+          ],
+          ['Currency support', false, false, true],
+          ['Mobile calculator', false, false, true],
+          ['Sankey report', true, false, true],
+          ['Balance Forecast Report', false, false, true],
+          ['Budget Analysis Report', false, false, true],
+          ['Monte Carlo Analysis Report', true, false, true],
+          ['Enable Banking sync (EU banks)', false, false, true],
+          ['Akahu Bank Sync (NZ banks)', false, false, true],
+        ];
+        const flagList = `<div class="st-flags">${flags
+          .map(
+            ([l, on, sub, fb, note]) =>
+              `<div class="${sub ? 'sub' : ''}">${cb(
+                `<span>${l}${fb ? ' <span class="fb">(give feedback)</span>' : ''}</span>`,
+                on,
+              )}${note ? `<span class="st-note">${note}</span>` : ''}</div>`,
+          )
+          .join('')}</div>`;
+
+        const advanced = state.sadv
+          ? `<div class="st-adv-head" id="st-advanced">Advanced Settings</div>
+          <section class="st-card">
+            <p><strong>IDs</strong> are the names Actual uses to identify your budget internally. There are several different IDs associated with your budget. The Budget ID is used to identify your budget file. The Sync ID is used to access the budget on the server.</p>
+            <div class="st-meta" style="grid-template-columns:1fr">
+              <span><strong>Budget ID:</strong> <span class="st-id">My-Finances-3f2a9c1</span></span>
+              <span><strong>Sync ID:</strong> <span class="st-id">${
+                state.sserver
+                  ? '8c4e1d2a-77b0-4f5e-9a61-2d0b3c9e5f14'
+                  : '(none)'
+              }</span></span>
+            </div>
+          </section>
+          <section class="st-card">
+            <p><strong>Reset budget cache</strong> will clear all cached values for the budget and recalculate the entire budget. All values in the budget are cached for performance reasons, and if there is a bug in the cache you won't see correct values. There is no danger in resetting the cache. Hopefully you never have to do this.</p>
+            <div class="st-act">${btn('Reset budget cache')}</div>
+          </section>
+          <section class="st-card">
+            <p>${
+              state.sserver
+                ? '<strong>Reset sync</strong> will remove all local data used to track changes for syncing, and create a fresh sync ID on the server. This file on other devices will have to be re-downloaded to use the new sync ID. Use this if there is a problem with syncing and you want to start fresh.'
+                : '<strong>Reset sync</strong> is only available when syncing is enabled.'
+            }</p>
+            <div class="st-act">${btn('Reset sync', !state.sserver)}</div>
+          </section>
+          <section class="st-card">
+            <p><strong>Repair transactions</strong> if you are experiencing bugs relating to split transactions or transfers and the "Reset budget cache" button above does not help, this tool may fix them. Some examples of bugs include seeing blank payees on splits or incorrect account balances. This tool does six things:</p>
+            <ul>
+              <li>Ensures that deleted split transactions are fully deleted. In previous versions of the app, certain split transactions may appear deleted but not all of them are actually deleted. This causes the transactions list to look correct, but certain balances may be incorrect when filtering.</li>
+              <li>Sync the payee and cleared flag of a split transaction to the main or "parent" transaction, if appropriate. The payee will only be set if it currently doesn't have one.</li>
+              <li>Checks that the sum of all child transactions adds up to the total amount. If not, these will be flagged below to allow you to easily locate and fix the amounts.</li>
+              <li>Checks for any non-split transactions with erroneous split errors and removes the errors if found.</li>
+              <li>Check if you have any budget transfers that erroneously contain a category, and remove the category.</li>
+              <li>Checks for any parent transactions with a category and removes the category if found.</li>
+            </ul>
+            <div class="st-act col">${btn('Repair transactions')}<span style="color:var(--pillPositiveText);font-weight:600">No split transactions found needing repair.</span></div>
+          </section>
+          <section class="st-card">
+            <p><strong>Experimental features.</strong> These features are not fully tested and may not work as expected. THEY MAY CAUSE IRRECOVERABLE DATA LOSS. They may do nothing at all. Only enable them if you know what you are doing.</p>
+            <div class="st-act">${
+              state.sexp
+                ? flagList
+                : btn('I understand the risks, show experimental features')
+            }</div>
+          </section>`
+          : `<div>${btn(
+              `Show advanced settings <span style="display:inline-flex;color:var(--pageTextSubdued)">${I.chevD}</span>`,
+            )}</div>`;
+
+        return `<main class="main st-main">
+          <div class="st-col">
+            <div class="head ru-head"><h1>Settings</h1></div>
+            ${about}${themes}${format}${lang}${auth}${enc}${budgetType}${exportCard}${advanced}
+          </div>
+        </main>`;
+      }
       let totB = 0,
         totS = 0;
       function render() {
@@ -8950,7 +9373,9 @@
                       ? rulesPage()
                       : state.page === 'tags'
                         ? tagsPage()
-                        : `<main class="main">
+                        : state.page === 'settings'
+                          ? settingsPage()
+                          : `<main class="main">
             ${header()}
             ${summary}
             ${ledger(offs)}
@@ -8976,6 +9401,20 @@
         );
         if (tgRowMenu && tgMenuRow)
           tgRowMenu.style.top = tgMenuRow.offsetTop + 34 + 'px';
+        // Settings: the theme menu opens under its select; advanced
+        // settings scroll into view as the app does for #advanced.
+        const stMenu = document.querySelector('.st-menu');
+        const stSel = document.querySelector('[data-st="theme"]');
+        if (stMenu && stSel) {
+          const host = stMenu.offsetParent.getBoundingClientRect();
+          const r = stSel.getBoundingClientRect();
+          stMenu.style.top = r.bottom - host.top + 6 + 'px';
+          stMenu.style.left = r.left - host.left + 'px';
+        }
+        const stAdv = document.getElementById('st-advanced');
+        if (stAdv && !state.sexp) stAdv.scrollIntoView(true);
+        const stFlags = document.querySelector('.st-flags');
+        if (stFlags) stFlags.scrollIntoView({ block: 'end' });
         // Tags menus open under their toolbar buttons, right-aligned.
         for (const [menuSel, btnSel] of [
           ['.tg-sel-menu', '[data-tg="sel"]'],

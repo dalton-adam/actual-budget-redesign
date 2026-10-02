@@ -19,7 +19,13 @@ import { useSyncedPref } from '#hooks/useSyncedPref';
 import { saveSyncedPrefs } from '#prefs/prefsSlice';
 import { useDispatch } from '#redux';
 
-import { Column, Setting } from './UI';
+import {
+  Column,
+  redesignCheckboxStyle,
+  redesignSelectStyle,
+  Setting,
+  useSettingsRedesign,
+} from './UI';
 
 const dateFormats: { value: SyncedPrefs['dateFormat']; label: string }[] = [
   { value: 'MM/dd/yyyy', label: 'MM/DD/YYYY' },
@@ -35,6 +41,7 @@ export function FormatSettings() {
   const dispatch = useDispatch();
 
   const sidebar = useSidebar();
+  const isRedesign = useSettingsRedesign();
   const [_firstDayOfWeekIdx, setFirstDayOfWeekIdxPref] =
     useSyncedPref('firstDayOfWeekIdx'); // Sunday;
   const firstDayOfWeekIdx = _firstDayOfWeekIdx || '0';
@@ -82,12 +89,15 @@ export function FormatSettings() {
                 f.value,
                 String(hideFraction) === 'true' ? f.labelNoFraction : f.label,
               ])}
-              className={selectButtonClassName}
+              {...(isRedesign
+                ? { triggerVariant: 'control', style: redesignSelectStyle }
+                : { className: selectButtonClassName })}
             />
 
             <Text style={{ display: 'flex' }}>
               <Checkbox
                 id="settings-textDecimal"
+                style={isRedesign ? redesignCheckboxStyle : undefined}
                 checked={String(hideFraction) === 'true'}
                 onChange={e =>
                   setHideFractionPref(String(e.currentTarget.checked))
@@ -104,7 +114,9 @@ export function FormatSettings() {
               value={dateFormat}
               onChange={format => setDateFormatPref(format)}
               options={dateFormats.map(f => [f.value, f.label])}
-              className={selectButtonClassName}
+              {...(isRedesign
+                ? { triggerVariant: 'control', style: redesignSelectStyle }
+                : { className: selectButtonClassName })}
             />
           </Column>
 
@@ -113,7 +125,9 @@ export function FormatSettings() {
               value={firstDayOfWeekIdx}
               onChange={idx => setFirstDayOfWeekIdxPref(idx)}
               options={Object.entries(daysOfWeek)}
-              className={selectButtonClassName}
+              {...(isRedesign
+                ? { triggerVariant: 'control', style: redesignSelectStyle }
+                : { className: selectButtonClassName })}
             />
           </Column>
         </View>

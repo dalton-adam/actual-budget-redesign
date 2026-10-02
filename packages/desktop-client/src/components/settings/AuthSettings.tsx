@@ -4,7 +4,6 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '@actual-app/components/button';
 import { Label } from '@actual-app/components/label';
 import { Text } from '@actual-app/components/text';
-import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
 import { useLoginMethod, useMultiuserEnabled } from '#components/ServerContext';
@@ -12,7 +11,7 @@ import { useSyncServerStatus } from '#hooks/useSyncServerStatus';
 import { pushModal } from '#modals/modalsSlice';
 import { useDispatch } from '#redux';
 
-import { Setting } from './UI';
+import { Setting, useSettingsRedesign, useSettingsStatusColors } from './UI';
 
 export function AuthSettings() {
   const { t } = useTranslation();
@@ -21,6 +20,8 @@ export function AuthSettings() {
   const loginMethod = useLoginMethod();
   const dispatch = useDispatch();
   const serverStatus = useSyncServerStatus();
+  const isRedesign = useSettingsRedesign();
+  const statusColors = useSettingsStatusColors();
 
   // Hide the OpenID block entirely when no server is configured
   if (serverStatus === 'no-server') {
@@ -41,7 +42,7 @@ export function AuthSettings() {
           </label>
           {isOffline && (
             <View>
-              <Text style={{ paddingTop: 5, color: theme.warningText }}>
+              <Text style={{ paddingTop: 5, color: statusColors.warning }}>
                 <Trans>
                   Server is offline. OpenID settings are unavailable.
                 </Trans>
@@ -55,7 +56,7 @@ export function AuthSettings() {
                 style={{
                   marginTop: '10px',
                 }}
-                variant="normal"
+                variant={isRedesign ? 'control' : 'normal'}
                 isDisabled={isOffline}
                 onPress={() =>
                   dispatch(
@@ -82,7 +83,7 @@ export function AuthSettings() {
                 style={{
                   marginTop: '10px',
                 }}
-                variant="normal"
+                variant={isRedesign ? 'control' : 'normal'}
                 isDisabled={isOffline}
                 onPress={() =>
                   dispatch(
@@ -98,7 +99,7 @@ export function AuthSettings() {
                 <Trans>Disable OpenID</Trans>
               </Button>
               {multiuserEnabled && (
-                <Text style={{ paddingTop: 5, color: theme.errorText }}>
+                <Text style={{ paddingTop: 5, color: statusColors.negative }}>
                   <Trans>
                     Disabling OpenID will deactivate multi-user mode.
                   </Trans>

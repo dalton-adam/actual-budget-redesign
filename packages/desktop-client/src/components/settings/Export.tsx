@@ -4,13 +4,12 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Block } from '@actual-app/components/block';
 import { ButtonWithLoading } from '@actual-app/components/button';
 import { Text } from '@actual-app/components/text';
-import { theme } from '@actual-app/components/theme';
 import { send } from '@actual-app/core/platform/client/connection';
 import { format } from 'date-fns';
 
 import { useMetadataPref } from '#hooks/useMetadataPref';
 
-import { Setting } from './UI';
+import { Setting, useSettingsRedesign, useSettingsStatusColors } from './UI';
 
 export function ExportBudget() {
   const { t } = useTranslation();
@@ -19,6 +18,8 @@ export function ExportBudget() {
   const [warnings, setWarnings] = useState<string[]>([]);
   const [budgetName] = useMetadataPref('budgetName');
   const [encryptKeyId] = useMetadataPref('encryptKeyId');
+  const isRedesign = useSettingsRedesign();
+  const statusColors = useSettingsStatusColors();
 
   async function onExport() {
     setIsLoading(true);
@@ -49,18 +50,22 @@ export function ExportBudget() {
     <Setting
       primaryAction={
         <>
-          <ButtonWithLoading onPress={onExport} isLoading={isLoading}>
+          <ButtonWithLoading
+            variant={isRedesign ? 'control' : 'normal'}
+            onPress={onExport}
+            isLoading={isLoading}
+          >
             <Trans>Export data</Trans>
           </ButtonWithLoading>
           {error && (
-            <Block style={{ color: theme.errorText, marginTop: 15 }}>
+            <Block style={{ color: statusColors.negative, marginTop: 15 }}>
               {t(
                 'An unknown error occurred while exporting. Please report this as a new issue on GitHub.',
               )}
             </Block>
           )}
           {warnings.includes('exceeds-import-size-limit') && (
-            <Block style={{ color: theme.warningText, marginTop: 15 }}>
+            <Block style={{ color: statusColors.warning, marginTop: 15 }}>
               <Trans>
                 This export is larger than Actual can safely re-import. You may
                 not be able to restore this backup.
@@ -68,7 +73,7 @@ export function ExportBudget() {
             </Block>
           )}
           {warnings.includes('may-exceed-available-memory') && (
-            <Block style={{ color: theme.warningText, marginTop: 15 }}>
+            <Block style={{ color: statusColors.warning, marginTop: 15 }}>
               <Trans>
                 This export is larger than the memory available on this device.
                 Restoring it here may fail.

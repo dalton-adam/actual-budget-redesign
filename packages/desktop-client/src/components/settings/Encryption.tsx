@@ -3,7 +3,6 @@ import { Trans } from 'react-i18next';
 
 import { Button } from '@actual-app/components/button';
 import { Text } from '@actual-app/components/text';
-import { theme } from '@actual-app/components/theme';
 
 import { Link } from '#components/common/Link';
 import { useServerURL } from '#components/ServerContext';
@@ -11,12 +10,15 @@ import { useMetadataPref } from '#hooks/useMetadataPref';
 import { pushModal } from '#modals/modalsSlice';
 import { useDispatch } from '#redux';
 
-import { Setting } from './UI';
+import { Setting, useSettingsRedesign, useSettingsStatusColors } from './UI';
 
 export function EncryptionSettings() {
   const dispatch = useDispatch();
   const serverURL = useServerURL();
   const [encryptKeyId] = useMetadataPref('encryptKeyId');
+  const isRedesign = useSettingsRedesign();
+  const statusColors = useSettingsStatusColors();
+  const buttonVariant = isRedesign ? 'control' : 'normal';
 
   const missingCryptoAPI = !(window.crypto && crypto.subtle);
 
@@ -31,13 +33,13 @@ export function EncryptionSettings() {
   return encryptKeyId ? (
     <Setting
       primaryAction={
-        <Button onPress={onChangeKey}>
+        <Button variant={buttonVariant} onPress={onChangeKey}>
           <Trans>Generate new key</Trans>
         </Button>
       }
     >
       <Text>
-        <Text style={{ color: theme.noticeTextLight, fontWeight: 600 }}>
+        <Text style={{ color: statusColors.positive, fontWeight: 600 }}>
           <Trans>End-to-end Encryption is turned on.</Trans>
         </Text>{' '}
         <Trans>
@@ -59,7 +61,7 @@ export function EncryptionSettings() {
   ) : missingCryptoAPI ? (
     <Setting
       primaryAction={
-        <Button isDisabled>
+        <Button variant={buttonVariant} isDisabled>
           <Trans>Enable encryption</Trans>
         </Button>
       }
@@ -84,6 +86,7 @@ export function EncryptionSettings() {
     <Setting
       primaryAction={
         <Button
+          variant={buttonVariant}
           onPress={() =>
             dispatch(
               pushModal({
@@ -116,7 +119,7 @@ export function EncryptionSettings() {
   ) : (
     <Setting
       primaryAction={
-        <Button isDisabled>
+        <Button variant={buttonVariant} isDisabled>
           <Trans>Enable encryption</Trans>
         </Button>
       }

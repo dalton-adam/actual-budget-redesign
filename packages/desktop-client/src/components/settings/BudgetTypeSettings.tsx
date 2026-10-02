@@ -8,11 +8,12 @@ import { send } from '@actual-app/core/platform/client/connection';
 import { Link } from '#components/common/Link';
 import { useSyncedPref } from '#hooks/useSyncedPref';
 
-import { Setting } from './UI';
+import { Setting, useSettingsRedesign } from './UI';
 
 export function BudgetTypeSettings() {
   const [budgetType = 'envelope', setBudgetType] = useSyncedPref('budgetType');
   const [isLoading, setIsLoading] = useState(false);
+  const isRedesign = useSettingsRedesign();
 
   async function onSwitchType() {
     setIsLoading(true);
@@ -30,7 +31,11 @@ export function BudgetTypeSettings() {
   return (
     <Setting
       primaryAction={
-        <ButtonWithLoading onPress={onSwitchType} isLoading={isLoading}>
+        <ButtonWithLoading
+          variant={isRedesign ? 'control' : 'normal'}
+          onPress={onSwitchType}
+          isLoading={isLoading}
+        >
           {budgetType === 'tracking' ? (
             <Trans>Switch to envelope budgeting</Trans>
           ) : (

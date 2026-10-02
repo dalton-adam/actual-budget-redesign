@@ -4,17 +4,17 @@ import { Trans, useTranslation } from 'react-i18next';
 import { ButtonWithLoading } from '@actual-app/components/button';
 import { Paragraph } from '@actual-app/components/paragraph';
 import { Text } from '@actual-app/components/text';
-import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import { send } from '@actual-app/core/platform/client/connection';
 import type { Handlers } from '@actual-app/core/types/handlers';
 
-import { Setting } from './UI';
+import { Setting, useSettingsRedesign, useSettingsStatusColors } from './UI';
 
 type Results = Awaited<ReturnType<Handlers['tools/fix-split-transactions']>>;
 
 function useRenderResults() {
   const { t } = useTranslation();
+  const statusColors = useSettingsStatusColors();
 
   function renderResults(results: Results) {
     const {
@@ -100,8 +100,8 @@ function useRenderResults() {
         style={{
           color:
             mismatchedSplits.length === 0
-              ? theme.noticeTextLight
-              : theme.errorText,
+              ? statusColors.positive
+              : statusColors.negative,
           whiteSpace: 'pre-wrap',
         }}
       >
@@ -116,6 +116,7 @@ function useRenderResults() {
 export function RepairTransactions() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Results | null>(null);
+  const isRedesign = useSettingsRedesign();
 
   const { renderResults } = useRenderResults();
 
@@ -137,7 +138,11 @@ export function RepairTransactions() {
             gap: '1em',
           }}
         >
-          <ButtonWithLoading isLoading={loading} onPress={onFix}>
+          <ButtonWithLoading
+            variant={isRedesign ? 'control' : 'normal'}
+            isLoading={loading}
+            onPress={onFix}
+          >
             <Trans>Repair transactions</Trans>
           </ButtonWithLoading>
           {results && renderResults(results)}
