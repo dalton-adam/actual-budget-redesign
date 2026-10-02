@@ -4154,6 +4154,173 @@
         border-radius: 6px;
         background: var(--pageBackground);
       }
+      /* APP-06b: the shared popover frame (Popover.tsx) and menu rows
+         (Menu.tsx). .old draws today's frame for comparison. */
+      .amenu {
+        position: fixed;
+        z-index: 60;
+        min-width: 220px;
+        padding: 6px;
+        border-radius: 12px;
+        background: var(--cardBackground);
+        border: 1px solid var(--cardBorder);
+        box-shadow: var(--popoverShadow);
+        color: var(--pageText);
+        font-size: 13px;
+        line-height: 1.3;
+      }
+      .amenu .mi {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 32px;
+        padding: 0 10px;
+        border-radius: 8px;
+        cursor: default;
+        user-select: none;
+      }
+      .amenu .mi:hover,
+      .amenu .mi.hl {
+        background: var(--tableRowHover);
+      }
+      .amenu .mi.focus {
+        outline: 2px solid var(--selectionBorder);
+        outline-offset: -2px;
+      }
+      .amenu .mi .k {
+        margin-left: auto;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        border-radius: 5px;
+        background: var(--cardInset);
+        color: var(--pageTextSubdued);
+        font-size: 11px;
+        font-weight: 600;
+        display: grid;
+        place-items: center;
+      }
+      .amenu .lbl {
+        padding: 10px 10px 4px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--pageTextFaint);
+      }
+      .amenu hr {
+        border: 0;
+        border-top: 1px solid var(--cardBorder);
+        margin: 6px 4px;
+      }
+      /* Upstream Toggle, unchanged by 06b */
+      .amenu .utg {
+        margin-left: auto;
+        width: 32px;
+        height: 16px;
+        border-radius: 99px;
+        background: var(--cardBorder);
+        position: relative;
+        flex: none;
+      }
+      .amenu .utg::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #fff;
+      }
+      .amenu .utg.on {
+        background: var(--accent);
+      }
+      .amenu .utg.on::after {
+        left: 18px;
+      }
+      /* The date picker's contents (pikaday), unchanged by 06b */
+      .amenu.dp {
+        min-width: 0;
+        padding: 10px;
+      }
+      .amenu .dp-h {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: 700;
+        padding: 2px 4px 8px;
+      }
+      .amenu .dp-g {
+        display: grid;
+        grid-template-columns: repeat(7, 30px);
+        gap: 2px;
+        text-align: center;
+        font-size: 12px;
+      }
+      .amenu .dp-g b {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--pageTextFaint);
+        padding-bottom: 4px;
+      }
+      .amenu .dp-g span {
+        height: 26px;
+        display: grid;
+        place-items: center;
+        border-radius: 4px;
+      }
+      .amenu .dp-g span.out {
+        color: var(--pageTextFaint);
+      }
+      .amenu .dp-g span.sel {
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+      }
+      [data-theme='dark'] .amenu .dp-g span.sel,
+      [data-theme='midnight'] .amenu .dp-g span.sel {
+        color: #16101f;
+      }
+      /* Today's frame and rows */
+      .amenu.old {
+        padding: 0;
+        border-radius: 4px;
+        border: 2px solid var(--cardBorder);
+        box-shadow:
+          0 15px 30px 0 rgba(0, 0, 0, 0.11),
+          0 5px 15px 0 rgba(0, 0, 0, 0.08);
+      }
+      .amenu.old.dp {
+        padding: 5px;
+      }
+      .amenu.old .mi {
+        min-height: 0;
+        padding: 10px;
+        border-radius: 0;
+      }
+      .amenu.old .mi:hover,
+      .amenu.old .mi.hl {
+        background: var(--controlBackground);
+        filter: brightness(0.94);
+      }
+      .amenu.old .mi .k {
+        min-width: 0;
+        height: auto;
+        padding: 0;
+        background: none;
+        font-size: 10px;
+        font-weight: 400;
+      }
+      .amenu.old .lbl {
+        padding: 3px 9px;
+        margin: 3px 0;
+        letter-spacing: 0;
+        font-weight: 400;
+      }
+      .amenu.old hr {
+        margin: 3px 0;
+      }
       /* Schedule dialog */
       .sdlg-scrim {
         position: fixed;
@@ -5143,6 +5310,11 @@
         dlg: params.get('dlg') || '',
         dlgold: params.get('dlgold') === '1',
         dlgx: params.get('dlgx') || '',
+        // APP-06b: a menu or popover over a page (select, help, toggles,
+        // date), today's frame for comparison, and the first row's state.
+        mnu: params.get('mnu') || '',
+        mnuold: params.get('mnuold') === '1',
+        mnuhl: params.get('mnuhl') || '',
         // Accounts pane: open or collapsed (device-local). Default: open at
         // 1280px and wider, collapsed below.
         pane:
@@ -6650,6 +6822,71 @@
         }" role="dialog" aria-modal="true">${body}</div></div>`;
       }
 
+      // APP-06b proposal: the shared popover frame (Popover.tsx) and menu
+      // rows (Menu.tsx). The contents are real menus with their upstream
+      // strings and keys; the date picker's calendar is unchanged and drawn
+      // only to show the frame around non-menu content.
+      function appMenu() {
+        const old = state.mnuold ? 'old' : '';
+        let n = 0;
+        const mi = (label, key = '', tail = '') => {
+          const i = n++;
+          const st =
+            i === 0 && state.mnuhl === 'hover'
+              ? 'hl'
+              : i === 0 && state.mnuhl === 'focus'
+                ? 'focus'
+                : '';
+          return `<div class="mi ${st}" role="menuitem" tabindex="-1">${label}${
+            key ? `<span class="k">${key}</span>` : ''
+          }${tail}</div>`;
+        };
+        const tg = (label, on) =>
+          mi(
+            label,
+            '',
+            `<span class="utg ${on ? 'on' : ''}" role="switch" aria-checked="${on}"></span>`,
+          );
+        const lbl = t => `<div class="lbl" role="presentation">${t}</div>`;
+        if (state.mnu === 'select') {
+          return `<div class="amenu ${old}" role="menu" style="top:178px;right:40px">
+            ${mi('Show', 'F')}${mi('Duplicate', 'U')}${mi('Delete', 'D')}
+            <hr>${mi('Link schedule', 'S')}${mi('Create rule')}${mi('Run Rules')}${mi('Make transfer', 'R')}
+            <hr>${lbl('Edit field')}${mi('Date', 'E')}${mi('Account', 'A')}${mi('Payee', 'P')}${mi('Notes', 'N')}${mi('Category', 'C')}${mi('Amount', 'M')}${mi('Cleared', 'L')}
+          </div>`;
+        }
+        if (state.mnu === 'help') {
+          return `<div class="amenu ${old}" role="menu" style="top:54px;right:16px">
+            ${mi('Documentation')}${mi('Community support (Discord)')}${mi(
+              'Keyboard shortcuts',
+            )}${mi('Take a tour')}${mi('Goal templates')}
+          </div>`;
+        }
+        if (state.mnu === 'toggles') {
+          return `<div class="amenu ${old}" role="menu" style="top:150px;right:40px">
+            ${tg('Bar chart', true)}<hr>${tg('Show balance', true)}${tg(
+              'Show categories',
+              false,
+            )}<hr>${tg('Show hidden categories', false)}
+          </div>`;
+        }
+        const days = [];
+        for (let d = 27; d <= 30; d++)
+          days.push(`<span class="out">${d}</span>`);
+        for (let d = 1; d <= 31; d++)
+          days.push(`<span class="${d === 2 ? 'sel' : ''}">${d}</span>`);
+        for (let d = 1; days.length < 35; d++)
+          days.push(`<span class="out">${d}</span>`);
+        return `<div class="amenu dp ${old}" role="dialog" aria-label="Choose date" style="top:236px;left:${
+          state.pane === 'open' ? 560 : 300
+        }px">
+          <div class="dp-h"><span>${I.chevL}</span><span>October 2026</span><span>${I.chevR}</span></div>
+          <div class="dp-g">${['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+            .map(d => `<b>${d}</b>`)
+            .join('')}${days.join('')}</div>
+        </div>`;
+      }
+
       function anchoredMenu() {
         const body = menuBody();
         return body
@@ -6735,6 +6972,26 @@
                 grp('Frame', 'dlgold', [
                   [false, 'Proposed'],
                   [true, 'Today'],
+                ]),
+              ]
+            : []),
+          grp('Menu', 'mnu', [
+            ['', 'Off'],
+            ['select', 'Selection'],
+            ['help', 'Help'],
+            ['toggles', 'Toggles'],
+            ['date', 'Date picker'],
+          ]),
+          ...(state.mnu
+            ? [
+                grp('Menu frame', 'mnuold', [
+                  [false, 'Proposed'],
+                  [true, 'Today'],
+                ]),
+                grp('First row', 'mnuhl', [
+                  ['', 'Rest'],
+                  ['hover', 'Hover'],
+                  ['focus', 'Focus'],
                 ]),
               ]
             : []),
@@ -7440,7 +7697,7 @@
             return `<div class="cal-m"><div class="cal-h">${name}<span class="num pos-t">↑ ${fmt2(
               inc,
             )}</span><span class="num neg-t">↓ ${fmt2(exp)}</span></div>
-              <div class="cal-g">${['S', 'M', 'T', 'W', 'T', 'F', 'S']
+              <div class="dp-g">${['S', 'M', 'T', 'W', 'T', 'F', 'S']
                 .map(x => `<div class="dow">${x}</div>`)
                 .join('')}${cells.join('')}</div></div>`;
           })
@@ -7935,7 +8192,7 @@
             return `<section class="rcard"><div class="cal-m"><div class="w-title">${name}</div><div class="cal-h" style="margin-bottom:4px"><span class="num pos-t">↑ ${fmt2(
               inc,
             )}</span><span class="num neg-t">↓ ${fmt2(exp)}</span></div>
-              <div class="cal-g">${['S', 'M', 'T', 'W', 'T', 'F', 'S']
+              <div class="dp-g">${['S', 'M', 'T', 'W', 'T', 'F', 'S']
                 .map(x => `<div class="dow">${x}</div>`)
                 .join('')}${cells.join('')}</div></div></section>`;
           })
@@ -9655,6 +9912,7 @@
       ${drawer()}
       ${anchoredMenu()}
       ${state.dlg ? appDialog() : ''}
+      ${state.mnu ? appMenu() : ''}
       ${controls()}`;
         placeAnchored();
         const ruMenu = document.querySelector('.ru-table .pay-menu');
@@ -9743,6 +10001,14 @@
           u.searchParams.set('dlgold', state.dlgold ? '1' : '0');
         } else {
           for (const k of ['dlg', 'dlgold', 'dlgx']) u.searchParams.delete(k);
+        }
+        if (state.mnu) {
+          u.searchParams.set('mnu', state.mnu);
+          u.searchParams.set('mnuold', state.mnuold ? '1' : '0');
+          if (state.mnuhl) u.searchParams.set('mnuhl', state.mnuhl);
+          else u.searchParams.delete('mnuhl');
+        } else {
+          for (const k of ['mnu', 'mnuold', 'mnuhl']) u.searchParams.delete(k);
         }
         if (state.rview === 'custom') {
           u.searchParams.set('rgraph', state.rgraph);

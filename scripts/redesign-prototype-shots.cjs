@@ -1,13 +1,13 @@
 // Screenshots of the static redesign prototype (docs/redesign/prototype).
 // Usage: node scripts/redesign-prototype-shots.cjs [--design-01 | --app-03 | --app-03c | --app-03d | --app-04 |
-//   --app-05a | --app-05b | --app-05c | --app-05d | --app-06a]
+//   --app-05a | --app-05b | --app-05c | --app-05d | --app-06a | --app-06b]
 // Default: the DESIGN-02 set (18+). --design-01 regenerates 01-17 from the
 // current prototype with the fixture and row height they were taken with.
 // --app-03 takes the Reports proposal (51+); --app-03c the custom report,
 // Calendar and Formula proposal (59+); --app-03d Monte Carlo (67+);
 // --app-04 Schedules (73+); --app-05a Payees (80+); --app-05b Rules (87+);
 // --app-05c Tags (93+); --app-05d Settings (101+); --app-06a the shared
-// dialog frame (108+).
+// dialog frame (108+); --app-06b menus and popovers (115+).
 const { chromium } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
@@ -319,6 +319,47 @@ const app06a = [
   ['113-dialog-loading-light-wide', W, H, `${dl}&theme=light&dlg=loading`],
   ['114-dialog-close-custom-theme-wide', W, H, `${dl}&theme=custom&dlg=close`],
 ];
+const ac = 'data=basic&page=account';
+const app06b = [
+  [
+    '115-menu-select-dark-wide-hover',
+    W,
+    H,
+    `${ac}&theme=dark&mnu=select&mnuhl=hover`,
+  ],
+  [
+    '116-menu-select-today-dark-wide',
+    W,
+    H,
+    `${ac}&theme=dark&mnu=select&mnuold=1&mnuhl=hover`,
+  ],
+  [
+    '117-menu-help-light-1000',
+    w,
+    h,
+    `${dl}&theme=light&pane=collapsed&mnu=help`,
+  ],
+  [
+    '118-menu-help-today-light-1000',
+    w,
+    h,
+    `${dl}&theme=light&pane=collapsed&mnu=help&mnuold=1`,
+  ],
+  [
+    '119-menu-toggles-midnight-wide-focus',
+    W,
+    H,
+    'data=basic&page=reports&theme=midnight&mnu=toggles&mnuhl=focus',
+  ],
+  ['120-popover-date-light-wide', W, H, `${ac}&theme=light&mnu=date`],
+  [
+    '121-popover-date-today-light-wide',
+    W,
+    H,
+    `${ac}&theme=light&mnu=date&mnuold=1`,
+  ],
+  ['122-menu-select-custom-theme-wide', W, H, `${ac}&theme=custom&mnu=select`],
+];
 const app05d = [
   ['101-settings-dark-wide', W, H, `${st}&theme=dark`],
   ['102-settings-light-1000', w, h, `${st}&theme=light&pane=collapsed`],
@@ -350,25 +391,27 @@ const app05d = [
   fs.mkdirSync(out, { recursive: true });
   const shots = process.argv.includes('--design-01')
     ? design01
-    : process.argv.includes('--app-06a')
-      ? app06a
-      : process.argv.includes('--app-05d')
-        ? app05d
-        : process.argv.includes('--app-05c')
-          ? app05c
-          : process.argv.includes('--app-05b')
-            ? app05b
-            : process.argv.includes('--app-05a')
-              ? app05a
-              : process.argv.includes('--app-04')
-                ? app04
-                : process.argv.includes('--app-03d')
-                  ? app03d
-                  : process.argv.includes('--app-03c')
-                    ? app03c
-                    : process.argv.includes('--app-03')
-                      ? app03
-                      : design02;
+    : process.argv.includes('--app-06b')
+      ? app06b
+      : process.argv.includes('--app-06a')
+        ? app06a
+        : process.argv.includes('--app-05d')
+          ? app05d
+          : process.argv.includes('--app-05c')
+            ? app05c
+            : process.argv.includes('--app-05b')
+              ? app05b
+              : process.argv.includes('--app-05a')
+                ? app05a
+                : process.argv.includes('--app-04')
+                  ? app04
+                  : process.argv.includes('--app-03d')
+                    ? app03d
+                    : process.argv.includes('--app-03c')
+                      ? app03c
+                      : process.argv.includes('--app-03')
+                        ? app03
+                        : design02;
   // PW_CHANNEL=msedge uses an installed browser instead of Playwright's.
   const b = await chromium.launch(
     process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {},
