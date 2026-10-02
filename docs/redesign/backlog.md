@@ -52,7 +52,7 @@ Budget header are reference material, not tasks to build.
 | APP-05b            | verified    | `3cbc474b6`              | Linux VRT regenerated (6). Custom theme, keyboard, privacy, 1000×700 passed (verification.md); desktop not run.                |
 | APP-05c            | verified    | `51cfe0733`, `07d3214fa` | New Tags E2E (11) and Linux VRT (9). Custom theme, 1000×700, keyboard passed (verification.md); desktop not run.               |
 | APP-05d            | verified    | `a1f4d90b6`, `08ea741bb` | Linux VRT regenerated (3). Themes, custom theme, keyboard passed (verification.md); desktop not run.                           |
-| APP-06a            | in progress | —                        | Drawing approved (shots `108`–`114`; design-decisions §10g). Implementation next.                                              |
+| APP-06a            | review      | `2a0bf2494`, ``          | Linux VRT regenerated (27). E2E 121/121; custom theme, 1000×700 and desktop not run (task-reports.md).                         |
 | APP-06b – f        | not started | —                        | Split October 1, 2026 (below). Each file list is rebuilt from source before it starts.                                         |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                              |
 
