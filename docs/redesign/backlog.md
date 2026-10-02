@@ -57,7 +57,7 @@ Budget header are reference material, not tasks to build.
 | APP-06c            | verified    | `5660d77ba`, `d638c6265` | Linux VRT 186/186, no snapshot changed. E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md).                                |
 | APP-06d            | verified    | `1d2e3cda2`, `cb1c20101` | Linux VRT 186/186 after regenerating 3 (date filter's empty register). E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md). |
 | APP-06e            | verified    | `6b9e22d61`, `5b1929c01` | Linux VRT 186/186, no snapshot changed. E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md).                                |
-| APP-06f            | verified    | `126cbf83d`              | Linux VRT 186/186, no snapshot changed. E2E 121/121; light, midnight, narrow, screen reader and desktop not run (task-reports.md).                |
+| APP-06f            | verified    | `d97c742a8`, `126cbf83d` | Linux VRT 186/186, no snapshot changed. E2E 121/121; light, midnight, narrow, screen reader and desktop not run (task-reports.md).                |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                                                 |
 
 States follow plan §16: not started, ready, in progress, review, verified,
