@@ -4321,6 +4321,206 @@
       .amenu.old hr {
         margin: 3px 0;
       }
+      /* APP-06c proposal: toasts (Notifications.tsx). Placement, width,
+         stacking and timing are upstream's. */
+      .atst-stack {
+        position: fixed;
+        right: 13px;
+        bottom: 20px;
+        width: 400px;
+        z-index: 55;
+      }
+      .atst-stack > .atst {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transform-origin: 50% 100%;
+      }
+      .atst {
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        column-gap: 12px;
+        align-items: start;
+        padding: 14px 44px 14px 14px;
+        border-radius: 12px;
+        background: var(--cardBackground);
+        border: 1px solid var(--cardBorder);
+        box-shadow: var(--popoverShadow);
+        color: var(--pageTextSubdued);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      .atst .ico {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        margin-top: -2px;
+      }
+      .atst .ico svg {
+        width: 13px;
+        height: 13px;
+      }
+      .atst.message .ico {
+        background: var(--pillPositiveBackground);
+        color: var(--pillPositiveText);
+      }
+      .atst.warning .ico {
+        background: var(--pillWarningBackground);
+        color: var(--pillWarningText);
+      }
+      .atst.error .ico {
+        background: var(--pillNegativeBackground);
+        color: var(--pillNegativeText);
+      }
+      .atst .body {
+        display: grid;
+        gap: 6px;
+        min-width: 0;
+      }
+      .atst .ttl {
+        color: var(--pageText);
+        font-size: 13.5px;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+      .atst .msg a {
+        color: var(--pageText);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .atst .row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .atst .row .msg {
+        flex: 1;
+        min-width: 0;
+      }
+      .atst .act {
+        flex: none;
+        min-height: 30px;
+        padding: 0 12px;
+        border-radius: 9px;
+        border: 1px solid var(--cardBorder);
+        background: var(--controlBackground);
+        color: var(--pageText);
+        font: inherit;
+        font-weight: 600;
+      }
+      .atst .act:hover,
+      .atst .act.hl {
+        background: var(--tableRowHover);
+      }
+      .atst pre {
+        margin: 2px 0 0;
+        padding: 10px;
+        border-radius: 8px;
+        background: var(--cardInset);
+        color: var(--pageText);
+        font:
+          12px/1.45 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Consolas,
+          monospace;
+        white-space: pre-wrap;
+      }
+      .atst .x {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 28px;
+        height: 28px;
+        border: 0;
+        border-radius: 8px;
+        background: none;
+        color: var(--pageTextSubdued);
+        display: grid;
+        place-items: center;
+      }
+      .atst .x:hover {
+        background: var(--tableRowHover);
+      }
+      .atst .x.focus {
+        outline: 2px solid var(--selectionBorder);
+        outline-offset: 2px;
+      }
+      .atst .x svg {
+        width: 10px;
+        height: 10px;
+      }
+      /* Today's toast: a status tint, 3px top stripe, coloured text */
+      .atst.old {
+        display: block;
+        padding: 14px 40px 14px 14px;
+        border-radius: 8px;
+        border: 0;
+        border-top: 3px solid;
+        box-shadow:
+          0 15px 30px 0 rgba(0, 0, 0, 0.11),
+          0 5px 15px 0 rgba(0, 0, 0, 0.08);
+        line-height: 1.4;
+      }
+      .atst.old.message {
+        background: color-mix(
+          in srgb,
+          var(--pillPositiveText) 14%,
+          var(--cardBackground)
+        );
+        border-top-color: var(--pillPositiveText);
+        color: var(--pillPositiveText);
+      }
+      .atst.old.warning {
+        background: color-mix(
+          in srgb,
+          var(--pillWarningText) 14%,
+          var(--cardBackground)
+        );
+        border-top-color: var(--pillWarningText);
+        color: var(--pillWarningText);
+      }
+      .atst.old.error {
+        background: color-mix(
+          in srgb,
+          var(--pillNegativeText) 14%,
+          var(--cardBackground)
+        );
+        border-top-color: var(--pillNegativeText);
+        color: var(--pillNegativeText);
+      }
+      .atst.old .ico {
+        display: none;
+      }
+      .atst.old .body {
+        gap: 10px;
+      }
+      .atst.old .ttl,
+      .atst.old .msg a,
+      .atst.old .act,
+      .atst.old .x {
+        color: inherit;
+      }
+      .atst.old .ttl {
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .atst.old .act {
+        background: transparent;
+        border-color: currentColor;
+        border-radius: 4px;
+        font-weight: 400;
+      }
+      .atst.old .x {
+        opacity: 0.7;
+      }
+      .atst.old pre {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
+      }
       /* Schedule dialog */
       .sdlg-scrim {
         position: fixed;
@@ -5315,6 +5515,11 @@
         mnu: params.get('mnu') || '',
         mnuold: params.get('mnuold') === '1',
         mnuhl: params.get('mnuhl') || '',
+        // APP-06c: a toast (update, saved, warning, error, stack), today's
+        // look for comparison, and the action hovered or close focused.
+        tst: params.get('tst') || '',
+        tstold: params.get('tstold') === '1',
+        tsthl: params.get('tsthl') || '',
         // Accounts pane: open or collapsed (device-local). Default: open at
         // 1280px and wider, collapsed below.
         pane:
@@ -6822,6 +7027,73 @@
         }" role="dialog" aria-modal="true">${body}</div></div>`;
       }
 
+      // APP-06c proposal: toasts (Notifications.tsx). The strings are real
+      // upstream notifications; placement, width, the three-deep stack and
+      // timing are unchanged.
+      function appToast() {
+        const old = state.tstold ? 'old' : '';
+        const sv = p =>
+          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+        const icons = {
+          message: sv('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
+          warning: sv('<path d="M12 6v7.5M12 18h.01"/>'),
+          error: sv('<path d="M7 7l10 10M17 7 7 17"/>'),
+        };
+        const close = `<button class="x ${
+          state.tsthl === 'focus' ? 'focus' : ''
+        }" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`;
+        const toast = ({ type, title, message, button, pre }, style = '') =>
+          `<div class="atst ${type} ${old}" role="alert" style="${style}">
+            <span class="ico" aria-hidden="true">${icons[type]}</span>
+            <div class="body">
+              ${title ? `<div class="ttl">${title}</div>` : ''}
+              <div class="row"><div class="msg">${message}</div>${
+                button
+                  ? `<button class="act ${state.tsthl === 'hover' ? 'hl' : ''}">${button}</button>`
+                  : ''
+              }</div>
+              ${pre ? `<pre>${pre}</pre>` : ''}
+            </div>${close}</div>`;
+        const T = {
+          update: {
+            type: 'message',
+            title: 'A new version of Actual is available!',
+            message: 'Click the button below to reload and apply the update.',
+            button: 'Update now',
+          },
+          saved: {
+            type: 'message',
+            message: 'Dashboard widget successfully saved.',
+          },
+          warning: {
+            type: 'warning',
+            title: 'Your data is out of sync',
+            message:
+              'There was a problem syncing your data. We can try to repair your sync state to fix it. <a>Learn more</a>',
+            button: 'Repair',
+          },
+          error: {
+            type: 'error',
+            message:
+              "We couldn't apply that change to the database. Please report this as a bug by <a>opening a GitHub issue</a>.",
+            pre: 'apply-failure: messages_crdt\nSQLITE_CONSTRAINT: UNIQUE constraint failed',
+          },
+        };
+        if (state.tst === 'stack') {
+          // Newest in front; each older toast 20px higher and 5% smaller.
+          const order = [T.saved, T.warning, T.update];
+          return `<div class="atst-stack">${order
+            .map((n, i) =>
+              toast(
+                n,
+                `z-index:${10 - i};transform:translateY(${-20 * i}px) scale(${1 - 0.05 * i})`,
+              ),
+            )
+            .join('')}</div>`;
+        }
+        return `<div class="atst-stack">${toast(T[state.tst] || T.update)}</div>`;
+      }
+
       // APP-06b proposal: the shared popover frame (Popover.tsx) and menu
       // rows (Menu.tsx). The contents are real menus with their upstream
       // strings and keys; the date picker's calendar is unchanged and drawn
@@ -6992,6 +7264,27 @@
                   ['', 'Rest'],
                   ['hover', 'Hover'],
                   ['focus', 'Focus'],
+                ]),
+              ]
+            : []),
+          grp('Toast', 'tst', [
+            ['', 'Off'],
+            ['update', 'Update'],
+            ['saved', 'Saved'],
+            ['warning', 'Warning'],
+            ['error', 'Error'],
+            ['stack', 'Stack of 3'],
+          ]),
+          ...(state.tst
+            ? [
+                grp('Toast look', 'tstold', [
+                  [false, 'Proposed'],
+                  [true, 'Today'],
+                ]),
+                grp('Toast state', 'tsthl', [
+                  ['', 'Rest'],
+                  ['hover', 'Button hover'],
+                  ['focus', 'Close focus'],
                 ]),
               ]
             : []),
@@ -9913,6 +10206,7 @@
       ${anchoredMenu()}
       ${state.dlg ? appDialog() : ''}
       ${state.mnu ? appMenu() : ''}
+      ${state.tst ? appToast() : ''}
       ${controls()}`;
         placeAnchored();
         const ruMenu = document.querySelector('.ru-table .pay-menu');
@@ -10009,6 +10303,14 @@
           else u.searchParams.delete('mnuhl');
         } else {
           for (const k of ['mnu', 'mnuold', 'mnuhl']) u.searchParams.delete(k);
+        }
+        if (state.tst) {
+          u.searchParams.set('tst', state.tst);
+          u.searchParams.set('tstold', state.tstold ? '1' : '0');
+          if (state.tsthl) u.searchParams.set('tsthl', state.tsthl);
+          else u.searchParams.delete('tsthl');
+        } else {
+          for (const k of ['tst', 'tstold', 'tsthl']) u.searchParams.delete(k);
         }
         if (state.rview === 'custom') {
           u.searchParams.set('rgraph', state.rgraph);

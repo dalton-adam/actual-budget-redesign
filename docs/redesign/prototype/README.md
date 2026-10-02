@@ -864,3 +864,72 @@ Questions for the owner:
 
 Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06b`
 (`PW_CHANNEL=msedge` uses the installed Edge).
+
+## APP-06c: toasts proposal (October 2, 2026)
+
+**Status: drawn, awaiting owner review.** Choose any page, then **Toast** in
+the prototype controls (Update, Saved, Warning, Error, Stack of 3); **Toast
+look → Today** draws today's toast with the same text; **Toast state** shows
+the action button hovered or the close button keyboard-focused. URL
+parameters: `tst=update|saved|warning|error|stack`, `tstold=0|1`,
+`tsthl=hover|focus`. The strings are real upstream notifications. "Today" is
+an approximation in the prototype's palette, not a screenshot of the app.
+
+Source traced for the brief: every toast renders in `Notifications` in
+`C/Notifications.tsx`, mounted by `C/FinancesApp.tsx` and
+`C/manager/ManagementApp.tsx` (the budget list), with `C/reports/Overview.tsx`
+only setting the inset. A toast is `role="alert"` with a type of `message`
+(used for successes and the update prompts), `warning` or `error`; an optional
+bold title; a message with Markdown-style links (external, or `#action`
+links); an optional button; optional `pre` text (monospace); and a close
+button. Today it is tinted by type (`noticeBackgroundLight`,
+`warningBackground`, `errorBackground`), has a 3px coloured top border, an 8px
+radius, `shadowLarge`, and text in the type's dark colour. The stack shows the
+newest three, each older one 20px higher and 5% smaller; non-sticky toasts
+close after 6.5s; touch and mouse swipe dismiss. Narrow widths (the mobile
+screens) use the same component, so 06c is gated on `isNarrowWidth` like 06a
+and 06b. No E2E page model or unit test refers to toasts.
+
+What the drawing proposes (presentation only):
+
+| Surface       | Today                                            | Proposed                                                                                                          |
+| ------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Frame         | Status tint, 3px coloured top border, 8px radius | `cardBackground`, 1px `cardBorder`, 12px radius (as menus)                                                        |
+| Elevation     | `shadowLarge`                                    | `popoverShadow` (needs approval: toasts are not on the approved-depth list)                                       |
+| Status signal | Background and text colour only                  | A 24px round icon in the pill tone: check (`message`), "!" (`warning`), × (`error`); the frame stays neutral      |
+| Title         | 13px/700 in the status colour                    | Title: 13.5px/600 Page Text                                                                                       |
+| Message       | 13px in the status colour, links `currentColor`  | 13px Secondary text, 1.45 line height; links Page Text, underlined                                                |
+| Action button | Bare, 1px status-colour border, 4px radius       | Control: Surface, Card Hairline, 9px radius, 30px tall, 13px/600 Page Text, Row Hover on hover, shared focus ring |
+| Close button  | 10px ×, 70% opacity, no hover                    | 28px icon button, 8px radius, Secondary ×, Row Hover on hover, shared focus ring (as the dialog close button)     |
+| `pre` text    | `rgba(0,0,0,.05)`, 4px radius                    | Card Inset, 8px radius, Page Text                                                                                 |
+| Loading cover | `tableBackground`                                | Surface White with the toast's radius, as the dialog cover (not drawn)                                            |
+| Narrow/mobile | upstream                                         | unchanged                                                                                                         |
+
+Unchanged by design: text, types, `role="alert"`, the close button's
+accessible name, placement (bottom right, 400px wide, the inset callers set),
+the three-deep stack and its offsets, timing, swipe-to-dismiss, link and button
+handlers, and the spinner on the button while its action runs.
+
+Questions for the owner:
+
+1. **Shadow:** give toasts the Popover shadow (drawn), or a hairline only?
+   They float over the page like a popover, so the drawing treats them as one.
+2. **Status signal:** a neutral card with a coloured icon (drawn), or keep a
+   tinted card? The 3px top stripe goes either way (DESIGN.md allows no
+   coloured edge thicker than 1px except the selected-row bar).
+3. **`message` icon:** a check for every `message` toast (drawn; nearly all are
+   successes or "update available"), or a neutral "i"?
+
+| File                                                | Shows                                                       |
+| --------------------------------------------------- | ----------------------------------------------------------- |
+| `shots/123-toast-update-light-wide.png`             | The update prompt with its button, light                    |
+| `shots/124-toast-update-today-light-wide.png`       | The same toast as it looks today                            |
+| `shots/125-toast-warning-dark-wide.png`             | The out-of-sync warning with a link and Repair button, dark |
+| `shots/126-toast-warning-today-dark-wide.png`       | The same toast today                                        |
+| `shots/127-toast-error-midnight-1000.png`           | An error with `pre` text, midnight, 1000×700                |
+| `shots/128-toast-error-today-midnight-1000.png`     | The same toast today                                        |
+| `shots/129-toast-stack-light-wide.png`              | Three toasts stacked (upstream offsets), light              |
+| `shots/130-toast-saved-custom-theme-wide-focus.png` | A one-line success, close button focused, custom theme      |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06c`
+(`PW_CHANNEL=msedge` uses the installed Edge).
