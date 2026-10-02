@@ -1533,3 +1533,12 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   dark at 1440×900 (hover, selection, selection menu) and light at
   1000×700. **Not run:** custom theme, keyboard walk-through, privacy mode
   (the page shows no amounts) and the desktop build.
+  **Follow-up checks (same day):** custom theme 0 misses (bases dark and
+  light, both sizes); keyboard reaches every control, with Space pressing a
+  rule button and Escape returning focus from both dialogs and the selection
+  menu; desktop build checked, with "Isolation check: nothing changed"
+  (verification.md). Two defects found and fixed in `a55a98620` (merge
+  `bfa623bba`): the quiet rule button showed `CellButton`'s default fill in
+  custom themes, and its focus sign was a faint shadow (now the redesign
+  focus ring). E2E 14/14 and Linux VRT 5/5 (unchanged) after the fix. Every
+  APP-05a check is now done.
