@@ -51,6 +51,8 @@ export const dialogTableCardStyle = {
   border: `1px solid ${theme.cardHairline}`,
   borderRadius: 12,
   overflow: 'hidden',
+  // The table's keyboard focus ring follows these corners (table.tsx).
+  '--card-inner-radius': '11px',
 } as const;
 
 /**

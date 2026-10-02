@@ -55,6 +55,15 @@ vi.mock('#hooks/useGlobalPref', () => ({
   },
 }));
 
+// Most tests check the upstream look (narrow widths); the desktop look has
+// its own test (design-decisions §10l).
+let mockIsRedesign = false;
+
+vi.mock('./UI', async () => ({
+  ...(await vi.importActual('./UI')),
+  useSettingsRedesign: () => mockIsRedesign,
+}));
+
 describe('ThemeInstaller', () => {
   const mockOnInstall = vi.fn();
   const mockOnClose = vi.fn();
@@ -113,6 +122,7 @@ describe('ThemeInstaller', () => {
     mockOnClose.mockClear();
     mockSetCustomCssOverride.mockClear();
     mockCustomCssOverride = undefined;
+    mockIsRedesign = false;
     vi.mocked(fetchThemeCss).mockResolvedValue(mockValidCss);
     vi.mocked(validateThemeCss).mockImplementation(css => css.trim());
     // Reset generateThemeId mock to default behavior
@@ -311,6 +321,45 @@ describe('ThemeInstaller', () => {
 
       // Verify onInstall was not called (theme installation failed)
       expect(mockOnInstall).not.toHaveBeenCalled();
+    });
+
+    it('uses the desktop look for the erroring and active themes', async () => {
+      mockIsRedesign = true;
+      const user = userEvent.setup();
+      const validationError = 'Invalid CSS format';
+
+      vi.mocked(validateThemeCss).mockImplementationOnce(() => {
+        throw new Error(validationError);
+      });
+
+      render(
+        <ThemeInstaller
+          onInstall={mockOnInstall}
+          onClose={mockOnClose}
+          installedTheme={{
+            id: 'theme-ocean456',
+            name: 'Ocean Blue',
+            repo: 'https://github.com/actualbudget/ocean-theme',
+            cssContent: mockValidCss,
+          }}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Demo Theme' }));
+      await waitFor(() => {
+        expect(screen.getByText(validationError)).toBeInTheDocument();
+      });
+
+      const demoButton = screen.getByRole('button', { name: 'Demo Theme' });
+      const oceanButton = screen.getByRole('button', { name: 'Ocean Blue' });
+      // Colours come from classes, not upstream's inline border.
+      expect(demoButton.getAttribute('style') || '').not.toMatch(/errorText/);
+      expect(demoButton).toHaveStyle({
+        backgroundColor: 'var(--color-pillNegativeBackground)',
+      });
+      expect(oceanButton).toHaveStyle({
+        backgroundColor: 'var(--color-selectionBackground)',
+      });
     });
 
     it('displays generic error when fetchThemeCss fails with non-Error object', async () => {

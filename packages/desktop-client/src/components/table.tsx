@@ -19,6 +19,7 @@ import type {
   RefObject,
   UIEvent,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AutoSizer } from 'react-virtualized-auto-sizer';
 
 import { Button } from '@actual-app/components/button';
@@ -531,6 +532,9 @@ type CellButtonProps = {
   onSelect?: (e) => void;
   onEdit?: () => void;
   className?: string;
+  role?: 'button' | 'checkbox';
+  'aria-checked'?: boolean;
+  'aria-label'?: string;
 };
 export const CellButton = forwardRef<HTMLDivElement, CellButtonProps>(
   (
@@ -544,6 +548,9 @@ export const CellButton = forwardRef<HTMLDivElement, CellButtonProps>(
       onSelect,
       onEdit,
       className,
+      role = 'button',
+      'aria-checked': ariaChecked,
+      'aria-label': ariaLabel,
     },
     ref,
   ) => {
@@ -565,6 +572,12 @@ export const CellButton = forwardRef<HTMLDivElement, CellButtonProps>(
         innerRef={ref}
         className={className}
         tabIndex={0}
+        // A div rather than a button (see above), so the role and state are
+        // set for screen readers.
+        role={role}
+        aria-checked={ariaChecked}
+        aria-disabled={disabled || undefined}
+        aria-label={ariaLabel}
         onKeyDown={e => {
           if (e.key === 'x' || e.key === ' ') {
             e.preventDefault();
@@ -635,6 +648,7 @@ type SelectCellProps = Omit<ComponentProps<typeof Cell>, 'children'> & {
   onSelect?: (e) => void;
   icon?: ReactNode;
   buttonProps?: Partial<CellButtonProps>;
+  'aria-label'?: string;
 };
 export function SelectCell({
   focused,
@@ -644,8 +658,10 @@ export function SelectCell({
   onEdit,
   icon = <SvgCheckmark width={6} height={6} />,
   buttonProps = {},
+  'aria-label': ariaLabel,
   ...props
 }: SelectCellProps) {
+  const { t } = useTranslation();
   return (
     <Cell
       {...props}
@@ -682,6 +698,11 @@ export function SelectCell({
           onEdit={onEdit}
           onSelect={onSelect}
           clickBehavior="none"
+          // A div keeps CellButton's key handling (see above).
+          // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role
+          role="checkbox"
+          aria-checked={Boolean(selected)}
+          aria-label={ariaLabel ?? t('Select')}
           {...buttonProps}
         >
           {selected && icon}
@@ -1184,6 +1205,20 @@ export const Table = forwardRef(
           flex: 1,
           outline: 'none',
           overflow: 'hidden',
+          // Keyboard focus on the table itself: a ring inside its edge that
+          // follows the corners of the card around it (design-decisions
+          // §10l). Cards set --card-inner-radius. An overlay rather than an
+          // outline, which the virtualised rows' layer would paint over.
+          '&:focus-visible::after': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            zIndex: 2,
+            pointerEvents: 'none',
+            border: `2px solid ${theme.selectionBorder}`,
+            borderBottomLeftRadius: 'var(--card-inner-radius, 0)',
+            borderBottomRightRadius: 'var(--card-inner-radius, 0)',
+          },
           ...style,
         }}
         tabIndex={0}

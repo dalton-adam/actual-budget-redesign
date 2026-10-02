@@ -5,13 +5,21 @@ import { AutoSizer } from 'react-virtualized-auto-sizer';
 
 import { Button } from '@actual-app/components/button';
 import { AnimatedLoading } from '@actual-app/components/icons/AnimatedLoading';
+import { SvgExclamationOutline } from '@actual-app/components/icons/v1';
 import { baseInputStyle } from '@actual-app/components/input';
 import { SpaceBetween } from '@actual-app/components/space-between';
+import { styles } from '@actual-app/components/styles';
+import type { CSSProperties } from '@actual-app/components/styles';
 import { Text } from '@actual-app/components/text';
 import { TextOneLine } from '@actual-app/components/text-one-line';
 import { theme as themeStyle } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
+import { css } from '@emotion/css';
 
+import {
+  dialogButtonStyle,
+  dialogEyebrowStyle,
+} from '#components/common/dialogStyles';
 import { Link } from '#components/common/Link';
 import { FixedSizeList } from '#components/FixedSizeList';
 import { useGlobalPref } from '#hooks/useGlobalPref';
@@ -27,6 +35,7 @@ import {
 import type { CatalogTheme, InstalledTheme } from '#style/customThemes';
 
 import { ColorPalette } from './ColorPalette';
+import { useSettingsRedesign } from './UI';
 
 // Theme item dimensions
 const ITEMS_PER_ROW = 3;
@@ -49,6 +58,7 @@ export function ThemeInstaller({
   mode,
 }: ThemeInstallerProps) {
   const { t } = useTranslation();
+  const isRedesign = useSettingsRedesign();
   const [customCssOverride, setCustomCssOverride] =
     useGlobalPref('customCssOverride');
   const [selectedCatalogTheme, setSelectedCatalogTheme] =
@@ -190,41 +200,55 @@ export function ThemeInstaller({
 
   return (
     <View
-      style={{
-        padding: 16,
-        backgroundColor: themeStyle.tableBackground,
-        borderRadius: 8,
-        border: `1px solid ${themeStyle.tableBorder}`,
-      }}
+      style={
+        isRedesign
+          ? {
+              // Card Inset panel in the Themes card (design-decisions §10l).
+              padding: 16,
+              backgroundColor: themeStyle.cardInset,
+              borderRadius: 12,
+            }
+          : {
+              padding: 16,
+              backgroundColor: themeStyle.tableBackground,
+              borderRadius: 8,
+              border: `1px solid ${themeStyle.tableBorder}`,
+            }
+      }
     >
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: 16,
+          marginBottom: isRedesign ? 10 : 16,
         }}
       >
-        <Text style={{ fontWeight: 600, fontSize: 14 }}>
+        <Text
+          style={
+            isRedesign
+              ? { fontWeight: 600, fontSize: 13.5, color: themeStyle.pageText }
+              : { fontWeight: 600, fontSize: 14 }
+          }
+        >
           <Trans>Install Custom Theme</Trans>
         </Text>
-        <Button variant="bare" onPress={onClose}>
+        <Button
+          variant={isRedesign ? 'control' : 'bare'}
+          style={isRedesign ? dialogButtonStyle : undefined}
+          onPress={onClose}
+        >
           <Trans>Close</Trans>
         </Button>
       </View>
 
       {/* Catalog Virtualized List */}
-      <Text style={{ marginBottom: 8, color: themeStyle.pageTextSubdued }}>
+      <Text style={isRedesign ? redesignLabelStyle : upstreamLabelStyle}>
         <Trans>Choose from catalog:</Trans>
       </Text>
       {catalogError ? (
-        <Text
-          style={{
-            color: themeStyle.errorText,
-            marginBottom: 12,
-            fontSize: 12,
-          }}
-        >
+        <Text style={isRedesign ? redesignMessageStyle : upstreamMessageStyle}>
+          {isRedesign && <SvgExclamationOutline style={messageIconStyle} />}
           <Trans>
             Failed to load theme catalog. You can still paste custom CSS below.
           </Trans>
@@ -309,25 +333,26 @@ export function ThemeInstaller({
                                   height: itemWidth,
                                   padding: 8,
                                   overflow: 'hidden',
-                                  borderRadius: 6,
-                                  border: `2px solid ${
-                                    hasError
-                                      ? themeStyle.errorText
-                                      : isActive
-                                        ? themeStyle.buttonPrimaryBackground
-                                        : themeStyle.tableBorder
-                                  }`,
-                                  backgroundColor: hasError
-                                    ? themeStyle.errorBackground
-                                    : isActive
-                                      ? themeStyle.tableRowBackgroundHover
-                                      : 'transparent',
                                   flexDirection: 'column',
                                   alignItems: 'center',
                                   gap: 8,
                                   flexShrink: 0,
                                   position: 'relative',
+                                  ...(!isRedesign &&
+                                    getUpstreamTileLook({
+                                      hasError,
+                                      isActive,
+                                    })),
                                 }}
+                                className={
+                                  isRedesign
+                                    ? hasError
+                                      ? tileErrorClassName
+                                      : isActive
+                                        ? tileActiveClassName
+                                        : tileClassName
+                                    : undefined
+                                }
                               >
                                 <View
                                   style={{
@@ -336,9 +361,10 @@ export function ThemeInstaller({
                                     left: 0,
                                     right: 0,
                                     bottom: 0,
-                                    borderRadius: 6,
-                                    backgroundColor:
-                                      themeStyle.overlayBackground,
+                                    borderRadius: isRedesign ? 11 : 6,
+                                    backgroundColor: isRedesign
+                                      ? themeStyle.scrim
+                                      : themeStyle.overlayBackground,
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     zIndex: 1,
@@ -357,11 +383,14 @@ export function ThemeInstaller({
                                     }}
                                   />
                                 </View>
-                                <ColorPalette colors={theme.colors} />
+                                <ColorPalette
+                                  colors={theme.colors}
+                                  radius={isRedesign ? 8 : undefined}
+                                />
                                 <TextOneLine
                                   style={{
-                                    fontSize: 12,
-                                    fontWeight: 500,
+                                    fontSize: isRedesign ? 12.5 : 12,
+                                    fontWeight: isRedesign ? 600 : 500,
                                     textAlign: 'center',
                                     width: '100%',
                                   }}
@@ -374,16 +403,22 @@ export function ThemeInstaller({
                                   direction="horizontal"
                                   align="center"
                                   wrap={false}
-                                  gap={4}
-                                  style={{ fontSize: 10 }}
+                                  gap={isRedesign ? 6 : 4}
+                                  style={{ fontSize: isRedesign ? 11 : 10 }}
                                 >
                                   <TextOneLine
                                     style={{
-                                      color: themeStyle.pageTextSubdued,
+                                      color: isRedesign
+                                        ? themeStyle.pageTextSecondary
+                                        : themeStyle.pageTextSubdued,
                                     }}
                                   >
                                     {t('by')}{' '}
-                                    <Text style={{ fontWeight: 'bold' }}>
+                                    <Text
+                                      style={{
+                                        fontWeight: isRedesign ? 600 : 'bold',
+                                      }}
+                                    >
                                       {extractRepoOwner(theme.repo)}
                                     </Text>
                                   </TextOneLine>
@@ -391,6 +426,10 @@ export function ThemeInstaller({
                                     variant="external"
                                     to={normalizeGitHubRepo(theme.repo)}
                                     onClick={e => e.stopPropagation()}
+                                    {...(isRedesign && {
+                                      linkColor: 'muted',
+                                      className: sourceLinkClassName,
+                                    })}
                                   >
                                     <Trans>Source</Trans>
                                   </Link>
@@ -412,12 +451,14 @@ export function ThemeInstaller({
       {/* Paste CSS Input */}
       <View
         style={{
-          borderTop: `1px solid ${themeStyle.tableBorder}`,
-          paddingTop: 16,
-          marginBottom: 16,
+          borderTop: `1px solid ${
+            isRedesign ? themeStyle.cardHairline : themeStyle.tableBorder
+          }`,
+          paddingTop: isRedesign ? 14 : 16,
+          marginBottom: isRedesign ? 0 : 16,
         }}
       >
-        <Text style={{ marginBottom: 8, color: themeStyle.pageTextSubdued }}>
+        <Text style={isRedesign ? redesignLabelStyle : upstreamLabelStyle}>
           <Trans>Additional CSS overrides:</Trans>
         </Text>
         <TextArea
@@ -425,11 +466,16 @@ export function ThemeInstaller({
           onChange={e => handlePastedCssChange(e.target.value)}
           placeholder={t(':root {\n  --color-sidebarItemSelected: #007bff;\n}')}
           aria-label={t('Custom Theme CSS')}
-          style={{
-            ...baseInputStyle,
-            height: 120,
-            resize: 'vertical',
-          }}
+          className={isRedesign ? redesignTextAreaClassName : undefined}
+          style={
+            isRedesign
+              ? undefined
+              : {
+                  ...baseInputStyle,
+                  height: 120,
+                  resize: 'vertical',
+                }
+          }
         />
         <View
           style={{
@@ -438,7 +484,11 @@ export function ThemeInstaller({
             marginTop: 8,
           }}
         >
-          <Button variant="normal" onPress={handleApplyOverride}>
+          <Button
+            variant={isRedesign ? 'control' : 'normal'}
+            style={isRedesign ? dialogButtonStyle : undefined}
+            onPress={handleApplyOverride}
+          >
             <Trans>Apply</Trans>
           </Button>
         </View>
@@ -447,15 +497,128 @@ export function ThemeInstaller({
       {/* Error Message */}
       {error && (
         <Text
-          style={{
-            color: themeStyle.errorText,
-            marginBottom: 12,
-            fontSize: 12,
-          }}
+          style={
+            isRedesign
+              ? { ...redesignMessageStyle, marginTop: 10, marginBottom: 0 }
+              : upstreamMessageStyle
+          }
         >
+          {isRedesign && <SvgExclamationOutline style={messageIconStyle} />}
           {error}
         </Text>
       )}
     </View>
   );
 }
+
+function getUpstreamTileLook({
+  hasError,
+  isActive,
+}: {
+  hasError: boolean;
+  isActive: boolean;
+}): CSSProperties {
+  return {
+    borderRadius: 6,
+    border: `2px solid ${
+      hasError
+        ? themeStyle.errorText
+        : isActive
+          ? themeStyle.buttonPrimaryBackground
+          : themeStyle.tableBorder
+    }`,
+    backgroundColor: hasError
+      ? themeStyle.errorBackground
+      : isActive
+        ? themeStyle.tableRowBackgroundHover
+        : 'transparent',
+  };
+}
+
+// Desktop looks (design-decisions §10l); narrow widths keep upstream's.
+// Classes rather than inline styles so hover and focus states apply.
+const tileClassName = css({
+  borderRadius: 12,
+  border: `1px solid ${themeStyle.cardHairline}`,
+  backgroundColor: themeStyle.cardBackground,
+  '&[data-hovered]': { backgroundColor: themeStyle.tableRowHover },
+  // Inside the edge: the list's rows leave no room above for an outer ring.
+  '&[data-focus-visible]': { ...styles.focusRing, outlineOffset: -2 },
+});
+
+const tileActiveClassName = css({
+  borderRadius: 12,
+  border: `1px solid ${themeStyle.selectionBorder}`,
+  boxShadow: `inset 0 0 0 0.5px ${themeStyle.selectionBorder}`,
+  backgroundColor: themeStyle.selectionBackground,
+  '&[data-hovered]': { backgroundColor: themeStyle.selectionBackground },
+  '&[data-focus-visible]': { ...styles.focusRing, outlineOffset: -2 },
+});
+
+const tileErrorClassName = css({
+  borderRadius: 12,
+  border: `1px solid ${themeStyle.pillNegativeText}`,
+  backgroundColor: themeStyle.pillNegativeBackground,
+  '&[data-hovered]': { backgroundColor: themeStyle.pillNegativeBackground },
+  '&[data-focus-visible]': { ...styles.focusRing, outlineOffset: -2 },
+});
+
+const upstreamLabelStyle: CSSProperties = {
+  marginBottom: 8,
+  color: themeStyle.pageTextSubdued,
+};
+
+const redesignLabelStyle: CSSProperties = {
+  ...dialogEyebrowStyle,
+  marginBottom: 8,
+};
+
+const upstreamMessageStyle: CSSProperties = {
+  color: themeStyle.errorText,
+  marginBottom: 12,
+  fontSize: 12,
+};
+
+const redesignMessageStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'flex-start',
+  gap: 6,
+  color: themeStyle.pillNegativeText,
+  marginBottom: 12,
+  fontSize: 12.5,
+  lineHeight: 1.4,
+};
+
+const messageIconStyle: CSSProperties = {
+  width: 13,
+  height: 13,
+  flexShrink: 0,
+  marginTop: 2,
+};
+
+// Doubled to outrank the Settings card's own link style.
+const sourceLinkClassName = css({
+  '&&': {
+    color: themeStyle.pageText,
+    fontWeight: 500,
+    textDecoration: 'underline',
+    textUnderlineOffset: 2,
+  },
+});
+
+const redesignTextAreaClassName = css({
+  height: 120,
+  resize: 'vertical',
+  margin: 0,
+  padding: '8px 10px',
+  borderRadius: 9,
+  border: `1px solid ${themeStyle.cardHairline}`,
+  backgroundColor: themeStyle.controlBackground,
+  color: themeStyle.pageText,
+  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+  fontSize: 12,
+  lineHeight: 1.5,
+  outline: 0,
+  '::placeholder': { color: themeStyle.pageTextFaint },
+  '&[data-focus-visible], &[data-focused]': styles.focusRing,
+});

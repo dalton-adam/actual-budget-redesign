@@ -4,9 +4,10 @@ const DEFAULT_COLORS = ['#ccc', '#999', '#666', '#333', '#111', '#000'];
 
 type ColorPaletteProps = {
   colors?: string[];
+  radius?: number;
 };
 
-export function ColorPalette({ colors }: ColorPaletteProps) {
+export function ColorPalette({ colors, radius = 4 }: ColorPaletteProps) {
   // Default fallback colors if not provided
   const paletteColors = colors ?? DEFAULT_COLORS;
 
@@ -19,7 +20,7 @@ export function ColorPalette({ colors }: ColorPaletteProps) {
         width: '100%',
         flex: 1,
         minHeight: 0,
-        borderRadius: 4,
+        borderRadius: radius,
         overflow: 'hidden',
       }}
     >

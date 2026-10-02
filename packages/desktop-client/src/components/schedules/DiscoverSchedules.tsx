@@ -159,6 +159,7 @@ function DiscoverSchedulesTable({
         }
       >
         <SelectCell
+          aria-label={t('Select all')}
           exposed={!loading}
           focused={false}
           selected={selectedItems.size > 0}

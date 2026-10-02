@@ -915,6 +915,20 @@ each:
 - No visual change for the button roles. Narrow widths keep the upstream
   installer (mobile is deferred, plan §19.4).
 
+**As implemented (APP-06f):** the table ring is a pseudo-element overlay,
+not an outline: the virtualised rows sit on their own layer and painted
+over an outline. Its corners come from `--card-inner-radius`, which the
+Surface card style and the dialog table card set (17px and 11px), so any
+table in those cards follows them. The Rules page list is not the shared
+`Table`, so the ring the drawing showed there does not apply.
+Catalog tiles' focus ring sits inside the
+edge (the list's rows leave no room above for an outer ring), and their
+colours are classes rather than inline styles so hover and focus apply.
+"Select all" reports checked when any row is selected, as the header box
+shows, not "mixed". Left as upstream: the empty category button on
+scheduled rows in the register, a focusable button with no content or
+action, which has no name.
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the

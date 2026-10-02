@@ -171,6 +171,9 @@ export const styles: CSSProperties = {
     border: `1px solid ${theme.cardHairline}`,
     borderRadius: 18,
     boxShadow: theme.cardElevation,
+    // Read by a table's keyboard focus ring so it follows the card's
+    // corners (radius less the hairline).
+    '--card-inner-radius': '17px',
   },
   tableContainer: {
     flex: 1,
