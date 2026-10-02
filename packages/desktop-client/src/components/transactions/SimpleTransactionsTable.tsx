@@ -206,6 +206,7 @@ export function SimpleTransactionsTable({
   isCard = false,
   style,
 }: SimpleTransactionsTableProps) {
+  const { t } = useTranslation();
   const format = useFormat();
   const dateFormat = useDateFormat() || 'MM/dd/yyyy';
   const selectedItems = useSelectedItems();
@@ -236,6 +237,7 @@ export function SimpleTransactionsTable({
   const headers = (
     <>
       <SelectCell
+        aria-label={t('Select all')}
         exposed
         focused={false}
         selected={selectedItems.size > 0}

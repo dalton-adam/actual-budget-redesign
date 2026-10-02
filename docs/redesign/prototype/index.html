@@ -21,6 +21,8 @@
   APP-05d (page=settings): sadv=0|1 (advanced shown, scrolled to), sexp=0|1 (experimental
   features listed), sauto=0|1 (theme follows the system), sserver=0|1 (a sync server),
   stmenu=theme (the theme menu open)
+  APP-06f: sinst=open|loading|error|nocat (custom-theme installer, page=settings),
+  sinstold=0|1 (today's installer), tblfocus=0|1 (table container focused; payees, rules, tags)
   APP-03c: rgraph=table|bar|stacked|line|area|donut, rlegend=0|1, rsummary=0|1, rlabels=0|1
   DESIGN-02: data=basic|states|many, density=50|44|38, rta=pos|zero|neg,
   when=past|current|future, cat=<category id>, pm=<panel month>, hover=<id>, edit=<id>:<month>,
@@ -5080,10 +5082,9 @@
       }
       .rdtcols {
         display: grid;
-        grid-template-columns: 96px minmax(0, 1.2fr) minmax(0, 1fr) minmax(
-            0,
-            1fr
-          ) 96px;
+        grid-template-columns:
+          96px minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr)
+          96px;
         align-items: center;
         column-gap: 12px;
         padding: 0 14px;
@@ -5162,20 +5163,18 @@
       /* Find schedules and link schedule */
       .dscols {
         display: grid;
-        grid-template-columns: 30px minmax(0, 1fr) minmax(0, 1fr) minmax(
-            0,
-            1.5fr
-          ) 100px;
+        grid-template-columns:
+          30px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr)
+          100px;
         align-items: center;
         column-gap: 12px;
         padding: 0 14px 0 8px;
       }
       .lkcols {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(
-            0,
-            1fr
-          ) 110px 120px 100px;
+        grid-template-columns:
+          minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)
+          110px 120px 100px;
         align-items: center;
         column-gap: 12px;
         padding: 0 14px;
@@ -6253,6 +6252,245 @@
       .st-err {
         color: var(--pillNegativeText);
       }
+      /* APP-06f: the custom-theme installer inside the Themes card */
+      .thi {
+        margin-top: 4px;
+        padding: 16px;
+        border-radius: 12px;
+        background: var(--cardInset);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .thi-h {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--pageText);
+      }
+      .thi-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        max-height: 300px;
+        overflow: hidden;
+        /* room for the focus ring, as upstream pads its tiles */
+        padding: 4px;
+        margin: -4px;
+      }
+      .thi-tile {
+        position: relative;
+        aspect-ratio: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 12px;
+        border: 1px solid var(--cardBorder);
+        background: var(--cardBackground);
+        color: var(--pageText);
+        text-align: center;
+        font: inherit;
+        min-width: 0;
+      }
+      .thi-tile.hover {
+        background: var(--tableRowHover);
+      }
+      .thi-tile.on {
+        background: var(--selectionBackground);
+        border-color: var(--selectionBorder);
+        box-shadow: inset 0 0 0 0.5px var(--selectionBorder);
+      }
+      .thi-tile.err {
+        background: var(--pillNegativeBackground);
+        border-color: var(--pillNegativeText);
+      }
+      .thi-tile.focus {
+        outline: 2px solid var(--selectionBorder);
+        outline-offset: 2px;
+      }
+      .thi-pal {
+        flex: 1;
+        min-height: 0;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .thi-name {
+        font-size: 12.5px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .thi-by {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        font-size: 11px;
+        color: var(--pageTextSubdued);
+        white-space: nowrap;
+      }
+      .thi-by b {
+        font-weight: 600;
+      }
+      .thi-by a {
+        color: var(--pageText);
+        font-weight: 500;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .thi-load {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: var(--scrim);
+        display: grid;
+        place-items: center;
+        color: var(--pageText);
+      }
+      .thi-load svg {
+        width: 22px;
+        height: 22px;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .thi-load svg {
+          animation: adlg-spin 0.9s linear infinite;
+        }
+      }
+      .thi-css {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-top: 14px;
+        border-top: 1px solid var(--cardBorder);
+      }
+      .thi-ta {
+        height: 96px;
+        padding: 8px 10px;
+        border-radius: 9px;
+        border: 1px solid var(--cardBorder);
+        background: var(--controlBackground);
+        color: var(--pageText);
+        font:
+          12px/1.5 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Consolas,
+          monospace;
+        white-space: pre;
+        overflow: hidden;
+      }
+      .thi-ta .ph {
+        color: var(--pageTextFaint);
+      }
+      .thi-row {
+        display: flex;
+        justify-content: flex-end;
+      }
+      .thi-msg {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        font-size: 12.5px;
+        line-height: 1.4;
+        color: var(--pillNegativeText);
+      }
+      .thi-msg svg {
+        flex: none;
+        margin-top: 2px;
+      }
+      /* Today's installer */
+      .thi.old {
+        background: var(--x-tableBackground, var(--cardBackground));
+        border: 1px solid var(--x-tableBorder, var(--cardBorder));
+        border-radius: 8px;
+        gap: 0;
+      }
+      .thi.old .thi-h {
+        font-size: 14px;
+        margin-bottom: 16px;
+      }
+      .thi.old .thi-h .tbtn {
+        height: auto;
+        padding: 4px 6px;
+        border: 0;
+        border-radius: 4px;
+        background: transparent;
+        font-weight: 400;
+        font-size: 13px;
+      }
+      .thi.old .st-ey {
+        text-transform: none;
+        letter-spacing: 0;
+        font-size: 13px;
+        font-weight: 400;
+        color: var(--pageTextSubdued);
+        margin-bottom: 8px;
+      }
+      .thi.old .thi-grid {
+        margin-bottom: 16px;
+      }
+      .thi.old .thi-tile {
+        border-radius: 6px;
+        border: 2px solid var(--cardBorder);
+        background: transparent;
+      }
+      .thi.old .thi-tile.on {
+        border-color: var(--accent);
+        background: var(--tableRowHover);
+        box-shadow: none;
+      }
+      .thi.old .thi-tile.err {
+        border-color: var(--pillNegativeText);
+      }
+      .thi.old .thi-pal {
+        border-radius: 4px;
+      }
+      .thi.old .thi-name {
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .thi.old .thi-by {
+        font-size: 10px;
+      }
+      .thi.old .thi-by b {
+        font-weight: 700;
+      }
+      .thi.old .thi-by a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .thi.old .thi-css {
+        margin-bottom: 16px;
+      }
+      .thi.old .thi-ta {
+        border-radius: 4px;
+        background: var(--cardBackground);
+        font: 13px/1.4 inherit;
+        font-family: inherit;
+      }
+      .thi.old .thi-row .tbtn {
+        height: 28px;
+        border-radius: 4px;
+        font-weight: 400;
+      }
+      .thi.old .thi-msg {
+        font-size: 12px;
+        margin-bottom: 12px;
+      }
+      .thi.old .thi-msg svg {
+        display: none;
+      }
+      /* APP-06f: the table container focused from the keyboard */
+      .card.tbl-focus {
+        outline: 2px solid var(--selectionBorder);
+        outline-offset: -2px;
+      }
       .st-adv-head {
         font-size: 18px;
         font-weight: 700;
@@ -6379,6 +6617,12 @@
         sauto: params.get('sauto') === '1',
         sserver: params.get('sserver') === '1',
         stmenu: params.get('stmenu') || '',
+        // APP-06f: the custom-theme installer (open, loading, error,
+        // nocatalog), today's look for comparison, and the shared table
+        // container focused from the keyboard (Payees, Rules, Tags).
+        sinst: params.get('sinst') || '',
+        sinstold: params.get('sinstold') === '1',
+        tblfocus: params.get('tblfocus') === '1',
         // APP-06a: a dialog over any page (confirm, close, group, loading),
         // today's frame for comparison, and the close button's state.
         dlg: params.get('dlg') || '',
@@ -8657,6 +8901,10 @@
             [false, 'Fixture'],
             [true, 'No match'],
           ]),
+          grp('Table focus', 'tblfocus', [
+            [false, 'Off'],
+            [true, 'Keyboard'],
+          ]),
         ];
         const rul = [
           grp('Selection', 'rusel', [
@@ -8666,6 +8914,10 @@
           grp('List', 'ruempty', [
             [false, 'Fixture'],
             [true, 'No match'],
+          ]),
+          grp('Table focus', 'tblfocus', [
+            [false, 'Off'],
+            [true, 'Keyboard'],
           ]),
         ];
         const tg = [
@@ -8689,6 +8941,10 @@
             [false, 'Fixture'],
             [true, 'No tags'],
           ]),
+          grp('Table focus', 'tblfocus', [
+            [false, 'Off'],
+            [true, 'Keyboard'],
+          ]),
         ];
         const stg = [
           grp('Advanced', 'sadv', [
@@ -8707,6 +8963,21 @@
             [false, 'None'],
             [true, 'Connected'],
           ]),
+          grp('Theme installer', 'sinst', [
+            ['', 'Closed'],
+            ['open', 'Open'],
+            ['loading', 'Loading'],
+            ['error', 'Error'],
+            ['nocat', 'No catalog'],
+          ]),
+          ...(state.sinst
+            ? [
+                grp('Installer look', 'sinstold', [
+                  [false, 'Proposed'],
+                  [true, 'Today'],
+                ]),
+              ]
+            : []),
         ];
         const pageGroups = {
           budget,
@@ -10786,7 +11057,7 @@
                 : 'Filter payees...'
             }</div>
           </div>
-          <div class="card pay-table ${nSel ? 'has-sel' : ''}" role="table" aria-label="Payees">
+          <div class="card pay-table ${nSel ? 'has-sel' : ''} ${state.tblfocus ? 'tbl-focus' : ''}" role="table" aria-label="Payees">
             <div class="paycols rhead" role="row"><div><span class="cb ${
               nSel ? 'on' : ''
             }" style="opacity:1">${
@@ -11001,7 +11272,7 @@
                 : 'Filter rules...'
             }</div>
           </div>
-          <div class="card ru-table ${nSel ? 'has-sel' : ''}" role="table" aria-label="Rules">
+          <div class="card ru-table ${nSel ? 'has-sel' : ''} ${state.tblfocus ? 'tbl-focus' : ''}" role="table" aria-label="Rules">
             <div class="rucols rhead" role="row"><div><span class="cb ${
               nSel ? 'on' : ''
             }" style="opacity:1">${
@@ -11169,7 +11440,7 @@
           </div>
           <div class="card tg-table ${
             nSel ? 'has-sel' : ''
-          }" role="table" aria-label="Tags">
+          } ${state.tblfocus ? 'tbl-focus' : ''}" role="table" aria-label="Tags">
             <div class="tgcols rhead" role="row"><div><span class="cb ${
               nSel ? 'on' : ''
             }" style="opacity:1">${
@@ -11240,6 +11511,131 @@
                 )}<div style="height:1px;background:var(--cardBorder);margin:5px 4px"></div><div class="mi" role="option">Custom theme</div></div>`
             : '';
 
+        // APP-06f: the custom-theme installer. Catalog names, owners and
+        // colours are fictional; strings are the app's own.
+        function installer() {
+          if (!state.sinst) return '';
+          const old = state.sinstold;
+          const cat = [
+            [
+              'Harbor Light',
+              'mira-k',
+              [
+                '#f7f9fb',
+                '#e3ebf2',
+                '#2f6f9f',
+                '#1d3b53',
+                '#8fb3cf',
+                '#c9dbe8',
+              ],
+            ],
+            [
+              'Linen',
+              'odalys',
+              [
+                '#fbf8f2',
+                '#efe7d9',
+                '#9a6b3f',
+                '#3d2f22',
+                '#c7a983',
+                '#e6d6bf',
+              ],
+            ],
+            [
+              'Meadow',
+              'tpark',
+              [
+                '#f5faf4',
+                '#dcefd8',
+                '#2f8a4c',
+                '#1c3b25',
+                '#8cc79a',
+                '#c3e3c8',
+              ],
+            ],
+            [
+              'Paper Mint',
+              'jun-w',
+              [
+                '#fbfdfc',
+                '#e4f3ee',
+                '#1f8f78',
+                '#173a33',
+                '#86cdbd',
+                '#c6e8df',
+              ],
+            ],
+            [
+              'Rosewood',
+              'lenka',
+              [
+                '#fdf7f8',
+                '#f2dfe3',
+                '#a8435a',
+                '#3e1f27',
+                '#d69aa8',
+                '#ecc9d1',
+              ],
+            ],
+            [
+              'Solar Dawn',
+              'b-achebe',
+              [
+                '#fffaf0',
+                '#fde9c4',
+                '#c9761a',
+                '#40280d',
+                '#f0b766',
+                '#f8d9a2',
+              ],
+            ],
+          ];
+          const active = 'Paper Mint';
+          const st = state.sinst;
+          const errMsg = 'Failed to load theme';
+          const alert =
+            '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>';
+          const spinner =
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-9-9"/></svg>';
+          const tile = ([name, owner, colors], i) => {
+            const cls = [
+              name === active && st !== 'error' ? 'on' : '',
+              st === 'error' && name === 'Rosewood' ? 'err' : '',
+              st === 'open' && !old && name === 'Linen' ? 'hover' : '',
+              st === 'open' && !old && name === 'Meadow' ? 'focus' : '',
+            ].join(' ');
+            return `<button class="thi-tile ${cls}" aria-label="${name}">
+              ${
+                st === 'loading' && name === 'Solar Dawn'
+                  ? `<span class="thi-load" role="status" aria-label="Loading">${spinner}</span>`
+                  : ''
+              }
+              <span class="thi-pal">${colors
+                .map(c => `<span style="background:${c}"></span>`)
+                .join('')}</span>
+              <span class="thi-name">${name}</span>
+              <span class="thi-by"><span>by <b>${owner}</b></span><a href="#">Source</a></span>
+            </button>`;
+          };
+          const catalog =
+            st === 'nocat'
+              ? `<div class="thi-msg">${alert}<span>Failed to load theme catalog. You can still paste custom CSS below.</span></div>`
+              : `<div class="thi-grid">${cat.map(tile).join('')}</div>`;
+          return `<div class="thi ${old ? 'old' : ''}" aria-label="Install Custom Theme">
+            <div class="thi-h"><span>Install Custom Theme</span><button class="tbtn sm">Close</button></div>
+            <span class="st-ey">Choose from catalog:</span>
+            ${catalog}
+            <div class="thi-css">
+              <span class="st-ey">Additional CSS overrides:</span>
+              <div class="thi-ta" role="textbox" aria-label="Custom Theme CSS"><span class="ph">:root {
+  --color-sidebarItemSelected: #007bff;
+}</span></div>
+              <div class="thi-row"><button class="tbtn sm">Apply</button></div>
+            </div>
+            ${st === 'error' ? `<div class="thi-msg">${alert}<span>${errMsg}</span></div>` : ''}
+          </div>`;
+        }
+
         const about = `<section class="st-card">
           <p><strong>Actual</strong> is a super fast privacy-focused app for managing your finances.</p>
           <div class="st-meta">
@@ -11266,6 +11662,7 @@
             }
           </div>
           ${themeMenu}
+          ${installer()}
         </section>`;
 
         const format = `<section class="st-card">
@@ -11500,6 +11897,8 @@
         if (stAdv && !state.sexp) stAdv.scrollIntoView(true);
         const stFlags = document.querySelector('.st-flags');
         if (stFlags) stFlags.scrollIntoView({ block: 'end' });
+        const stInst = document.querySelector('.thi');
+        if (stInst) stInst.scrollIntoView({ block: 'end' });
         // Tags menus open under their toolbar buttons, right-aligned.
         for (const [menuSel, btnSel] of [
           ['.tg-sel-menu', '[data-tg="sel"]'],
@@ -11583,6 +11982,14 @@
         } else {
           for (const k of ['odlg', 'odlgold']) u.searchParams.delete(k);
         }
+        if (state.sinst) {
+          u.searchParams.set('sinst', state.sinst);
+          u.searchParams.set('sinstold', state.sinstold ? '1' : '0');
+        } else {
+          for (const k of ['sinst', 'sinstold']) u.searchParams.delete(k);
+        }
+        if (state.tblfocus) u.searchParams.set('tblfocus', '1');
+        else u.searchParams.delete('tblfocus');
         if (state.tst) {
           u.searchParams.set('tst', state.tst);
           u.searchParams.set('tstold', state.tstold ? '1' : '0');

@@ -13,6 +13,7 @@ export function UserDirectoryHeader() {
   return (
     <TableHeader style={{}}>
       <SelectCell
+        aria-label={t('Select all')}
         exposed
         focused={false}
         selected={selectedItems.size > 0}

@@ -57,7 +57,7 @@ Budget header are reference material, not tasks to build.
 | APP-06c            | verified    | `5660d77ba`, `d638c6265` | Linux VRT 186/186, no snapshot changed. E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md).                                |
 | APP-06d            | verified    | `1d2e3cda2`, `cb1c20101` | Linux VRT 186/186 after regenerating 3 (date filter's empty register). E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md). |
 | APP-06e            | verified    | `6b9e22d61`, `5b1929c01` | Linux VRT 186/186, no snapshot changed. E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md).                                |
-| APP-06f            | not started | —                        | Split October 1, 2026 (below). The file list is rebuilt from source before it starts.                                                             |
+| APP-06f            | verified    | `126cbf83d`              | Linux VRT 186/186, no snapshot changed. E2E 121/121; light, midnight, narrow, screen reader and desktop not run (task-reports.md).                |
 | QA-01, RELEASE-01  | not started | —                        | —                                                                                                                                                 |
 
 States follow plan §16: not started, ready, in progress, review, verified,
@@ -92,8 +92,8 @@ does not claim Claude's prototype is production-ready.
    October 1, 2026. ~~Then **APP-05a**~~ Merged October 1, 2026. ~~Then **APP-05b**~~ Merged October 1, 2026. ~~Then **APP-05c**~~ Merged
    October 1, 2026. ~~Then **APP-05d**~~ Merged
    October 1, 2026. Then **APP-06** (split into 06a – f; ~~06a~~ merged October 1;
-   ~~06b~~, ~~06c~~, ~~06d~~, ~~06e~~ merged October 2;
-   06f next), then QA-01 and RELEASE-01.
+   ~~06b~~, ~~06c~~, ~~06d~~, ~~06e~~, ~~06f~~ merged October 2), then QA-01
+   and RELEASE-01.
 
 The review's reasoning is in plan §19.
 

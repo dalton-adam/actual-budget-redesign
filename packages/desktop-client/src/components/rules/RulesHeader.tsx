@@ -28,6 +28,7 @@ export function RulesHeader() {
       }}
     >
       <SelectCell
+        aria-label={t('Select all')}
         exposed
         focused={false}
         selected={selectedItems.size > 0}

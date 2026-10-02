@@ -13,6 +13,7 @@ import { Button } from '@actual-app/components/button';
 import { SvgDotsHorizontalTriple } from '@actual-app/components/icons/v1';
 import { SvgCheck } from '@actual-app/components/icons/v2';
 import { styles } from '@actual-app/components/styles';
+import type { CSSProperties as ViewStyle } from '@actual-app/components/styles';
 import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -46,7 +47,8 @@ type SchedulesTableProps = {
    */
   isCard?: boolean;
   style: CSSProperties;
-  tableStyle?: CSSProperties;
+  // A View style, so a card can set --card-inner-radius (table.tsx).
+  tableStyle?: ViewStyle;
 } & (
   | {
       minimal: true;

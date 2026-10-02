@@ -511,10 +511,20 @@ function StatusCell({
   onEdit,
   onUpdate,
 }: StatusCellProps) {
+  const { t } = useTranslation();
   const isRegister = useIsRegister();
   const isClearedField =
     status === 'cleared' || status === 'reconciled' || status == null;
   const statusProps = getStatusProps(status);
+  // The button shows only an icon, so its state is its accessible name.
+  const statusLabel =
+    status === 'cleared'
+      ? t('Cleared')
+      : status === 'reconciled'
+        ? t('Reconciled')
+        : status == null
+          ? t('Uncleared')
+          : titleFirst(getStatusLabel(status));
 
   // The register draws cleared as a check, uncleared as a ring and
   // reconciled as a muted lock (design-decisions §10).
@@ -568,6 +578,7 @@ function StatusCell({
           ...(isChild && { visibility: 'hidden' }),
         }}
         disabled={isPreview || isChild}
+        aria-label={statusLabel}
         onEdit={() => onEdit(id, 'cleared')}
         onSelect={onSelect}
       >

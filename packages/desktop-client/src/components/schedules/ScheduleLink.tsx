@@ -191,7 +191,13 @@ export function ScheduleLink({
               isCard={isCard}
               // A hairline card inside the dialog, without elevation.
               tableStyle={
-                isCard ? { borderRadius: 12, boxShadow: 'none' } : undefined
+                isCard
+                  ? {
+                      borderRadius: 12,
+                      boxShadow: 'none',
+                      '--card-inner-radius': '11px',
+                    }
+                  : undefined
               }
               style={null}
             />

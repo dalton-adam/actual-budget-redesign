@@ -297,7 +297,7 @@ Calm and tactile: redesign variants are opt-in, so existing variants and screens
 - **Tab / Tab selected:** transparent tabs inside a Nav Track (12px radius, 2px padding). The selected tab is Surface White, 600 weight, with the Active tab shadow. 7px 14px padding, 10px radius.
 - **Control:** Surface White, hairline border, 9px radius, at least 30×30px. Used for steppers, toggles and the month menu. Hover is a Row Hover wash.
 - **Primary / Normal / Bare:** upstream buttons, unchanged.
-- **Focus:** a 2px Actual Purple outline at 2px offset (`styles.focusRing`) on every redesign control.
+- **Focus:** a 2px Actual Purple outline at 2px offset (`styles.focusRing`) on every redesign control. A table that takes focus itself (the shared `Table`, APP-06f) draws the same ring inside its edge, on keyboard focus only, following the corners of the card around it.
 - **Disabled:** 45% opacity rather than a recolor, so disabled always reads as quieter in any theme.
 - **Motion:** color transitions of .15s, only when reduced motion is not requested.
 
@@ -346,6 +346,8 @@ The custom report editor (APP-03c) puts its toolbar above two cards. The chart c
 ### Settings Page
 
 The Settings page (APP-05d) is one 720px column at the page's left margin under the Display title. Each setting is a Surface card **without** elevation (18px 20px padding, 12px apart): the explanation in Secondary text with its bold lead term in Page Text, then the controls under a Card Hairline divider. Select labels are Eyebrow text; selects are Control buttons at least 32px tall and 170px wide; actions are Control buttons; checkboxes keep the shared checkbox with 5px corners and a Faint border. The version lines and IDs sit on Card Inset (10px radius); "You're up to date!" is a positive status pill; status text uses the pill text roles. "Show advanced settings" and the experimental-features reveal are Control buttons, and "Advanced Settings" is a Headline. Below the narrow breakpoint the page keeps the upstream look (mobile is deferred).
+
+The custom-theme installer (APP-06f) opens under the Themes controls as a Card Inset panel (12px radius, no border): a 13.5px/600 title with a Control "Close", Eyebrow labels, and the catalog as Surface tiles (hairline, 12px radius) three to a row, each with its palette (8px radius), the name at 12.5px/600 and "by" in Secondary text with "Source" Page Text underlined. Hover is the Row Hover wash; the installed theme takes the selection tint and border; a theme that failed takes the negative pill tint and border; the loading cover is the Scrim. Keyboard focus rings sit inside the tile's edge. The CSS box is a Control-look textarea in monospace, "Apply" a Control button, and errors negative pill text after an alert icon.
 
 ### Dialogs
 

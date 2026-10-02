@@ -1892,3 +1892,49 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   theme in the app (drawn only), keyboard focus through the rule editor,
   the formula and templating toggles, narrow widths in the app (the narrow
   branches are upstream code), and the desktop build.
+
+- APP-06f: branch `redesign/app-06f-a11y`, code `126cbf83d`. Drawing
+  `094e9e0cf` (prototype shots `161`–`170`); the owner left the four
+  questions to the implementer on October 2, 2026, who chose the drawn
+  option for each (design-decisions §10l, recorded in `c2df3f921`). The
+  file list was rebuilt from source first: the shared `Table` is used by
+  Payees, Tags, Schedules, Found Schedules, Link schedule, the rule
+  dialog's transactions, the linked-accounts dialog, the user directory
+  and the register (the Rules page list is not); `CellButton` is also
+  `SelectCell`'s checkbox and the register's status, split and parent
+  payee buttons. **Change:** the `Table` container shows a 2px Selection
+  Border ring inside its edge on keyboard focus only, drawn as an overlay
+  (an outline was painted over by the virtualised rows' layer) whose
+  corners follow `--card-inner-radius`, set by `styles.surfaceCard`, the
+  dialog table card and Link schedule's card. `CellButton` has
+  `role="button"` and `aria-disabled`; `SelectCell` has `role="checkbox"`,
+  `aria-checked` and a name ("Select"; "Select all" in the six header
+  checkboxes, two new strings); the register's status button is named by
+  its state from existing strings. The custom-theme installer (desktop,
+  `useSettingsRedesign`) is a Card Inset panel with Eyebrow labels,
+  Control "Close" and "Apply", Surface tiles (hairline, 12px radius; hover,
+  active, error and focus as classes so they apply), a Scrim loading
+  cover, a monospace Control-look textarea and negative pill error text
+  with an icon; `ColorPalette` takes a radius. `DESIGN.md` updates the
+  focus rule and adds the installer to the Settings page entry. No
+  handler, test id, catalog or install behaviour changed. **Checks:**
+  typecheck passes; oxlint over the changed files 0 errors (one
+  `prefer-tag-over-role` disabled on the checkbox `div`, which keeps
+  `CellButton`'s key handling); oxfmt applied. Web unit tests: the full
+  run found one failure, the installer test that reads upstream's inline
+  error colours; it now covers the narrow look and a new test covers the
+  desktop look (installer and `TransactionsTable` tests 68 passed,
+  1 skipped; the full suite was not rerun). E2E against the dev server
+  with the installed Edge (scratch config, not committed): the APP-06b set
+  **121/121**. In the app (demo budget, dark): Tab reaches the Payees
+  table with the ring following the card's corners; roles and names
+  checked on Payees and the register; the installer opened from the Dark
+  theme select, a catalog theme installed (custom theme: active tile on
+  its selection colours), a tile focused by keyboard, no console errors,
+  then the theme set back. Linux VRT (Docker, Playwright v1.61.1, checkout
+  at `/mnt/host/c/dev/actual-budget-redesign`, HTTPS dev server over the
+  LAN address, one worker, no retries): **186/186**, no snapshot changed
+  (the ring needs keyboard focus; no screenshot shows the installer).
+  **Not run:** light and midnight in the app, narrow widths, a screen
+  reader, and the desktop build. **Left as upstream:** the empty,
+  unnamed category button on scheduled rows in the register.
