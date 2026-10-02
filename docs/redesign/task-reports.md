@@ -1788,3 +1788,52 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   changed (no screenshot test shows a toast). **Not run:** custom theme in
   the app (drawn only), keyboard focus on the close button in the app, the
   button loading state, and the desktop build.
+- APP-06d: branch `redesign/app-06d-states`, code `cb1c20101`, snapshots
+  `e8b8d72b0`. Drawing `65aa6b14a` (prototype shots `131`–`144`); the owner
+  approved it on October 2, 2026, choosing the drawn option for both
+  questions (neutral title with a red status icon for section errors; a
+  button row with "Restart app" as primary in Fatal Error) and leaving the
+  rest to the implementer, who kept the drawing (design-decisions §10j). The
+  file list was rebuilt from source first: besides the three named files,
+  `util/LoadComponent.tsx` holds a copy of the loading indicator,
+  `AppBackground.tsx` shows the budget loading text, and the account
+  register's two empty states (`accounts/AccountEmptyMessage.tsx`, the "No
+  transactions" line in `accounts/Account.tsx`) were still upstream.
+  **Change (desktop, not `isNarrowWidth`):** `FeatureErrorFallback` shows a
+  40px round "!" in the negative pill tone, a 15px/600 Page Text title, the
+  message on Card Inset (monospace, Secondary, selectable) and a `control`
+  "Try again"; `FatalError` uses the dialog's text size, a `ModalButtons`
+  row with "Show Error" as a bare underlined Secondary button (keyboard
+  reachable; it was a span) on the left and "Restart app" as `primary` on
+  the right, the stack on Card Inset above it (monospace, scrolls past
+  140px), and its "in touch" link in Page Text, underlined; the three
+  loading states use a 13.5px/500 Secondary message and a 20px Secondary
+  spinner, 12px apart; the first-account message leads with its first
+  sentence on its own line (16px/600 Page Text) over 13.5px Secondary text
+  without the extra table border; "No transactions" is the shared 13px
+  Secondary empty line. Below the narrow breakpoint the shared components
+  keep the upstream look; the account register is desktop only. No string
+  (the `Trans` children are unchanged), handler, role, error routing or
+  timing changed. `DESIGN.md` adds a Loading, Error and Empty States entry.
+  **Checks:** typecheck passes; oxlint over the seven files: no new findings
+  (three upstream warnings in untouched lines); oxfmt applied; impeccable
+  hook: no findings; web unit tests **1052 passed, 1 skipped**
+  (`FatalError.test.tsx` 7/7, including "Show Error"). E2E against the HTTPS
+  dev server with the installed Edge (scratch config, not committed): the
+  APP-06b set **121/121**. VISUAL (scratch Playwright script, demo budget,
+  1440×900, light, dark and midnight; temporary debug throws in `Titlebar`
+  and `schedules/index.tsx` and a forced loading flag in `reports/Overview`,
+  all reverted before committing): Fatal Error with and without the stack,
+  the section error on Schedules, "Loading reports...", the empty register
+  after a search, the budget loading text on the budget list, and the
+  first-account state in a fresh budget. Found while checking: the Reports
+  dashboard route has no section error boundary upstream, so an error there
+  reaches Fatal Error (not changed; presentation only). Linux VRT (Docker,
+  Playwright v1.61.1, checkout at `/mnt/host/c/dev/actual-budget-redesign`,
+  HTTPS dev server over the LAN address, one worker, no retries): full run
+  185/186; the one failure was the date filter's empty register (the
+  intended new empty line), so its **3 snapshots** were regenerated, checked
+  and re-run (pass). **Not run:** custom theme in the app (drawn only),
+  narrow widths in the app (the narrow branches are upstream code), the
+  `SharedArrayBuffer` and IndexedDB bodies in the app (unit tests only), and
+  the desktop build.

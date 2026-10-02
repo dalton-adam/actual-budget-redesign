@@ -17,46 +17,47 @@ Budget header are reference material, not tasks to build.
 
 ### Status ledger
 
-| ID                 | State       | Merged                   | Open gaps carried forward                                                                                                      |
-| ------------------ | ----------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| DISC-01, DISC-02   | verified    | Stage 0 docs             | Reports baseline: 58 passed, 1 failed, 15 skipped. Performance baseline recorded in QA-00.                                     |
-| DESIGN-01 – 03     | verified    | docs                     | design-decisions §11 items 2, 5 still "Shown".                                                                                 |
-| UI-01              | verified    | `4b7b82ea6`              | Accepted light contrast shortfalls (design-decisions §8).                                                                      |
-| UI-02              | verified    | `3dd3144a3`              | Storybook needs a local case-sensitivity workaround on macOS.                                                                  |
-| UI-03              | verified    | `0e57f083c`, `0129f2c00` | —                                                                                                                              |
-| NAV-01             | verified    | `7eea259f3`              | —                                                                                                                              |
-| NAV-02 (+ e2e fix) | verified    | `f02e5ff5e`, `ed654319e` | Collapsed-rail initials are ambiguous; the open account has no visible fill in light (both → BUD-04).                          |
-| BUD-01             | verified    | `03e9150c3`              | Tour summary step fixed in TOUR-FIX. Custom theme passed in QA-00.                                                             |
-| TERM-01            | verified    | `f771c251d`              | Light and midnight wording checked in QA-00.                                                                                   |
-| BUD-02             | verified    | `b732f170f`              | Goal caption left out (→ decision D-3). Edit and scroll regressions found in QA-00 (→ PERF-01, 02).                            |
-| BUD-03             | verified    | `6b53968b8`              | Custom theme passed in QA-00.                                                                                                  |
-| DETAIL-01          | verified    | `5f238b120`              | The overlay passed in a custom theme in QA-00.                                                                                 |
-| DETAIL-02          | verified    | `d90250dff`              | Goal box and pace chart (→ DETAIL-04); month stepper, links and notes editing (→ DETAIL-03).                                   |
-| TOUR-FIX           | verified    | `485a7fbe3`              | —                                                                                                                              |
-| THEME-02           | verified    | `f9f4e1892`              | Linux VRT baselines regenerated in QA-00; WIDE not run.                                                                        |
-| QA-00              | verified    | `1e94b0559`              | VRT: 23 of 204 changed snapshots reviewed by eye, the rest by script. QA-01 thresholds decided (D-6).                          |
-| ELEC-01            | verified    | `0a8582cea`              | Dev builds isolated by `scripts/redesign-electron.mjs`; packaged builds are not (stage-0.md). Title bar wrap → TOPBAR-FIX.     |
-| BUD-04             | verified    | `c0527171d`              | Adds theme role `navListActive`. Linux VRT regenerated in DETAIL-03.                                                           |
-| PERF-01            | verified    | `8f88c6841`              | Edits now 57–59% faster than the base. Adds `C/budget/index.tsx` (owner-approved; may touch SYNC-01).                          |
-| PERF-02            | verified    | docs only                | PERF-01 fixed it; no source change. 1000×700 hit 33.3 ms in 5 of 7 runs (a pass; QA-01 watches).                               |
-| ASSIGN-FIX         | verified    | `cc078bd06`              | Snapshots stale since BUD-04 regenerated in DETAIL-03.                                                                         |
-| DETAIL-03          | verified    | `658a38c90`              | Linux VRT regenerated (177, incl. BUD-04's pane); custom theme and WIDE passed. Session-only category and month memory.        |
-| DETAIL-04          | verified    | `9059b8491`              | E2E and WIDE ran against a dev server, not a `build:browser` preview. Linux VRT regenerated (21).                              |
-| TOPBAR-FIX         | verified    | `107560a51`              | Icon-only Help when narrow is still "Shown" (design-decisions §11 item 6). Linux VRT: no snapshot changed.                     |
-| SYNC-01            | blocked     | —                        | No upstream release after v26.9.0 (checked September 29, 2026). Start when v26.10.0 ships; before RELEASE-01 (D-1).            |
-| APP-01             | verified    | `875ddad48`              | Linux VRT regenerated (69) on Windows. Custom theme, keyboard, privacy and desktop passed.                                     |
-| APP-02             | verified    | `f8fcc70d8`              | Linux VRT regenerated (66) and desktop window checked on Windows. E2E test "by payee" changed (SYNC-01 conflict risk).         |
-| APP-03a – d        | verified    | `0a7384ab1`, `ba03773c2` | 03a – d merged; all checks done (03d custom theme, keyboard, privacy, desktop on October 1, 2026).                             |
-| APP-04             | verified    | `f0052659d`              | Linux VRT regenerated (27). Keyboard, privacy, header custom theme and desktop passed (verification.md).                       |
-| APP-05a            | verified    | `3623d9384`, `bfa623bba` | Linux VRT regenerated (6). Custom theme, keyboard and desktop passed; rule button fill and focus ring fixed (verification.md). |
-| APP-05b            | verified    | `3cbc474b6`              | Linux VRT regenerated (6). Custom theme, keyboard, privacy, 1000×700 passed (verification.md); desktop not run.                |
-| APP-05c            | verified    | `51cfe0733`, `07d3214fa` | New Tags E2E (11) and Linux VRT (9). Custom theme, 1000×700, keyboard passed (verification.md); desktop not run.               |
-| APP-05d            | verified    | `a1f4d90b6`, `08ea741bb` | Linux VRT regenerated (3). Themes, custom theme, keyboard passed (verification.md); desktop not run.                           |
-| APP-06a            | verified    | `8d0244c25`, `b31f33d66` | Linux VRT regenerated (27). E2E 121/121; custom theme, 1000×700 and desktop not run (task-reports.md).                         |
-| APP-06b            | verified    | `102c85b33`, `e16964ccb` | Linux VRT regenerated (51). E2E 121/121; custom theme, 1000×700 and desktop not run (task-reports.md).                         |
-| APP-06c            | verified    | `5660d77ba`, `d638c6265` | Linux VRT 186/186, no snapshot changed. E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md).             |
-| APP-06d – f        | not started | —                        | Split October 1, 2026 (below). Each file list is rebuilt from source before it starts.                                         |
-| QA-01, RELEASE-01  | not started | —                        | —                                                                                                                              |
+| ID                 | State       | Merged                   | Open gaps carried forward                                                                                                                         |
+| ------------------ | ----------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DISC-01, DISC-02   | verified    | Stage 0 docs             | Reports baseline: 58 passed, 1 failed, 15 skipped. Performance baseline recorded in QA-00.                                                        |
+| DESIGN-01 – 03     | verified    | docs                     | design-decisions §11 items 2, 5 still "Shown".                                                                                                    |
+| UI-01              | verified    | `4b7b82ea6`              | Accepted light contrast shortfalls (design-decisions §8).                                                                                         |
+| UI-02              | verified    | `3dd3144a3`              | Storybook needs a local case-sensitivity workaround on macOS.                                                                                     |
+| UI-03              | verified    | `0e57f083c`, `0129f2c00` | —                                                                                                                                                 |
+| NAV-01             | verified    | `7eea259f3`              | —                                                                                                                                                 |
+| NAV-02 (+ e2e fix) | verified    | `f02e5ff5e`, `ed654319e` | Collapsed-rail initials are ambiguous; the open account has no visible fill in light (both → BUD-04).                                             |
+| BUD-01             | verified    | `03e9150c3`              | Tour summary step fixed in TOUR-FIX. Custom theme passed in QA-00.                                                                                |
+| TERM-01            | verified    | `f771c251d`              | Light and midnight wording checked in QA-00.                                                                                                      |
+| BUD-02             | verified    | `b732f170f`              | Goal caption left out (→ decision D-3). Edit and scroll regressions found in QA-00 (→ PERF-01, 02).                                               |
+| BUD-03             | verified    | `6b53968b8`              | Custom theme passed in QA-00.                                                                                                                     |
+| DETAIL-01          | verified    | `5f238b120`              | The overlay passed in a custom theme in QA-00.                                                                                                    |
+| DETAIL-02          | verified    | `d90250dff`              | Goal box and pace chart (→ DETAIL-04); month stepper, links and notes editing (→ DETAIL-03).                                                      |
+| TOUR-FIX           | verified    | `485a7fbe3`              | —                                                                                                                                                 |
+| THEME-02           | verified    | `f9f4e1892`              | Linux VRT baselines regenerated in QA-00; WIDE not run.                                                                                           |
+| QA-00              | verified    | `1e94b0559`              | VRT: 23 of 204 changed snapshots reviewed by eye, the rest by script. QA-01 thresholds decided (D-6).                                             |
+| ELEC-01            | verified    | `0a8582cea`              | Dev builds isolated by `scripts/redesign-electron.mjs`; packaged builds are not (stage-0.md). Title bar wrap → TOPBAR-FIX.                        |
+| BUD-04             | verified    | `c0527171d`              | Adds theme role `navListActive`. Linux VRT regenerated in DETAIL-03.                                                                              |
+| PERF-01            | verified    | `8f88c6841`              | Edits now 57–59% faster than the base. Adds `C/budget/index.tsx` (owner-approved; may touch SYNC-01).                                             |
+| PERF-02            | verified    | docs only                | PERF-01 fixed it; no source change. 1000×700 hit 33.3 ms in 5 of 7 runs (a pass; QA-01 watches).                                                  |
+| ASSIGN-FIX         | verified    | `cc078bd06`              | Snapshots stale since BUD-04 regenerated in DETAIL-03.                                                                                            |
+| DETAIL-03          | verified    | `658a38c90`              | Linux VRT regenerated (177, incl. BUD-04's pane); custom theme and WIDE passed. Session-only category and month memory.                           |
+| DETAIL-04          | verified    | `9059b8491`              | E2E and WIDE ran against a dev server, not a `build:browser` preview. Linux VRT regenerated (21).                                                 |
+| TOPBAR-FIX         | verified    | `107560a51`              | Icon-only Help when narrow is still "Shown" (design-decisions §11 item 6). Linux VRT: no snapshot changed.                                        |
+| SYNC-01            | blocked     | —                        | No upstream release after v26.9.0 (checked September 29, 2026). Start when v26.10.0 ships; before RELEASE-01 (D-1).                               |
+| APP-01             | verified    | `875ddad48`              | Linux VRT regenerated (69) on Windows. Custom theme, keyboard, privacy and desktop passed.                                                        |
+| APP-02             | verified    | `f8fcc70d8`              | Linux VRT regenerated (66) and desktop window checked on Windows. E2E test "by payee" changed (SYNC-01 conflict risk).                            |
+| APP-03a – d        | verified    | `0a7384ab1`, `ba03773c2` | 03a – d merged; all checks done (03d custom theme, keyboard, privacy, desktop on October 1, 2026).                                                |
+| APP-04             | verified    | `f0052659d`              | Linux VRT regenerated (27). Keyboard, privacy, header custom theme and desktop passed (verification.md).                                          |
+| APP-05a            | verified    | `3623d9384`, `bfa623bba` | Linux VRT regenerated (6). Custom theme, keyboard and desktop passed; rule button fill and focus ring fixed (verification.md).                    |
+| APP-05b            | verified    | `3cbc474b6`              | Linux VRT regenerated (6). Custom theme, keyboard, privacy, 1000×700 passed (verification.md); desktop not run.                                   |
+| APP-05c            | verified    | `51cfe0733`, `07d3214fa` | New Tags E2E (11) and Linux VRT (9). Custom theme, 1000×700, keyboard passed (verification.md); desktop not run.                                  |
+| APP-05d            | verified    | `a1f4d90b6`, `08ea741bb` | Linux VRT regenerated (3). Themes, custom theme, keyboard passed (verification.md); desktop not run.                                              |
+| APP-06a            | verified    | `8d0244c25`, `b31f33d66` | Linux VRT regenerated (27). E2E 121/121; custom theme, 1000×700 and desktop not run (task-reports.md).                                            |
+| APP-06b            | verified    | `102c85b33`, `e16964ccb` | Linux VRT regenerated (51). E2E 121/121; custom theme, 1000×700 and desktop not run (task-reports.md).                                            |
+| APP-06c            | verified    | `5660d77ba`, `d638c6265` | Linux VRT 186/186, no snapshot changed. E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md).                                |
+| APP-06d            | verified    | `cb1c20101`              | Linux VRT 186/186 after regenerating 3 (date filter's empty register). E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md). |
+| APP-06e – f        | not started | —                        | Split October 1, 2026 (below). Each file list is rebuilt from source before it starts.                                                            |
+| QA-01, RELEASE-01  | not started | —                        | —                                                                                                                                                 |
 
 States follow plan §16: not started, ready, in progress, review, verified,
 blocked. All application work not marked verified is pending; this document
@@ -90,8 +91,8 @@ does not claim Claude's prototype is production-ready.
    October 1, 2026. ~~Then **APP-05a**~~ Merged October 1, 2026. ~~Then **APP-05b**~~ Merged October 1, 2026. ~~Then **APP-05c**~~ Merged
    October 1, 2026. ~~Then **APP-05d**~~ Merged
    October 1, 2026. Then **APP-06** (split into 06a – f; ~~06a~~ merged October 1;
-   ~~06b~~, ~~06c~~ merged October 2;
-   06d next), then QA-01 and RELEASE-01.
+   ~~06b~~, ~~06c~~, ~~06d~~ merged October 2;
+   06e next), then QA-01 and RELEASE-01.
 
 The review's reasoning is in plan §19.
 
@@ -103,14 +104,14 @@ tasks left a set of dialogs and small accessibility gaps for APP-06. One
 surface per sub-task, each drawn for approval first. 06a goes first because
 06e's dialogs sit inside its frame.
 
-| ID      | Surface                                                                                                       | Main files                                                                                                                                           |
-| ------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| APP-06a | Shared dialog frame: backdrop, card, title, close button, button row, loading cover. Desktop only             | `C/common/Modal.tsx`                                                                                                                                 |
-| APP-06b | Menus and popovers                                                                                            | `L/Menu.tsx`, `L/Popover.tsx`; callers `C/select/DateSelect.tsx`, `C/navigation/navMenuStyles.ts` (`C/ContextMenu.tsx` needed no change)             |
-| APP-06c | Toasts                                                                                                        | `C/Notifications.tsx`                                                                                                                                |
-| APP-06d | Loading, error and empty states                                                                               | `C/FatalError.tsx`, `C/FeatureErrorFallback.tsx`, `C/reports/LoadingIndicator.tsx`                                                                   |
-| APP-06e | Dialogs with their own layouts: rule editor, Category Learning, payee merge, Find schedules and link-schedule | `C/modals/EditRuleModal.tsx`, the `C/rules/` editor, `C/payees/CategoryLearning.tsx`, `C/modals/ConfirmPayeesMergeModal.tsx`, `C/schedules/` dialogs |
-| APP-06f | Accessibility leftovers: shared table container focus ring, `CellButton` button role, custom-theme installer  | `C/table.tsx`, `C/settings/ThemeInstaller.tsx`                                                                                                       |
+| ID      | Surface                                                                                                       | Main files                                                                                                                                                                                                                                                     |
+| ------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| APP-06a | Shared dialog frame: backdrop, card, title, close button, button row, loading cover. Desktop only             | `C/common/Modal.tsx`                                                                                                                                                                                                                                           |
+| APP-06b | Menus and popovers                                                                                            | `L/Menu.tsx`, `L/Popover.tsx`; callers `C/select/DateSelect.tsx`, `C/navigation/navMenuStyles.ts` (`C/ContextMenu.tsx` needed no change)                                                                                                                       |
+| APP-06c | Toasts                                                                                                        | `C/Notifications.tsx`                                                                                                                                                                                                                                          |
+| APP-06d | Loading, error and empty states                                                                               | `C/FatalError.tsx`, `C/FeatureErrorFallback.tsx`, `C/reports/LoadingIndicator.tsx`; rebuilt October 2 to add `C/util/LoadComponent.tsx`, `C/AppBackground.tsx`, `C/accounts/AccountEmptyMessage.tsx` and the register's empty line in `C/accounts/Account.tsx` |
+| APP-06e | Dialogs with their own layouts: rule editor, Category Learning, payee merge, Find schedules and link-schedule | `C/modals/EditRuleModal.tsx`, the `C/rules/` editor, `C/payees/CategoryLearning.tsx`, `C/modals/ConfirmPayeesMergeModal.tsx`, `C/schedules/` dialogs                                                                                                           |
+| APP-06f | Accessibility leftovers: shared table container focus ring, `CellButton` button role, custom-theme installer  | `C/table.tsx`, `C/settings/ThemeInstaller.tsx`                                                                                                                                                                                                                 |
 
 ### Open owner decisions
 
