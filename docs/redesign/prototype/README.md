@@ -622,3 +622,88 @@ Questions for the owner:
 
 Regenerate with `node scripts/redesign-prototype-shots.cjs --app-05c`
 (`PW_CHANNEL=msedge` uses the installed Edge).
+
+## APP-05d: Settings proposal (October 1, 2026)
+
+**Status: drawn, awaiting owner review.** Choose **Page → Settings** (or
+More → Settings). URL parameters: `sadv=0|1` (advanced settings shown and
+scrolled to), `sexp=0|1` (experimental features listed), `sauto=0|1` (theme
+follows the system, so the Light and Dark theme menus show), `sserver=0|1`
+(a sync server: server version, Authentication method, encryption available,
+Reset sync enabled) and `stmenu=theme` (the theme menu open).
+
+Source traced for the brief: the page is `C/settings/index.tsx` (the `Page`
+header, the 530px column, the narrow-only budget name and Switch file row,
+`About` and `AdvancedAbout`). Every block is the shared `Setting` box in
+`C/settings/UI.tsx`, which also holds `AdvancedToggle` (the "Show advanced
+settings" link, the "Advanced Settings" heading, `#advanced` scrolling) and
+`Column` (the bold label above each select). The blocks: `Themes.tsx` (theme
+selects; the custom-theme installer `ThemeInstaller.tsx` and its
+`ColorPalette.tsx` open inside this block), `Format.tsx`, `Currency.tsx`
+(only with the currency feature flag), `LanguageSettings.tsx`,
+`AuthSettings.tsx` (only with a server), `Encryption.tsx`,
+`BudgetTypeSettings.tsx`, `Backups.tsx` (desktop app only), `Export.tsx`,
+`Reset.tsx` (Reset budget cache, Reset sync), `RepairTransactions.tsx` and
+`Experimental.tsx` (feature flag checkboxes). The selects are the shared
+`Select`, the checkboxes the shared `forms` `Checkbox`, the links the shared
+`Link` (`linkColor="purple"`). None of the settings components is used
+outside the page; the shared ones are, so any change to them must be an
+opt-in prop or a local style. Tests: `settings/Themes.test.tsx`,
+`ThemeInstaller.test.tsx`, `AuthSettings.test.tsx` (UNIT);
+`e2e/settings.test.ts` (page visuals in three themes, export) with page model
+`e2e/page-models/settings-page.ts` (finds `data-testid` `settings`,
+`advanced-settings`, `experimental-settings` and buttons by name; many other
+E2E files enable experimental features through it); and
+`e2e/settings.mobile.test.ts` (mobile visuals). **The same component renders
+the mobile Settings screen**, so the restyle must be gated on
+`isNarrowWidth` to keep mobile on the upstream look (plan §19.4).
+
+What the drawing proposes (each item is presentation only):
+
+| Surface             | Today                                                                     | Proposed                                                                                                                                        |
+| ------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page                | Regular-weight header; one 530px column (centred with a floating sidebar) | The 28px bold title; one 720px column at the page's left margin                                                                                 |
+| Each setting        | `pillBackground` box, 4px radius, `pillBorderDark` border, 15px padding   | A Surface card **without** elevation (hairline, 18px radius, 18px 20px padding), 12px apart; text in Secondary, the bold lead term in Page Text |
+| Controls            | Action under the text, no separator                                       | Under a hairline divider inside the card, in a row that wraps                                                                                   |
+| Select labels       | 500-weight sentence-case label above each select                          | Eyebrow labels (Theme, Numbers, Dates…); same strings, CSS uppercase                                                                            |
+| Selects and buttons | Upstream `Select` and normal buttons                                      | 32px Control style (9px radius, hairline, chevron); buttons the small Control button; disabled at 45%                                           |
+| Checkboxes          | Upstream checkbox                                                         | The redesign checkbox (rounded, Actual Purple when on), label in Page Text                                                                      |
+| About               | Version lines in a two-column grid; "You're up to date!" in green 600     | The grid on Card Inset with the values at 600 (tabular); "You're up to date!" as a positive pill; Release Notes as a link                       |
+| IDs (advanced)      | Text lines                                                                | The two ID lines on Card Inset                                                                                                                  |
+| Show advanced       | Green text link                                                           | A Control button with a chevron; "Advanced Settings" heading at Headline (18px/700)                                                             |
+| Experimental        | Green "I understand the risks…" link; checkbox list                       | The link as a Control button; the list unchanged in content, "(give feedback)" in the link colour, the deprecated note in Pill Warning Text     |
+| Status text         | `noticeText`, `warningText`, `errorText`                                  | Pill Positive / Warning / Negative Text (repair results, export warnings, OpenID warnings, encryption on)                                       |
+| Links               | `pageTextPositive` (purple)                                               | Unchanged colour; 600 weight, no underline (as the details panel's link)                                                                        |
+| Theme installer     | Catalogue and CSS box inside the Themes block                             | Unchanged until APP-06; it sits inside the new card                                                                                             |
+| Narrow / mobile     | Upstream                                                                  | Unchanged (upstream look below the narrow breakpoint)                                                                                           |
+
+Unchanged by design: every handler and preference write (theme, dark theme,
+custom themes, formats, currency, language, OpenID, encryption, budget type,
+export, reset cache, reset sync, repair, feature flags, update
+notification), the order of the blocks, which blocks show when, the
+`#advanced` link, every string, test id and accessible name, and mobile.
+
+Questions for the owner:
+
+1. **Column:** 720px at the page's left margin (drawn), or keep today's
+   530px column?
+2. **Controls:** under a hairline inside each card (drawn), or text on the
+   left and controls on the right?
+3. **Grouping:** keep one list of cards in today's order (drawn; no new
+   strings), or add section headings (for example General, Budget file,
+   Advanced), which adds new translatable strings?
+4. **Advanced and experimental reveals:** Control buttons (drawn), or keep
+   the green text links?
+
+| File                                              | Shows                                                     |
+| ------------------------------------------------- | --------------------------------------------------------- |
+| `shots/101-settings-dark-wide.png`                | Settings, dark, 1440×900, no server                       |
+| `shots/102-settings-light-1000.png`               | Light, 1000×700, pane collapsed                           |
+| `shots/103-settings-midnight-wide-theme-menu.png` | The theme menu open, midnight                             |
+| `shots/104-settings-custom-theme-wide.png`        | Custom theme through the fallback layer                   |
+| `shots/105-settings-advanced-light-wide.png`      | Advanced settings shown (IDs, resets, repair)             |
+| `shots/106-settings-experimental-dark-1000.png`   | Experimental features listed                              |
+| `shots/107-settings-server-auto-light-wide.png`   | With a server, theme following the system (three selects) |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-05d`
+(`PW_CHANNEL=msedge` uses the installed Edge).
