@@ -349,7 +349,7 @@ The Settings page (APP-05d) is one 720px column at the page's left margin under 
 
 ### Dialogs
 
-Every desktop dialog (APP-06a, the shared `Modal` frame) is a Surface card with the Popover shadow: Card Hairline border, 18px radius, 18px 22px 20px padding, over the `scrim` without blur. The title is a left-aligned Headline on one line with the close button, a 30px icon button with no fill or border that takes the Row Hover wash on hover and the focus ring. `ModalButtons` sits 20px below the content; the buttons inside dialogs are still the upstream normal and primary buttons. The loading cover is Surface White with the card's radius. Each dialog's own contents keep their layout. Below the narrow breakpoint every dialog keeps the upstream frame (mobile is deferred).
+Every desktop dialog (APP-06a, the shared `Modal` frame) is a Surface card with the Popover shadow: Card Hairline border, 18px radius, 18px 22px 20px padding, over the `scrim` without blur. The title is a left-aligned Headline on one line with the close button, a 30px icon button with no fill or border that takes the Row Hover wash on hover and the focus ring. `ModalButtons` sits 20px below the content; the buttons inside most dialogs are still the upstream normal and primary buttons (the dialogs below use Control buttons). The loading cover is Surface White with the card's radius. Each dialog's own contents keep their layout. Below the narrow breakpoint every dialog keeps the upstream frame (mobile is deferred).
 
 ### Menus and Popovers
 
@@ -362,6 +362,10 @@ Every desktop toast (APP-06c, `Notifications`) is a Surface card with the Popove
 ### Loading, Error and Empty States
 
 On desktop (APP-06d) a loading state is a 13.5px/500 Secondary message over a 20px Secondary spinner, 12px apart, after the upstream fade-in delay. A section that fails to load shows a 40px round "!" in the negative pill tone, a 15px/600 Page Text title, the error message on Card Inset in monospace, and a Control "Try again" button; the title is never red. The Fatal Error dialog uses the dialog frame with a button row: "Show Error" as an underlined Secondary text button on the left, "Restart app" as the primary button on the right, the stack on Card Inset above them. Empty lists use one line of 13px Secondary text with 40px padding; a first-run empty state leads with a 16px/600 Page Text sentence over 13.5px Secondary copy and its primary action. Below the narrow breakpoint these keep the upstream look.
+
+### Dialogs With Their Own Layouts
+
+Inside the dialog frame, the rule editor, Category Learning, the two payee merge dialogs, Found Schedules and Link schedule (APP-06e) use Control buttons (13px/600) with a primary button of the same 30px, 9px-radius shape, placed at the right; a dismiss action such as "Do nothing" sits at the left. The rule editor's stage is a segmented control; its sections are split by Card Hairline dividers with the Cancel / Save footer always in view; lead lines are 13.5px/600 Page Text; each condition and action is a Card Inset row with a hairline (10px radius, at least 44px) whose field name is Page Text 600 and operator Secondary, as the rule chips; − / + are 28px icon buttons; split groups are hairline boxes (12px radius) with an Eyebrow label. Tables inside these dialogs are hairline cards (12px radius, no elevation) with Eyebrow headers and 44px rows; selected rows take the selection tint. Merge previews show the payees as one hairline list over a Faint arrow and the target on the selection tint with the selection border; notes are Secondary text after a Faint icon. Inputs and pickers inside keep their shared components' look. Below the narrow breakpoint, and on the mobile rule page, these keep the upstream look.
 
 ### Account Hero
 

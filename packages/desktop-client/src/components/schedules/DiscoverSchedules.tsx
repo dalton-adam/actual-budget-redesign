@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { ButtonWithLoading } from '@actual-app/components/button';
+import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { Paragraph } from '@actual-app/components/paragraph';
 import { SpaceBetween } from '@actual-app/components/space-between';
 import { styles } from '@actual-app/components/styles';
@@ -11,7 +12,13 @@ import { View } from '@actual-app/components/view';
 import { send } from '@actual-app/core/platform/client/connection';
 import { q } from '@actual-app/core/shared/query';
 import type { DiscoverScheduleEntity } from '@actual-app/core/types/models';
+import { css } from '@emotion/css';
 
+import {
+  dialogEyebrowStyle,
+  dialogPrimaryButtonStyle,
+  dialogTableCardStyle,
+} from '#components/common/dialogStyles';
 import { Modal, ModalCloseButton, ModalHeader } from '#components/common/Modal';
 import { Field, Row, SelectCell, Table, TableHeader } from '#components/table';
 import { DisplayId } from '#components/util/DisplayId';
@@ -30,13 +37,17 @@ import { getRecurringDescription } from '#util/schedule';
 import { ScheduleAmountCell } from './SchedulesTable';
 
 const ROW_HEIGHT = 43;
+/** Row height of the card look (design-decisions §10k). */
+const CARD_ROW_HEIGHT = 44;
 
 function DiscoverSchedulesTable({
   schedules,
   loading,
+  isCard,
 }: {
   schedules: DiscoverScheduleEntity[];
   loading: boolean;
+  isCard: boolean;
 }) {
   const { t } = useTranslation();
 
@@ -56,7 +67,7 @@ function DiscoverSchedulesTable({
 
     return (
       <Row
-        height={ROW_HEIGHT}
+        height={isCard ? CARD_ROW_HEIGHT : ROW_HEIGHT}
         inset={15}
         onClick={e => {
           dispatchSelected({
@@ -78,6 +89,19 @@ function DiscoverSchedulesTable({
             backgroundColor: theme.tableRowBackgroundHover,
             color: theme.tableText,
           },
+          // Hairline rows, selection tint (design-decisions §10k).
+          ...(isCard && {
+            color: theme.tableText,
+            backgroundColor: selected
+              ? theme.selectionBackground
+              : theme.cardBackground,
+            ':hover': {
+              backgroundColor: selected
+                ? theme.selectionBackground
+                : theme.tableRowHover,
+            },
+            '& > div': { borderColor: theme.cardHairline },
+          }),
         }}
       >
         <SelectCell
@@ -92,10 +116,13 @@ function DiscoverSchedulesTable({
             });
           }}
         />
-        <Field width="flex">
+        <Field width="flex" style={isCard ? { fontWeight: 600 } : undefined}>
           <DisplayId type="payees" id={item.payee} />
         </Field>
-        <Field width="flex">
+        <Field
+          width="flex"
+          style={isCard ? { color: theme.pageTextSecondary } : undefined}
+        >
           <DisplayId type="accounts" id={item.account} />
         </Field>
         <Field width="auto" title={recurDescription} style={{ flex: 1.5 }}>
@@ -106,9 +133,31 @@ function DiscoverSchedulesTable({
     );
   }
 
+  const headerFieldStyle = isCard ? dialogEyebrowStyle : undefined;
+
   return (
-    <View style={styles.tableContainer}>
-      <TableHeader height={ROW_HEIGHT} inset={15}>
+    <View
+      style={
+        isCard
+          ? { ...dialogTableCardStyle, flex: '1 1 auto', minHeight: 0 }
+          : styles.tableContainer
+      }
+    >
+      <TableHeader
+        height={isCard ? 38 : ROW_HEIGHT}
+        inset={15}
+        style={
+          isCard
+            ? {
+                backgroundColor: theme.cardBackground,
+                '& > div': {
+                  borderTopWidth: 0,
+                  borderColor: theme.cardHairline,
+                },
+              }
+            : undefined
+        }
+      >
         <SelectCell
           exposed={!loading}
           focused={false}
@@ -117,24 +166,28 @@ function DiscoverSchedulesTable({
             dispatchSelected({ type: 'select-all', isRangeSelect: e.shiftKey })
           }
         />
-        <Field width="flex">
+        <Field width="flex" style={headerFieldStyle}>
           <Trans>Payee</Trans>
         </Field>
-        <Field width="flex">
+        <Field width="flex" style={headerFieldStyle}>
           <Trans>Account</Trans>
         </Field>
-        <Field width="auto" style={{ flex: 1.5 }}>
+        <Field width="auto" style={{ ...headerFieldStyle, flex: 1.5 }}>
           <Trans>When</Trans>
         </Field>
-        <Field width={100} style={{ textAlign: 'right' }}>
+        <Field width={100} style={{ ...headerFieldStyle, textAlign: 'right' }}>
           <Trans>Amount</Trans>
         </Field>
       </TableHeader>
       <Table
-        rowHeight={ROW_HEIGHT}
+        rowHeight={isCard ? CARD_ROW_HEIGHT : ROW_HEIGHT}
         style={{
           flex: 1,
           backgroundColor: 'transparent',
+          // The dialog fits its rows, so the table needs a real basis.
+          ...(isCard && {
+            flex: `1 1 ${CARD_ROW_HEIGHT * Math.max(2, schedules.length)}px`,
+          }),
         }}
         items={schedules}
         loading={loading}
@@ -148,6 +201,8 @@ function DiscoverSchedulesTable({
 
 export function DiscoverSchedules() {
   const { t } = useTranslation();
+  const { isNarrowWidth } = useResponsive();
+  const isCard = !isNarrowWidth;
 
   const { data, isLoading } = useSendPlatformRequest('schedule/discover');
 
@@ -193,10 +248,19 @@ export function DiscoverSchedules() {
     setCreating(false);
   }
 
+  const paragraphStyle = isCard
+    ? { fontSize: 13.5, color: theme.pageTextSecondary }
+    : undefined;
+
   return (
     <Modal
       name="schedules-discover"
-      containerProps={{ style: { width: 850, height: 650 } }}
+      containerProps={{
+        // On desktop the dialog fits its rows, up to 650px.
+        style: isCard
+          ? { width: 850, maxHeight: 650 }
+          : { width: 850, height: 650 },
+      }}
     >
       {({ state }) => (
         <>
@@ -204,13 +268,13 @@ export function DiscoverSchedules() {
             title={t('Found Schedules')}
             rightContent={<ModalCloseButton onPress={() => state.close()} />}
           />
-          <Paragraph>
+          <Paragraph style={paragraphStyle}>
             <Trans>
               We found some possible schedules in your current transactions.
               Select the ones you want to create.
             </Trans>
           </Paragraph>
-          <Paragraph>
+          <Paragraph style={paragraphStyle}>
             <Trans>
               If you expected a schedule here and don't see it, it might be
               because the payees of the transactions don't match. Make sure you
@@ -220,7 +284,11 @@ export function DiscoverSchedules() {
           </Paragraph>
 
           <SelectedProvider instance={selectedInst}>
-            <DiscoverSchedulesTable loading={isLoading} schedules={schedules} />
+            <DiscoverSchedulesTable
+              loading={isLoading}
+              schedules={schedules}
+              isCard={isCard}
+            />
           </SelectedProvider>
 
           <SpaceBetween
@@ -233,6 +301,7 @@ export function DiscoverSchedules() {
           >
             <ButtonWithLoading
               variant="primary"
+              className={isCard ? css(dialogPrimaryButtonStyle) : undefined}
               isLoading={creating}
               isDisabled={selectedInst.items.size === 0}
               onPress={() => {

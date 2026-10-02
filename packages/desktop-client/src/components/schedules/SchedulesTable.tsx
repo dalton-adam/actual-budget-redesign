@@ -41,8 +41,8 @@ type SchedulesTableProps = {
   allowCompleted: boolean;
   onSelect: (id: ScheduleEntity['id']) => void;
   /**
-   * The Schedules page's card look (design-decisions §10b, APP-04). The
-   * Find schedules and link-schedule dialogs keep upstream's until APP-06.
+   * The Schedules page's card look (design-decisions §10b, APP-04), also
+   * used by the desktop link-schedule dialog (§10k, APP-06e).
    */
   isCard?: boolean;
   style: CSSProperties;

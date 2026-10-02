@@ -33,6 +33,7 @@ export function EditRuleModal({
               state.close();
             }}
             onCancel={() => state.close()}
+            isDialog
             style={{
               maxWidth: '100%',
               width: 900,
