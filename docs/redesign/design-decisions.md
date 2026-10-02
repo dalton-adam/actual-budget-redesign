@@ -887,6 +887,34 @@ look is opt-in: `RuleEditor`'s `isDialog` prop and `SimpleTransactionsTable`'s
 transactions table are unchanged. Shared values live in
 `common/dialogStyles.ts`.
 
+## 10l. Accessibility leftovers (APP-06f)
+
+**APP-06f (approved October 2, 2026):** drawn in the prototype (Theme
+installer, Table focus; shots `161`–`170`, prototype README). The owner
+left the four questions to the implementer, who chose the drawn option for
+each:
+
+- **Table container:** when the shared `Table` itself has keyboard focus
+  (`:focus-visible` only), a 2px Selection Border ring sits inside its
+  edge and follows the corners of the card around it.
+- **`CellButton`:** announced as a button, and as disabled when it is.
+  **`SelectCell`** is announced as a checkbox with its checked state.
+- **Names for icon-only cells:** the register's status button is named by
+  its state ("Cleared", "Uncleared", "Reconciled", or the schedule status)
+  and selection checkboxes "Select" (rows) or "Select all" (headers).
+  Existing strings are reused; "Select" and "Select all" are new.
+- **Custom-theme installer:** a Card Inset panel (12px radius, no border)
+  under the Themes controls; 13.5px/600 title and a Control "Close";
+  Eyebrow labels (strings unchanged); catalog tiles are Surface tiles with
+  a hairline and 12px radius, the name 600 Page Text, "by" Secondary and
+  "Source" Page Text underlined, the Row Hover wash on hover, the active
+  theme on the selection tint with the selection border, a failed one on
+  the negative pill tint; the loading cover is the Scrim; the CSS box takes
+  the Control look in monospace; "Apply" is a Control button; errors are
+  negative pill text after an alert icon.
+- No visual change for the button roles. Narrow widths keep the upstream
+  installer (mobile is deferred, plan §19.4).
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the

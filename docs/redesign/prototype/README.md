@@ -1126,7 +1126,9 @@ Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06e`
 
 ## APP-06f: accessibility leftovers proposal (October 2, 2026)
 
-**Status: drawn for approval.** On **Settings**, choose **Theme installer**
+**Status: approved October 2, 2026.** The owner left the four questions to
+the implementer, who chose the drawn option for each (design-decisions
+§10l). On **Settings**, choose **Theme installer**
 (Open, Loading, Error, No catalog) and **Installer look → Today**; on
 **Payees**, **Rules** or **Tags**, choose **Table focus → Keyboard**. URL
 parameters: `sinst=open|loading|error|nocat`, `sinstold=0|1`,
