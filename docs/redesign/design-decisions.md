@@ -840,6 +840,40 @@ both questions and left the rest to the implementer, who kept the drawing:
   shared components keep the upstream look (mobile is deferred, plan
   §19.4); the account register is desktop only.
 
+## 10k. Dialogs with their own layouts (APP-06e)
+
+**APP-06e (approved October 2, 2026):** drawn in the prototype (Own-layout
+dialog; shots `145`–`160`, prototype README). The owner chose the drawn
+option for all four questions:
+
+- Inside the §10g frame, the rule editor, Category Learning, Confirm Merge,
+  merge unused payees, Found Schedules and Link schedule use **Control
+  buttons** (`control` variant; primary stays `primary`).
+- **Rule editor** (desktop dialog only; the mobile rule page keeps
+  upstream): the stage is a segmented control; sections are split by
+  hairlines and the Delete / Cancel / Save footer stays in view; the lead
+  lines are 13.5px/600; each condition and action is a Card Inset row with a
+  hairline (10px radius, 44px min) whose **field name is Page Text 600**
+  (not green) and operator Secondary, matching the rule chips (§10d); − / +
+  are 28px icon buttons; split groups are hairline boxes (12px radius) with
+  an Eyebrow label; the transactions table sits in a hairline card with
+  Eyebrow headers.
+- **Category Learning:** Secondary body text with the bold term in Page
+  Text, "Learn more" Page Text underlined, the button at the right.
+- **Payee merges:** Confirm Merge shows the merged payees as one hairline
+  list, a Faint arrow and the target on the selection tint with the
+  selection border. `MergeUnusedPayeesModal` is included: payee names 600
+  Page Text, the note as Secondary text with an icon, the checkbox
+  start-aligned, and **"Do nothing" at the left** with Merge as primary at
+  the right.
+- **Found Schedules** and **Link schedule:** tables in hairline cards with
+  Eyebrow headers and 44px rows; Link schedule puts its sentence on its own
+  line, the search at the left and "Create New" at the right, and its table
+  takes the APP-04 card look.
+- Strings, handlers, test ids, accessible names and which buttons show are
+  unchanged. Below the narrow breakpoint the dialogs keep upstream (mobile
+  is deferred, plan §19.4).
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the

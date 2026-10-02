@@ -1018,7 +1018,10 @@ Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06d`
 
 ## APP-06e: dialogs with their own layouts proposal (October 2, 2026)
 
-**Status: drawn for approval.** Choose any page, then **Own-layout dialog**
+**Status: approved October 2, 2026.** The owner chose the drawn option for
+all four questions (Control buttons, Page Text field names, "Do nothing" at
+the left, `MergeUnusedPayeesModal` included). Choose any page, then
+**Own-layout dialog**
 in the prototype controls (Rule, Rule with splits, Category Learning,
 Confirm Merge, Merge unused, Found Schedules, Link schedule); **Dialog look
 → Today** draws today's contents in today's frame. URL parameters:
