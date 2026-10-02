@@ -1622,3 +1622,19 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   focused field drew a second border. **Not run:** midnight, custom theme,
   1000×700, keyboard walk-through, privacy mode (no amounts on the page) and
   the desktop build.
+- APP-05c follow-up (October 1, 2026, `07d3214fa`): **new Tags E2E file**
+  `e2e/tags.test.ts` with page model `e2e/page-models/tags-page.ts` and
+  `Navigation.goToTagsPage()`. Eleven tests on the test budget: page visuals
+  (with and without a selected tag), new-tag row visuals, tags listed with
+  descriptions, filtering (one match, no match), creating a tag, Add disabled
+  for a taken name, renaming from the context menu, editing a description,
+  hiding then showing hidden tags and unhiding, deleting two selected tags
+  from the selection menu, and View Transactions opening the register.
+  **11/11** against the dev server with the installed Edge, then **22/22**
+  with `--repeat-each=2`. Linux VRT (Playwright v1.61.1 Docker image, HTTPS
+  dev server on 3021 over the LAN address, checkout mounted at its
+  `/mnt/host` path): **9 new snapshots** (page visuals ×2 and the new-tag
+  row, light, dark and midnight); the re-run without updates passed 11/11.
+  Found while writing them: View Transactions is the shared `CellButton`, a
+  plain `div` with no button role, so screen readers don't announce it as a
+  button (upstream; left for APP-06).
