@@ -938,7 +938,8 @@ Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06c`
 
 ## APP-06d: loading, error and empty states proposal (October 2, 2026)
 
-**Status: proposed, awaiting owner approval.** Choose any page, then
+**Status: approved October 2, 2026.** The owner chose the drawn option for
+both questions and left the rest to the implementer. Choose any page, then
 **State** in the prototype controls (Fatal error, Loading error, Section
 error, Page loading, Budget loading, First account, No transactions);
 **State look → Today** draws today's version with the same text; **Error

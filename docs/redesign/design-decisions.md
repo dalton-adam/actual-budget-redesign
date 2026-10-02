@@ -810,6 +810,36 @@ all three questions:
   unchanged. Below the narrow breakpoint toasts keep the upstream look
   (mobile is deferred, plan §19.4).
 
+## 10j. Loading, error and empty states (APP-06d)
+
+**APP-06d (approved October 2, 2026):** drawn in the prototype (State;
+shots `131`–`144`, prototype README). The owner chose the drawn option for
+both questions and left the rest to the implementer, who kept the drawing:
+
+- **Section error** (`FeatureErrorFallback.tsx`): a neutral Page Text title
+  (15px/600) under a **40px round "!"** in the negative pill tone, as toasts
+  signal status; the error message sits on Card Inset (8px radius,
+  monospace, Secondary text, selectable); "Try again" is a Control button.
+- **Fatal error** (`FatalError.tsx`, inside the §10g frame): the dialog's
+  own text size; a button row with "Show Error" (12.5px Secondary,
+  underlined, now a real button) at the left and **"Restart app" as the
+  primary button** at the right; the stack shows above the row on Card Inset,
+  monospace, scrolling past 140px. Its "in touch" link is Page Text,
+  underlined.
+- **Loading** (`reports/LoadingIndicator.tsx`, `util/LoadComponent.tsx`,
+  `AppBackground.tsx`): 13.5px/500 Secondary message and a 20px Secondary
+  spinner, 12px apart. The fade-in delay and the budget-loading slide are
+  unchanged.
+- **Empty account register** (`accounts/AccountEmptyMessage.tsx`,
+  `accounts/Account.tsx`): the first-account message puts its first
+  sentence on its own line (16px/600 Page Text) over 13.5px Secondary body
+  text, 420px wide, with no extra border; "No transactions" uses the shared
+  empty line from APP-04/05 (13px Secondary, 40px padding, not italic).
+- Strings, handlers, which error shows which body, the `SharedArrayBuffer`
+  override flow and roles are unchanged. Below the narrow breakpoint the
+  shared components keep the upstream look (mobile is deferred, plan
+  §19.4); the account register is desktop only.
+
 ## 11. Items shown but not separately decided
 
 Confirm or change these before the named task starts; until then the
@@ -845,4 +875,5 @@ Confirm or change these before the named task starts; until then the
 | Oct 1, 2026  | APP-06a: dialogs take the popover shadow (added to the approved depth list); other questions left to the implementer (§10g)                              | Owner answers in the APP-06a session                                                                                             |
 | Oct 2, 2026  | APP-06b: menus and popovers take a 12px card frame, Row Hover rows, key caps; tooltips unchanged (§10h)                                                  | Owner answers in the APP-06b session                                                                                             |
 | Oct 2, 2026  | APP-06c: toasts take a neutral card with the popover shadow (added to the approved depth list) and a status icon; check for `message` (§10i)             | Owner answers in the APP-06c session                                                                                             |
+| Oct 2, 2026  | APP-06d: section errors take a neutral title and a red status icon; Fatal Error gets a button row with Restart app as primary (§10j)                     | Owner answers in the APP-06d session                                                                                             |
 | Sep 30, 2026 | APP-02: register as drawn (§10, §11 item 5); dividers instead of stripes; payee initial in the category accent; square tags in the register only         | Owner answers in the APP-02 session                                                                                              |
