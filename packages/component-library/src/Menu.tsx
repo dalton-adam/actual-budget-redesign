@@ -9,6 +9,8 @@ import type {
 } from 'react';
 
 import { Button } from './Button';
+import { useResponsive } from './hooks/useResponsive';
+import { styles } from './styles';
 import { Text } from './Text';
 import { theme } from './theme';
 import { Toggle } from './Toggle';
@@ -24,6 +26,28 @@ type KeybindingProps = {
 };
 
 function Keybinding({ keyName }: KeybindingProps) {
+  const { isNarrowWidth } = useResponsive();
+  if (!isNarrowWidth) {
+    return (
+      <Text
+        style={{
+          marginLeft: 10,
+          minWidth: 18,
+          height: 18,
+          padding: '0 5px',
+          borderRadius: 5,
+          backgroundColor: theme.cardInset,
+          color: theme.pageTextSubdued,
+          fontSize: 11,
+          fontWeight: 600,
+          lineHeight: '18px',
+          textAlign: 'center',
+        }}
+      >
+        {keyName}
+      </Text>
+    );
+  }
   return (
     <Text style={{ fontSize: 10, color: theme.menuKeybindingText }}>
       {keyName}
@@ -80,7 +104,11 @@ export function Menu<const NameType = string>({
   const filteredItems = items.filter(
     item => item && item !== Menu.line && item.type !== Menu.label,
   );
+  const { isNarrowWidth } = useResponsive();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  // Arrow keys move the highlight; on desktop that row also shows the
+  // focus ring so keyboard users can tell it apart from the pointer.
+  const [isKeyboardHighlight, setIsKeyboardHighlight] = useState(false);
   const currentIndex = filteredItems.indexOf(items[hoveredIndex || 0]);
   const transformIndex = (idx: number) => items.indexOf(filteredItems[idx]);
 
@@ -114,10 +142,12 @@ export function Menu<const NameType = string>({
     switch (e.key) {
       case 'ArrowUp':
         e.preventDefault();
+        setIsKeyboardHighlight(true);
         hoverPrevious();
         break;
       case 'ArrowDown':
         e.preventDefault();
+        setIsKeyboardHighlight(true);
         hoverNext();
         break;
       case 'Enter':
@@ -150,7 +180,13 @@ export function Menu<const NameType = string>({
     <View
       role="menu"
       className={className}
-      style={{ outline: 'none', borderRadius: 4, overflow: 'hidden', ...style }}
+      style={{
+        outline: 'none',
+        borderRadius: 4,
+        overflow: 'hidden',
+        ...(!isNarrowWidth && { padding: 6, borderRadius: 12 }),
+        ...style,
+      }}
       tabIndex={0}
       onKeyDown={onKeyDown}
       innerRef={elRef}
@@ -159,22 +195,43 @@ export function Menu<const NameType = string>({
       {items.map((item, idx) => {
         if (item === Menu.line) {
           return (
-            <View key={idx} style={{ margin: '3px 0px' }}>
-              <View style={{ borderTop: '1px solid ' + theme.menuBorder }} />
+            <View
+              key={idx}
+              style={{ margin: isNarrowWidth ? '3px 0px' : '6px 4px' }}
+            >
+              <View
+                style={{
+                  borderTop:
+                    '1px solid ' +
+                    (isNarrowWidth ? theme.menuBorder : theme.cardHairline),
+                }}
+              />
             </View>
           );
         } else if (isLabel(item)) {
           return (
             <Text
               key={idx}
-              style={{
-                color: theme.menuItemTextHeader,
-                fontSize: 11,
-                lineHeight: '1em',
-                textTransform: 'uppercase',
-                margin: '3px 9px',
-                marginTop: 5,
-              }}
+              style={
+                isNarrowWidth
+                  ? {
+                      color: theme.menuItemTextHeader,
+                      fontSize: 11,
+                      lineHeight: '1em',
+                      textTransform: 'uppercase',
+                      margin: '3px 9px',
+                      marginTop: 5,
+                    }
+                  : {
+                      color: theme.pageTextFaint,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      letterSpacing: '0.06em',
+                      lineHeight: '1em',
+                      textTransform: 'uppercase',
+                      padding: '10px 10px 4px',
+                    }
+              }
             >
               {item.name}
             </Text>
@@ -196,15 +253,35 @@ export function Menu<const NameType = string>({
               justifyContent: 'center',
               alignItems: 'center',
               color: theme.menuItemText,
+              ...(!isNarrowWidth && {
+                minHeight: 32,
+                padding: '0 10px',
+                borderRadius: 8,
+                fontSize: 13,
+                backgroundColor: 'transparent',
+                color: theme.pageText,
+              }),
               ...(item.disabled && { color: theme.buttonBareDisabledText }),
               ...(!item.disabled &&
-                hoveredIndex === idx && {
-                  backgroundColor: theme.menuItemBackgroundHover,
-                  color: theme.menuItemTextHover,
-                }),
+                hoveredIndex === idx &&
+                (isNarrowWidth
+                  ? {
+                      backgroundColor: theme.menuItemBackgroundHover,
+                      color: theme.menuItemTextHover,
+                    }
+                  : {
+                      backgroundColor: theme.tableRowHover,
+                      ...(isKeyboardHighlight && {
+                        ...styles.focusRing,
+                        outlineOffset: -2,
+                      }),
+                    })),
               ...(!isLabel(item) && getItemStyle?.(item)),
             }}
-            onHoverStart={() => setHoveredIndex(idx)}
+            onHoverStart={() => {
+              setIsKeyboardHighlight(false);
+              setHoveredIndex(idx);
+            }}
             onHoverEnd={() => setHoveredIndex(null)}
             onPress={() => {
               if (

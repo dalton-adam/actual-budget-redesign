@@ -790,3 +790,77 @@ Questions for the owner:
 
 Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06a`
 (`PW_CHANNEL=msedge` uses the installed Edge).
+
+## APP-06b: menus and popovers proposal (October 2, 2026)
+
+**Status: approved October 2, 2026.** The owner chose the drawn option for
+all four questions (12px radius, Row Hover wash, key caps, tooltips left
+for later). Choose any page, then **Menu** in
+the prototype controls (Selection, Help, Toggles, Date picker); **Menu
+frame → Today** draws today's frame over the same contents; **First row**
+shows the hover and keyboard-focus states. URL parameters:
+`mnu=select|help|toggles|date`, `mnuold=0|1`, `mnuhl=hover|focus`. The
+"Today" frame is an approximation in the prototype's palette, not a
+screenshot of the app.
+
+Source traced for the brief: every desktop popover renders inside
+`Popover` in `L/Popover.tsx` (react-aria), whose frame is `styles.tooltip`:
+`tooltipBackground`, a 2px `tooltipBorder`, 4px radius, `shadowLarge`
+(hard-coded black). About 40 desktop files use it (60 uses), and not only
+for menus: date pickers, autocomplete, the month picker, budget cell menus,
+filters, report menus, notes and the save-report form. `Menu` in
+`L/Menu.tsx` draws the rows: bare buttons with 10px padding,
+`menuItemBackgroundHover` on hover, `Menu.label` (11px uppercase,
+`menuItemTextHeader`), `Menu.line` (`menuBorder`), optional 10px icons,
+upstream `Toggle`s and a 10px keybinding in `menuKeybindingText`. About 50
+files use `Menu`, including the mobile menu dialogs, so 06b is gated on
+`isNarrowWidth` like 06a. `C/ContextMenu.tsx` is a 200px `Popover` around a
+`Menu`. The Accounts and More menus (NAV-01) already pass `menuPanelStyle`
+(12px radius, 6px padding, 32px rows with 8px radius); 06b makes that the
+default and keeps their rows. Tooltips (`L/Tooltip.tsx`) share
+`styles.tooltip` but are not menus; they stay out of 06b unless the owner
+says otherwise.
+
+What the drawing proposes (presentation only):
+
+| Surface         | Today                                                | Proposed                                                                                    |
+| --------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Popover frame   | `tooltipBackground`, 2px `tooltipBorder`, 4px radius | `cardBackground`, 1px Card Hairline, 12px radius (as the NAV-01 menus and Schedules ⋯ menu) |
+| Elevation       | `shadowLarge`                                        | `popoverShadow` (already approved for menus and popovers)                                   |
+| Menu padding    | none                                                 | 6px inside the frame, so row hovers sit inset                                               |
+| Rows            | 10px padding, square, `menuItemBackgroundHover`      | 32px min height, 0 10px padding, 8px radius, 13px, Row Hover wash (`tableRowHover`)         |
+| Keyboard focus  | hover colour only                                    | the shared 2px focus ring, inset (`outlineOffset: -2`)                                      |
+| Section labels  | 11px uppercase, `menuItemTextHeader`, 3px 9px        | Eyebrow: 11px/600 uppercase, 0.06em tracking, 10px 10px 4px                                 |
+| Dividers        | `menuBorder`, 3px 0                                  | Card Hairline, 6px 4px                                                                      |
+| Keybindings     | 10px text, `menuKeybindingText`                      | an 18px key cap: `cardInset`, 5px radius, 11px/600 Secondary text                           |
+| Toggles         | upstream `Toggle`                                    | unchanged                                                                                   |
+| Content         | per popover (date picker, notes, forms)              | unchanged; only the frame around it changes                                                 |
+| Narrow / mobile | upstream                                             | unchanged                                                                                   |
+
+Unchanged by design: items, strings, order, handlers, `role="menu"` and
+arrow-key / Enter navigation, placement, offsets, `isNonModal`, widths that
+callers pass, test ids and accessible names.
+
+Questions for the owner:
+
+1. **Radius:** 12px (drawn; matches the menus already shipped in NAV-01 and
+   Schedules), or 16px like the prototype's budget popovers?
+2. **Row hover:** the Row Hover wash (drawn; matches tables and the dialog
+   close button), or keep the menu-specific `menuItemBackgroundHover`?
+3. **Keybindings:** a small key cap (drawn), or plain Secondary text?
+4. **Tooltips:** leave `Tooltip` on today's look (drawn), or give it the
+   same frame in 06b?
+
+| File                                             | Shows                                                        |
+| ------------------------------------------------ | ------------------------------------------------------------ |
+| `shots/115-menu-select-dark-wide-hover.png`      | The transaction selection menu, first row hovered, dark      |
+| `shots/116-menu-select-today-dark-wide.png`      | The same menu in today's frame                               |
+| `shots/117-menu-help-light-1000.png`             | The Help menu, light, 1000×700                               |
+| `shots/118-menu-help-today-light-1000.png`       | The same menu in today's frame                               |
+| `shots/119-menu-toggles-midnight-wide-focus.png` | A report menu with toggles, first row keyboard-focused       |
+| `shots/120-popover-date-light-wide.png`          | The date picker in the new frame (calendar unchanged), light |
+| `shots/121-popover-date-today-light-wide.png`    | The same date picker in today's frame                        |
+| `shots/122-menu-select-custom-theme-wide.png`    | The selection menu in the custom theme                       |
+
+Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06b`
+(`PW_CHANNEL=msedge` uses the installed Edge).

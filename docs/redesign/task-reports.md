@@ -1716,3 +1716,38 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   without updates **6/6**. No mobile snapshot changed. **Not run:** custom
   theme in the app, 1000×700, light and midnight in the dev server, and the
   desktop build.
+
+- APP-06b: branch `redesign/app-06b-menus`, code `a8b1b6ee8`. Drawing
+  `4e6203175` (prototype shots `115`–`122`); the owner approved it on
+  October 2, 2026, choosing the drawn option for all four questions (12px
+  radius, Row Hover wash, key caps, tooltips left for later;
+  design-decisions §10h). **Change:** on desktop (not `isNarrowWidth`)
+  `Popover` is a Surface card (`cardBackground`, `cardHairline` border,
+  12px radius, `popoverShadow`); `Menu` sits 6px inside it with 32px rows
+  (0 10px padding, 8px radius, 13px, `pageText`), the Row Hover wash on
+  hover, the inset focus ring on a row reached with the arrow keys, Eyebrow
+  section labels, Card Hairline dividers and key-cap keybindings. Callers
+  that undid the frame: `DateSelect` no longer passes `styles.popover`,
+  and the NAV-01 `menuPanelStyle` keeps only its 6px inset, with its row
+  hover and divider moved to the same roles. The autocomplete keeps its
+  own background (it takes the radius and shadow); `TagAutocomplete`
+  replaces the class and is unchanged; tooltips are unchanged. Below the
+  narrow breakpoint every piece keeps the upstream look. No item, string,
+  handler, keyboard behaviour, placement, test id or accessible name
+  changed. `DESIGN.md` adds a Menus and Popovers entry. **Checks:**
+  typecheck passes; oxlint over the four files 0 errors; oxfmt applied;
+  web unit tests **1052 passed, 1 skipped**. E2E against the dev server
+  with the installed Edge (scratch config, not committed): accounts,
+  transactions, budget, help-menu, reports, schedules, payees, rules,
+  settings, command-bar, tags, onboarding, nav-02, detail-01 – 04, bud-01,
+  tour and bank-sync **121/121**. Impeccable detector over `Menu.tsx`,
+  `Popover.tsx` and `navMenuStyles.ts`: no findings. VISUAL in the dev
+  server (demo budget, dark, 1440×900): the Help menu (frame, 6px inset,
+  32px rows, arrow-key ring confirmed by computed style) and the
+  transaction selection menu (Edit field label, key caps, a disabled row).
+  Linux VRT (Docker, full run **186/186**): 51 snapshots changed, all popovers
+  and menus (budget summary breakdown, help menu, reports date range
+  picker, transaction filters), reviewed and committed in `e16964ccb`;
+  re-run without updates **7/7**. No mobile snapshot changed. **Not run:**
+  custom theme in the app, 1000×700, light and midnight in the dev server,
+  and the desktop build.
