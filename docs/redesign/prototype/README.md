@@ -867,7 +867,9 @@ Regenerate with `node scripts/redesign-prototype-shots.cjs --app-06b`
 
 ## APP-06c: toasts proposal (October 2, 2026)
 
-**Status: drawn, awaiting owner review.** Choose any page, then **Toast** in
+**Status: approved October 2, 2026.** The owner chose the drawn option for
+all three questions (popover shadow, neutral card with a status icon, a
+check for `message`). Choose any page, then **Toast** in
 the prototype controls (Update, Saved, Warning, Error, Stack of 3); **Toast
 look → Today** draws today's toast with the same text; **Toast state** shows
 the action button hovered or the close button keyboard-focused. URL
