@@ -1586,3 +1586,39 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   with Delete 1 rules, and the payee rules dialog in dark. **Not run:**
   custom theme, keyboard walk-through, privacy mode (amount values keep
   `FinancialText`, unchanged), 1000×700 and the desktop build.
+
+- APP-05c: **merged October 1, 2026** into `redesign/main` (branch
+  `redesign/app-05c-tags`, code `a80f3cd54`). Drawing approved the same day
+  (prototype shots `93`–`100`; the owner chose the drawn option for all four
+  questions; design-decisions §10e). **Change:** `tags/ManageTagsPage.tsx`
+  gives the page the Display title. `tags/ManageTags.tsx` puts the intro
+  sentence under the title in Secondary text and one toolbar above the
+  table: Add New (primary, plus icon), the selection button while tags are
+  selected, then the filter and the `…` menu at the right; one Surface card
+  table; "No Tags" centred in Secondary text, not italic (still only when
+  there are no tags at all). `tags/TagsHeader.tsx` is an Eyebrow header;
+  `tags/TagsList.tsx` passes 44px rows (the shared `ROW_HEIGHT` is
+  untouched) on the card background; `tags/TagRow.tsx` has hairline
+  dividers, `tableRowHover` hover and the selection tint, "No description"
+  in Faint (not italic), and a quiet View Transactions button that takes a
+  hairline on row hover, with the redesign focus ring. `tags/TagEditor.tsx`
+  passes `useTagCSS`'s existing `square` option (the register's shape).
+  `tags/TagCreationRow.tsx` is one Card Inset block with 30px fields, the
+  square colour preview and `control` Cancel / primary Add buttons.
+  `tags/TagsMenuButton.tsx` is a 34px `control` icon button.
+  `tags/SelectedTagsButton.tsx` passes a new opt-in `variant="control"` to
+  the shared `SelectedItemsButton` in `table.tsx` (label then chevron); its
+  default bare look, used by the register and the schedule dialog, is
+  unchanged. No handler, query, filter matching, sort, pref, route, test id
+  or string changed. **Checks:** typecheck passes; oxlint over the changed
+  files 0 errors; oxfmt applied; web unit tests **1052 passed, 1 skipped**
+  (Tags: 5/5). There is no Tags E2E file and no Tags VRT; the register's and
+  schedule dialog's selection button take the unchanged default branch, so
+  no E2E or VRT was re-run. Impeccable detector over the changed files: no
+  findings. VISUAL in the dev server (test budget, 1280 wide): dark and
+  light, selection with the "1 Tags" menu, the new-tag row (Add enables on
+  a valid name; Escape closes it), the `…` menu; no console errors. Two
+  fixes found there: the tag pill stretched across its column, and the
+  focused field drew a second border. **Not run:** midnight, custom theme,
+  1000×700, keyboard walk-through, privacy mode (no amounts on the page) and
+  the desktop build.
