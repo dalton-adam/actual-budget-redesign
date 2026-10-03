@@ -350,7 +350,9 @@ function SpendingInternal({ widget }: SpendingInternalProps) {
               style={{
                 alignItems: 'center',
                 flexDirection: 'row',
-                flex: 1,
+                // Grow from its natural width so the row wraps instead of
+                // squeezing the Filter button when there is no room.
+                flex: '1 0 auto',
               }}
             >
               <FilterButton

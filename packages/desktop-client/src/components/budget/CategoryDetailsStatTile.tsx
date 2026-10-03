@@ -22,8 +22,10 @@ export function CategoryDetailsStatTile({
     <View
       data-testid={testId}
       style={{
-        flex: 1,
-        minWidth: 0,
+        flex: '1 1 0',
+        // Never narrower than its value, so the row wraps a tile onto the
+        // next line rather than splitting a number.
+        minWidth: 'max-content',
         padding: '8px 10px',
         borderRadius: 10,
         backgroundColor: theme.cardInset,
@@ -44,10 +46,11 @@ export function CategoryDetailsStatTile({
       <PrivacyFilter>
         <FinancialText
           style={{
-            fontSize: 15,
+            // Long amounts step down a size so three tiles still fit.
+            fontSize: value.length > 8 ? 13 : 15,
             fontWeight: 600,
             color: theme.pageText,
-            overflowWrap: 'anywhere',
+            whiteSpace: 'nowrap',
           }}
         >
           {value}

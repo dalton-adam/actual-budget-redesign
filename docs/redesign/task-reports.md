@@ -2009,3 +2009,25 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   `raw.githubusercontent.com`; the client reports v26.10.0. D-1: the fork
   now carries v26.10.0's database migration, so the official v26.10.0 app
   and the fork can open the same budget once this merges.
+- QA-01: **checks done October 3, 2026; in review**, branch
+  `redesign/qa-01` (not merged). Full record in
+  [verification.md](verification.md#qa-01-started-october-2-2026). Base for
+  performance: upstream v26.10.0 (`2bebdbaae`) in a separate worktree,
+  measured in the same session on this Windows machine with the installed
+  Edge (`PERF_CHANNEL`, added to `scripts/redesign-perf.mjs`). **Checks:**
+  typecheck passes; oxlint clean (oxfmt's repo-wide check flags only CRLF
+  working copies); unit tests pass except two loot-core tests and
+  sync-server's teardown, which fail the same way on v26.10.0 (Windows
+  file locks); E2E 123/123; WIDE 78/78; Linux VRT 188/188 with no snapshot
+  changed; 150 theme × size views, custom themes with no off-role colour
+  except tag pills; keyboard, 19 menus and dialogs, privacy, reduced
+  motion, budget correctness, tracking budget and the desktop build (with
+  its isolation check) recorded. Protected diff: no backend, sync, schema
+  or storage-format change. **Fixed** (`ca4149231`): details-panel stat
+  tiles splitting amounts mid-number; the Spending report squeezing its
+  Filter button at 1000 px. **Performance:** Assigned edits 71% faster
+  than v26.10.0; two D-6 misses from the details panel (demo first row
+  +14% at 1440×900, month label +12% at 1000×700) → **PERF-03**.
+  **Open for the owner:** PERF-03 or written acceptance; tracking budgets
+  keep upstream's layout; SYNC-01's follow-ups; upstream's unnamed row
+  buttons; the plan §12 walkthrough.
