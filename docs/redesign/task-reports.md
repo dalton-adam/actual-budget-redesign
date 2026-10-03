@@ -2075,3 +2075,29 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   [verification/app-07/](verification/app-07/); the callout checked by eye
   in dark. **Not run:** midnight, a custom theme, privacy mode, the desktop
   build.
+- A11Y-01: **verified October 3, 2026**, branch `redesign/a11y-01`. QA-01
+  finding 4, owner go-ahead the same day. **Finding re-read:** the two
+  "View notes" stops are not duplicates. One opens the category's notes
+  (`SidebarCategoryButtons`), the other that month's notes for the
+  category (the Assigned cell's gutter). Removing either would drop a
+  keyboard path, so both stay and get distinct names. **Names added:**
+  "Category menu for ‹name›", "View notes for ‹name›", "View month notes
+  for ‹name›", "Assigned amount menu for ‹name›" (tracking: "Budgeted
+  amount menu for ‹name›"), and on group rows "Group menu for ‹name›" and
+  "View notes for ‹name›". `C/NotesButton.tsx` takes an optional `label`;
+  every other caller keeps "View notes". **Changed:** `C/NotesButton.tsx`,
+  `C/budget/{SidebarCategory,SidebarCategoryButtons,SidebarGroup}.tsx`,
+  `C/budget/envelope/EnvelopeBudgetComponents.tsx`,
+  `C/budget/tracking/TrackingBudgetComponents.tsx`. No visual change.
+  **Checks:** typecheck passes; oxlint (type-aware) and oxfmt clean on the
+  changed files; `C/budget` unit tests 88/88; `build:browser`, preview on
+  127.0.0.1:3028; E2E budget, bud-01, detail-01 – 04 and tour with the
+  installed Edge (scratch config outside the repo, no retries) **38/38**
+  (detail-02 and detail-03 find the row's notes by the "View notes"
+  substring, which the new names keep). Keyboard (demo, 1440×900): Tab
+  from "Show details for Food" reaches the category menu, category notes,
+  month notes and Assigned amount menu in that order, each named, the
+  last with a visible ring. Impeccable detector: 4 findings, the same 4
+  `transition: max-width` lines as on `redesign/main` (the row tools'
+  hover-expand gutter), none added. Linux VRT not run (names only). **Not
+  run:** a screen reader.

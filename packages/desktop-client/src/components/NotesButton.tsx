@@ -23,6 +23,8 @@ type NotesButtonProps = {
   defaultColor?: string;
   tooltipPosition?: ComponentProps<typeof Tooltip>['placement'];
   showPlaceholder?: boolean;
+  /** The button's accessible name; rows name their notes (A11Y-01). */
+  label?: string;
   style?: CSSProperties;
 };
 export function NotesButton({
@@ -32,6 +34,7 @@ export function NotesButton({
   defaultColor = theme.buttonNormalText,
   tooltipPosition = 'bottom start',
   showPlaceholder = false,
+  label,
   style,
 }: NotesButtonProps) {
   const { t } = useTranslation();
@@ -69,7 +72,7 @@ export function NotesButton({
         <Button
           ref={triggerRef}
           variant="bare"
-          aria-label={t('View notes')}
+          aria-label={label ?? t('View notes')}
           className={cx(
             css({
               color: defaultColor,

@@ -161,6 +161,7 @@ export function SidebarGroup({
             <Button
               variant="bare"
               className="hover-visible"
+              aria-label={t('Group menu for {{name}}', { name: group.name })}
               style={{ padding: 3 }}
               onPress={handleContextMenu}
             >
@@ -193,7 +194,11 @@ export function SidebarGroup({
               </Button>
             </Tooltip>
 
-            <NotesButton id={group.id} defaultColor={theme.pageTextLight} />
+            <NotesButton
+              id={group.id}
+              label={t('View notes for {{name}}', { name: group.name })}
+              defaultColor={theme.pageTextLight}
+            />
           </View>
         </>
       )}
