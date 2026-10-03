@@ -40,6 +40,7 @@
     "#components/banksync/useBuiltInBankSyncProviders": "./src/components/banksync/useBuiltInBankSyncProviders.ts",
     "#components/banksync/useBankSyncAccountSettings": "./src/components/banksync/useBankSyncAccountSettings.ts",
     "#components/budget": "./src/components/budget/index.tsx",
+    "#components/budget/budgetAmountUndo": "./src/components/budget/budgetAmountUndo.ts",
     "#components/budget/categoryPresentation": "./src/components/budget/categoryPresentation.ts",
     "#components/budget/envelopeTable": "./src/components/budget/envelopeTable.ts",
     "#components/budget/goals/actions": "./src/components/budget/goals/actions.ts",

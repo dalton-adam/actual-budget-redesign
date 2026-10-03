@@ -2101,3 +2101,33 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   `transition: max-width` lines as on `redesign/main` (the row tools'
   hover-expand gutter), none added. Linux VRT not run (names only). **Not
   run:** a screen reader.
+- UNDO-FIX: **verified October 3, 2026**, branch `redesign/undo-fix`. Owner
+  go-ahead the same day, ahead of RELEASE-01. **Cause:** the shared table
+  input (`InputValue` in `C/table.tsx`) stops every key but Enter and Tab
+  from bubbling, and the global Cmd/Ctrl+Z handler in `src/index.tsx` skips
+  focused inputs. After Enter saves an amount the next row's box is open and
+  focused, so undo did nothing. **Fix, inside `C/budget/`:** a new
+  `useBudgetAmountUndoKeys` hook (`C/budget/budgetAmountUndo.ts`) passed
+  through the Assigned cell's `inputProps` in envelope and tracking. It
+  marks the box edited on its first change and, on a capture-phase key
+  down, hands Cmd/Ctrl+Z (redo with Shift) to the existing `#undo` actions
+  only while the box is unedited. `src/undo/`, `C/table.tsx` and
+  `src/index.tsx` unchanged. **Changed:** the two new files above (hook and
+  test), `C/budget/envelope/EnvelopeBudgetComponents.tsx`,
+  `C/budget/tracking/TrackingBudgetComponents.tsx`, an import-map entry in
+  `packages/desktop-client/package.json`, and a new case in
+  `packages/desktop-client/e2e/budget.test.ts`. No visual change.
+  **Checks:** typecheck passes; oxlint and oxfmt clean on the changed
+  files; `C/budget` unit tests 92/92 (4 new); `build:browser`, preview on
+  127.0.0.1:3018; E2E(budget) with the installed Edge (scratch config
+  outside the repo, no retries) **9/9**. The new case ("undo and redo work
+  right after Enter saves an amount") fails on a build without the fix
+  (stays 123.45) and passes with it. By hand (demo, 1440×900): typing 450
+  into Food's box and pressing Ctrl+Z put the box's text back to 400.00
+  without touching the saved amount. Impeccable detector: the same 4
+  `transition: max-width` lines as on `redesign/main`, none added. Linux
+  VRT not run (no visual change). **Not run:** the tracking budget by hand
+  (same hook, same cell props), the desktop build. Playwright's bundled
+  Chromium is not installed on this machine; the shell recipe's anchored
+  `'(^|/)FILE\.test\.ts$'` matches nothing on Windows, use
+  `'(^|[\/])FILE\.test\.ts$'`.
