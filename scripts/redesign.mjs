@@ -5,12 +5,16 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv[2] ?? 'dev';
-if (!['dev', 'preview'].includes(mode)) {
-  console.error('Usage: node scripts/redesign.mjs [dev|preview]');
+if (!['dev', 'preview', 'release'].includes(mode)) {
+  console.error('Usage: node scripts/redesign.mjs [dev|preview|release]');
   process.exit(1);
 }
+// release serves the same built files as preview on its own port, so a copy
+// of a real budget lives in a browser origin that tests and demos never use
+// (docs/redesign/release.md).
+const isBuilt = mode !== 'dev';
 if (
-  mode === 'preview' &&
+  isBuilt &&
   !existsSync(path.join(root, 'packages/desktop-client/build/index.html'))
 ) {
   console.error(
@@ -18,14 +22,14 @@ if (
   );
   process.exit(1);
 }
-const port = mode === 'preview' ? '3018' : '3017';
+const port = { dev: '3017', preview: '3018', release: '3016' }[mode];
 const args = [
   path.join(root, '.yarn/releases/yarn-4.17.1.cjs'),
   'workspace',
   '@actual-app/web',
   'exec',
   'vite',
-  ...(mode === 'preview' ? ['preview'] : []),
+  ...(isBuilt ? ['preview'] : []),
   '--mode=browser',
   '--host',
   '127.0.0.1',
@@ -35,7 +39,9 @@ const args = [
 ];
 console.log('Actual redesign ' + mode + ': http://127.0.0.1:' + port);
 console.log(
-  'Use Try the demo. Do not connect a server or import a real budget.',
+  mode === 'release'
+    ? 'Budgets here live only in this browser. Export after each session (docs/redesign/release.md).'
+    : 'Use Try the demo. Do not connect a server or import a real budget.',
 );
 const child = spawn(process.execPath, args, {
   cwd: root,

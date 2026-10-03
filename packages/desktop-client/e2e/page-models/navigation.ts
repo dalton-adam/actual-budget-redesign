@@ -202,7 +202,12 @@ export class Navigation {
       .waitFor({ state: 'visible' });
 
     await fillReactInput(this.page.getByLabel('Name'), data.name);
-    await fillReactInput(this.page.getByLabel('Balance'), String(data.balance));
+    // By role: Budget rows behind the dialog have buttons named
+    // "… for Starting Balances", which a label match would also find.
+    await fillReactInput(
+      this.page.getByRole('textbox', { name: 'Balance' }),
+      String(data.balance),
+    );
 
     if (data.offBudget) {
       await this.page.getByLabel('Off budget').click();

@@ -63,10 +63,10 @@ Budget header are reference material, not tasks to build.
 | PERF-04            | not started | —                        | Optional (PERF-03): cut the open panel's resting cost on a month switch.                                                                          |
 | APP-07             | verified    | `d8ffb1955` (merge)      | Notifications page and Monte Carlo Income table restyled; sidebar flag hidden. Midnight, custom theme, desktop not run (task-reports.md).         |
 | A11Y-01            | verified    | `9b2d99060` (merge)      | Row menu and notes buttons named; the two notes stops are distinct (category, month), so both stay. Screen reader not run.                        |
-| UNDO-FIX           | verified    | (this merge)             | Ctrl+Z / Ctrl+Shift+Z in an unedited Budget amount box run app undo/redo; mid-edit keeps text undo. Tracking checked by code only.                |
+| UNDO-FIX           | verified    | `1f687b25d` (merge)      | Ctrl+Z / Ctrl+Shift+Z in an unedited Budget amount box run app undo/redo; mid-edit keeps text undo. Tracking checked by code only.                |
 | GOAL-01            | not started | —                        | Owner request October 3, 2026: long-term planning goals on Budget rows. Design first; builds on `#goal` templates (decision D-3).                 |
 | LOAN-01            | not started | —                        | Owner request October 3, 2026: loan details on off-budget loan accounts, payoff dates, principal/interest split. Design first; may need a schema. |
-| RELEASE-01         | not started | —                        | —                                                                                                                                                 |
+| RELEASE-01         | review      | (this merge)             | Browser build on 127.0.0.1:3016, release.md. Waits on the owner checking a copy of the real budget (release.md step 3).                           |
 
 States follow plan §16: not started, ready, in progress, review, verified,
 blocked. All application work not marked verified is pending; this document
@@ -107,7 +107,8 @@ does not claim Claude's prototype is production-ready.
    ~~PERF-03~~ merged October 3, 2026 (one D-6 miss owner-accepted). ~~QA-01~~
    verified October 3, 2026 after the owner's walkthrough. PERF-04 is optional.
 10. **APP-07** and **A11Y-01** (QA-01 findings 3 and 4, owner-approved
-    October 3, 2026), then **RELEASE-01**. UNDO-FIX can ride along if small.
+    October 3, 2026), then **RELEASE-01**. ~~UNDO-FIX~~ merged October 3, 2026;
+    RELEASE-01 built the same day and waits on the owner's check (release.md).
     **GOAL-01** and **LOAN-01** come after RELEASE-01, each designed and
     approved before any code. The owner kept the "On budget" / "Off budget"
     wording (walkthrough, October 3, 2026).
