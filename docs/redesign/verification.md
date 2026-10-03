@@ -814,7 +814,10 @@ lower half of the page).
 ## QA-01 (started October 2, 2026)
 
 Branch `redesign/qa-01` from `redesign/main` at `83b4c8600` (v26.10.0 merged
-in SYNC-01). Status: **in progress**. Screenshots go in
+in SYNC-01). Status: **review**: the checks ran October 2 – 3, 2026; release
+waits on PERF-03 (or the owner accepting its two D-6 misses) and the
+owner's walkthrough ([open findings](#open-findings-for-the-owner)).
+Screenshots are in
 [verification/qa-01/](verification/qa-01/).
 
 ### Brief (plan §15)
@@ -850,7 +853,7 @@ sync server.
 | Area                 | Method                                                                                                                                                                                                                                       |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | CHECK and unit tests | `typecheck`, `lint`, root `test`                                                                                                                                                                                                             |
-| E2E                  | `build:browser`, `node scripts/redesign.mjs preview`; every desktop E2E file (23) with `E2E_START_URL=http://127.0.0.1:3018`, installed Edge; the mobile files (7) recorded separately                                                       |
+| E2E                  | `build:browser`, `node scripts/redesign.mjs preview`; every desktop E2E file (20) with `E2E_START_URL=http://127.0.0.1:3018`, installed Edge; the mobile files (9) recorded separately                                                       |
 | WIDE                 | `scripts/redesign-baseline.config.ts` against the preview                                                                                                                                                                                    |
 | Linux VRT            | Full run in Docker (`running-vrts`), no updates; any change inspected                                                                                                                                                                        |
 | Performance          | `scripts/redesign-perf.mjs run 7` at 1440×900 and 1000×700; base: upstream v26.10.0 (`2bebdbaae`) built in a separate worktree, `vite preview` on 127.0.0.1:3019; both measured in the same session on this machine; D-6 thresholds          |
@@ -867,3 +870,287 @@ sync server.
 envelope, assign until Ready to Assign is zero, cover an overspend, switch
 months, inspect a transaction, switch light and dark) is the owner's, in
 the disposable budget, once the checks above pass.
+
+### Environment
+
+| Item     | Value                                                                                                                                                             |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Machine  | Intel Core i5-13600K, 16 GB, Windows 11 Home (desktop, mains power)                                                                                               |
+| Runtime  | Node 24.14.1; Playwright 1.61.1 driving the installed Microsoft Edge 154 (`channel: 'msedge'`; Playwright's own Chromium is not installed), fresh context per run |
+| Base     | Upstream v26.10.0 (`2bebdbaae`) in the worktree `C:\dev\actual-base-v26.10.0`: `install`, `build:browser`, `vite preview --mode=browser` on 127.0.0.1:3019        |
+| Redesign | `redesign/qa-01` (`77b9630d4`, `redesign/main` plus the brief): `build:browser`, `node scripts/redesign.mjs preview` on 127.0.0.1:3018                            |
+| Fixture  | Try the demo in a fresh context (random transactions each time; categories and counts fixed). No sync server, no real budget                                      |
+
+QA-00 ran on an Apple M1, so its numbers are not comparable with these;
+D-6 compares the two builds measured in the same session.
+
+### Automated checks
+
+| Check                   | Result                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `typecheck`             | Pass                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `lint`                  | oxlint (`--type-aware --quiet`): 0 findings. `oxfmt --check .` lists 479 files: 478 are files Git checked out with CRLF line endings on this Windows machine (oxfmt wants LF; the committed blobs are LF), and the 479th was this file before formatting. Not a code finding                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Root `test` (lage)      | web 1,190 passed, 2 skipped (86 files); components, api, crdt, cli, ci-actions, eslint-plugin pass. **loot-core: 2 failed** (`server/main.test.ts`, "budget is successfully loaded" and "budget detects out of sync migrations": `EBUSY` unlinking the test budget's `db.sqlite`). **sync-server: 606/606 passed**, exit code 1 from an `EBUSY` while deleting `account.sqlite` in teardown. The same loot-core file fails the same two tests in the untouched v26.10.0 worktree on this machine, and neither package differs from v26.10.0 (scope review below): Windows file locking, not the redesign. The run rewrote 14 committed `.snap` files with LF endings only; restored                                                                                                           |
+| E2E, every desktop file | `build:browser` preview, Edge, one worker, no retries (scratch config extending `packages/desktop-client/playwright.config.ts`): **123/123** in 6.6 min, 20 files. After the two fixes below (`ca4149231`), rebuilt and rerun: budget, bud-01, detail-01 – 04, reports, tour **57/57**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| WIDE                    | `scripts/redesign-baseline.config.ts` against the preview with Edge: **78/78** (both viewports, no skips)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Linux VRT               | `running-vrts` recipe: Docker Desktop (WSL2), Playwright v1.61.1 image, checkout mounted at `/mnt/host/c/dev/actual-budget-redesign`, HTTPS Vite dev server on 3021 over the LAN address, one worker, no retries, no updates: **188/188** in 27.7 min, **no snapshot changed**. Covers every E2E file including the 9 mobile files                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| Mobile E2E              | Included in the VRT run above (accounts, bank-sync, budget, budget-automations, payees, rules, schedules, settings, transactions mobile files): all pass                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Scope (protected diff)  | `git diff 2bebdbaae HEAD`: nothing under `packages/loot-core`, `packages/sync-server`, `packages/crdt`, `packages/api`, `packages/desktop-electron` or `packages/plugins-service`. Outside components: theme files and `style/theme.tsx` (fallback layer; parser `customThemes.ts` unchanged), package exports for new components, `useTagCSS`, notes tag formatter, the Windows `vite.config.mts` spawn fix, E2E tests and redesign scripts. New persisted state is browser `localStorage`/`sessionStorage` only (details panel open, accounts pane expanded, session category/month memory); synced, global and metadata prefs are only read (`budgetType`, `budgetName`, `categoryExpandedState`). No new `send()` handler calls; the panel reads `notes` and `transactions` through `q()` |
+
+### Performance
+
+`PERF_CHANNEL=msedge node scripts/redesign-perf.mjs run 7
+data/redesign/qa-01-perf.json` (method as in QA-00 above; 42 runs, none
+failed), then `summary`. Base: v26.10.0. Medians of 7, ms (range).
+
+**1440×900**
+
+| Measure                            |             Base |         Redesign |   Change | Redesign, panel closed |
+| ---------------------------------- | ---------------: | ---------------: | -------: | ---------------------: |
+| Demo created, page settled         | 1939 (1829–2054) | 2060 (1997–2136) |      +6% |       1990 (1923–2156) |
+| First paint, demo: first row       |  1072 (988–1204) | 1227 (1159–1327) | **+14%** |       1128 (1009–1259) |
+| First paint, demo: settled         | 1106 (1029–1237) | 1405 (1306–1458) |     +27% |       1128 (1009–1259) |
+| First paint, large: first row      | 2220 (2090–2276) | 2295 (2157–2380) |      +3% |       2361 (2260–2483) |
+| First paint, large: settled        | 2552 (2440–2611) | 2890 (2664–2999) |     +13% |       2734 (2623–2857) |
+| Scroll: mean frame                 | 16.7 (16.7–16.7) | 16.7 (16.6–16.7) |       0% |       16.7 (16.7–16.7) |
+| Scroll: p95 frame                  | 16.8 (16.8–16.9) | 16.8 (16.8–16.8) |       0% |       16.8 (16.8–16.8) |
+| Scroll: longest frame              | 17.1 (16.9–17.6) | 18.6 (16.9–29.8) |      +8% |       18.3 (17.1–26.4) |
+| Scroll: frames over 33 ms (of 359) |          0 (0–0) |          0 (0–0) |        — |                0 (0–0) |
+| Assigned edit: median              |    252 (243–259) |       73 (69–75) |     −71% |             72 (70–74) |
+| Assigned edit: p90                 |    355 (267–382) |      97 (87–119) |     −73% |            88 (79–100) |
+| Assigned edit: 20 edits in total   | 5272 (4837–5436) | 1495 (1464–1538) |     −72% |       1473 (1394–1570) |
+| Month switch: label                |    398 (381–417) |    434 (423–450) |      +9% |          418 (412–427) |
+| Month switch: settled              |    794 (776–805) |    590 (562–599) |     −26% |          418 (412–427) |
+| Open register: first rows          |    466 (364–487) |    441 (359–482) |      −5% |          482 (435–506) |
+| Open register: settled             |    479 (457–493) |    457 (400–482) |      −5% |          493 (446–506) |
+| Open register again: first rows    |    355 (300–538) |    331 (298–420) |      −7% |          343 (305–390) |
+
+**1000×700**
+
+| Measure                            |             Base |         Redesign |   Change | Redesign, panel closed |
+| ---------------------------------- | ---------------: | ---------------: | -------: | ---------------------: |
+| Demo created, page settled         | 1899 (1835–2009) | 2032 (1952–2112) |      +7% |       1889 (1703–1986) |
+| First paint, demo: first row       |  1089 (983–1176) | 1103 (1025–1161) |      +1% |          947 (883–996) |
+| First paint, demo: settled         | 1120 (1026–1210) | 1276 (1210–1319) |     +14% |          947 (883–996) |
+| First paint, large: first row      | 2212 (2081–2313) | 2141 (2080–2262) |      −3% |       2162 (2096–2254) |
+| First paint, large: settled        | 2546 (2409–2647) | 2799 (2644–3111) |     +10% |       2561 (2432–2651) |
+| Scroll: mean frame                 | 16.7 (16.7–16.7) | 16.7 (16.7–16.8) |       0% |       16.7 (16.7–16.8) |
+| Scroll: p95 frame                  | 16.8 (16.8–16.9) | 16.8 (16.8–16.8) |       0% |       16.8 (16.8–16.9) |
+| Scroll: longest frame              | 17.5 (16.9–18.2) | 33.3 (17.7–33.4) |     +90% |       33.3 (17.7–33.3) |
+| Scroll: frames over 33 ms (of 359) |          0 (0–0) |          0 (0–0) |        — |                0 (0–0) |
+| Assigned edit: median              |    254 (237–257) |       73 (70–76) |     −71% |             72 (70–75) |
+| Assigned edit: p90                 |    383 (301–395) |     103 (94–109) |     −73% |           103 (94–113) |
+| Assigned edit: 20 edits in total   | 5557 (4929–5680) | 1536 (1476–1620) |     −72% |       1514 (1440–1559) |
+| Month switch: label                |    405 (390–410) |    452 (417–459) | **+12%** |          407 (401–425) |
+| Month switch: settled              |    792 (787–806) |    590 (571–604) |     −26% |          407 (401–425) |
+| Open register: first rows          |    434 (357–469) |    417 (369–475) |      −4% |          414 (378–462) |
+| Open register: settled             |    441 (411–475) |    426 (377–484) |      −3% |          448 (388–470) |
+| Open register again: first rows    |    321 (306–375) |    324 (305–332) |      +1% |          316 (290–413) |
+
+**Against D-6** (blocking measures pass at no more than 10% over the base;
+scrolling passes with no frame over 33 ms, which the script counts as an
+interval over 33.4 ms, two 60 Hz frames):
+
+| Blocking measure              | 1440×900        | 1000×700        |
+| ----------------------------- | --------------- | --------------- |
+| Assigned edit, median and p90 | Pass (−71/−73%) | Pass (−71/−73%) |
+| First paint, demo: first row  | **Miss (+14%)** | Pass (+1%)      |
+| First paint, large: first row | Pass (+3%)      | Pass (−3%)      |
+| Month switch: label           | Pass (+9%)      | **Miss (+12%)** |
+| Open register: first rows     | Pass (−5%)      | Pass (−4%)      |
+| Scroll                        | Pass            | Pass            |
+
+- **Both misses come from the details panel.** With the panel closed the
+  same measures are +5% (first row, 1440) and +0% (month label, 1000).
+  The panel renders in the
+  same commit as the table on load and as the new month label on a switch,
+  so its work delays both paints by about 40–150 ms. The month label at
+  1440 (+9%) is just inside the threshold for the same reason. Opened as
+  **PERF-03** (below); the owner may instead accept them in writing (D-6).
+- **Scrolling at 1000×700:** 1–2 intervals of 33.2–33.4 ms in 11 of the 14
+  redesign runs (both variants), i.e. one dropped frame, never two; the
+  base has none. Under the D-6 bar, as in PERF-02.
+- **Assigned edits are about 3.5× faster than v26.10.0** (PERF-01's
+  change); the base itself is slower here than QA-00 measured v26.9.0 on
+  the M1 (252 vs 125 ms).
+- Reported only: settled measures. The panel's own loading puts first
+  paint settled at +27% (1440) and +14% (1000) on the demo and +10–13% on
+  the large budget; month switch settles 26% sooner than the base (the
+  base animates its month summary).
+
+### Screens, themes and sizes
+
+Scratch Playwright scripts outside the app (kept locally in
+`data/redesign/`, git-ignored), against the preview with Edge, a fresh
+demo per theme and size. Views: Budget (details panel open), all accounts,
+one account register, Reports dashboard, Net worth, Cash flow, Spending
+("This Month"), Custom report, Summary ("Total Income (YTD)"), Calendar,
+Schedules, Payees, Rules, Tags, Settings. Cash flow, Spending, Summary and
+Calendar are opened from their dashboard cards: their bare routes
+(`/reports/cash-flow` and so on) spin forever without a widget id, in
+v26.10.0 too.
+
+| Pass                        | Views                                                                                                                                                                                                       | Result                                                                                                                                                                                                                                                                                                                                                                                |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Light, dark, midnight       | 15 views × 3 themes × 1440×900 and 1000×700 (90)                                                                                                                                                            | No horizontal page overflow, no console errors. Reviewed as contact sheets: every screen on the same surfaces and type in each theme. **Found:** the Spending report's Filter button squeezed at 1000 px (fixed below). The Calendar report clips its third month at 1000 px inside its scroll strip, as v26.10.0 does                                                                |
+| Custom theme (QA-00 method) | 15 views × custom light and custom dark × both sizes (60)                                                                                                                                                   | Every v26.10.0 `--color-*` role (resolved from the base theme files, `color-mix()` included) hue-rotated 150°, no redesign roles, installed as `installedCustomLightTheme`; the validator accepted both. Every visible text, background and border colour compared with the active roles: **no miss except the tag pills** (each tag's own colour, by design). No overflow, no errors |
+| Layout                      | Budget (panel or overlay), all accounts, Reports, Settings at 1920×1080, 1280×800, 1000×700, 820×700 and 200% zoom (720×450 CSS px at 2×)                                                                   | No horizontal overflow at any size; compact navigation below 900 px; the details panel becomes the overlay at 820 px and at 200% zoom and closes with Escape                                                                                                                                                                                                                          |
+| Long content                | An 80-character Greek and English group name, an emoji first character (🏠), Japanese (東京旅行の積立金), Turkish and German letters, 999,999,999.99 and −1,234,567.89 assigned, the 1.000,33 number format | Long names truncate with an ellipsis in rows and group rows; the tile shows 🏠, 東 and Ö as first characters; the panel header wraps the long name and group. **Found:** stat tiles split amounts mid-number (fixed below). Ten-digit amounts truncate with an ellipsis in the table's amount columns and the Ready to Assign card at 1000–1280 px (not compared with the base)       |
+
+### Keyboard and accessibility
+
+- **Tab walk** on all 15 views at 1440×900 (up to 80 stops each),
+  recording each stop's name and focus indicator. Every redesign control
+  shows the 2px ring or the browser's focus ring. Stops without a detected
+  ring: the filter boxes on Accounts, Schedules, Payees, Rules and Tags
+  (the ring is on the wrapper, as recorded in APP-05), Recharts chart
+  surfaces (Recharts 3's default accessibility layer,
+  `role="application"`; neither codebase sets it) and the Rules page's rule
+  rows (its own list, not the shared table).
+- **Unnamed stops:** each Budget row has a zero-width category menu button
+  with no name, a duplicate "View notes" stop (one zero-width, one
+  invisible) and an unnamed budget menu button. **v26.10.0 has the same
+  stops on the same row**; the redesign adds the named "Show details for …"
+  and "Available …" stops. Left as upstream.
+- **Menus and dialogs:** 19 openers, each focused and opened with Enter:
+  Budget page menu, month picker, Ready to Assign breakdown, table menu,
+  Accounts and More tab menus, budget switcher, Help, Add account, register
+  Filter and menu, Create rule, Category learning, Find schedules, Add
+  schedule, Tags menu, dashboard menu, Add widget, custom report Options.
+  **All 19:** focus moves inside, Escape closes, focus returns to the
+  opener with a visible ring. No page errors.
+- **Colour-only warnings:** overspent amounts keep the minus sign and the
+  negative pill; Ready to Assign says "Overassigned" or "All assigned";
+  schedule states are worded pills with icons.
+- **Not run:** a screen reader.
+
+### Privacy
+
+Privacy mode on, all 15 views at 1440×900: every amount-shaped text was
+checked for a blur, the redacted font, or the hidden-until-hover layer
+`PrivacyFilter` uses. Visible amounts left: the Rules page's condition
+amounts (upstream: `rules/` has no privacy filter, recorded in APP-05b),
+the Summary report's filter chip "amount is greater than 0.00" (a filter
+condition, as on Rules) and the Settings page's number-format sample
+"1,000.33". **Pass.**
+
+### Reduced motion
+
+The QA-00 interactions plus a menu, a dialog and the welcome toast, with
+`prefers-reduced-motion` unset and set to `reduce`. Without it: colour
+transitions on tabs and buttons (0.15 s), the accounts pane width
+(0.18 s), progress fills (0.2 s) and upstream's 0.25 s opacity on hover
+icons. With it: **none of those run.** Still running with reduced motion:
+the dialog frame's entry (opacity and transform, 0.1 s), Button's
+box-shadow (0.25 s) and the loading spinner (1.6 s). All three are
+identical in v26.10.0 (`C/common/Modal.tsx`, `L/Button.tsx`,
+`L/icons/AnimatedLoading.tsx`). **Pass** for the redesign's own motion.
+
+### Budget correctness
+
+Demo budget, 1440×900, values read from the page:
+
+| Step                                           | Result                                                                                                                         |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Assign 100 more to Food                        | Ready to Assign 0.00 → −100.00 with "Overassigned"; Food available +100; the panel's Assigned and Activity tiles match the row |
+| Panel arithmetic                               | From previous month + Assigned + Activity = the row's Available (e.g. 606.37 + 500.00 − 0.02 = 1,106.35)                       |
+| Assign until Ready to Assign is zero (Savings) | 0.00 with "All assigned"                                                                                                       |
+| Cover an overspent category from Food          | Its available becomes 0.00, Food's falls by the overspend, Ready to Assign unchanged                                           |
+| Add a −23.45 Food transaction                  | Food activity and available −23.45; the panel's Activity follows and its list shows the transaction                            |
+| Next month and back                            | Same Ready to Assign and Food available                                                                                        |
+| Ready to Assign breakdown                      | 4,714.17 − 697.52 − 3,030.00 − 986.65 = 0.00, as shown                                                                         |
+
+All checks pass, on two different random demos.
+
+### Tracking budget
+
+Budget type switched to tracking in the demo: the table renders with
+budgeted, spent and balance, inline editing and the category context menu
+work, no page errors, at 1440×900 and 1000×700. **It keeps upstream's
+tracking layout** (the narrow centred table, the month strip and the month
+summary card) inside the redesigned navigation and title bar; the redesign
+scoped the Budget page to envelope budgets. A finding for the owner, not a
+defect.
+
+### Desktop build
+
+`node scripts/redesign-electron.mjs --remote-debugging-port=9333
+--inspect=9334` after the stage-0.md preparation (Electron install,
+`electron-rebuild` of `better-sqlite3`, `build:plugins-service`, core
+`build:node`, `desktop-electron build:dist`). `better-sqlite3` 13 (from
+v26.10.0) ships N-API prebuilds: the rebuild left no `build/` folder, the
+desktop build opened SQLite with the prebuild, and Node still loads the
+module afterwards, so there was nothing to restore. Driven over CDP:
+
+- The window opened 885 px wide (compact navigation) on the sandbox's
+  existing demo budget, loaded from
+  `data\redesign-electron\documents\Actual\_test-budget`; resized to
+  1440×900 through the main process.
+- Assigned edit (Food 400.00 → 425.00: Ready to Assign −25.00,
+  "Overassigned"), restored; month switch; dark and midnight; privacy
+  mode; register, Reports, Schedules, Settings (client v26.10.0); a dialog
+  opened and closed with Escape. No page errors.
+- Quit with `app.quit()` over the inspector: **"Isolation check: nothing
+  changed"** in `%APPDATA%\Actual`, `OneDrive\Documents\Actual` and
+  `Documents\Actual`.
+- **Not covered:** the packaged `app://` bundle (stage-0.md: packaged
+  builds are not isolated); native menus and zoom (ELEC-01 covered them on
+  macOS).
+
+### Fixed in QA-01
+
+`ca4149231`, two presentation fixes:
+
+1. **Stat tiles split amounts mid-number.** In the 820 px overlay the
+   details panel showed "12,345.6 / 7" over two lines (at 1280 px
+   "999.999.9 / 99,99"); a five-digit From previous month, common for
+   savings categories, would wrap. Values now stay on one line, step down
+   from 15 to 13 px from nine characters, and the tiles wrap onto a second
+   row only as a last resort (`C/budget/CategoryDetailsStatTile.tsx`,
+   `C/budget/CategoryDetailsSummary.tsx`). Checked at 820, 1000, 1280 and
+   1440 px with 10,976.36 and 999,999,999.99: one row, one line each.
+2. **The Spending report squeezed its Filter button at 1000 px** to
+   "Filte" with a clipped icon: the Filter/Save group had a zero flex
+   basis, so the row shrank it instead of wrapping. v26.10.0 wraps to a
+   second line. The group now grows from its natural width
+   (`C/reports/reports/Spending.tsx`); at 1000 px Filter and Save move to
+   a second line, at 1100 and 1440 px they stay on one.
+
+Screenshots: [Spending before](verification/qa-01/spending-filter-before-1000.png)
+and [after](verification/qa-01/spending-filter-after-1000.png), [stat tiles before](verification/qa-01/stat-tiles-before-820-long-content.png)
+and [after](verification/qa-01/stat-tiles-after-820.png). Also kept:
+[custom dark](verification/qa-01/custom-dark-budget-1440.png),
+[privacy](verification/qa-01/privacy-budget-1440.png),
+[tracking](verification/qa-01/tracking-budget-1440.png),
+[desktop dark](verification/qa-01/desktop-budget-dark-1440.png).
+
+Checks after the fixes: typecheck passes; oxlint and oxfmt on the three
+files clean; web unit tests for `C/budget` 88/88; Impeccable hook: no
+findings; rebuilt preview E2E 57/57 (above); Linux VRT for the affected
+files (below).
+
+### Open findings for the owner
+
+| #   | Finding                                                                                                                                                                                                                                | Blocks release? | Proposed                                                                                                                                                                                            |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **D-6 misses:** demo first row +14% at 1440×900 and month-switch label +12% at 1000×700, both from the details panel rendering in the same commit (panel closed: +5% and +0%)                                                          | Yes (D-6)       | **PERF-03** (backlog): render the panel's body after the table and the month label paint, then rerun the perf script. Or accept both in writing                                                     |
+| 2   | **Tracking budgets keep upstream's layout** inside the redesigned shell                                                                                                                                                                | No              | Record as a scope decision (envelope only, as designed), or open a task to bring the tracking table onto the redesign's surfaces                                                                    |
+| 3   | SYNC-01's follow-ups are still open: upstream's notifications bell and Notifications page, the Monte Carlo Income table, and the Experimental "Redesigned sidebar" toggle and "Set account group" item that do nothing in the redesign | No              | Unchanged since SYNC-01; small tasks if wanted before release                                                                                                                                       |
+| 4   | Upstream accessibility gaps on each Budget row: an unnamed category menu button, an unnamed budget menu button and a duplicate "View notes" tab stop                                                                                   | No              | Same in v26.10.0; leave, or name them in a small task                                                                                                                                               |
+| 5   | The plan §12 user walkthrough                                                                                                                                                                                                          | Yes (plan §12)  | Owner, in the disposable demo: find an account, inspect an envelope, assign until Ready to Assign is zero, cover an overspent category, switch months, inspect a transaction, switch light and dark |
+
+### Not checked in QA-01
+
+A screen reader; the packaged desktop bundle (not isolated, stage-0.md);
+auto theme with separate custom light and dark themes, and a CSS override
+on its own (QA-00 left both); mobile beyond its E2E and VRT (deferred,
+plan §19.4); performance in the desktop build (browser only, headless, as
+in QA-00).
+
+**Linux VRT after the fixes** (same recipe, no updates): budget,
+budget.mobile, bud-01, detail-01 – 04 and reports, 93 tests. First run 85
+passed and 8 failed with "Target page, context or browser has been
+closed" (time-outs in bud-01 and budget.mobile, the first files, while the
+preview rebuild and the desktop preparation were loading the machine; no
+screenshot mismatch). Those two files rerun on an idle machine: **42/42**.
+No snapshot changed.
