@@ -221,12 +221,8 @@ export function ExperimentalFeatures() {
             >
               <Trans>Mobile calculator</Trans>
             </FeatureToggle>
-            <FeatureToggle
-              flag="newSidebarUI"
-              feedbackLink="https://github.com/actualbudget/actual/issues/9007"
-            >
-              <Trans>Redesigned sidebar</Trans>
-            </FeatureToggle>
+            {/* Upstream's "Redesigned sidebar" is left out: the redesign has
+                its own navigation (SYNC-01, APP-07). */}
             <FeatureToggle
               flag="sankeyReport"
               feedbackLink="https://github.com/actualbudget/actual/issues/1919"

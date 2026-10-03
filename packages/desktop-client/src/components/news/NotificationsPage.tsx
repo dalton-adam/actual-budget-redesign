@@ -9,8 +9,8 @@ import { View } from '@actual-app/components/view';
 
 import { Link } from '#components/common/Link';
 import { MOBILE_NAV_HEIGHT } from '#components/mobile/MobileNavTabs';
-import { Page } from '#components/Page';
-import { Setting } from '#components/settings/UI';
+import { Page, PageHeader } from '#components/Page';
+import { Setting, useSettingsRedesign } from '#components/settings/UI';
 import { useNewsFeed } from '#hooks/useNewsFeed';
 import { getUnseenEntries } from '#news/utils';
 
@@ -22,6 +22,7 @@ const DISCORD_URL = 'https://discord.gg/pRYNYr4W5A';
 
 export function NotificationsPage() {
   const { t } = useTranslation();
+  const isRedesign = useSettingsRedesign();
   const { entries, isLoading, error, lastSeenNewsDate, markAllSeen } =
     useNewsFeed();
 
@@ -41,13 +42,30 @@ export function NotificationsPage() {
   }, [entries]);
 
   return (
-    <Page header={t('Notifications')}>
+    <Page
+      header={
+        isRedesign ? (
+          // Display title and one 720px column of cards, as Settings (APP-07).
+          <PageHeader
+            title={
+              <Text style={titleStyle}>
+                <Trans>Notifications</Trans>
+              </Text>
+            }
+            style={{ marginTop: 6 }}
+          />
+        ) : (
+          t('Notifications')
+        )
+      }
+    >
       <View
         style={{
-          marginTop: 10,
+          marginTop: isRedesign ? 14 : 10,
           flexShrink: 0,
-          gap: 30,
-          maxWidth: 800,
+          gap: isRedesign ? 12 : 30,
+          maxWidth: isRedesign ? 720 : 800,
+          width: isRedesign ? '100%' : undefined,
           paddingBottom: MOBILE_NAV_HEIGHT,
         }}
       >
@@ -116,3 +134,10 @@ export function NotificationsPage() {
     </Page>
   );
 }
+
+const titleStyle = {
+  fontSize: 28,
+  fontWeight: 700,
+  letterSpacing: -0.4,
+  lineHeight: 1.2,
+} as const;

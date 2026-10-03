@@ -12,6 +12,7 @@ import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
 import { Alert } from '#components/alerts';
+import { useSettingsRedesign } from '#components/settings/UI';
 import { parseAdmonitionMarker } from '#news/admonitions';
 import type { AdmonitionType } from '#news/admonitions';
 
@@ -44,6 +45,46 @@ const admonitionStyles: Record<AdmonitionType, ComponentProps<typeof Alert>> = {
     backgroundColor: theme.errorBackground,
   },
 };
+
+// On desktop the callouts take the pill tones on a flat 12px box, like the
+// redesign's other notices (APP-07); mobile keeps the upstream alert colours.
+const redesignAdmonitionStyles: Record<
+  AdmonitionType,
+  ComponentProps<typeof Alert>
+> = {
+  note: {
+    icon: SvgInformationOutline,
+    color: theme.pillNeutralText,
+    backgroundColor: theme.cardInset,
+  },
+  tip: {
+    icon: SvgInformationOutline,
+    color: theme.pillPositiveText,
+    backgroundColor: theme.pillPositiveBackground,
+  },
+  info: {
+    icon: SvgInformationOutline,
+    color: theme.pillNeutralText,
+    backgroundColor: theme.cardInset,
+  },
+  warning: {
+    icon: SvgExclamationOutline,
+    color: theme.pillWarningText,
+    backgroundColor: theme.pillWarningBackground,
+  },
+  danger: {
+    icon: SvgExclamationOutline,
+    color: theme.pillNegativeText,
+    backgroundColor: theme.pillNegativeBackground,
+  },
+};
+
+const redesignAlertStyle = {
+  margin: '10px 0',
+  borderRadius: 12,
+  boxShadow: 'none',
+  padding: '11px 12px',
+} as const;
 
 // The marker paragraph is located twice: once in the hast tree (to read its
 // text) and once in the rendered React children (to drop it). Both look at
@@ -80,6 +121,7 @@ export function MarkdownBlockquote({
   children,
 }: MarkdownBlockquoteProps) {
   const { t } = useTranslation();
+  const isRedesign = useSettingsRedesign();
   const marker = parseAdmonitionMarker(firstParagraphText(node));
 
   if (!marker) {
@@ -95,14 +137,19 @@ export function MarkdownBlockquote({
   };
 
   return (
-    <Alert {...admonitionStyles[marker.type]} style={{ margin: '10px 0' }}>
+    <Alert
+      {...(isRedesign ? redesignAdmonitionStyles : admonitionStyles)[
+        marker.type
+      ]}
+      style={isRedesign ? redesignAlertStyle : { margin: '10px 0' }}
+    >
       <View style={{ gap: 4 }}>
         <Text
           style={{
-            fontWeight: 700,
-            fontSize: 12,
+            fontWeight: isRedesign ? 650 : 700,
+            fontSize: isRedesign ? 11 : 12,
             textTransform: 'uppercase',
-            letterSpacing: 0.5,
+            letterSpacing: isRedesign ? '0.07em' : 0.5,
           }}
         >
           {marker.title || defaultTitles[marker.type]}
