@@ -43,7 +43,7 @@ Budget header are reference material, not tasks to build.
 | DETAIL-03          | verified    | `658a38c90`              | Linux VRT regenerated (177, incl. BUD-04's pane); custom theme and WIDE passed. Session-only category and month memory.                           |
 | DETAIL-04          | verified    | `9059b8491`              | E2E and WIDE ran against a dev server, not a `build:browser` preview. Linux VRT regenerated (21).                                                 |
 | TOPBAR-FIX         | verified    | `107560a51`              | Icon-only Help when narrow is still "Shown" (design-decisions §11 item 6). Linux VRT: no snapshot changed.                                        |
-| SYNC-01            | in review   | —                        | v26.10.0 merged on `redesign/sync-v26.10.0`; checks passed, Linux VRT regenerated (185). Awaiting owner approval to merge.                        |
+| SYNC-01            | verified    | `9f3ffdaae`, `e08b13534` | Now on v26.10.0. Linux VRT 188/188 after regenerating 185 (title bar bell). Restyle bell, Notifications, Income table (task-reports.md).          |
 | APP-01             | verified    | `875ddad48`              | Linux VRT regenerated (69) on Windows. Custom theme, keyboard, privacy and desktop passed.                                                        |
 | APP-02             | verified    | `f8fcc70d8`              | Linux VRT regenerated (66) and desktop window checked on Windows. E2E test "by payee" changed (SYNC-01 conflict risk).                            |
 | APP-03a – d        | verified    | `0a7384ab1`, `ba03773c2` | 03a – d merged; all checks done (03d custom theme, keyboard, privacy, desktop on October 1, 2026).                                                |
@@ -84,8 +84,8 @@ does not claim Claude's prototype is production-ready.
    September 29, 2026.
 8. **SYNC-01** once, before RELEASE-01 (decision D-1). Blocked September 29,
    2026: no upstream release after v26.9.0 yet, so APP-01 goes first.
-   v26.10.0 shipped; merged on `redesign/sync-v26.10.0` October 2, 2026 (in
-   review), ahead of QA-01 so QA-01 measures v26.10.0.
+   ~~v26.10.0~~ Merged October 2, 2026, ahead of QA-01 so QA-01 measures
+   v26.10.0.
 9. ~~**APP-01**~~ Merged September 29, 2026; Linux VRT regenerated September 30.
    ~~Then **APP-02**~~ Merged September 30, 2026; Linux VRT regenerated the same day.
    ~~Then **APP-03a**~~ Merged September 30, 2026. ~~Then **APP-03b**~~ Merged

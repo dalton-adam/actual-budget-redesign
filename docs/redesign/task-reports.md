@@ -1938,8 +1938,8 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   **Not run:** light and midnight in the app, narrow widths, a screen
   reader, and the desktop build. **Left as upstream:** the empty,
   unnamed category button on scheduled rows in the register.
-- SYNC-01: **in review October 2, 2026** on branch
-  `redesign/sync-v26.10.0`; not merged. Merge of upstream release tag
+- SYNC-01: **done October 2, 2026**, merged into `redesign/main` with
+  owner approval (`9f3ffdaae`, branch `redesign/sync-v26.10.0`). Merge of upstream release tag
   **v26.10.0** (`e08b13534`, conflict resolution only) plus three follow-up
   commits. Upstream shipped v26.10.0 while QA-01 was starting; the owner
   chose to sync first so QA-01 measures what will ship, with v26.10.0 as the
