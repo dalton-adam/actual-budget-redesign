@@ -58,8 +58,8 @@ Budget header are reference material, not tasks to build.
 | APP-06d            | verified    | `1d2e3cda2`, `cb1c20101` | Linux VRT 186/186 after regenerating 3 (date filter's empty register). E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md). |
 | APP-06e            | verified    | `6b9e22d61`, `5b1929c01` | Linux VRT 186/186, no snapshot changed. E2E 121/121; custom theme, keyboard and desktop not run (task-reports.md).                                |
 | APP-06f            | verified    | `d97c742a8`, `126cbf83d` | Linux VRT 186/186, no snapshot changed. E2E 121/121; light, midnight, narrow, screen reader and desktop not run (task-reports.md).                |
-| QA-01              | review      | `ca4149231` (on branch)  | Matrix run (verification.md). Fixed stat tiles and Spending filter. D-6: PERF-03, one miss owner-accepted. Owner walkthrough open.                |
-| PERF-03            | verified    | `07245cb08` (on branch)  | First row passes; month label +10% (1440), +11% (1000) owner-accepted October 3, 2026. Panel can lag a switch by ≤0.5 s.                          |
+| QA-01              | review      | `04db3111d` (merge)      | Matrix run (verification.md). Fixed stat tiles and Spending filter. D-6: PERF-03, one miss owner-accepted. Owner walkthrough open.                |
+| PERF-03            | verified    | `3d3f70a55` (merge)      | First row passes; month label +10% (1440), +11% (1000) owner-accepted October 3, 2026. Panel can lag a switch by ≤0.5 s.                          |
 | PERF-04            | not started | —                        | Optional (PERF-03): cut the open panel's resting cost on a month switch.                                                                          |
 | RELEASE-01         | not started | —                        | —                                                                                                                                                 |
 
