@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Trans, useTranslation } from 'react-i18next';
 import { Route, Routes, useLocation } from 'react-router';
@@ -18,17 +18,16 @@ import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { Tooltip } from '@actual-app/components/tooltip';
 import { View } from '@actual-app/components/view';
-import { listen } from '@actual-app/core/platform/client/connection';
 import { isDevelopmentEnvironment } from '@actual-app/core/shared/environment';
 import { css } from '@emotion/css';
 
 import { sync } from '#app/appSlice';
 import { SharedArrayBufferWarning } from '#components/SharedArrayBufferWarning';
 import { useIsTestEnv } from '#hooks/useIsTestEnv';
-import { useMetadataPref } from '#hooks/useMetadataPref';
 import { useNavigate } from '#hooks/useNavigate';
 import { useSheetValue } from '#hooks/useSheetValue';
 import { useSyncedPref } from '#hooks/useSyncedPref';
+import { useSyncStatus } from '#hooks/useSyncStatus';
 import { useDispatch } from '#redux';
 import * as bindings from '#spreadsheet/bindings';
 
@@ -42,6 +41,7 @@ import {
   TITLEBAR_TIGHT,
 } from './navigation/constants';
 import { TopNav } from './navigation/TopNav';
+import { NotificationsButton } from './news/NotificationsButton';
 import { useServerURL } from './ServerContext';
 import { BudgetName } from './sidebar/BudgetName';
 import { ThemeSelector } from './ThemeSelector';
@@ -139,45 +139,12 @@ type ServerSyncButtonProps = {
 };
 function ServerSyncButton({ style, isMobile = false }: ServerSyncButtonProps) {
   const { t } = useTranslation();
-  const [cloudFileId] = useMetadataPref('cloudFileId');
   const dispatch = useDispatch();
-  const [syncing, setSyncing] = useState(false);
-  const [syncState, setSyncState] = useState<
-    null | 'offline' | 'local' | 'disabled' | 'error'
-  >(null);
-
-  useEffect(() => {
-    const unlisten = listen('sync-event', event => {
-      if (event.type === 'start') {
-        setSyncing(true);
-        setSyncState(null);
-      } else {
-        // Give the layout some time to apply the starting animation
-        // so we always finish it correctly even if it's almost
-        // instant
-        setTimeout(() => {
-          setSyncing(false);
-        }, 200);
-      }
-
-      if (event.type === 'error') {
-        // Use the offline state if either there is a network error or
-        // if this file isn't a "cloud file". You can't sync a local
-        // file.
-        if (event.subtype === 'network') {
-          setSyncState('offline');
-        } else if (!cloudFileId) {
-          setSyncState('local');
-        } else {
-          setSyncState('error');
-        }
-      } else if (event.type === 'success') {
-        setSyncState(event.syncDisabled ? 'disabled' : null);
-      }
-    });
-
-    return unlisten;
-  }, [cloudFileId]);
+  // Give the layout some time to apply the starting animation so we
+  // always finish it correctly even if the sync is almost instant
+  const { isSyncing: syncing, syncState } = useSyncStatus({
+    syncingEndDelayMs: 200,
+  });
 
   const mobileColor =
     syncState === 'error'
@@ -367,6 +334,7 @@ export function Titlebar({ style }: TitlebarProps) {
         <UncategorizedButton />
         {isDevelopmentEnvironment() && !isTestEnv && <ThemeSelector />}
         <PrivacyButton />
+        <NotificationsButton />
         {serverURL ? <ServerSyncButton /> : null}
         <SharedArrayBufferWarning />
         <LoggedInUser />

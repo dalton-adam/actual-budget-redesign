@@ -683,8 +683,9 @@ const app06f = [
       await p.evaluate(() => {
         for (const el of document.querySelectorAll(
           'html, body, .app, .page, .rmain',
-        ))
+        )) {
           Object.assign(el.style, { height: 'auto', overflow: 'visible' });
+        }
       });
     }
     await p.screenshot({ path: `${out}/${name}.png`, fullPage: !!full });

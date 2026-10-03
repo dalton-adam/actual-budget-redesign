@@ -13,10 +13,11 @@ import type {
 
 import { FinancialText } from '#components/FinancialText';
 import { PrivacyFilter } from '#components/PrivacyFilter';
+import { useDateFormat } from '#hooks/useDateFormat';
 import { useFormat } from '#hooks/useFormat';
 import { useLocale } from '#hooks/useLocale';
 
-import { ReportOptions } from './ReportOptions';
+import { getIntervalFormat, ReportOptions } from './ReportOptions';
 
 type ReportSummaryProps = {
   data: DataEntity;
@@ -106,7 +107,8 @@ export function useReportDateRangeText(
 ) {
   const locale = useLocale();
   const { t } = useTranslation();
-  const intervalFormat = ReportOptions.intervalFormat.get(interval) || '';
+  const dateFormat = useDateFormat() || 'MM/dd/yyyy';
+  const intervalFormat = getIntervalFormat(interval, dateFormat);
   const start = monthUtils.format(startDate, intervalFormat, locale);
   const end = monthUtils.format(endDate, intervalFormat, locale);
   return start !== end ? `${start} ${t('to')} ${end}` : start;
