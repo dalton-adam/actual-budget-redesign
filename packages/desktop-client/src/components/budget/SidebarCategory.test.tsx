@@ -5,13 +5,25 @@ import { generateCategory } from '@actual-app/core/mocks';
 import { initServer } from '@actual-app/core/platform/client/connection';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 
+import { SidebarProvider } from '#components/sidebar/SidebarProvider';
 import {
   configureTestAppStore,
   createTestQueryClient,
   TestProviders,
 } from '#mocks';
 
+import { EnvelopeTableLayoutProvider } from './envelopeTable';
 import { SidebarCategory } from './SidebarCategory';
+
+// The redesigned budget rows read their column layout from the table's
+// provider, which needs the accounts pane's state
+function BudgetTableProviders({ children }: { children: ReactNode }) {
+  return (
+    <SidebarProvider>
+      <EnvelopeTableLayoutProvider>{children}</EnvelopeTableLayoutProvider>
+    </SidebarProvider>
+  );
+}
 
 vi.mock(
   '@actual-app/core/platform/client/connection',
@@ -34,7 +46,9 @@ describe('SidebarCategory context menu', () => {
 
   async function renderRow(children: ReactNode) {
     const result = render(
-      <TestProviders store={store}>{children}</TestProviders>,
+      <TestProviders store={store}>
+        <BudgetTableProviders>{children}</BudgetTableProviders>
+      </TestProviders>,
     );
     // Flush the async notes query kicked off on mount
     await act(() => Promise.resolve());
@@ -78,13 +92,15 @@ describe('SidebarCategory context menu', () => {
     // node, then puts a brand new one back when editing ends.
     rerender(
       <TestProviders store={store}>
-        <SidebarCategory
-          innerRef={null}
-          category={category}
-          editing
-          onEditName={vi.fn()}
-          onSave={onSave}
-        />
+        <BudgetTableProviders>
+          <SidebarCategory
+            innerRef={null}
+            category={category}
+            editing
+            onEditName={vi.fn()}
+            onSave={onSave}
+          />
+        </BudgetTableProviders>
       </TestProviders>,
     );
 
@@ -99,14 +115,16 @@ describe('SidebarCategory context menu', () => {
     const renamed = { ...category, name: 'Food' };
     rerender(
       <TestProviders store={store}>
-        <SidebarCategory
-          innerRef={null}
-          category={renamed}
-          editing={false}
-          onEditName={vi.fn()}
-          onSave={onSave}
-          onDelete={vi.fn()}
-        />
+        <BudgetTableProviders>
+          <SidebarCategory
+            innerRef={null}
+            category={renamed}
+            editing={false}
+            onEditName={vi.fn()}
+            onSave={onSave}
+            onDelete={vi.fn()}
+          />
+        </BudgetTableProviders>
       </TestProviders>,
     );
     await act(() => Promise.resolve());

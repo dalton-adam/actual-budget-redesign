@@ -5,13 +5,25 @@ import { generateCategoryGroup } from '@actual-app/core/mocks';
 import { initServer } from '@actual-app/core/platform/client/connection';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 
+import { SidebarProvider } from '#components/sidebar/SidebarProvider';
 import {
   configureTestAppStore,
   createTestQueryClient,
   TestProviders,
 } from '#mocks';
 
+import { EnvelopeTableLayoutProvider } from './envelopeTable';
 import { SidebarGroup } from './SidebarGroup';
+
+// The redesigned budget rows read their column layout from the table's
+// provider, which needs the accounts pane's state
+function BudgetTableProviders({ children }: { children: ReactNode }) {
+  return (
+    <SidebarProvider>
+      <EnvelopeTableLayoutProvider>{children}</EnvelopeTableLayoutProvider>
+    </SidebarProvider>
+  );
+}
 
 vi.mock(
   '@actual-app/core/platform/client/connection',
@@ -34,7 +46,9 @@ describe('SidebarGroup context menu', () => {
 
   async function renderRow(children: ReactNode) {
     const result = render(
-      <TestProviders store={store}>{children}</TestProviders>,
+      <TestProviders store={store}>
+        <BudgetTableProviders>{children}</BudgetTableProviders>
+      </TestProviders>,
     );
     // Flush the async notes query kicked off on mount
     await act(() => Promise.resolve());
@@ -79,15 +93,17 @@ describe('SidebarGroup context menu', () => {
     // node, then puts a brand new one back when editing ends.
     rerender(
       <TestProviders store={store}>
-        <SidebarGroup
-          group={group}
-          editing
-          collapsed={false}
-          onEdit={vi.fn()}
-          onSave={onSave}
-          onDelete={vi.fn()}
-          onToggleCollapse={vi.fn()}
-        />
+        <BudgetTableProviders>
+          <SidebarGroup
+            group={group}
+            editing
+            collapsed={false}
+            onEdit={vi.fn()}
+            onSave={onSave}
+            onDelete={vi.fn()}
+            onToggleCollapse={vi.fn()}
+          />
+        </BudgetTableProviders>
       </TestProviders>,
     );
 
@@ -102,15 +118,17 @@ describe('SidebarGroup context menu', () => {
     const renamed = { ...group, name: 'Renamed Group' };
     rerender(
       <TestProviders store={store}>
-        <SidebarGroup
-          group={renamed}
-          editing={false}
-          collapsed={false}
-          onEdit={vi.fn()}
-          onSave={onSave}
-          onDelete={vi.fn()}
-          onToggleCollapse={vi.fn()}
-        />
+        <BudgetTableProviders>
+          <SidebarGroup
+            group={renamed}
+            editing={false}
+            collapsed={false}
+            onEdit={vi.fn()}
+            onSave={onSave}
+            onDelete={vi.fn()}
+            onToggleCollapse={vi.fn()}
+          />
+        </BudgetTableProviders>
       </TestProviders>,
     );
     await act(() => Promise.resolve());
