@@ -121,7 +121,7 @@ export function CategoryDetailsSummary({
           }
         />
       </View>
-      <View style={{ flexDirection: 'row', gap: 8 }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
         <CategoryDetailsStatTile
           testId="category-details-carried-in"
           label={t('From {{month}}', { month: previousMonth })}
