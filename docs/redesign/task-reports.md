@@ -2031,3 +2031,18 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   **Open for the owner:** PERF-03 or written acceptance; tracking budgets
   keep upstream's layout; SYNC-01's follow-ups; upstream's unnamed row
   buttons; the plan §12 walkthrough.
+- PERF-03: **verified October 3, 2026**, branch `redesign/perf-03`
+  (`07245cb08`). Full record in
+  [verification.md](verification.md#perf-03-october-3-2026). The details
+  panel's frame renders with the page and its contents follow once the
+  browser is idle, so the table's first rows and the month label paint
+  first. **D-6 (base v26.10.0, same session):** first row +2% / −3%
+  (1440 / 1000, was +14% in QA-01); month label +10% at 1440 (pass) and
+  +11% at 1000×700, **accepted in writing by the owner** October 3, 2026;
+  all other blocking measures pass. **Checks:** typecheck, oxlint, oxfmt;
+  `C/budget` unit tests 88/88; E2E 38/38 against the rebuilt preview;
+  Linux VRT 26/26 with no snapshot changed. **Scope:** also changes
+  `C/budget/CategoryDetailsContext.tsx` (not on the card; the context is
+  not exported). **Trade-off:** after a month switch the panel can show the
+  previous month for up to half a second. **Follow-up:** optional PERF-04,
+  the open panel's resting cost (about 10–13 ms per switch).

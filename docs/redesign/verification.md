@@ -814,9 +814,11 @@ lower half of the page).
 ## QA-01 (started October 2, 2026)
 
 Branch `redesign/qa-01` from `redesign/main` at `83b4c8600` (v26.10.0 merged
-in SYNC-01). Status: **review**: the checks ran October 2 – 3, 2026; release
-waits on PERF-03 (or the owner accepting its two D-6 misses) and the
-owner's walkthrough ([open findings](#open-findings-for-the-owner)).
+in SYNC-01). Status: **review**: the checks ran October 2 – 3, 2026.
+PERF-03 fixed one D-6 miss and narrowed the other; the owner accepted the
+remaining one (month label at 1000×700, +11%) on October 3, 2026
+([PERF-03](#perf-03-october-3-2026)). Release still waits on the owner's
+walkthrough ([open findings](#open-findings-for-the-owner)).
 Screenshots are in
 [verification/qa-01/](verification/qa-01/).
 
@@ -1133,7 +1135,7 @@ files (below).
 
 | #   | Finding                                                                                                                                                                                                                                | Blocks release? | Proposed                                                                                                                                                                                            |
 | --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **D-6 misses:** demo first row +14% at 1440×900 and month-switch label +12% at 1000×700, both from the details panel rendering in the same commit (panel closed: +5% and +0%)                                                          | Yes (D-6)       | **PERF-03** (backlog): render the panel's body after the table and the month label paint, then rerun the perf script. Or accept both in writing                                                     |
+| 1   | **D-6 misses:** demo first row +14% at 1440×900 and month-switch label +12% at 1000×700, both from the details panel rendering in the same commit (panel closed: +5% and +0%)                                                          | Yes (D-6)       | **Done in PERF-03:** first row passes (+2%, −3%); month label +10% at 1440 (pass) and **+11% at 1000, accepted by the owner** October 3, 2026. Optional follow-up PERF-04                           |
 | 2   | **Tracking budgets keep upstream's layout** inside the redesigned shell                                                                                                                                                                | No              | Record as a scope decision (envelope only, as designed), or open a task to bring the tracking table onto the redesign's surfaces                                                                    |
 | 3   | SYNC-01's follow-ups are still open: upstream's notifications bell and Notifications page, the Monte Carlo Income table, and the Experimental "Redesigned sidebar" toggle and "Set account group" item that do nothing in the redesign | No              | Unchanged since SYNC-01; small tasks if wanted before release                                                                                                                                       |
 | 4   | Upstream accessibility gaps on each Budget row: an unnamed category menu button, an unnamed budget menu button and a duplicate "View notes" tab stop                                                                                   | No              | Same in v26.10.0; leave, or name them in a small task                                                                                                                                               |
@@ -1154,3 +1156,78 @@ closed" (time-outs in bud-01 and budget.mobile, the first files, while the
 preview rebuild and the desktop preparation were loading the machine; no
 screenshot mismatch). Those two files rerun on an idle machine: **42/42**.
 No snapshot changed.
+
+## PERF-03 (October 3, 2026)
+
+Branch `redesign/perf-03` from `redesign/qa-01`; change `07245cb08`
+(`C/budget/CategoryDetailsPanel.tsx`, `C/budget/CategoryDetailsContext.tsx`).
+The second file is outside the task card's list: the panel's contents need
+the details context, which only that file can provide.
+
+### Cause
+
+QA-01's two misses came from the details panel rendering in the same
+commit as the table on load and as the new month label on a switch.
+Profiles (CPU, Long Animation Frames and Chrome traces on the production
+preview, with the large budget of 100 extra categories) showed:
+
+- Moving the panel's render out of the click with `useDeferredValue` or
+  into the frame after the paint fixed the first row but not the month
+  label: the script reads the time with a separate call after it sees the
+  new label, and that call waited behind the panel's update (a remount of
+  its body, one commit that a transition cannot split).
+- With the panel's contents frozen (never updating after the first
+  render; no panel component commits on the switch), a switch still costs
+  about 10–13 ms more than with the panel closed. That cost is spread over
+  the table's own rendering, not inside the panel; CSS containment on the
+  panel did not remove it (within noise).
+- With the panel closed, the redesign's label is already about 3–4% over
+  the base.
+
+### Change
+
+The panel frame renders with the page, so the table never shifts; its
+contents get the details once the browser is idle (`requestIdleCallback`,
+500 ms at most, as a transition; a 50 ms timeout where the browser has no
+`requestIdleCallback`). On a first load or a month switch the table and
+the month label paint first. No handler, query or saved value changed.
+**Trade-off:** after a month switch the panel can show the previous month
+for up to half a second while the browser is busy; its own month stepper
+steps from the month it shows.
+
+### Measurements
+
+`PERF_CHANNEL=msedge node scripts/redesign-perf.mjs run 7
+data/redesign/perf-03-final.json`, base v26.10.0 measured in the same
+session (the machine was faster than in QA-01's run). Medians of 7, ms.
+
+| Blocking measure (D-6)        | 1440×900 base → redesign | Change | 1000×700 base → redesign | Change   |
+| ----------------------------- | ------------------------ | ------ | ------------------------ | -------- |
+| Assigned edit, median         | 214 → 39                 | −82%   | 213 → 41                 | −81%     |
+| Assigned edit, p90            | 223 → 52                 | −77%   | 229 → 55                 | −76%     |
+| First paint, demo: first row  | 758 → 772                | +2%    | 759 → 735                | −3%      |
+| First paint, large: first row | 1204 → 1226              | +2%    | 1201 → 1196              | −0%      |
+| Month switch: label           | 224 → 246                | +10%   | 224 → 249                | **+11%** |
+| Open register: first rows     | 242 → 240                | −1%    | 229 → 225                | −2%      |
+| Scroll: frames over 33 ms     | 0 → 0                    | Pass   | 0 → 0                    | Pass     |
+
+Panel closed, month label: 231 (1440) and 234 (1000). Reported only:
+first paint settled +8% / +3% (demo) and +19% / +16% (large; the panel
+fills in after the table), month switch settled −55% / −54%.
+
+**Against D-6:** every blocking measure passes except the month label at
+1000×700, 1 point over (about 25 ms; the run-to-run spread is about ±3%).
+**The owner accepted it in writing on October 3, 2026.** Before this
+change, in the same session: first row +10% / −0% and month label
++17% / +15%. A follow-up to cut the panel's resting cost (mount less of it
+until needed) is logged as optional **PERF-04**.
+
+### Checks
+
+Typecheck passes; oxlint and oxfmt clean on both files; web unit tests for
+`C/budget` 88/88; E2E against the rebuilt preview (budget, bud-01,
+detail-01 – 04, tour) 38/38; Linux VRT (Docker, same recipe, no updates)
+for budget, onboarding and accounts **26/26**, no snapshot changed
+(bud-01 and detail-01 – 04 have no screenshots). Scratch scripts in
+`data/redesign/` (git-ignored): `perf-03-loaf.mjs`, `perf-03-trace.mjs`,
+`perf-03-clickprof.mjs`, `perf-03-renders.mjs`.
