@@ -126,15 +126,17 @@ export function ToBudgetPopover({
     );
   }
 
+  const closeMenu = () => {
+    setMenuStep('actions');
+    onClose();
+  };
+
   return (
     <Popover
       triggerRef={triggerRef}
       placement={placement}
       isOpen={isOpen}
-      onOpenChange={() => {
-        setMenuStep('actions');
-        onClose();
-      }}
+      onOpenChange={closeMenu}
       isNonModal
       {...popoverProps}
     >
@@ -157,7 +159,7 @@ export function ToBudgetPopover({
         )}
         {menuStep === 'buffer' && (
           <HoldMenu
-            onClose={onClose}
+            onClose={closeMenu}
             onSubmit={amount => {
               onBudgetAction(month, 'hold', { amount });
             }}
@@ -166,7 +168,7 @@ export function ToBudgetPopover({
         {menuStep === 'transfer' && (
           <TransferMenu
             initialAmount={availableValue}
-            onClose={onClose}
+            onClose={closeMenu}
             onSubmit={(amount, categoryId) => {
               onBudgetAction(month, 'transfer-available', {
                 amount,
@@ -179,7 +181,7 @@ export function ToBudgetPopover({
           <CoverMenu
             showToBeBudgeted={false}
             initialAmount={availableValue}
-            onClose={onClose}
+            onClose={closeMenu}
             onSubmit={(amount, categoryId) => {
               onBudgetAction(month, 'cover-overbudgeted', {
                 category: categoryId,

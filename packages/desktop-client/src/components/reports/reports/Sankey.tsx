@@ -26,7 +26,6 @@ import type {
   SankeyWidget,
   TimeFrame,
 } from '@actual-app/core/types/models';
-import * as d from 'date-fns';
 import { debounce } from 'es-toolkit/compat';
 import type { TFunction } from 'i18next';
 import type { SankeyData } from 'recharts/types/chart/Sankey';
@@ -39,7 +38,10 @@ import { LoadingIndicator } from '#components/reports/LoadingIndicator';
 import { ReportPageBody } from '#components/reports/ReportPageBody';
 import { ReportPageCard } from '#components/reports/ReportPageCard';
 import { ReportPageTitle } from '#components/reports/ReportPageTitle';
-import { calculateTimeRange } from '#components/reports/reportRanges';
+import {
+  boundMonthRangeFromDates,
+  calculateTimeRange,
+} from '#components/reports/reportRanges';
 import { ReportSegmentedControl } from '#components/reports/ReportSegmentedControl';
 import {
   buildSankeyData,
@@ -50,7 +52,6 @@ import {
 import type { Graph } from '#components/reports/spreadsheets/sankey-spreadsheet';
 import { useReport } from '#components/reports/useReport';
 import { useReportControlVariant } from '#components/reports/useReportControlVariant';
-import { fromDateRepr } from '#components/reports/util';
 import { useCategories } from '#hooks/useCategories';
 import { useDashboardWidget } from '#hooks/useDashboardWidget';
 import { useFormatList } from '#hooks/useFormatList';
@@ -390,6 +391,8 @@ type OptionsButtonProps = {
   onTogglePercentages: () => void;
   groupAccounts: boolean;
   onToggleGroupAccounts: () => void;
+  showTransfers: boolean;
+  onToggleShowTransfers: () => void;
 };
 
 function OptionsButton({
@@ -397,6 +400,8 @@ function OptionsButton({
   onTogglePercentages,
   groupAccounts,
   onToggleGroupAccounts,
+  showTransfers,
+  onToggleShowTransfers,
 }: OptionsButtonProps) {
   const normalControlVariant = useReportControlVariant('normal');
   const { t } = useTranslation();
@@ -421,6 +426,7 @@ function OptionsButton({
           onMenuSelect={item => {
             if (item === 'show-percentages') onTogglePercentages();
             if (item === 'group-accounts') onToggleGroupAccounts();
+            if (item === 'show-transfers') onToggleShowTransfers();
           }}
           items={[
             {
@@ -432,6 +438,11 @@ function OptionsButton({
               name: 'group-accounts',
               text: t('Group accounts in Spent view'),
               toggle: groupAccounts,
+            },
+            {
+              name: 'show-transfers',
+              text: t('Show transfers in Spent view'),
+              toggle: showTransfers,
             },
           ]}
         />
@@ -526,6 +537,9 @@ function SankeyInner({ widget }: SankeyInnerProps) {
   const [groupAccounts, setGroupAccounts] = useState(
     widget?.meta?.groupAccounts ?? false,
   );
+  const [showTransfers, setShowTransfers] = useState(
+    widget?.meta?.showTransfers ?? false,
+  );
 
   const [layerRange, setLayerRange] = useState<LayerRange>(() =>
     normalizeLayerRange(widget?.meta?.mode ?? 'spent', {
@@ -589,16 +603,26 @@ function SankeyInner({ widget }: SankeyInnerProps) {
       return null;
     }
 
-    return createBaseGraphSpreadsheet(
+    const [boundedStart, boundedEnd] = boundMonthRangeFromDates(
+      earliestTransaction,
+      latestTransaction,
       start,
       end,
+    );
+
+    return createBaseGraphSpreadsheet(
+      boundedStart,
+      boundedEnd,
       groupedCategories,
       conditions,
       conditionsOp,
       graphMode,
       groupAccounts,
+      showTransfers,
     );
   }, [
+    earliestTransaction,
+    latestTransaction,
     datesInitialized,
     start,
     end,
@@ -607,6 +631,7 @@ function SankeyInner({ widget }: SankeyInnerProps) {
     conditionsOp,
     graphMode,
     groupAccounts,
+    showTransfers,
   ]);
 
   const defaultGetBaseGraph = async (
@@ -671,29 +696,13 @@ function SankeyInner({ widget }: SankeyInnerProps) {
       setDatesInitialized(true);
 
       const currentMonth = monthUtils.currentMonth();
-      let earliestMonth = earliestTransaction
-        ? monthUtils.monthFromDate(
-            d.parseISO(fromDateRepr(earliestTransaction.date)),
-          )
-        : currentMonth;
-      const latestTransactionMonth = latestTransaction
-        ? monthUtils.monthFromDate(
-            d.parseISO(fromDateRepr(latestTransaction.date)),
-          )
-        : currentMonth;
+      const earliestMonth = monthUtils.getMonth(earliestTransactionDate);
+      const latestTransactionMonth = monthUtils.getMonth(latestTransactionDate);
 
       const latestMonth =
         latestTransactionMonth > currentMonth
           ? latestTransactionMonth
           : currentMonth;
-
-      // Make sure the month selects are at least populated with a
-      // year's worth of months. We can undo this when we have fancier
-      // date selects.
-      const yearAgo = monthUtils.subMonths(latestMonth, 12);
-      if (earliestMonth > yearAgo) {
-        earliestMonth = yearAgo;
-      }
 
       const allMonths = monthUtils
         .rangeInclusive(earliestMonth, latestMonth)
@@ -731,6 +740,7 @@ function SankeyInner({ widget }: SankeyInnerProps) {
             topNcategories,
             categorySort,
             showPercentages,
+            showTransfers,
             layerFrom,
             layerTo,
             timeFrame: {
@@ -907,6 +917,8 @@ function SankeyInner({ widget }: SankeyInnerProps) {
             onTogglePercentages={() => setShowPercentages(v => !v)}
             groupAccounts={groupAccounts}
             onToggleGroupAccounts={() => setGroupAccounts(v => !v)}
+            showTransfers={showTransfers}
+            onToggleShowTransfers={() => setShowTransfers(v => !v)}
           />
         </View>
         {widget && (

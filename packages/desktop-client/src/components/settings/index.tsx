@@ -56,6 +56,8 @@ function About() {
     });
   const dispatch = useDispatch();
   const isRedesign = useSettingsRedesign();
+  const [showNewsFeed, setShowNewsFeedPref] = useGlobalPref('showNewsFeed');
+  const isNewsFeedEnabled = Boolean(showNewsFeed);
 
   return (
     <Setting>
@@ -124,9 +126,17 @@ function About() {
           >
             <Trans>Release Notes</Trans>
           </Link>
+          {isNewsFeedEnabled && (
+            <>
+              {' · '}
+              <Link variant="internal" to="/notifications">
+                <Trans>Notifications</Trans>
+              </Link>
+            </>
+          )}
         </Text>
       </View>
-      <View>
+      <View style={{ gap: 5 }}>
         <Text style={{ display: 'flex' }}>
           <Checkbox
             id="settings-notifyWhenUpdateIsAvailable"
@@ -138,6 +148,19 @@ function About() {
           />
           <label htmlFor="settings-notifyWhenUpdateIsAvailable">
             <Trans>Display a notification when updates are available</Trans>
+          </label>
+        </Text>
+        <Text style={{ display: 'flex' }}>
+          <Checkbox
+            id="settings-showNewsFeed"
+            style={isRedesign ? redesignCheckboxStyle : undefined}
+            checked={showNewsFeed}
+            onChange={e => setShowNewsFeedPref(e.currentTarget.checked)}
+          />
+          <label htmlFor="settings-showNewsFeed">
+            <Trans>
+              Show in-app notifications (release notes and announcements)
+            </Trans>
           </label>
         </Text>
       </View>
