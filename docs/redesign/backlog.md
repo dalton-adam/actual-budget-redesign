@@ -66,7 +66,7 @@ Budget header are reference material, not tasks to build.
 | UNDO-FIX           | verified    | `1f687b25d` (merge)      | Ctrl+Z / Ctrl+Shift+Z in an unedited Budget amount box run app undo/redo; mid-edit keeps text undo. Tracking checked by code only.                |
 | GOAL-01            | not started | —                        | Owner request October 3, 2026: long-term planning goals on Budget rows. Design first; builds on `#goal` templates (decision D-3).                 |
 | LOAN-01            | not started | —                        | Owner request October 3, 2026: loan details on off-budget loan accounts, payoff dates, principal/interest split. Design first; may need a schema. |
-| RELEASE-01         | review      | (this merge)             | Browser build on 127.0.0.1:3016, release.md. Waits on the owner checking a copy of the real budget (release.md step 3).                           |
+| RELEASE-01         | review      | `d6a318942` (merge)      | Browser build on 127.0.0.1:3016, release.md. Waits on the owner checking a copy of their YNAB budget (release.md step 3).                         |
 
 States follow plan §16: not started, ready, in progress, review, verified,
 blocked. All application work not marked verified is pending; this document

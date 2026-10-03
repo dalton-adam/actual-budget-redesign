@@ -2158,3 +2158,9 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   machine, so the install steps are written for the Mac and not run
   there; Actual does not request persistent browser storage (release.md
   says to export after each session).
+  **Correction, same day (owner):** there is no Actual budget; the owner's
+  budget is in YNAB and the installed desktop app has never held a real
+  budget. release.md now checks a copy imported from a YNAB JSON export
+  (Import my budget → nYNAB), rolls back to YNAB, drops the desktop-app
+  version check, and gives install steps for either computer. nYNAB import
+  on this build: `onboarding.test.ts` 6/6 (fictional file).
