@@ -21,6 +21,8 @@ import type {
   MonteCarloContribution,
   MonteCarloIncomeStream,
 } from '#components/reports/reports/monte-carlo/monteCarloSimulation';
+import { useMonteCarloStyles } from '#components/reports/reports/monte-carlo/monteCarloStyles';
+import { useReportControlVariant } from '#components/reports/useReportControlVariant';
 import { Field, Row, TableHeader } from '#components/table';
 import { FinancialInput } from '#components/util/FinancialInput';
 
@@ -46,6 +48,11 @@ export function MonteCarloIncomeStreams({
   onConfigChange,
 }: MonteCarloIncomeStreamsProps) {
   const { t } = useTranslation();
+  // The same card table as Contributions (APP-03d), added in v26.10.0
+  // after that task, so it follows here (APP-07).
+  const { tableContainer, tableHeader, rowBackground, rowBorder } =
+    useMonteCarloStyles();
+  const controlVariant = useReportControlVariant('normal');
 
   function updateIncomeStream(
     incomeStreamId: string,
@@ -83,7 +90,7 @@ export function MonteCarloIncomeStreams({
     <View style={{ gap: 10 }}>
       <View
         style={{
-          ...styles.tableContainer,
+          ...tableContainer,
           ...styles.horizontalScrollbar,
           flex: 'unset',
           // Scroll sideways when the columns' minimum widths don't fit,
@@ -92,7 +99,7 @@ export function MonteCarloIncomeStreams({
         }}
       >
         <View style={{ minWidth: 'fit-content' }}>
-          <TableHeader>
+          <TableHeader style={tableHeader}>
             <Field width="flex" style={{ minWidth: 150 }}>
               <Trans>Income name</Trans>
             </Field>
@@ -124,7 +131,8 @@ export function MonteCarloIncomeStreams({
               collapsed
               height={INCOME_ROW_HEIGHT}
               style={{
-                backgroundColor: theme.tableBackground,
+                backgroundColor: rowBackground,
+                borderColor: rowBorder,
                 ':hover': { backgroundColor: theme.tableRowBackgroundHover },
               }}
             >
@@ -252,7 +260,7 @@ export function MonteCarloIncomeStreams({
       </View>
 
       <View style={{ flexDirection: 'row' }}>
-        <Button onPress={addIncomeStream}>
+        <Button variant={controlVariant} onPress={addIncomeStream}>
           <SvgAdd width={10} height={10} style={{ marginRight: 5 }} />
           <Trans>Add income</Trans>
         </Button>

@@ -2046,3 +2046,32 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   not exported). **Trade-off:** after a month switch the panel can show the
   previous month for up to half a second. **Follow-up:** optional PERF-04,
   the open panel's resting cost (about 10–13 ms per switch).
+- APP-07: **verified October 3, 2026**, branch `redesign/app-07`. QA-01
+  finding 3 (SYNC-01's follow-ups), owner go-ahead the same day. **Changed:**
+  `C/news/NotificationsPage.tsx` (Display title, 720px column, 12px gaps on
+  desktop), `C/news/NewsEntryCard.tsx` (neutral Release/Post pill, 15px/650
+  title, positive "Unread" pill in place of the dot, Secondary date, links
+  under the card's hairline), `C/news/MarkdownBlockquote.tsx` (callouts as
+  flat 12px pill-tone boxes with an Eyebrow title),
+  `C/reports/reports/monte-carlo/MonteCarloIncomeStreams.tsx` (the
+  Contributions table's card styles: hairline frame, Eyebrow header, card
+  rows, Control "Add income"), `C/settings/Experimental.tsx` (the
+  "Redesigned sidebar" toggle removed) and `C/accounts/Header.tsx` ("Set
+  account group" removed from the account menu); `DESIGN.md` (Notifications
+  page). Narrow widths keep upstream's look. The `newSidebarUI` pref,
+  upstream's `C/sidebar/redesign/` and the menu's `account-group` handler
+  are untouched, so an upstream merge sees two small deletions. **Bell:**
+  no change; it already matches the privacy button beside it (bare, 15px
+  icon) and its badge uses the primary button roles. **Checks:** typecheck
+  passes; oxlint (type-aware) and oxfmt clean on the changed files; unit
+  tests for `C/news`, Monte Carlo, `C/settings` and `C/accounts` 186/186;
+  `build:browser`, preview on 127.0.0.1:3028 (another session held 3018),
+  E2E settings, reports and accounts with the installed Edge (scratch
+  config, no retries) **33/33**; Impeccable detector: no findings. No
+  Linux VRT snapshot covers the changed surfaces (no E2E screenshots the
+  Notifications page, the Monte Carlo Income tab, the experimental list or
+  the account menu), so none was run. **VISUAL:** demo budget, dark and
+  light at 1440×900 and 1000×700, before and after, in
+  [verification/app-07/](verification/app-07/); the callout checked by eye
+  in dark. **Not run:** midnight, a custom theme, privacy mode, the desktop
+  build.

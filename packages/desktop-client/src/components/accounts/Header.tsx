@@ -47,7 +47,6 @@ import type { SavedFilter } from '#components/filters/SavedFilterMenuButton';
 import { NotesButton } from '#components/NotesButton';
 import { SelectedTransactionsButton } from '#components/transactions/SelectedTransactionsButton';
 import { useDateFormat } from '#hooks/useDateFormat';
-import { useFeatureFlag } from '#hooks/useFeatureFlag';
 import { useLocale } from '#hooks/useLocale';
 import { useLocalPref } from '#hooks/useLocalPref';
 import { useSplitsExpanded } from '#hooks/useSplitsExpanded';
@@ -800,7 +799,6 @@ function AccountMenu({
 }: AccountMenuProps) {
   const { t } = useTranslation();
   const syncServerStatus = useSyncServerStatus();
-  const newSidebarUIEnabled = useFeatureFlag('newSidebarUI');
 
   return (
     <Menu
@@ -827,14 +825,8 @@ function AccountMenu({
           name: 'manage-columns',
           text: t('Manage table columns'),
         },
-        ...(newSidebarUIEnabled
-          ? [
-              {
-                name: 'account-group',
-                text: t('Set account group'),
-              } as const,
-            ]
-          : []),
+        // "Set account group" belongs to upstream's flagged sidebar, which
+        // the redesign leaves out (SYNC-01), so it is not offered (APP-07).
         {
           name: 'toggle-reconciled',
           text: showReconciled
