@@ -1,6 +1,8 @@
 import React, {
   createContext,
+  startTransition,
   useContext,
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -283,6 +285,39 @@ export function CategoryDetailsProvider({
 function getScrollContainer(container: HTMLElement | null) {
   return container?.querySelector<HTMLElement>(
     '[data-testid="budget-table-scroll-container"]',
+  );
+}
+
+/**
+ * Gives the panel's contents the details once the browser is idle. On a
+ * first load or a new budget month the table and the month label paint
+ * first, and the panel catches up once they are done.
+ */
+export function DeferredCategoryDetails({ children }: { children: ReactNode }) {
+  const live = useContext(CategoryDetailsContext);
+  const [shown, setShown] = useState<CategoryDetailsContextValue | null>(null);
+
+  useEffect(() => {
+    if (shown === live) {
+      return;
+    }
+    // Browsers without requestIdleCallback (Safari) wait a few frames.
+    const update = () => startTransition(() => setShown(live));
+    if (typeof requestIdleCallback === 'function') {
+      const idle = requestIdleCallback(update, { timeout: 500 });
+      return () => cancelIdleCallback(idle);
+    }
+    const timeout = setTimeout(update, 50);
+    return () => clearTimeout(timeout);
+  }, [live, shown]);
+
+  if (!shown) {
+    return null;
+  }
+  return (
+    <CategoryDetailsContext.Provider value={shown}>
+      {children}
+    </CategoryDetailsContext.Provider>
   );
 }
 
