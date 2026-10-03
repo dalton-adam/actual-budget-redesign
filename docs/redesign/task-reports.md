@@ -1938,3 +1938,74 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   **Not run:** light and midnight in the app, narrow widths, a screen
   reader, and the desktop build. **Left as upstream:** the empty,
   unnamed category button on scheduled rows in the register.
+- SYNC-01: **in review October 2, 2026** on branch
+  `redesign/sync-v26.10.0`; not merged. Merge of upstream release tag
+  **v26.10.0** (`e08b13534`, conflict resolution only) plus three follow-up
+  commits. Upstream shipped v26.10.0 while QA-01 was starting; the owner
+  chose to sync first so QA-01 measures what will ship, with v26.10.0 as the
+  performance base. **Owner decision:** keep the redesign's navigation;
+  leave out upstream's floating-sidebar wrapper and its `newSidebarUI`
+  flagged sidebar. **Conflicts (196 files):** 179 Linux VRT PNGs kept as
+  ours, then regenerated (below). 17 source files:
+  `C/sidebar/index.tsx` (ours: `FloatableSidebar` returns `<Sidebar />`
+  on desktop; upstream's wrapper left out), `C/sidebar/Sidebar.tsx`
+  (ours); `C/settings/index.tsx` (both prefs; upstream's new news-feed
+  checkbox styled with `redesignCheckboxStyle`); `C/FinancesApp.tsx` and
+  `C/Titlebar.tsx` (both sides' imports; upstream's `NotificationsButton`
+  bell renders in the redesigned title bar);
+  `C/budget/envelope/budgetsummary/ToBudget.tsx` (upstream's fix ported:
+  `closeMenu` in `ToBudgetPopover` resets the menu step and closes, used by
+  `onOpenChange` and the Hold, Transfer and Cover dialogs);
+  `C/FatalError.tsx` (upstream's `canChooseDocumentDir` and
+  `ChooseDocumentDirButton` in both layouts; Restart becomes `normal`
+  when the folder button shows); `C/reports/Header.tsx`,
+  `C/reports/ReportSummary.tsx` (upstream's date-format fix moved into
+  `useReportDateRangeText`), `C/reports/reports/CustomReport.tsx` (narrow
+  `flex: 1`), `C/reports/reports/Sankey.tsx` (imports); the six Monte Carlo
+  files (`MonteCarlo`, `Configuration`, `Contributions`,
+  `RunDetailTable`, `RunsTable`, `WithdrawalRuleConfiguration`): upstream's
+  income, cashflow and surplus features kept with the redesign's
+  `useMonteCarloStyles()`, `useReportControlVariant` and `usePotColumns()`
+  in place of upstream's constants. `MonteCarloPotConfiguration.tsx`
+  merged cleanly but used the removed `FIELD_STYLE` and `POT_COLUMNS`;
+  swapped for the hooks. **Follow-up commits:** `62e068165` braces in
+  `scripts/redesign-prototype-shots.cjs` (a lint error already on
+  `redesign/main`); `5d161406b` upstream's new `SidebarGroup` and
+  `SidebarCategory` tests wrapped in `SidebarProvider` and
+  `EnvelopeTableLayoutProvider`, which the redesign's budget rows need
+  (PERF-01); `278c6494d` upstream's legend-scroll E2E test reads the
+  redesign's legend list (the element after the "Category" heading);
+  its chart-height checks are unchanged. **Release notes re-read** for
+  files the redesign touched: title bar (notifications bell, news feed),
+  sidebar (floating wrapper and flagged sidebar, left out), budget table
+  (To Budget menu fix, new sidebar row tests), Settings (news-feed pref),
+  reports (Monte Carlo, date format, legend scrolling), CSV import (new
+  Encoding field), fatal error screen (choose document folder). Themes:
+  no conflict. **Checks:** typecheck passes; lint clean. Unit tests: web
+  1,255 passed, 1 skipped; the other packages pass. E2E (dev server, every
+  redesign file): **123/123** (the Reports file 19/19 after `278c6494d`).
+  WIDE **78/78**. Impeccable detector: no findings. VISUAL (demo budget):
+  Budget, navigation, title bar bell, Settings, Notifications page, To
+  Budget menu after Hold/Transfer/Cover, and Monte Carlo income, cashflow
+  and surplus views. Linux VRT (Docker, Playwright v1.61.1, HTTPS dev
+  server over the LAN address, one worker, no retries): full run 138
+  passed, 33 failed, 17 not run (skipped after failures in serial files).
+  Every failure was located by script and the outliers checked by eye: 29
+  are the title bar's icon strip (the new bell), Settings desktop and
+  mobile are the new checkbox moving the page down, the split transaction
+  is the title bar's uncategorized notice moving left, and CSV import is
+  upstream's Encoding field. The 13 affected files were regenerated
+  (`--update-snapshots=changed`): **185 snapshots** rewritten, each checked
+  against the committed one by script (172 only in the title bar strip,
+  6 CSV import, 5 Settings, 2 custom report midnight: the bell plus
+  221 pixels of anti-aliasing, checked by eye). Re-run without updating:
+  **84/84**; with the other 104 tests from the full run, **188/188**. **Follow-ups (not in
+  this task):** restyle upstream's bell, Notifications page and Monte Carlo
+  Income tab table, which keep upstream styling; hide the Experimental
+  "Redesigned sidebar" toggle and its "Set account group" account-menu
+  item, which do nothing with the redesign's sidebar; upstream's
+  `C/sidebar/redesign/*` and `SidebarShell` are now unused. **Note:** the
+  news feed is on by default and fetches `news.json` from
+  `raw.githubusercontent.com`; the client reports v26.10.0. D-1: the fork
+  now carries v26.10.0's database migration, so the official v26.10.0 app
+  and the fork can open the same budget once this merges.
