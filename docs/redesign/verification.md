@@ -814,11 +814,11 @@ lower half of the page).
 ## QA-01 (started October 2, 2026)
 
 Branch `redesign/qa-01` from `redesign/main` at `83b4c8600` (v26.10.0 merged
-in SYNC-01). Status: **review**: the checks ran October 2 – 3, 2026.
-PERF-03 fixed one D-6 miss and narrowed the other; the owner accepted the
-remaining one (month label at 1000×700, +11%) on October 3, 2026
-([PERF-03](#perf-03-october-3-2026)). Release still waits on the owner's
-walkthrough ([open findings](#open-findings-for-the-owner)).
+in SYNC-01). Status: **verified October 3, 2026**: the checks ran October
+2 – 3, 2026. PERF-03 fixed one D-6 miss and narrowed the other; the owner
+accepted the remaining one (month label at 1000×700, +11%) on October 3,
+2026 ([PERF-03](#perf-03-october-3-2026)). The owner's walkthrough passed
+the same day ([open findings](#open-findings-for-the-owner)).
 Screenshots are in
 [verification/qa-01/](verification/qa-01/).
 
@@ -1133,13 +1133,22 @@ files (below).
 
 ### Open findings for the owner
 
-| #   | Finding                                                                                                                                                                                                                                | Blocks release? | Proposed                                                                                                                                                                                            |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **D-6 misses:** demo first row +14% at 1440×900 and month-switch label +12% at 1000×700, both from the details panel rendering in the same commit (panel closed: +5% and +0%)                                                          | Yes (D-6)       | **Done in PERF-03:** first row passes (+2%, −3%); month label +10% at 1440 (pass) and **+11% at 1000, accepted by the owner** October 3, 2026. Optional follow-up PERF-04                           |
-| 2   | **Tracking budgets keep upstream's layout** inside the redesigned shell                                                                                                                                                                | No              | Record as a scope decision (envelope only, as designed), or open a task to bring the tracking table onto the redesign's surfaces                                                                    |
-| 3   | SYNC-01's follow-ups are still open: upstream's notifications bell and Notifications page, the Monte Carlo Income table, and the Experimental "Redesigned sidebar" toggle and "Set account group" item that do nothing in the redesign | No              | Unchanged since SYNC-01; small tasks if wanted before release                                                                                                                                       |
-| 4   | Upstream accessibility gaps on each Budget row: an unnamed category menu button, an unnamed budget menu button and a duplicate "View notes" tab stop                                                                                   | No              | Same in v26.10.0; leave, or name them in a small task                                                                                                                                               |
-| 5   | The plan §12 user walkthrough                                                                                                                                                                                                          | Yes (plan §12)  | Owner, in the disposable demo: find an account, inspect an envelope, assign until Ready to Assign is zero, cover an overspent category, switch months, inspect a transaction, switch light and dark |
+| #   | Finding                                                                                                                                                                                                                                | Blocks release? | Proposed                                                                                                                                                                                                                                                                     |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **D-6 misses:** demo first row +14% at 1440×900 and month-switch label +12% at 1000×700, both from the details panel rendering in the same commit (panel closed: +5% and +0%)                                                          | Yes (D-6)       | **Done in PERF-03:** first row passes (+2%, −3%); month label +10% at 1440 (pass) and **+11% at 1000, accepted by the owner** October 3, 2026. Optional follow-up PERF-04                                                                                                    |
+| 2   | **Tracking budgets keep upstream's layout** inside the redesigned shell                                                                                                                                                                | No              | Record as a scope decision (envelope only, as designed), or open a task to bring the tracking table onto the redesign's surfaces                                                                                                                                             |
+| 3   | SYNC-01's follow-ups are still open: upstream's notifications bell and Notifications page, the Monte Carlo Income table, and the Experimental "Redesigned sidebar" toggle and "Set account group" item that do nothing in the redesign | No              | **Owner, October 3, 2026:** do it before release → APP-07                                                                                                                                                                                                                    |
+| 4   | Upstream accessibility gaps on each Budget row: an unnamed category menu button, an unnamed budget menu button and a duplicate "View notes" tab stop                                                                                   | No              | **Owner, October 3, 2026:** do it before release → A11Y-01                                                                                                                                                                                                                   |
+| 5   | The plan §12 user walkthrough                                                                                                                                                                                                          | Yes (plan §12)  | **Passed October 3, 2026** (owner, fresh demo on the `af6790289` build). Owner, in the disposable demo: find an account, inspect an envelope, assign until Ready to Assign is zero, cover an overspent category, switch months, inspect a transaction, switch light and dark |
+
+**Walkthrough notes (October 3, 2026).** The owner questioned the "On
+budget" / "Off budget" wording in the accounts pane, then kept it. Checking
+an undo question in the same demo: Ctrl+Z undid two Assigned edits once the
+page had focus, but does nothing while a Budget amount box has focus, which
+it does right after Enter saves an amount (`src/index.tsx` skips undo when
+an input is focused) → UNDO-FIX. Feature requests recorded as GOAL-01 and
+LOAN-01 (backlog). The walkthrough ran on port 3028 (`redesign-walkthrough`
+in `.claude/launch.json`, local) because another session held 3018.
 
 ### Not checked in QA-01
 
