@@ -210,9 +210,10 @@ test.describe('Reports', () => {
         await expect
           .poll(() => chart.evaluate(el => el.clientHeight))
           .toBe(originalHeight);
+        // The redesigned legend scrolls its list, which follows the heading
         const legend = content
           .getByText('Category', { exact: true })
-          .locator('..');
+          .locator('xpath=following-sibling::*[1]');
         await expect
           .poll(() => legend.evaluate(el => el.scrollHeight > el.clientHeight))
           .toBe(true);
