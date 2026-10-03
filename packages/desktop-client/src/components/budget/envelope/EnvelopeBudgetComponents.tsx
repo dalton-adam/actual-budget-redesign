@@ -378,6 +378,9 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
           >
             <NotesButton
               id={`${category.id}-${month}`}
+              label={t('View month notes for {{name}}', {
+                name: category.name,
+              })}
               defaultColor={theme.pageTextLight}
             />
             <View
@@ -392,6 +395,9 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
             >
               <Button
                 variant="bare"
+                aria-label={t('Assigned amount menu for {{name}}', {
+                  name: category.name,
+                })}
                 onPress={() => {
                   resetBudgetPosition(2, -4);
                   setBudgetMenuOpen(true);
