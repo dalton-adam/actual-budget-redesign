@@ -810,3 +810,60 @@ lower half of the page).
 | Privacy (05b)            | Rules at 1440×900 and 1000×700 with privacy on: rule amounts stay visible. v26.9.0 does the same (no privacy filter in `rules/`), so this is upstream behaviour, not a regression. Tags and Settings show no amounts.                                                                                                                                                                       |
 | 1000×700 (05b, 05c)      | Both pages fit: toolbar on one line, table card with its header, no horizontal scroll.                                                                                                                                                                                                                                                                                                      |
 | Desktop build            | **Not run.** `scripts/redesign-electron.mjs` needs port 3001 for its renderer, held by another session's dev server.                                                                                                                                                                                                                                                                        |
+
+## QA-01 (started October 2, 2026)
+
+Branch `redesign/qa-01` from `redesign/main` at `83b4c8600` (v26.10.0 merged
+in SYNC-01). Status: **in progress**. Screenshots go in
+[verification/qa-01/](verification/qa-01/).
+
+### Brief (plan §15)
+
+**Objective.** Run the plan §12 matrix over the whole redesigned app on
+v26.10.0, record the evidence here, and fix or open a task for every
+regression found. QA-01 is the gate before RELEASE-01.
+
+**Starting state.** Every implementation task is merged and verified
+(backlog ledger). Checks the tasks left open, collected from the ledger and
+task reports: custom theme on APP-06a – f; keyboard on APP-06c – e; light,
+midnight, narrow and a screen reader on APP-06f; 1000×700 on APP-06a, b;
+the desktop build on APP-05b – d and APP-06a – f; 200% zoom, tracking
+budgets and privacy beyond earlier tasks (QA-00 "Not checked"). SYNC-01's
+follow-ups (upstream's bell, Notifications page and Monte Carlo Income
+table keep upstream styling; the "Redesigned sidebar" experimental toggle
+does nothing) are recorded as findings, not fixed here.
+
+**Allowed files.** This file, [backlog.md](backlog.md),
+[task-reports.md](task-reports.md), screenshots under
+`verification/qa-01/`; `scripts/redesign-perf.mjs` (QA-01 adds
+`PERF_CHANNEL` so it can drive the installed Edge; no measure changed).
+A small presentation fix for a regression found here, or a test that
+covers it, is named in the report with its own commit; anything larger, or
+anything touching protected areas, becomes a new task.
+
+**Protected.** Backend, financial calculations, schemas, sync, storage
+formats, custom-theme parsing, persisted preferences; no real budget, no
+sync server.
+
+**Checks.**
+
+| Area                 | Method                                                                                                                                                                                                                                       |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CHECK and unit tests | `typecheck`, `lint`, root `test`                                                                                                                                                                                                             |
+| E2E                  | `build:browser`, `node scripts/redesign.mjs preview`; every desktop E2E file (23) with `E2E_START_URL=http://127.0.0.1:3018`, installed Edge; the mobile files (7) recorded separately                                                       |
+| WIDE                 | `scripts/redesign-baseline.config.ts` against the preview                                                                                                                                                                                    |
+| Linux VRT            | Full run in Docker (`running-vrts`), no updates; any change inspected                                                                                                                                                                        |
+| Performance          | `scripts/redesign-perf.mjs run 7` at 1440×900 and 1000×700; base: upstream v26.10.0 (`2bebdbaae`) built in a separate worktree, `vite preview` on 127.0.0.1:3019; both measured in the same session on this machine; D-6 thresholds          |
+| Screens × themes     | Budget, account register, Reports (dashboard and one report of each kind), Schedules, Payees, Rules, Tags, Settings, a dialog, a menu, a toast; light, dark, midnight and a custom theme (QA-00's hue-rotated method); 1000×700 and 1440×900 |
+| Layout               | Narrow (compact navigation, details overlay), 200% zoom, long names, emoji and non-Latin first characters, large and negative amounts, a non-US number format                                                                                |
+| Keyboard and a11y    | Tab order and focus ring on every screen above; Escape and focus return in dialogs, menus and the details panel; accessible names; no colour-only warnings                                                                                   |
+| Privacy              | Privacy mode on every screen with amounts, including the details panel and charts                                                                                                                                                            |
+| Budget correctness   | Demo budget: record values, then assign, cover an overspend, move money, switch months and edit a transaction; check saved values, Ready to Assign, progress bars and the pace chart agree                                                   |
+| Tracking budget      | Switch the demo to tracking; Budget page and its menus work and read correctly                                                                                                                                                               |
+| Desktop build        | `node scripts/redesign-electron.mjs` (stage-0.md procedure): the main flows; native checks recorded separately                                                                                                                               |
+| Scope                | `git diff 2bebdbaae redesign/qa-01` over `packages/loot-core`, `packages/sync-server`, `packages/crdt`, `packages/api`, migrations, theme parsing and persisted preference keys                                                              |
+
+**Owner.** The plan §12 user walkthrough (find an account, inspect an
+envelope, assign until Ready to Assign is zero, cover an overspend, switch
+months, inspect a transaction, switch light and dark) is the owner's, in
+the disposable budget, once the checks above pass.

@@ -1,12 +1,14 @@
-// Times the same demo-budget actions in the v26.9.0 base build and the
+// Times the same demo-budget actions in the upstream base build and the
 // redesign build (QA-00; QA-01 reruns it against the recorded medians).
 // Method and results: docs/redesign/verification.md.
 //
 // Serve both builds first (the redesign with `node scripts/redesign.mjs
-// preview`, the base from a v26.9.0 worktree on another port), then:
+// preview`, the base from a worktree of the upstream release tag on another
+// port), then:
 //   node scripts/redesign-perf.mjs run [runs] [out.json] [WxH ...]
 //   node scripts/redesign-perf.mjs summary [out.json]
-// PERF_BASE_URL and PERF_REDESIGN_URL override the default ports.
+// PERF_BASE_URL and PERF_REDESIGN_URL override the default ports; PERF_CHANNEL
+// runs an installed browser (e.g. msedge) instead of Playwright's Chromium.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 import { chromium } from '@playwright/test';
@@ -303,7 +305,9 @@ async function oneRun(browser, build, [width, height], run) {
 }
 
 async function runAll() {
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({
+    channel: process.env.PERF_CHANNEL,
+  });
   const results = [];
   for (let run = 0; run < RUNS; run++) {
     for (const viewport of VIEWPORTS) {
