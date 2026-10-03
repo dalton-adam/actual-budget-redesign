@@ -63,7 +63,7 @@ Budget header are reference material, not tasks to build.
 | PERF-04            | not started | —                        | Optional (PERF-03): cut the open panel's resting cost on a month switch.                                                                          |
 | APP-07             | verified    | `d8ffb1955` (merge)      | Notifications page and Monte Carlo Income table restyled; sidebar flag hidden. Midnight, custom theme, desktop not run (task-reports.md).         |
 | A11Y-01            | verified    | `9b2d99060` (merge)      | Row menu and notes buttons named; the two notes stops are distinct (category, month), so both stay. Screen reader not run.                        |
-| UNDO-FIX           | not started | —                        | Ctrl+Z does nothing while a Budget amount box has focus, which it does right after Enter saves an amount (seen in the walkthrough).               |
+| UNDO-FIX           | verified    | (this merge)             | Ctrl+Z / Ctrl+Shift+Z in an unedited Budget amount box run app undo/redo; mid-edit keeps text undo. Tracking checked by code only.                |
 | GOAL-01            | not started | —                        | Owner request October 3, 2026: long-term planning goals on Budget rows. Design first; builds on `#goal` templates (decision D-3).                 |
 | LOAN-01            | not started | —                        | Owner request October 3, 2026: loan details on off-budget loan accounts, payoff dates, principal/interest split. Design first; may need a schema. |
 | RELEASE-01         | not started | —                        | —                                                                                                                                                 |

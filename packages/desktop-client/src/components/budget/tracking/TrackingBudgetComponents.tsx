@@ -23,6 +23,7 @@ import type {
   CategoryMonthProps,
 } from '#components/budget';
 import { BalanceWithCarryover } from '#components/budget/BalanceWithCarryover';
+import { useBudgetAmountUndoKeys } from '#components/budget/budgetAmountUndo';
 import { makeAmountGrey } from '#components/budget/util';
 import { NotesButton } from '#components/NotesButton';
 import { CellValue, CellValueText } from '#components/spreadsheet/CellValue';
@@ -205,6 +206,7 @@ export const CategoryMonth = memo(function CategoryMonth({
   const [menuOpen, setMenuOpen] = useState(false);
   const triggerRef = useRef(null);
   const format = useFormat();
+  const budgetAmountUndoKeys = useBudgetAmountUndoKeys();
 
   const [balanceMenuOpen, setBalanceMenuOpen] = useState(false);
   const triggerBalanceMenuRef = useRef(null);
@@ -392,6 +394,7 @@ export const CategoryMonth = memo(function CategoryMonth({
             unformatExpr: format.fromEdit,
           }}
           inputProps={{
+            ...budgetAmountUndoKeys,
             onBlur: () => {
               onEdit(null);
             },

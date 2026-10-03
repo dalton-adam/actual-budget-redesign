@@ -61,6 +61,25 @@ test.describe('Budget', () => {
     });
   });
 
+  test('undo and redo work right after Enter saves an amount', async () => {
+    const row = budgetPage.budgetTable.getByTestId('row').nth(1);
+    const categoryName =
+      (await row.getByTestId('category-name').textContent()) ?? '';
+    const budgetCell = row.getByTestId('budget').first();
+    const originalAmount = (await budgetCell.textContent()) ?? '';
+
+    await budgetPage.setBudgetedAmount(categoryName, '123.45');
+    await expect(budgetCell).toHaveText('123.45');
+    // Enter moves the edit to the next row, so an amount box has focus.
+    await expect(page.locator('input:focus')).toBeVisible();
+
+    await page.keyboard.press('ControlOrMeta+z');
+    await expect(budgetCell).toHaveText(originalAmount);
+
+    await page.keyboard.press('ControlOrMeta+Shift+z');
+    await expect(budgetCell).toHaveText('123.45');
+  });
+
   test('clicking on spent amounts opens a transaction page', async () => {
     const accountPage = await budgetPage.clickOnSpentAmountForRow(1);
     expect(page.url()).toContain('/accounts');

@@ -20,6 +20,7 @@ import type {
   CategoryMonthProps,
 } from '#components/budget';
 import { BalanceWithCarryover } from '#components/budget/BalanceWithCarryover';
+import { useBudgetAmountUndoKeys } from '#components/budget/budgetAmountUndo';
 import {
   ENVELOPE_ASSIGNED_TOOLS_WIDTH,
   envelopeCellBorderStyle,
@@ -259,6 +260,7 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
 }: CategoryMonthProps) {
   const { t } = useTranslation();
   const format = useFormat();
+  const budgetAmountUndoKeys = useBudgetAmountUndoKeys();
 
   const budgetMenuTriggerRef = useRef(null);
   const balanceMenuTriggerRef = useRef(null);
@@ -494,6 +496,7 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
             unformatExpr: format.fromEdit,
           }}
           inputProps={{
+            ...budgetAmountUndoKeys,
             onBlur: () => {
               onEdit(null);
             },
