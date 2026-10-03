@@ -12,6 +12,7 @@ import { css } from '@emotion/css';
 import { CategoryDetailsBody } from './CategoryDetailsBody';
 import {
   CATEGORY_DETAILS_PANEL_ID,
+  DeferredCategoryDetails,
   DETAILS_PANEL_GAP,
   useCategoryDetails,
 } from './CategoryDetailsContext';
@@ -49,7 +50,14 @@ export function CategoryDetailsPanel({ width }: CategoryDetailsPanelProps) {
   if (!details) {
     return null;
   }
-  const { month } = details;
+
+  // The frame renders at once, so the table never shifts; its contents
+  // follow when the browser is idle (DeferredCategoryDetails).
+  const contents = (
+    <DeferredCategoryDetails>
+      <CategoryDetailsContents />
+    </DeferredCategoryDetails>
+  );
 
   if (details.mode === 'overlay') {
     return (
@@ -84,10 +92,7 @@ export function CategoryDetailsPanel({ width }: CategoryDetailsPanelProps) {
             aria-label={t('Category details')}
             className={css({ display: 'flex', flex: 1, outline: 'none' })}
           >
-            <SurfaceCard style={panelCardStyle}>
-              <CategoryDetailsHeader month={month} />
-              <CategoryDetailsBody month={month} />
-            </SurfaceCard>
+            <SurfaceCard style={panelCardStyle}>{contents}</SurfaceCard>
           </Dialog>
         </Modal>
       </ModalOverlay>
@@ -118,10 +123,20 @@ export function CategoryDetailsPanel({ width }: CategoryDetailsPanelProps) {
         flexShrink: 0,
       })}
     >
-      <SurfaceCard style={panelCardStyle}>
-        <CategoryDetailsHeader month={month} />
-        <CategoryDetailsBody month={month} />
-      </SurfaceCard>
+      <SurfaceCard style={panelCardStyle}>{contents}</SurfaceCard>
     </aside>
+  );
+}
+
+function CategoryDetailsContents() {
+  const month = useCategoryDetails()?.month;
+  if (!month) {
+    return null;
+  }
+  return (
+    <>
+      <CategoryDetailsHeader month={month} />
+      <CategoryDetailsBody month={month} />
+    </>
   );
 }
