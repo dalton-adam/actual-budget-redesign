@@ -2131,3 +2131,30 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   Chromium is not installed on this machine; the shell recipe's anchored
   `'(^|/)FILE\.test\.ts$'` matches nothing on Windows, use
   `'(^|[\/])FILE\.test\.ts$'`.
+- RELEASE-01: **in review October 3, 2026**, branch `redesign/release-01`.
+  Owner choices the same day: **browser build first** (a side-by-side
+  desktop package is a later packaging task) and UNDO-FIX before the build.
+  **Delivered:** [release.md](release.md) (build record, install on the
+  Mac, walkthrough on an exported copy, export habit, switching options,
+  rollback); a `release` mode in `scripts/redesign.mjs` that serves the
+  same `build/` on 127.0.0.1:3016, so a real-budget copy lives in a browser
+  origin tests and demos never use; a line in the handbook. **Build:**
+  `build:browser` from `1f687b25d`, 209 files, 53 MB, contains UNDO-FIX
+  (checked in the bundle). **Found while verifying:** A11Y-01's names
+  ("Category menu for Starting Balances", "View notes for Starting
+  Balances") made the add-account helper's `getByLabel('Balance')` match
+  three elements, failing 8 `accounts` tests; A11Y-01 had run only the
+  Budget files. Fixed in the page model (`e2e/page-models/navigation.ts`,
+  by role), `5cc5c7f89`. **Checks:** E2E, every desktop file, against this
+  build with the installed Edge (scratch config, one worker, no retries):
+  116 passed and 8 failed, then `accounts` 12/12 after the fix, so
+  **124/124**. Release server: starts on 3016, `crossOriginIsolated`
+  true, welcome screen lists no budgets, no console errors; the import
+  path's wording (Import my budget → Actual → Select file...) read from
+  the running build and nothing imported. Migrations since v26.9.0: one
+  (`1788468782000_add_messages_pending`), hence rollback's "26.10.0 or
+  newer". **Open:** the owner's check on a copy of the real budget (plan
+  §13 exit condition); no Actual desktop app is installed on this Windows
+  machine, so the install steps are written for the Mac and not run
+  there; Actual does not request persistent browser storage (release.md
+  says to export after each session).
