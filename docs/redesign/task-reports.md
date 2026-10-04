@@ -2164,7 +2164,7 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   (Import my budget → nYNAB), rolls back to YNAB, drops the desktop-app
   version check, and gives install steps for either computer. nYNAB import
   on this build: `onboarding.test.ts` 6/6 (fictional file).
-- PKG-01: **in review October 3, 2026**, branch `redesign/pkg-01`. Owner
+- PKG-01: **merged October 3, 2026** (`cd67c0a23`); installed in `/Applications`. Owner
   request the same day: a desktop app to replace the browser tab, keeping
   the option of a sync server and bank sync later. **Delivered:**
   `scripts/redesign-package.mjs` builds `Actual Redesign.app` (macOS) with
