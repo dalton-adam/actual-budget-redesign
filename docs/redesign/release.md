@@ -5,14 +5,16 @@ browser build you run on your own computer. Plan §13 asks for a controlled,
 reversible release. This document is the build record, the install steps,
 the walkthrough to run on a copy of your YNAB budget, and the way back.
 
-**You don't have an Actual budget yet** (owner, October 3, 2026): your
-budget is in YNAB, and the installed Actual desktop app noted in Stage 0 has
-never held a real budget. So the copy to check comes from YNAB, and the way
-back is to keep using YNAB, which nothing here touches.
+**A copy of the owner's YNAB budget is now imported** (October 3, 2026)
+at the isolated release origin. The installed Actual desktop app and the
+original YNAB budget were not changed. The way back remains using YNAB.
 
-**State: waiting for the owner's check.** The build passes its tests (below).
-Plan §13 counts the release as delivered only once you have run it on a copy
-of your own budget (step 3) and found it usable.
+**State: import reconciliation passed; editing walkthrough still pending.**
+The owner reviewed the live YNAB budget against the imported copy. Account
+balances and current category totals match; the Ready to Assign difference
+is explained. See the [import verification record](ynab-import-check.md).
+Plan §13 counts the release as delivered only once the remaining workflow
+checks in step 3 are run on this copy and the owner finds it usable.
 
 ## What it is
 
@@ -44,11 +46,11 @@ after Enter saves an amount (UNDO-FIX). Full task list: the backlog ledger.
 - **Not checked:** a screen reader; the desktop (Electron) bundle; the
   tracking budget's Ctrl+Z by hand.
 - **Budgets live in the browser.** The browser build stores budgets in the
-  site's own storage for `127.0.0.1:3016`. Actual does not ask the browser
-  to keep that storage, so clearing site data, a browser reset or storage
-  pressure can remove it. Safari also clears storage for sites you have not
-  visited in a while. Use Chrome or Edge, and export after each session
-  (step 4).
+  site's own storage for `127.0.0.1:3016`. Actual requests persistent
+  storage, but the browser may deny that request. Clearing site data or
+  resetting the browser can still remove the budget; storage pressure can
+  remove it if persistence was not granted. Use the same browser, profile
+  and port, and export after each session (step 4).
 
 ## Verification of this build
 
@@ -128,6 +130,19 @@ Nothing you do in this copy reaches YNAB.
 
 Settings → **Export data** in the redesign, every time you finish. Keep the
 zips somewhere backed up. An export is the only copy outside the browser.
+
+The October 3 import has a private, restore-checked Actual ZIP at
+`data/redesign/private-budget/actual-test-budget-2026-10-03.zip` in the local
+checkout. The original YNAB JSON is alongside it. This directory is ignored
+by Git and is not served by the release server; it does not travel with a
+clone or a push. Copy the ZIP separately to your private backup location.
+It captures the imported snapshot, not edits made after that snapshot.
+
+To restore a separate copy, use a fresh browser profile, start the release
+server, open the budget list and choose **Import file** → **Actual**, then
+select the ZIP. Actual preserves the archive's budget ID: restoring into a
+profile that already contains that budget replaces its current data.
+Export any newer work before restoring there.
 
 ## 5. Switching for real
 
