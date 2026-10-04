@@ -1240,3 +1240,42 @@ for budget, onboarding and accounts **26/26**, no snapshot changed
 (bud-01 and detail-01 – 04 have no screenshots). Scratch scripts in
 `data/redesign/` (git-ignored): `perf-03-loaf.mjs`, `perf-03-trace.mjs`,
 `perf-03-clickprof.mjs`, `perf-03-renders.mjs`.
+
+## PKG-01 (October 3, 2026)
+
+Packaged macOS build from `redesign/pkg-01` (based on `eca4890ee`) with `node scripts/redesign-package.mjs`, on Apple silicon (macOS 27, Node 24.14.1, Electron 43.4.0). The installed Actual app (26.9.0, `com.actualbudget.actual`) was present and not running.
+
+### Build
+
+| Check                                                           | Result                                                                                         |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Bundle                                                          | `packages/desktop-electron/dist/mac-arm64/Actual Redesign.app`, 345 MB                         |
+| `Info.plist`                                                    | `CFBundleIdentifier` `io.github.dalton-adam.actual-redesign`, `CFBundleName` "Actual Redesign" |
+| Packaged `productName` (`app.asar`)                             | "Actual Redesign"                                                                              |
+| Signature                                                       | ad hoc, hardened runtime flag; not notarized                                                   |
+| JavaScript migrations in the packaged backend                   | all present, including `1788468782000_add_messages_pending`                                    |
+| Node native modules afterwards                                  | `better-sqlite3`, `bcrypt`, `argon2` load in Node; no `build/` folder left behind              |
+| `desktop-electron` typecheck; oxlint and oxfmt on changed files | pass                                                                                           |
+
+### Isolation run
+
+A scratch script (outside the repo) launched the app binary with `--remote-debugging-port`, drove it over CDP and, before quitting, listed every open file of the app's processes with `lsof`. It then compared modification times in the installed app's folders with the start of the run.
+
+| Check                                                                        | Result                                                                                                                                     |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| First launch                                                                 | Welcome screen, no budgets listed                                                                                                          |
+| Folders created                                                              | `~/Library/Application Support/Actual Redesign`, `~/Documents/Actual Redesign/Actual` only                                                 |
+| Try the demo                                                                 | Opened `app://actual/budget`, redesigned Budget page with details panel; budget saved as `~/Documents/Actual Redesign/Actual/_test-budget` |
+| Open files in `~/Library/Application Support/Actual` or `~/Documents/Actual` | 0 (55 in the app's own folders)                                                                                                            |
+| Files changed in those folders during the run                                | 0                                                                                                                                          |
+
+The test folders were deleted afterwards, so the first real launch starts empty.
+
+### Found and fixed
+
+1. **Backend failed to start:** loot-core creates only the last folder of the budget path, and `~/Documents/Actual Redesign` did not exist (`ENOENT`). `index.ts` now creates it.
+2. **No budget would open** ("Could not find JS migration code to run for 1788468782000"): the packaged backend was a stale bundle restored from lage's cache (stage-0.md, "Packaged desktop build"). The script now rebuilds it and checks every migration is present.
+
+### Not checked
+
+Intel Macs, Windows and Linux packages; the DMG; a screen reader; importing a real budget into the package (left for the owner); sync server and bank sync.

@@ -18,7 +18,7 @@ Browser storage is SQLite backed by origin-scoped IndexedDB, implemented in `pac
 
 No sync server is started or connected. No bank credentials or real budget exports are used. The launcher binds only to 127.0.0.1. Existing shared-memory COOP/COEP headers remain active.
 
-Electron's `index.ts` has separate development and packaged-data handling. Its `watch` script specifies ACTUAL_DOCUMENT_DIR and ACTUAL_DATA_DIR, but packaged builds override these defaults. **Do not assume environment variables alone make a packaged app safe.** The desktop review below (ELEC-01) covers development builds; packaged builds are still not safe to launch.
+Electron's `index.ts` has separate development and packaged-data handling. Its `watch` script specifies ACTUAL_DOCUMENT_DIR and ACTUAL_DATA_DIR, but packaged builds override these defaults. **Do not assume environment variables alone make a packaged app safe.** The desktop review below (ELEC-01) covers development builds. Packaged builds are safe only when built by `scripts/redesign-package.mjs` (PKG-01, below), which renames the app.
 
 ## Desktop isolation review (ELEC-01)
 
@@ -52,7 +52,7 @@ Traced through `packages/desktop-electron/index.ts`, `window-state.ts`, `package
 
 Only this procedure is approved for running the redesign as a desktop app. Use it for every desktop check until a packaging task changes the answer for packaged builds.
 
-1. **Never** run upstream's `yarn start:desktop`, `yarn workspace desktop-electron watch`, `yarn build:desktop` or the resulting `.app`/`.dmg`/`.exe`/`.appx` for this fork. Never open the fork's build with `open`, from Finder or from Explorer: it shares the installed app's bundle ID and app name.
+1. **Never** run upstream's `yarn start:desktop`, `yarn workspace desktop-electron watch`, `yarn build:desktop` or the resulting `.app`/`.dmg`/`.exe`/`.appx` for this fork. Never open the fork's build with `open`, from Finder or from Explorer: it shares the installed app's bundle ID and app name. The one exception is the renamed package from `scripts/redesign-package.mjs` (next section).
 2. One-time preparation, from the repository root:
 
    ```sh
@@ -87,9 +87,30 @@ Only this procedure is approved for running the redesign as a desktop app. Use i
 
 ### Remaining risks
 
-- **Packaged builds are not isolated** (point 3 above). Running one needs a separately scoped source change first, for example a distinct `productName`/`appId` for fork builds and honouring the directory variables when packaged. RELEASE-01 must not build or install a desktop package until that exists.
+- **Upstream-named packaged builds are not isolated** (point 3 above). Only the renamed package below is.
 - The development build loads the renderer from Vite (`http://localhost:3001`) rather than the packaged `app://actual` bundle, so desktop-only issues in the production bundle are not covered.
 - The script's change check compares modification times. It cannot see reads, and it would miss a change made and reverted within one run. `lsof` on the running processes (recorded in the verification record) is the check for open files; on Windows, Resource Monitor or Sysinternals Handle serves the same purpose.
+
+## Packaged desktop build (PKG-01)
+
+Added October 3, 2026, macOS only. `node scripts/redesign-package.mjs` builds `packages/desktop-electron/dist/mac-arm64/Actual Redesign.app` (`mac` on Intel), which can be installed beside the official app:
+
+|                                                       | Installed Actual                       | Actual Redesign                                 |
+| ----------------------------------------------------- | -------------------------------------- | ----------------------------------------------- |
+| Bundle ID                                             | `com.actualbudget.actual`              | `io.github.dalton-adam.actual-redesign`         |
+| Settings, window state, Chromium storage (`userData`) | `~/Library/Application Support/Actual` | `~/Library/Application Support/Actual Redesign` |
+| Default budget folder                                 | `~/Documents/Actual`                   | `~/Documents/Actual Redesign/Actual`            |
+
+How it is isolated:
+
+1. electron-builder gets `appId`, `productName` and `extraMetadata.productName` overrides on the command line; `package.json` is unchanged, so upstream's own builds keep their names. `app.getName()` reads the packaged `productName`, which names `userData`.
+2. `packages/desktop-electron/index.ts` gives any packaged build not named "Actual" a budget parent folder of `~/Documents/<name>` (loot-core appends `Actual`). An app named "Actual" behaves exactly as upstream.
+3. The script reads the built bundle's `Info.plist` and the `productName` inside `app.asar`, and fails if either still matches the installed app.
+4. The budget folder setting (Settings → Files, `document-dir`) lives in the renamed app's own `global-store.json`. Do not point it at `~/Documents/Actual`.
+
+Build notes: upstream's package script runs first with `--skip-exe-build --skip-translations` (English only; nothing downloaded), which also rebuilds the browser build in `packages/desktop-client/build/`. electron-builder's `beforePackHook` recompiles `better-sqlite3`, `bcrypt` and `argon2` for Electron in the shared `node_modules`; the script removes those Electron builds afterwards so Node uses its prebuilds again, and checks all three load. Upstream's package script builds the desktop backend (`build:node`) before `yarn build:browser`, whose cached lage `build` step for `@actual-app/core` can restore an older `lib-dist/**`, including a stale `bundle.desktop.js`. The first PKG-01 build shipped such a bundle, without the 26.10.0 migration `1788468782000_add_messages_pending`, and no budget would open. The script therefore rebuilds the backend, `update-client` and `build:dist` afterwards, and fails if any JavaScript migration in `packages/loot-core/migrations/` is missing from the packaged bundle. With no signing identity the app is signed ad hoc (`afterSignHook`) and not notarized. A locally built app carries no quarantine flag, so it opens without a Gatekeeper prompt on this Mac; copied to another Mac it would need right-click → Open. Upstream has no auto-updater in `desktop-electron`, so the app never fetches official releases. Updating means pulling, rerunning the script and replacing the app in `/Applications`.
+
+The isolation evidence is in the [verification record](verification.md#pkg-01-october-3-2026).
 
 ## Code map
 
