@@ -60,13 +60,69 @@ test.describe('BUD-01 month toolbar and summary cards', () => {
     const cardAmount = await budgetPage.readyToAssignCard
       .getByTestId('ready-to-assign-amount')
       .textContent();
-    await expect(breakdown.getByTestId(/to-budget$/)).toHaveText(
-      cardAmount ?? '',
-    );
+    await expect(
+      breakdown.getByTestId('ready-to-assign-breakdown-total'),
+    ).toHaveText(cardAmount ?? '');
     await expect(page.getByRole('menu')).toBeVisible();
 
     await page.keyboard.press('Escape');
     await expect(breakdown).toBeHidden();
+  });
+
+  test('money assigned next month comes out of this month (RTA-01)', async () => {
+    const month = await budgetPage.getSelectedMonth();
+    const amountText = budgetPage.readyToAssignCard.getByTestId(
+      'ready-to-assign-amount',
+    );
+    const readAmount = async () =>
+      Number(((await amountText.textContent()) ?? '').replace(/,/g, ''));
+    const before = await readAmount();
+
+    await page.evaluate(async currentMonth => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const $send = (window as any).$send as (
+        type: string,
+        args?: unknown,
+      ) => Promise<{
+        value?: number | null;
+        list?: Array<{ id: string; is_income: boolean; hidden: boolean }>;
+      }>;
+      const [year, monthNumber] = currentMonth.split('-').map(Number);
+      const next =
+        monthNumber === 12
+          ? `${year + 1}-01`
+          : `${year}-${String(monthNumber + 1).padStart(2, '0')}`;
+      const { list = [] } = await $send('get-categories');
+      const category = list.find(c => !c.is_income && !c.hidden);
+      if (!category) {
+        throw new Error('No expense category in the test budget');
+      }
+      const sheetName = `budget${next.replace('-', '')}`;
+      const { value } = await $send('get-cell', {
+        sheetName,
+        name: `budget-${category.id}`,
+      });
+      await $send('budget/budget-amount', {
+        month: next,
+        category: category.id,
+        amount: (value ?? 0) + 1000000,
+      });
+    }, month);
+
+    // $10,000 is more than the test budget has, so it reaches this month.
+    await expect.poll(readAmount).toBeLessThan(before);
+    await expect(budgetPage.readyToAssignCard).toHaveAttribute(
+      'data-kind',
+      'negative',
+    );
+    const breakdown = await budgetPage.openReadyToAssignBreakdown();
+    await expect(
+      breakdown.getByTestId('ready-to-assign-needed-later'),
+    ).toBeVisible();
+    await expect(
+      breakdown.getByTestId('ready-to-assign-breakdown-total'),
+    ).toHaveText((await amountText.textContent()) ?? '');
+    await page.keyboard.press('Escape');
   });
 
   test('month stepper and Today move the focused month', async () => {

@@ -24,6 +24,7 @@ import { envelopeBudget } from '#spreadsheet/bindings';
 
 import { ReadyToAssignBreakdown } from './ReadyToAssignBreakdown';
 import { ToBudgetPopover } from './ToBudget';
+import { useReadyToAssign } from './useReadyToAssign';
 
 type ReadyToAssignKind = 'positive' | 'zero' | 'negative';
 
@@ -53,7 +54,7 @@ export function ReadyToAssignCard({
   const [menuOpen, setMenuOpen] = useState(false);
   const [position, setPosition] = useState({ crossOffset: 0, offset: 0 });
 
-  const toBudget = useEnvelopeSheetValue(envelopeBudget.toBudget) ?? 0;
+  const { readyToAssign, neededForLaterMonths } = useReadyToAssign(month);
   // The spreadsheet cache only refreshes subscribed cells. Subscribe to the
   // breakdown's and menu's cells while the card is shown, as the always
   // visible TotalsList did, so opening the popover never shows a stale value.
@@ -65,7 +66,7 @@ export function ReadyToAssignCard({
   useEnvelopeSheetValue(envelopeBudget.autoBuffered);
   useEnvelopeSheetValue(envelopeBudget.totalIncome);
   useEnvelopeSheetValue(envelopeBudget.fromLastMonth);
-  const kind = getReadyToAssignKind(toBudget);
+  const kind = getReadyToAssignKind(readyToAssign);
   const prevMonthName = monthUtils.format(
     monthUtils.prevMonth(month),
     'MMM',
@@ -107,7 +108,7 @@ export function ReadyToAssignCard({
   const amount = (
     <PrivacyFilter>
       <FinancialText style={{ color: amountColor }}>
-        {format(toBudget, 'financial')}
+        {format(readyToAssign, 'financial')}
       </FinancialText>
     </PrivacyFilter>
   );
@@ -217,7 +218,12 @@ export function ReadyToAssignCard({
         placement="bottom start"
         style={{ width: 300, margin: 1 }}
         header={
-          <ReadyToAssignBreakdown month={month} prevMonthName={prevMonthName} />
+          <ReadyToAssignBreakdown
+            month={month}
+            prevMonthName={prevMonthName}
+            readyToAssign={readyToAssign}
+            neededForLaterMonths={neededForLaterMonths}
+          />
         }
         {...position}
       />
