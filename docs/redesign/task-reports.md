@@ -2186,3 +2186,31 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   clean. **Open:** the owner installing it and importing their budget;
   Intel, Windows and Linux; notarization (needs an Apple Developer
   account).
+- RTA-01: **in review October 3, 2026** (branch `redesign/rta-01`). Owner
+  request the same day: Ready to Assign should go down when money is
+  assigned to a later month, as in YNAB. Owner approved: always on; the
+  month's own To Budget stays traceable in the breakdown; To Budget menu
+  amounts are not capped. **Delivered:** `useReadyToAssign.ts` reads the
+  existing `to-budget` and `last-month-overspent` cells of every later month
+  inside the budget bounds and shows the lowest To Budget from the focused
+  month on, after adding back later months' overspending (so this month's
+  overspending stays in next month, as Actual puts it). Past months are
+  unchanged. Takes nothing out until every later month has loaded. The
+  card, compact strip and breakdown use it; the breakdown adds "Needed for
+  later months" when non-zero. No loot-core, spreadsheet cell, menu or
+  mobile change. **Found while verifying:** the first version also counted
+  October's overspending, which Actual subtracts from November, as "needed
+  for later months" (the demo showed −104.49 with nothing assigned in
+  November); fixed and covered by a unit test. **Checks:** unit tests
+  `useReadyToAssign.test.ts` 10/10; `yarn typecheck` passed; oxlint (0
+  errors) and oxfmt on changed files; E2E `bud-01` + `budget` 14/14 in
+  Chromium against a dev server (new test: $10,000 assigned next month
+  makes this month negative and shows the new row); Impeccable detector
+  `[]`. Demo budget by hand: October 0.00 with 104.49 overspent;
+  $300 assigned to Food in November → October −300.00 Overassigned and
+  breakdown 4,230.83 − 1,200.83 − 3,030.00 − 0.00 − 300.00 = −300.00;
+  removing it → 0.00 and the row disappears. **Open:** VRT not run (the
+  fixtures have nothing assigned in later months, so no snapshot should
+  change); light, midnight and custom theme not checked; mobile still
+  shows the month's own To Budget (mobile deferred, plan §19.4); not yet
+  checked on the private YNAB-import copy.

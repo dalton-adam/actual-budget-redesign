@@ -75,6 +75,19 @@ figures and "never color alone" stay in force.
   Budget menu actions in their existing conditions (Move to a category, Hold
   for next month, Cover from a category, Reset next month's buffer, Disable
   current auto hold). No new "Assign" action. **Approved.**
+- **Ready to Assign takes out money assigned in later months** (RTA-01,
+  owner decision October 3, 2026). Actual's To Budget carries forward, so
+  money assigned in November never lowered October's figure; YNAB's does.
+  For the current and future months, the card shows the lowest To Budget
+  from the focused month to the last budget month, after adding back each
+  later month's "Overspent in previous month" (overspending stays in the
+  month after it, as in Actual). Past months show their own To Budget. When
+  this takes something out, the breakdown adds a **Needed for later
+  months** row (tooltip gives this month's own amount) before the total,
+  so the rows still add up. Always on, no setting. Every spreadsheet cell,
+  To Budget menu action and its conditions, the Ready to Assign entry in
+  category pickers, the Hold dialog, mobile, reports and the API keep the
+  month's own To Budget. **Approved.**
 - **Assigned** card: existing total budgeted, subline "across N categories".
 - **Activity** card: existing total spent plus a stacked bar of the six
   largest spending categories in their accents, then "other" (faint), then
@@ -952,17 +965,18 @@ Confirm or change these before the named task starts; until then the
 
 ## 12. Evidence
 
-| Date         | Review                                                                                                                                                   | Record                                                                                                                           |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Sep 27, 2026 | Plan §1.1 owner decisions                                                                                                                                | [plan.md](plan.md) §1.1                                                                                                          |
-| Sep 27, 2026 | DESIGN-01 review: layout A, summary cards, all three themes, panel on Budget only                                                                        | [prototype README](prototype/README.md#owner-decisions-september-27-2026), commit `78f444a86`                                    |
-| Sep 27, 2026 | DESIGN-02 walkthrough: 44px rows, collapsible accounts pane, one month at a time, empty bar for negative Available without spending, reconciliation band | [prototype README](prototype/README.md#owner-decisions-september-27-2026-walkthrough), commit `aa422ef87`, screenshots `18`–`50` |
-| Sep 27, 2026 | After NAV-01: accounts pane default confirmed (open at 1280px and wider, collapsed below; §2, §11 item 4)                                                | Owner confirmation in the NAV-01 session                                                                                         |
-| Sep 28, 2026 | DETAIL-02: third stat tile "From previous month" confirmed (§5, §11 item 1); the panel lists posted transactions only                                    | Owner confirmation in the DETAIL-02 session                                                                                      |
-| Sep 29, 2026 | DETAIL-04: pace chart for past and future months as §7.2 (§11 item 2); goal box contents (§5 item 4)                                                     | Owner confirmation in the DETAIL-04 session                                                                                      |
-| Sep 29, 2026 | APP-01: account hero as drawn (§10, §11 item 5); balance toggle kept; bank-sync error moves into the hero                                                | Owner answers in the APP-01 session                                                                                              |
-| Oct 1, 2026  | APP-06a: dialogs take the popover shadow (added to the approved depth list); other questions left to the implementer (§10g)                              | Owner answers in the APP-06a session                                                                                             |
-| Oct 2, 2026  | APP-06b: menus and popovers take a 12px card frame, Row Hover rows, key caps; tooltips unchanged (§10h)                                                  | Owner answers in the APP-06b session                                                                                             |
-| Oct 2, 2026  | APP-06c: toasts take a neutral card with the popover shadow (added to the approved depth list) and a status icon; check for `message` (§10i)             | Owner answers in the APP-06c session                                                                                             |
-| Oct 2, 2026  | APP-06d: section errors take a neutral title and a red status icon; Fatal Error gets a button row with Restart app as primary (§10j)                     | Owner answers in the APP-06d session                                                                                             |
-| Sep 30, 2026 | APP-02: register as drawn (§10, §11 item 5); dividers instead of stripes; payee initial in the category accent; square tags in the register only         | Owner answers in the APP-02 session                                                                                              |
+| Date         | Review                                                                                                                                                             | Record                                                                                                                           |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| Sep 27, 2026 | Plan §1.1 owner decisions                                                                                                                                          | [plan.md](plan.md) §1.1                                                                                                          |
+| Sep 27, 2026 | DESIGN-01 review: layout A, summary cards, all three themes, panel on Budget only                                                                                  | [prototype README](prototype/README.md#owner-decisions-september-27-2026), commit `78f444a86`                                    |
+| Sep 27, 2026 | DESIGN-02 walkthrough: 44px rows, collapsible accounts pane, one month at a time, empty bar for negative Available without spending, reconciliation band           | [prototype README](prototype/README.md#owner-decisions-september-27-2026-walkthrough), commit `aa422ef87`, screenshots `18`–`50` |
+| Sep 27, 2026 | After NAV-01: accounts pane default confirmed (open at 1280px and wider, collapsed below; §2, §11 item 4)                                                          | Owner confirmation in the NAV-01 session                                                                                         |
+| Sep 28, 2026 | DETAIL-02: third stat tile "From previous month" confirmed (§5, §11 item 1); the panel lists posted transactions only                                              | Owner confirmation in the DETAIL-02 session                                                                                      |
+| Sep 29, 2026 | DETAIL-04: pace chart for past and future months as §7.2 (§11 item 2); goal box contents (§5 item 4)                                                               | Owner confirmation in the DETAIL-04 session                                                                                      |
+| Sep 29, 2026 | APP-01: account hero as drawn (§10, §11 item 5); balance toggle kept; bank-sync error moves into the hero                                                          | Owner answers in the APP-01 session                                                                                              |
+| Oct 1, 2026  | APP-06a: dialogs take the popover shadow (added to the approved depth list); other questions left to the implementer (§10g)                                        | Owner answers in the APP-06a session                                                                                             |
+| Oct 2, 2026  | APP-06b: menus and popovers take a 12px card frame, Row Hover rows, key caps; tooltips unchanged (§10h)                                                            | Owner answers in the APP-06b session                                                                                             |
+| Oct 2, 2026  | APP-06c: toasts take a neutral card with the popover shadow (added to the approved depth list) and a status icon; check for `message` (§10i)                       | Owner answers in the APP-06c session                                                                                             |
+| Oct 2, 2026  | APP-06d: section errors take a neutral title and a red status icon; Fatal Error gets a button row with Restart app as primary (§10j)                               | Owner answers in the APP-06d session                                                                                             |
+| Oct 3, 2026  | RTA-01: Ready to Assign takes out money assigned in later months, always on; the month's own figure stays in the breakdown; To Budget menu amounts not capped (§3) | Owner answers in the RTA-01 session                                                                                              |
+| Sep 30, 2026 | APP-02: register as drawn (§10, §11 item 5); dividers instead of stripes; payee initial in the category accent; square tags in the register only                   | Owner answers in the APP-02 session                                                                                              |
