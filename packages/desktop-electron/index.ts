@@ -65,7 +65,15 @@ if (isPlaywrightTest) {
   }
 } else {
   if (!isDev || !process.env.ACTUAL_DOCUMENT_DIR) {
-    process.env.ACTUAL_DOCUMENT_DIR = app.getPath('documents');
+    // A build packaged under another name (the redesign's "Actual Redesign")
+    // already gets its own userData folder; give it its own budget folder too,
+    // so it never opens the installed app's budgets in ~/Documents/Actual.
+    process.env.ACTUAL_DOCUMENT_DIR =
+      app.getName() === 'Actual'
+        ? app.getPath('documents')
+        : path.join(app.getPath('documents'), app.getName());
+    // loot-core creates only the last folder (<this>/Actual).
+    fs.mkdirSync(process.env.ACTUAL_DOCUMENT_DIR, { recursive: true });
   }
 
   if (!isDev || !process.env.ACTUAL_DATA_DIR) {

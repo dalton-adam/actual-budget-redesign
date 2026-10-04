@@ -2164,3 +2164,25 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   (Import my budget → nYNAB), rolls back to YNAB, drops the desktop-app
   version check, and gives install steps for either computer. nYNAB import
   on this build: `onboarding.test.ts` 6/6 (fictional file).
+- PKG-01: **in review October 3, 2026**, branch `redesign/pkg-01`. Owner
+  request the same day: a desktop app to replace the browser tab, keeping
+  the option of a sync server and bank sync later. **Delivered:**
+  `scripts/redesign-package.mjs` builds `Actual Redesign.app` (macOS) with
+  bundle ID `io.github.dalton-adam.actual-redesign` and product name
+  "Actual Redesign", passed to electron-builder on the command line so
+  upstream's `package.json` and builds are unchanged; `desktop-electron`'s
+  `index.ts` gives a packaged build with any other name the budget folder
+  `~/Documents/<name>/Actual` (an app named "Actual" behaves as upstream).
+  The script checks the bundle ID, both names and every JavaScript
+  migration in the packaged backend, and puts the Node builds of the three
+  native modules back. Docs: stage-0.md "Packaged desktop build",
+  release.md "Desktop app (macOS)". **Found while verifying:** the backend
+  could not create `~/Documents/Actual Redesign` (fixed in `index.ts`), and
+  upstream's package script ships a stale backend restored from lage's
+  cache, so no budget opened (fixed in the script). **Checks:**
+  verification.md "PKG-01": demo budget opens on the packaged app; `lsof`
+  shows no open file, and modification times show no change, in the
+  installed app's folders; `desktop-electron` typecheck; oxlint and oxfmt
+  clean. **Open:** the owner installing it and importing their budget;
+  Intel, Windows and Linux; notarization (needs an Apple Developer
+  account).

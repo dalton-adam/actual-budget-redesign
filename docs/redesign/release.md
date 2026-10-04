@@ -157,8 +157,28 @@ The release does not decide this. If the copy works for you:
   session (step 4). Entering the same spending in both means keeping two
   budgets by hand.
 
-A desktop package of the redesign, with its own name and folders, is a
-separate packaging task.
+A desktop package of the redesign now exists for macOS (PKG-01): see
+"Desktop app" below.
+
+## Desktop app (macOS)
+
+Instead of the browser build, you can run the redesign as a Mac app named
+**Actual Redesign**. It has its own settings and budget folders and never
+opens the official Actual app's data (stage-0.md, "Packaged desktop build").
+
+```sh
+node scripts/redesign-package.mjs
+```
+
+Drag `packages/desktop-electron/dist/mac-arm64/Actual Redesign.app` into
+`/Applications`. Budgets are saved as files in
+`~/Documents/Actual Redesign/Actual`, which Time Machine backs up. To move
+your budget over, export it from the browser build (Settings → **Export
+data**), then in the app choose **Import file** → **Actual**. After that,
+use one or the other; they do not sync with each other.
+
+To update: pull, rerun the script, quit the app and replace it in
+`/Applications`. Your budgets stay in `~/Documents/Actual Redesign`.
 
 ## Rollback
 
@@ -181,4 +201,4 @@ separate packaging task.
 - Plan §13: once the redesign is accepted, remove preview scaffolding in a
   separate change.
 - Next tasks: GOAL-01 and LOAN-01 (each designed and approved first), the
-  packaging task, and optional PERF-04.
+  packaging task (done for macOS: PKG-01), and optional PERF-04.
