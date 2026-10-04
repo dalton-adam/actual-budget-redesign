@@ -1,6 +1,6 @@
 // @ts-strict-ignore
 import React from 'react';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, MouseEvent } from 'react';
 
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -27,6 +27,9 @@ import { RenderMonths } from './RenderMonths';
 import { SidebarCategory } from './SidebarCategory';
 
 import { useBudgetComponents } from '.';
+
+const ROW_CONTROL_SELECTOR =
+  'button, a, input, textarea, select, [role="button"], [role="menuitem"]';
 
 type ExpenseCategoryProps = {
   cat: CategoryEntity;
@@ -86,10 +89,30 @@ export function ExpenseCategory({
   // edge (design-decisions §4.2).
   const isDetailsSubject =
     !!details && details.isShown && details.selectedCategoryId === cat.id;
+  const opensDetails = isEnvelopeTable && !!details && cat.id !== 'new';
+
+  // A click anywhere on the row opens its details, except on the row's own
+  // controls. The name stays the keyboard opener (SidebarCategory).
+  const onRowClick = (e: MouseEvent<HTMLDivElement>) => {
+    if (!opensDetails || dragState || e.defaultPrevented) {
+      return;
+    }
+    const target = e.target as Element;
+    // Popovers opened from the row are portaled out of it but still bubble
+    // their React events here.
+    if (
+      !e.currentTarget.contains(target) ||
+      target.closest(ROW_CONTROL_SELECTOR)
+    ) {
+      return;
+    }
+    details.openCategory(cat.id);
+  };
 
   return (
     <Row
       innerRef={dropRef}
+      onClick={onRowClick}
       collapsed
       height={isEnvelopeTable ? ENVELOPE_CATEGORY_ROW_HEIGHT : undefined}
       style={{
