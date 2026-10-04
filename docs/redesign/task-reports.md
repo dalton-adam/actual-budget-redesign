@@ -2186,7 +2186,7 @@ IncomeHeader,RenderMonths}.tsx`, `C/budget/envelope/EnvelopeBudgetComponents.tsx
   clean. **Open:** the owner installing it and importing their budget;
   Intel, Windows and Linux; notarization (needs an Apple Developer
   account).
-- RTA-01: **in review October 3, 2026** (branch `redesign/rta-01`). Owner
+- RTA-01: **merged October 3, 2026** (`d0f9b8928`). Owner
   request the same day: Ready to Assign should go down when money is
   assigned to a later month, as in YNAB. Owner approved: always on; the
   month's own To Budget stays traceable in the breakdown; To Budget menu

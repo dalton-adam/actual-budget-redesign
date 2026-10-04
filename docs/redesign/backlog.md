@@ -68,7 +68,7 @@ Budget header are reference material, not tasks to build.
 | LOAN-01            | not started | —                        | Owner request October 3, 2026: loan details on off-budget loan accounts, payoff dates, principal/interest split. Design first; may need a schema.    |
 | RELEASE-01         | review      | `d6a318942` (merge)      | Browser build on 127.0.0.1:3016, release.md. Waits on the owner checking a copy of their YNAB budget (release.md step 3).                            |
 | PKG-01             | verified    | `cd67c0a23` (merge)      | Packaged macOS app "Actual Redesign": own bundle ID, settings and budget folders; isolation run clean (verification.md). Ad hoc signed, macOS only.  |
-| RTA-01             | review      | branch `redesign/rta-01` | Owner request October 3, 2026: Ready to Assign takes out money assigned in later months (design-decisions §3). Desktop only; mobile keeps To Budget. |
+| RTA-01             | verified    | `d0f9b8928` (merge)      | Owner request October 3, 2026: Ready to Assign takes out money assigned in later months (design-decisions §3). Desktop only; mobile keeps To Budget. |
 
 States follow plan §16: not started, ready, in progress, review, verified,
 blocked. All application work not marked verified is pending; this document
